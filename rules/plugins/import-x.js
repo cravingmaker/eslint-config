@@ -41,7 +41,6 @@ const staticAnalysisRules = {
 		'error',
 		{
 			caseSensitive: true,
-			ignore: [],
 		},
 	],
 	'import-x/no-useless-path-segments': ['error', { noUselessIndex: true }],
@@ -55,15 +54,9 @@ const staticAnalysisRules = {
 			maxDepth: Infinity,
 		},
 	],
-	'import-x/no-internal-modules': [
-		'off',
-		{
-			allow: [],
-			forbid: [],
-		},
-	],
+	'import-x/no-internal-modules': 'off',
 	'import-x/no-relative-parent-imports': 'off',
-	'import-x/no-restricted-paths': ['off', { zones: [] }],
+	'import-x/no-restricted-paths': 'off',
 	'import-x/no-webpack-loader-syntax': 'off',
 };
 
@@ -71,7 +64,7 @@ const styleGuideRules = {
 	'import-x/consistent-type-specifier-style': ['error', 'prefer-top-level'],
 	'import-x/exports-last': 'error',
 	'import-x/extensions': ['error', 'never', { fix: true }],
-	'import-x/first': 'absolute-first',
+	'import-x/first': ['error', 'absolute-first'],
 	'import-x/group-exports': 'error',
 	'import-x/newline-after-import': [
 		'error',
@@ -191,7 +184,7 @@ const styleGuideRules = {
 	],
 	'import-x/no-named-export': 'off',
 	'import-x/prefer-default-export': 'off',
-	'import-x/prefer-namespace-import': ['off', { patterns: [] }],
+	'import-x/prefer-namespace-import': 'off',
 };
 
 const importXRules = {
