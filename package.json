@@ -1,0 +1,35 @@
+{
+	"name": "@cravingmaker/eslint-config",
+	"version": "0.0.1",
+	"description": "Craving Maker's ESLint configuration (Flat Config)",
+	"keywords": [
+		"cravingmaker",
+		"eslint",
+		"eslintconfig",
+		"style",
+		"code-style",
+		"lint"
+	],
+	"homepage": "https://github.com/cravingmaker/eslint-config#readme",
+	"bugs": {
+		"url": "https://github.com/cravingmaker/eslint-config/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/cravingmaker/eslint-config.git"
+	},
+	"license": "MIT",
+	"author": "cravingmaker (https://github.com/cravingmaker)",
+	"type": "module",
+	"exports": "./index.js",
+	"peerDependencies": {
+		"eslint": ">=10.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"eslint-plugin-import-x": "^4.16.2",
+		"eslint-plugin-unused-imports": "^4.4.1"
+	}
+}

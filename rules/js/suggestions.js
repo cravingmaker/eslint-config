@@ -1,0 +1,391 @@
+const recommendedSuggestionRules = {
+	'no-case-declarations': 'error',
+	'no-delete-var': 'error',
+	'no-empty-static-block': 'error',
+	'no-extra-boolean-cast': ['error', {}],
+	'no-global-assign': ['error', { exceptions: [] }],
+	'no-nonoctal-decimal-escape': 'error',
+	'no-octal': 'error',
+	'no-redeclare': ['error', { builtinGlobals: true }],
+	'no-regex-spaces': 'error',
+	'no-shadow-restricted-names': ['error', { reportGlobalThis: true }],
+	'no-unused-labels': 'error',
+	'no-useless-catch': 'error',
+	'no-useless-escape': ['error', { allowRegexCharacters: [] }],
+	'no-with': 'error',
+	'preserve-caught-error': ['error', { requireCatchParameter: false }],
+	'require-yield': 'error',
+
+	// Rules with overridden options
+	'no-empty': ['error', { allowEmptyCatch: true }],
+};
+
+const suggestionRules = {
+	...recommendedSuggestionRules,
+
+	'accessor-pairs': [
+		'error',
+		{
+			enforceForClassMembers: true,
+			enforceForTSTypes: false,
+			getWithoutSet: false,
+			setWithoutGet: true,
+		},
+	],
+	'arrow-body-style': ['error', 'as-needed'],
+	'block-scoped-var': 'error',
+	camelcase: [
+		'error',
+		{
+			allow: [],
+			ignoreDestructuring: false,
+			ignoreGlobals: false,
+			ignoreImports: false,
+			properties: 'always',
+		},
+	],
+	complexity: [
+		'error',
+		{
+			max: 20,
+			variant: 'classic',
+		},
+	],
+	'default-case': ['error', {}],
+	'default-case-last': 'error',
+	'dot-notation': ['error', { allowKeywords: true }],
+	eqeqeq: ['error', 'always'],
+	'max-depth': ['error', { max: 4 }],
+	'no-alert': 'error',
+	'no-array-constructor': 'error',
+	'no-bitwise': [
+		'error',
+		{
+			allow: [],
+			int32Hint: false,
+		},
+	],
+	'no-caller': 'error',
+	'no-eq-null': 'error',
+	'no-eval': ['error', { allowIndirect: false }],
+	'no-extend-native': ['error', { exceptions: [] }],
+	'no-extra-bind': 'error',
+	'no-extra-label': 'error',
+	'no-implicit-coercion': [
+		'error',
+		{
+			allow: [],
+			boolean: true,
+			disallowTemplateShorthand: false,
+			number: true,
+			string: true,
+		},
+	],
+	'no-implicit-globals': ['error', { lexicalBindings: false }],
+	'no-implied-eval': 'error',
+	'no-iterator': 'error',
+	'no-label-var': 'error',
+	'no-labels': [
+		'error',
+		{
+			allowLoop: false,
+			allowSwitch: false,
+		},
+	],
+	'no-lone-blocks': 'error',
+	'no-lonely-if': 'error',
+	'no-multi-assign': ['error', { ignoreNonDeclaration: false }],
+	'no-multi-str': 'error',
+	'no-negated-condition': 'error',
+	'no-new': 'error',
+	'no-new-func': 'error',
+	'no-new-wrappers': 'error',
+	'no-object-constructor': 'error',
+	'no-octal-escape': 'error',
+	'no-proto': 'error',
+	'no-script-url': 'error',
+	'no-throw-literal': 'error',
+	'no-undef-init': 'error',
+	'no-unneeded-ternary': ['error', { defaultAssignment: true }],
+	'no-useless-call': 'error',
+	'no-useless-computed-key': ['error', { enforceForClassMembers: true }],
+	'no-useless-concat': 'error',
+	'no-useless-constructor': 'error',
+	'no-useless-rename': [
+		'error',
+		{
+			ignoreDestructuring: false,
+			ignoreExport: false,
+			ignoreImport: false,
+		},
+	],
+	'no-useless-return': 'error',
+	'no-var': 'error',
+	'no-warning-comments': [
+		'error',
+		{
+			location: 'start',
+			terms: ['todo', 'fixme', 'xxx'],
+		},
+	],
+	'operator-assignment': ['error', 'always'],
+	'prefer-arrow-callback': [
+		'error',
+		{
+			allowNamedFunctions: false,
+			allowUnboundThis: true,
+		},
+	],
+	'prefer-exponentiation-operator': 'error',
+	'prefer-numeric-literals': 'error',
+	'prefer-object-has-own': 'error',
+	'prefer-object-spread': 'error',
+	'prefer-promise-reject-errors': ['error', { allowEmptyReject: false }],
+	'prefer-rest-params': 'error',
+	'prefer-spread': 'error',
+	'prefer-template': 'error',
+	radix: 'error',
+	yoda: [
+		'error',
+		'never',
+		{
+			exceptRange: false,
+			onlyEquality: false,
+		},
+	],
+
+	// Rules with overridden options
+	'func-name-matching': [
+		'error',
+		'always',
+		{
+			considerPropertyDescriptor: true,
+			includeCommonJSModuleExports: false,
+		},
+	],
+	'func-names': ['error', 'never', { generators: 'never' }],
+	'grouped-accessor-pairs': [
+		'error',
+		'getBeforeSet',
+		{
+			enforceForTSTypes: false,
+		},
+	],
+	'max-lines': [
+		'error',
+		{
+			max: 1500,
+			skipBlankLines: true,
+			skipComments: true,
+		},
+	],
+	'max-nested-callbacks': ['error', 4],
+	'max-params': [
+		'error',
+		{
+			countThis: 'except-void',
+			max: 4,
+		},
+	],
+	'no-else-return': ['error', { allowElseIf: false }],
+	'no-return-assign': ['error', 'always'],
+	'no-sequences': ['error', { allowInParentheses: false }],
+	'no-unused-expressions': [
+		'error',
+		{
+			allowShortCircuit: false,
+			allowTaggedTemplates: false,
+			allowTernary: false,
+			enforceForJSX: true,
+			ignoreDirectives: false,
+		},
+	],
+	'no-void': ['error', { allowAsStatement: false }],
+	'object-shorthand': [
+		'error',
+		'always',
+		{
+			avoidExplicitReturnArrows: true,
+			avoidQuotes: false,
+			ignoreConstructors: false,
+		},
+	],
+	'one-var': ['error', 'never'],
+	'prefer-const': [
+		'error',
+		{
+			destructuring: 'all',
+			ignoreReadBeforeAssign: false,
+		},
+	],
+	'prefer-destructuring': [
+		'error',
+		{
+			AssignmentExpression: {
+				array: false,
+				object: false,
+			},
+			VariableDeclarator: {
+				array: false,
+				object: true,
+			},
+		},
+		{ enforceForRenamedProperties: false },
+	],
+	'prefer-regex-literals': ['error', { disallowRedundantWrapping: true }],
+	'require-unicode-regexp': ['error', { requireFlag: 'v' }],
+
+	// Handled by Prettier
+	curly: ['off', 'all'],
+
+	// Turned off rules
+	'capitalized-comments': [
+		'off',
+		{
+			ignoreConsecutiveComments: false,
+			ignoreInlineComments: false,
+		},
+	],
+	'class-methods-use-this': [
+		'off',
+		{
+			enforceForClassFields: true,
+			exceptMethods: [],
+			ignoreOverrideMethods: false,
+		},
+	],
+	'consistent-return': ['off', { treatUndefinedAsUnspecified: false }],
+	'consistent-this': ['off', 'that'],
+	'default-param-last': 'off',
+	'guard-for-in': 'off',
+	'id-denylist': 'off',
+	'id-length': [
+		'off',
+		{
+			exceptionPatterns: [],
+			exceptions: [],
+			max: Infinity,
+			min: 2,
+			properties: 'always',
+		},
+	],
+	'id-match': [
+		'off',
+		'^.+$',
+		{
+			classFields: false,
+			ignoreDestructuring: false,
+			onlyDeclarations: false,
+			properties: false,
+		},
+	],
+	'init-declarations': ['off', 'always'],
+	'max-classes-per-file': [
+		'off',
+		{
+			ignoreExpressions: false,
+			max: 1,
+		},
+	],
+	'max-lines-per-function': [
+		'off',
+		{
+			IIFEs: false,
+			max: 50,
+			skipBlankLines: true,
+			skipComments: true,
+		},
+	],
+	'max-statements': ['off', 10],
+	'new-cap': [
+		'off',
+		{
+			capIsNew: true,
+			capIsNewExceptions: [],
+			newIsCap: true,
+			newIsCapExceptions: [],
+			properties: true,
+		},
+	],
+	'no-console': ['off', { allow: [] }],
+	'no-continue': 'off',
+	'no-div-regex': 'off',
+	'no-empty-function': ['off', { allow: [] }],
+	'no-inline-comments': ['off', {}],
+	'no-invalid-this': ['off', { capIsConstructor: true }],
+	'no-loop-func': 'off',
+	'no-magic-numbers': [
+		'off',
+		{
+			detectObjects: false,
+			enforceConst: false,
+			ignore: [],
+			ignoreArrayIndexes: false,
+			ignoreClassFieldInitialValues: false,
+			ignoreDefaultValues: false,
+		},
+	],
+	'no-nested-ternary': 'off',
+	'no-param-reassign': ['off', { props: false }],
+	'no-plusplus': ['off', { allowForLoopAfterthoughts: false }],
+	'no-restricted-exports': ['off', {}],
+	'no-restricted-globals': ['off', {}],
+	'no-restricted-imports': ['off', {}],
+	'no-restricted-properties': 'off',
+	'no-restricted-syntax': 'off',
+	'no-shadow': [
+		'off',
+		{
+			allow: [],
+			builtinGlobals: false,
+			hoist: 'functions',
+			ignoreFunctionTypeParameterNameValueShadow: true,
+			ignoreOnInitialization: false,
+			ignoreTypeValueShadow: true,
+		},
+	],
+	'no-ternary': 'off',
+	'no-undefined': 'off',
+	'no-underscore-dangle': [
+		'off',
+		{
+			allow: [],
+			allowAfterSuper: false,
+			allowAfterThis: false,
+			allowAfterThisConstructor: false,
+			allowFunctionParams: true,
+			allowInArrayDestructuring: true,
+			allowInObjectDestructuring: true,
+			enforceInClassFields: false,
+			enforceInMethodNames: false,
+		},
+	],
+	'prefer-named-capture-group': 'off',
+	'require-await': 'off',
+	'sort-imports': [
+		'off',
+		{
+			allowSeparatedGroups: false,
+			ignoreCase: false,
+			ignoreDeclarationSort: false,
+			ignoreMemberSort: false,
+			memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
+		},
+	],
+	'sort-keys': [
+		'off',
+		'asc',
+		{
+			allowLineSeparatedGroups: false,
+			caseSensitive: true,
+			ignoreComputedKeys: false,
+			minKeys: 2,
+			natural: false,
+		},
+	],
+	'sort-vars': ['off', { ignoreCase: false }],
+	strict: ['off', 'safe'],
+	'vars-on-top': 'off',
+};
+
+export { recommendedSuggestionRules, suggestionRules };
