@@ -164,7 +164,7 @@ const styleGuideRules = {
 	'import-x/order': [
 		'error',
 		{
-			groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object'],
+			groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
 			'newlines-between': 'always',
 			alphabetize: {
 				order: 'asc',
@@ -194,4 +194,4 @@ const importXRules = {
 	...styleGuideRules,
 };
 
-export { helpfulWarningRules, moduleSystemRules, staticAnalysisRules, styleGuideRules, importXRules };
+export { importXRules };

@@ -1,3 +1,5 @@
+import { noUnusedVarsOptions, noUseBeforeDefineOptions } from '../common.js';
+
 const recommendedPossibleProblemRules = {
 	'constructor-super': 'error',
 	'for-direction': 'error',
@@ -69,25 +71,13 @@ const recommendedPossibleProblemRules = {
 	'no-unused-vars': [
 		'error',
 		{
-			args: 'after-used',
-			argsIgnorePattern: '^_',
-			caughtErrors: 'all',
-			caughtErrorsIgnorePattern: '^_',
-			destructuredArrayIgnorePattern: '^_',
-			ignoreClassWithStaticInitBlock: false,
-			ignoreRestSiblings: true,
-			ignoreUsingDeclarations: false,
-			reportUsedIgnorePattern: false,
-			vars: 'all',
-			varsIgnorePattern: '^_',
+			...noUnusedVarsOptions,
 		},
 	],
 
-	// Handled by Prettier
-	'no-unexpected-multiline': 'off',
-
 	// Turned off rules
 	'no-useless-assignment': 'off', // Often produces noise in control flow and refactoring patterns
+	'no-unexpected-multiline': 'off', // Handled by Prettier
 };
 
 const possibleProblemRules = {
@@ -120,19 +110,8 @@ const possibleProblemRules = {
 			includeExports: false,
 		},
 	],
-	'no-use-before-define': [
-		'off',
-		{
-			allowNamedExports: false,
-			classes: true,
-			enums: true,
-			functions: true,
-			ignoreTypeReferences: true,
-			typedefs: true,
-			variables: true,
-		},
-	],
+	'no-use-before-define': ['off', { ...noUseBeforeDefineOptions }],
 	'require-atomic-updates': ['off', { allowProperties: false }],
 };
 
-export { recommendedPossibleProblemRules, possibleProblemRules };
+export { possibleProblemRules };

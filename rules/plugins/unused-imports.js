@@ -1,27 +1,17 @@
+import { noUnusedVarsOptions } from '../common.js';
+
 const unusedImportsRules = {
 	'unused-imports/no-unused-imports': 'error',
 
 	// Rules with overridden options
+	'@typescript-eslint/no-unused-vars': 'off',
+	'no-unused-vars': 'off',
 	'unused-imports/no-unused-vars': [
 		'error',
 		{
-			args: 'after-used',
-			argsIgnorePattern: '^_',
-			caughtErrors: 'all',
-			caughtErrorsIgnorePattern: '^_',
-			destructuredArrayIgnorePattern: '^_',
-			ignoreClassWithStaticInitBlock: false,
-			ignoreRestSiblings: true,
-			ignoreUsingDeclarations: false,
-			reportUsedIgnorePattern: false,
-			vars: 'all',
-			varsIgnorePattern: '^_',
+			...noUnusedVarsOptions,
 		},
 	],
-
-	// Turned off conflicted rules
-	'no-unused-vars': 'off',
-	'@typescript-eslint/no-unused-vars': 'off',
 };
 
 export { unusedImportsRules };

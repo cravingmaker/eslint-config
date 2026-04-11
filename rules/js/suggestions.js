@@ -1,3 +1,15 @@
+import {
+	classMethodsUseThisOptions,
+	consistentReturnOptions,
+	dotNotationOptions,
+	maxParamsOptions,
+	noEmptyFunctionOptions,
+	noUnusedExpressionsOptions,
+	preferDestructuring1stOptions,
+	preferDestructuring2ndOptions,
+	preferPromiseRejectErrorsOptions,
+} from '../common.js';
+
 const recommendedSuggestionRules = {
 	'no-case-declarations': 'error',
 	'no-delete-var': 'error',
@@ -53,7 +65,7 @@ const suggestionRules = {
 	],
 	'default-case': ['error', {}],
 	'default-case-last': 'error',
-	'dot-notation': ['error', { allowKeywords: true }],
+	'dot-notation': ['error', { ...dotNotationOptions }],
 	eqeqeq: ['error', 'always'],
 	'max-depth': ['error', { max: 4 }],
 	'no-alert': 'error',
@@ -140,7 +152,7 @@ const suggestionRules = {
 	'prefer-numeric-literals': 'error',
 	'prefer-object-has-own': 'error',
 	'prefer-object-spread': 'error',
-	'prefer-promise-reject-errors': ['error', { allowEmptyReject: false }],
+	'prefer-promise-reject-errors': ['error', { ...preferPromiseRejectErrorsOptions }],
 	'prefer-rest-params': 'error',
 	'prefer-spread': 'error',
 	'prefer-template': 'error',
@@ -180,24 +192,14 @@ const suggestionRules = {
 		},
 	],
 	'max-nested-callbacks': ['error', 4],
-	'max-params': [
-		'error',
-		{
-			countThis: 'except-void',
-			max: 4,
-		},
-	],
+	'max-params': ['error', { ...maxParamsOptions }],
 	'no-else-return': ['error', { allowElseIf: false }],
 	'no-return-assign': ['error', 'always'],
 	'no-sequences': ['error', { allowInParentheses: false }],
 	'no-unused-expressions': [
 		'error',
 		{
-			allowShortCircuit: false,
-			allowTaggedTemplates: false,
-			allowTernary: false,
-			enforceForJSX: true,
-			ignoreDirectives: false,
+			...noUnusedExpressionsOptions,
 		},
 	],
 	'no-void': ['error', { allowAsStatement: false }],
@@ -218,25 +220,9 @@ const suggestionRules = {
 			ignoreReadBeforeAssign: false,
 		},
 	],
-	'prefer-destructuring': [
-		'error',
-		{
-			AssignmentExpression: {
-				array: false,
-				object: false,
-			},
-			VariableDeclarator: {
-				array: false,
-				object: true,
-			},
-		},
-		{ enforceForRenamedProperties: false },
-	],
+	'prefer-destructuring': ['error', { ...preferDestructuring1stOptions }, { ...preferDestructuring2ndOptions }],
 	'prefer-regex-literals': ['error', { disallowRedundantWrapping: true }],
 	'require-unicode-regexp': ['error', { requireFlag: 'v' }],
-
-	// Handled by Prettier
-	curly: ['off', 'all'],
 
 	// Turned off rules
 	'capitalized-comments': [
@@ -246,16 +232,10 @@ const suggestionRules = {
 			ignoreInlineComments: false,
 		},
 	],
-	'class-methods-use-this': [
-		'off',
-		{
-			enforceForClassFields: true,
-			exceptMethods: [],
-			ignoreOverrideMethods: false,
-		},
-	],
-	'consistent-return': ['off', { treatUndefinedAsUnspecified: false }],
+	'class-methods-use-this': ['off', { ...classMethodsUseThisOptions }],
+	'consistent-return': ['off', { ...consistentReturnOptions }],
 	'consistent-this': ['off', 'that'],
+	curly: ['off', 'all'], // Handled by Prettier
 	'default-param-last': 'off',
 	'guard-for-in': 'off',
 	'id-denylist': 'off',
@@ -310,7 +290,7 @@ const suggestionRules = {
 	'no-console': ['off', { allow: [] }],
 	'no-continue': 'off',
 	'no-div-regex': 'off',
-	'no-empty-function': ['off', { allow: [] }],
+	'no-empty-function': ['off', { ...noEmptyFunctionOptions }],
 	'no-inline-comments': ['off', {}],
 	'no-invalid-this': ['off', { capIsConstructor: true }],
 	'no-loop-func': 'off',
@@ -388,4 +368,4 @@ const suggestionRules = {
 	'vars-on-top': 'off',
 };
 
-export { recommendedSuggestionRules, suggestionRules };
+export { suggestionRules };
