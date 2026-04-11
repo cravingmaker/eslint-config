@@ -4,6 +4,7 @@ import {
 	dotNotationOptions,
 	maxParamsOptions,
 	noEmptyFunctionOptions,
+	noShadowOptions,
 	noUnusedExpressionsOptions,
 	preferDestructuring1stOptions,
 	preferDestructuring2ndOptions,
@@ -56,6 +57,7 @@ const suggestionRules = {
 			properties: 'always',
 		},
 	],
+	'class-methods-use-this': ['error', { ...classMethodsUseThisOptions }],
 	complexity: [
 		'error',
 		{
@@ -65,6 +67,7 @@ const suggestionRules = {
 	],
 	'default-case': ['error', {}],
 	'default-case-last': 'error',
+	'default-param-last': 'error',
 	'dot-notation': ['error', { ...dotNotationOptions }],
 	eqeqeq: ['error', 'always'],
 	'max-depth': ['error', { max: 4 }],
@@ -78,6 +81,7 @@ const suggestionRules = {
 		},
 	],
 	'no-caller': 'error',
+	'no-empty-function': ['error', { ...noEmptyFunctionOptions }],
 	'no-eq-null': 'error',
 	'no-eval': ['error', { allowIndirect: false }],
 	'no-extend-native': ['error', { exceptions: [] }],
@@ -106,6 +110,7 @@ const suggestionRules = {
 	],
 	'no-lone-blocks': 'error',
 	'no-lonely-if': 'error',
+	'no-loop-func': 'error',
 	'no-multi-assign': ['error', { ignoreNonDeclaration: false }],
 	'no-multi-str': 'error',
 	'no-negated-condition': 'error',
@@ -165,6 +170,7 @@ const suggestionRules = {
 			onlyEquality: false,
 		},
 	],
+	'require-await': 'error',
 
 	// Rules with overridden options
 	'func-name-matching': [
@@ -196,6 +202,7 @@ const suggestionRules = {
 	'no-else-return': ['error', { allowElseIf: false }],
 	'no-return-assign': ['error', 'always'],
 	'no-sequences': ['error', { allowInParentheses: false }],
+	'no-shadow': ['error', { ...noShadowOptions }],
 	'no-unused-expressions': [
 		'error',
 		{
@@ -232,11 +239,9 @@ const suggestionRules = {
 			ignoreInlineComments: false,
 		},
 	],
-	'class-methods-use-this': ['off', { ...classMethodsUseThisOptions }],
 	'consistent-return': ['off', { ...consistentReturnOptions }],
 	'consistent-this': ['off', 'that'],
 	curly: ['off', 'all'], // Handled by Prettier
-	'default-param-last': 'off',
 	'guard-for-in': 'off',
 	'id-denylist': 'off',
 	'id-length': [
@@ -290,10 +295,8 @@ const suggestionRules = {
 	'no-console': ['off', { allow: [] }],
 	'no-continue': 'off',
 	'no-div-regex': 'off',
-	'no-empty-function': ['off', { ...noEmptyFunctionOptions }],
 	'no-inline-comments': ['off', {}],
 	'no-invalid-this': ['off', { capIsConstructor: true }],
-	'no-loop-func': 'off',
 	'no-magic-numbers': [
 		'off',
 		{
@@ -313,17 +316,6 @@ const suggestionRules = {
 	'no-restricted-imports': ['off', {}],
 	'no-restricted-properties': 'off',
 	'no-restricted-syntax': 'off',
-	'no-shadow': [
-		'off',
-		{
-			allow: [],
-			builtinGlobals: false,
-			hoist: 'functions',
-			ignoreFunctionTypeParameterNameValueShadow: true,
-			ignoreOnInitialization: false,
-			ignoreTypeValueShadow: true,
-		},
-	],
 	'no-ternary': 'off',
 	'no-undefined': 'off',
 	'no-underscore-dangle': [
@@ -341,7 +333,6 @@ const suggestionRules = {
 		},
 	],
 	'prefer-named-capture-group': 'off',
-	'require-await': 'off',
 	'sort-imports': [
 		'off',
 		{

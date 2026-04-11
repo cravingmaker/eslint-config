@@ -91,6 +91,7 @@ const possibleProblemRules = {
 	'no-template-curly-in-string': 'error',
 	'no-unmodified-loop-condition': 'error',
 	'no-unreachable-loop': ['error', { ignore: [] }],
+	'no-use-before-define': ['error', { ...noUseBeforeDefineOptions }],
 
 	// Rules with overridden options
 	'array-callback-return': [
@@ -110,7 +111,6 @@ const possibleProblemRules = {
 			includeExports: false,
 		},
 	],
-	'no-use-before-define': ['off', { ...noUseBeforeDefineOptions }],
 	'require-atomic-updates': ['off', { allowProperties: false }],
 };
 

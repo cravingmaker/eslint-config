@@ -4,6 +4,7 @@ import {
 	dotNotationOptions,
 	maxParamsOptions,
 	noEmptyFunctionOptions,
+	noShadowOptions,
 	noUnusedExpressionsOptions,
 	noUnusedVarsOptions,
 	noUseBeforeDefineOptions,
@@ -40,11 +41,7 @@ const tsEslintConflictedEslintRecommendedRules = {
 	'no-undef': 'off', // ts(2304) & ts(2552)
 	'no-unreachable': 'off', // ts(7027)
 	'no-unsafe-negation': 'off', // ts(2365) & ts(2322) & ts(2358)
-	'no-var': 'error', // ts transpiles let/const to var, so no need for vars any more
 	'no-with': 'off', // ts(1101) & ts(2410)
-	'prefer-const': 'error', // ts provides better types with const
-	'prefer-rest-params': 'error', // ts provides better types with rest args over arg@typescript-eslint/semiuments
-	'prefer-spread': 'error', // ts transpiles spread to apply, so no need for manual apply
 
 	...tsEslintDeprecatedConflictedEslintRecommendedRules,
 };
@@ -409,7 +406,6 @@ const tsEslintDeprecatedOtherRules = {
 	'@typescript-eslint/sort-type-constituents': 'off', // Deprecated in favor of the perfectionist/sort-intersection-types and perfectionist/sort-union-types rule
 	'@typescript-eslint/no-var-requires': 'off', // Deprecated in favour of the @typescript-eslint/no-require-imports rule
 
-	'no-loss-of-precision': 'error', // Use ESLint's rule instead
 	'@typescript-eslint/no-loss-of-precision': 'off', // Deprecated because the base eslint/no-loss-of-precision added support for numeric separators
 
 	// Will be removed in a future major version of typescript-eslint
@@ -560,6 +556,8 @@ const tsEslintOtherRules = {
 			},
 		},
 	],
+
+	'no-use-before-define': 'off',
 	'@typescript-eslint/no-use-before-define': [
 		'error',
 		{
@@ -584,11 +582,7 @@ const tsEslintOtherRules = {
 	'@typescript-eslint/no-shadow': [
 		'error',
 		{
-			allow: [],
-			builtinGlobals: false,
-			ignoreFunctionTypeParameterNameValueShadow: true,
-			ignoreOnInitialization: false,
-			ignoreTypeValueShadow: true,
+			...noShadowOptions,
 
 			hoist: 'functions-and-types',
 		},
@@ -644,29 +638,6 @@ const tsEslintOtherRules = {
 };
 
 const tsEslintOtherTypeCheckedOnlyRules = {
-	'@typescript-eslint/naming-convention': [
-		'error',
-		{
-			selector: 'default',
-			format: ['camelCase'],
-			leadingUnderscore: 'allow',
-			trailingUnderscore: 'allow',
-		},
-		{
-			selector: 'import',
-			format: ['camelCase', 'PascalCase'],
-		},
-		{
-			selector: 'variable',
-			format: ['camelCase', 'UPPER_CASE'],
-			leadingUnderscore: 'allow',
-			trailingUnderscore: 'allow',
-		},
-		{
-			selector: 'typeLike',
-			format: ['PascalCase'],
-		},
-	],
 	'@typescript-eslint/no-unnecessary-qualifier': 'error',
 	'@typescript-eslint/no-unsafe-type-assertion': 'error',
 	'@typescript-eslint/prefer-readonly': ['error', { onlyInlineLambdas: false }],
@@ -704,6 +675,31 @@ const tsEslintOtherTypeCheckedOnlyRules = {
 			considerDefaultExhaustiveForUnions: false,
 			defaultCaseCommentPattern: '^no default$',
 			requireDefaultForNonUnion: true,
+		},
+	],
+
+	camelcase: 'off',
+	'@typescript-eslint/naming-convention': [
+		'error',
+		{
+			selector: 'default',
+			format: ['camelCase'],
+			leadingUnderscore: 'allow',
+			trailingUnderscore: 'allow',
+		},
+		{
+			selector: 'import',
+			format: ['camelCase', 'PascalCase'],
+		},
+		{
+			selector: 'variable',
+			format: ['camelCase', 'UPPER_CASE'],
+			leadingUnderscore: 'allow',
+			trailingUnderscore: 'allow',
+		},
+		{
+			selector: 'typeLike',
+			format: ['PascalCase'],
 		},
 	],
 

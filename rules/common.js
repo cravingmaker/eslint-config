@@ -15,6 +15,15 @@ const maxParamsOptions = {
 
 const noEmptyFunctionOptions = { allow: [] };
 
+const noShadowOptions = {
+	allow: [],
+	builtinGlobals: false,
+	hoist: 'functions',
+	ignoreFunctionTypeParameterNameValueShadow: true,
+	ignoreOnInitialization: false,
+	ignoreTypeValueShadow: true,
+};
+
 const noUnusedExpressionsOptions = {
 	allowShortCircuit: true,
 	allowTaggedTemplates: true,
@@ -70,6 +79,7 @@ export {
 	dotNotationOptions,
 	maxParamsOptions,
 	noEmptyFunctionOptions,
+	noShadowOptions,
 	noUnusedExpressionsOptions,
 	noUnusedVarsOptions,
 	noUseBeforeDefineOptions,

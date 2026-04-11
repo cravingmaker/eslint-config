@@ -63,7 +63,7 @@ const staticAnalysisRules = {
 const styleGuideRules = {
 	'import-x/consistent-type-specifier-style': ['error', 'prefer-top-level'],
 	'import-x/exports-last': 'error',
-	'import-x/extensions': ['error', 'never', { fix: true }],
+	'import-x/extensions': ['error', 'ignorePackages', { js: 'always' }],
 	'import-x/first': ['error', 'absolute-first'],
 	'import-x/group-exports': 'error',
 	'import-x/newline-after-import': [
