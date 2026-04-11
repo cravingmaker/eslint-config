@@ -4,6 +4,9 @@ import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescrip
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
+import pluginHtmlReact from '@html-eslint/eslint-plugin-react';
+import pluginHtml from '@html-eslint/eslint-plugin';
+import htmlParser from '@html-eslint/parser';
 import pluginJson from '@eslint/json';
 import { eslintCommentsRules } from './rules/plugins/eslint-comments.js';
 import { importXRules } from './rules/plugins/import-x.js';
@@ -12,6 +15,8 @@ import { suggestionRules } from './rules/js/suggestions.js';
 import { unusedImportsRules } from './rules/plugins/unused-imports.js';
 import { tsEslintRules, tsEslintTypeCheckedRules } from './rules/ts/typescript-eslint.js';
 import { json5EslintRules, jsoncEslintRules, jsonEslintRules } from './rules/plugins/json.js';
+import { htmlEslintRules } from './rules/plugins/html.js';
+import { htmlReactEslintRules } from './rules/plugins/html-react.js';
 
 /**
  * @param {Object} [options]
@@ -26,12 +31,15 @@ export function createConfig({
 	ignores = [],
 	jsRules = {},
 	tsRules = {},
+	reactRules = {},
+	htmlRules = {},
 	jsonRules = {},
 	jsoncRules = {},
 	json5Rules = {},
 	ts = true,
 	tsTypeChecked = true,
 	tsconfigRootDir = process.cwd(),
+	react = true,
 } = {}) {
 	return defineConfig([
 		globalIgnores(['node_modules/', 'dist/', 'build/', 'coverage/', ...ignores]),
@@ -64,6 +72,9 @@ export function createConfig({
 			? [
 					{
 						files: ['**/*.{ts,mts,tsx,mtsx}'],
+						plugins: {
+							'@typescript-eslint': tseslint.plugin,
+						},
 						languageOptions: {
 							parser: tseslint.parser,
 							parserOptions: tsTypeChecked
@@ -73,9 +84,6 @@ export function createConfig({
 										tsconfigRootDir,
 									}
 								: { sourceType: 'module' },
-						},
-						plugins: {
-							'@typescript-eslint': tseslint.plugin,
 						},
 						settings: {
 							'import-x/resolver-next': [
@@ -98,6 +106,41 @@ export function createConfig({
 					},
 				]
 			: []),
+
+		...(react
+			? [
+					{
+						files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
+						plugins: {
+							'@html-eslint/react': pluginHtmlReact,
+						},
+						languageOptions: {
+							parserOptions: {
+								ecmaFeatures: {
+									jsx: true,
+								},
+							},
+						},
+						rules: {
+							...htmlReactEslintRules,
+							...reactRules,
+						},
+					},
+				]
+			: []),
+
+		{
+			files: ['**/*.html'],
+			plugins: { '@html-eslint': pluginHtml },
+			language: 'html/html',
+			languageOptions: {
+				parser: htmlParser,
+			},
+			rules: {
+				...htmlEslintRules,
+				...htmlRules,
+			},
+		},
 
 		{
 			files: ['**/*.json'],
