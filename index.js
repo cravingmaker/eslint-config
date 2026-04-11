@@ -1,5 +1,6 @@
 import pluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments';
-import pluginImportX from 'eslint-plugin-import-x';
+import pluginImportX, { createNodeResolver } from 'eslint-plugin-import-x';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
@@ -68,6 +69,15 @@ export function createConfig({
 			},
 			plugins: {
 				'@typescript-eslint': tseslint.plugin,
+			},
+			settings: {
+				'import-x/resolver-next': [
+					createTypeScriptImportResolver({
+						alwaysTryTypes: true,
+						...(tsconfigRootDir ? { project: tsconfigRootDir } : {}),
+					}),
+					createNodeResolver(),
+				],
 			},
 			rules: {
 				...possibleProblemRules,
