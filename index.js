@@ -4,12 +4,14 @@ import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescrip
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import tseslint from 'typescript-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
+import pluginJson from '@eslint/json';
 import { eslintCommentsRules } from './rules/plugins/eslint-comments.js';
 import { importXRules } from './rules/plugins/import-x.js';
 import { possibleProblemRules } from './rules/js/possible-problems.js';
 import { suggestionRules } from './rules/js/suggestions.js';
 import { unusedImportsRules } from './rules/plugins/unused-imports.js';
 import { tsEslintRules, tsEslintTypeCheckedRules } from './rules/ts/typescript-eslint.js';
+import { json5EslintRules, jsoncEslintRules, jsonEslintRules } from './rules/plugins/json.js';
 
 /**
  * @param {Object} [options]
@@ -24,6 +26,9 @@ export function createConfig({
 	ignores = [],
 	jsRules = {},
 	tsRules = {},
+	jsonRules = {},
+	jsoncRules = {},
+	json5Rules = {},
 	ts = true,
 	tsTypeChecked = true,
 	tsconfigRootDir = process.cwd(),
@@ -55,39 +60,74 @@ export function createConfig({
 			},
 		},
 
-		...(ts ? [{
-			files: ['**/*.{ts,mts,tsx,mtsx}'],
-			languageOptions: {
-				parser: tseslint.parser,
-				parserOptions: tsTypeChecked
-					? {
-							sourceType: 'module',
-							projectService: true,
-							tsconfigRootDir,
-						}
-					: { sourceType: 'module' },
-			},
-			plugins: {
-				'@typescript-eslint': tseslint.plugin,
-			},
-			settings: {
-				'import-x/resolver-next': [
-					createTypeScriptImportResolver({
-						alwaysTryTypes: true,
-						...(tsconfigRootDir ? { project: tsconfigRootDir } : {}),
-					}),
-					createNodeResolver(),
-				],
-			},
+		...(ts
+			? [
+					{
+						files: ['**/*.{ts,mts,tsx,mtsx}'],
+						languageOptions: {
+							parser: tseslint.parser,
+							parserOptions: tsTypeChecked
+								? {
+										sourceType: 'module',
+										projectService: true,
+										tsconfigRootDir,
+									}
+								: { sourceType: 'module' },
+						},
+						plugins: {
+							'@typescript-eslint': tseslint.plugin,
+						},
+						settings: {
+							'import-x/resolver-next': [
+								createTypeScriptImportResolver({
+									alwaysTryTypes: true,
+									...(tsconfigRootDir ? { project: tsconfigRootDir } : {}),
+								}),
+								createNodeResolver(),
+							],
+						},
+						rules: {
+							...possibleProblemRules,
+							...suggestionRules,
+							...(tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules),
+							...unusedImportsRules,
+							...importXRules,
+							...eslintCommentsRules,
+							...tsRules,
+						},
+					},
+				]
+			: []),
+
+		{
+			files: ['**/*.json'],
+			ignores: ['**/package-lock.json', '**/yarn.lock'],
+			plugins: { pluginJson },
+			language: 'json/json',
 			rules: {
-				...possibleProblemRules,
-				...suggestionRules,
-				...(tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules),
-				...unusedImportsRules,
-				...importXRules,
-				...eslintCommentsRules,
-				...tsRules,
+				...jsonEslintRules,
+				...jsonRules,
 			},
-		}] : []),
+		},
+
+		{
+			files: ['**/*.jsonc', '**/tsconfig*.json', '**/.vscode/*.json', '**/.devcontainer/*.json'],
+			plugins: { pluginJson },
+			language: 'json/jsonc',
+			rules: {
+				...jsoncEslintRules,
+				...jsoncRules,
+			},
+		},
+
+		{
+			files: ['**/*.json5'],
+			plugins: { pluginJson },
+			language: 'json/json5',
+			rules: {
+				...json5EslintRules,
+				...json5Rules,
+			},
+		},
 	]);
 }
