@@ -176,7 +176,6 @@ const tsEslintRecommendedTypeCheckedOnlyRules = {
 		'error',
 		{
 			...preferPromiseRejectErrorsOptions,
-
 			allow: [],
 			allowThrowingAny: false,
 			allowThrowingUnknown: false,
@@ -234,7 +233,6 @@ const tsEslintRecommendedTypeCheckedOnlyRules = {
 };
 
 const tsEslintStylisticRules = {
-	'@typescript-eslint/adjacent-overload-signatures': 'error',
 	'@typescript-eslint/ban-tslint-comment': 'error',
 	'@typescript-eslint/class-literal-property-style': ['error', 'fields'],
 	'@typescript-eslint/consistent-generic-constructors': ['error', 'constructor'],
@@ -264,6 +262,9 @@ const tsEslintStylisticRules = {
 		},
 	],
 	'@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+
+	// Turned off rules
+	'@typescript-eslint/adjacent-overload-signatures': 'off', // Use ESLint's perfectionist/sort-object-types and perfectionist/sort-interfaces rule instead
 };
 
 const tsEslintStylisticTypeCheckedOnlyRules = {
@@ -278,7 +279,6 @@ const tsEslintStylisticTypeCheckedOnlyRules = {
 		'error',
 		{
 			...dotNotationOptions,
-
 			allowIndexSignaturePropertyAccess: false,
 			allowPrivateClassPropertyAccess: false,
 			allowProtectedClassPropertyAccess: false,
@@ -435,7 +435,6 @@ const tsEslintOtherRules = {
 		'error',
 		{
 			...classMethodsUseThisOptions,
-
 			ignoreClassesThatImplementAnInterface: 'public-fields',
 			ignoreOverrideMethods: true,
 		},
@@ -458,8 +457,38 @@ const tsEslintOtherRules = {
 			},
 		},
 	],
-	'@typescript-eslint/member-ordering': [
+
+	'no-use-before-define': 'off',
+	'@typescript-eslint/no-use-before-define': [
 		'error',
+		{
+			...noUseBeforeDefineOptions,
+			functions: false,
+			typedefs: true,
+		},
+	],
+
+	'max-params': 'off',
+	'@typescript-eslint/max-params': [
+		'error',
+		{
+			...maxParamsOptions,
+			countVoidThis: false,
+		},
+	],
+
+	'no-shadow': 'off',
+	'@typescript-eslint/no-shadow': [
+		'error',
+		{
+			...noShadowOptions,
+			hoist: 'functions-and-types',
+		},
+	],
+
+	// Turned off rules
+	'@typescript-eslint/member-ordering': [
+		'off', // Use perfectionist's sort-classes rule instead
 		{
 			default: {
 				memberTypes: [
@@ -557,38 +586,6 @@ const tsEslintOtherRules = {
 		},
 	],
 
-	'no-use-before-define': 'off',
-	'@typescript-eslint/no-use-before-define': [
-		'error',
-		{
-			...noUseBeforeDefineOptions,
-
-			functions: false,
-			typedefs: true,
-		},
-	],
-
-	'max-params': 'off',
-	'@typescript-eslint/max-params': [
-		'error',
-		{
-			...maxParamsOptions,
-
-			countVoidThis: false,
-		},
-	],
-
-	'no-shadow': 'off',
-	'@typescript-eslint/no-shadow': [
-		'error',
-		{
-			...noShadowOptions,
-
-			hoist: 'functions-and-types',
-		},
-	],
-
-	// Turned off rules
 	'@typescript-eslint/explicit-function-return-type': [
 		'off',
 		{

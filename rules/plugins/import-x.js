@@ -37,12 +37,7 @@ const staticAnalysisRules = {
 	'import-x/no-dynamic-require': 'error',
 	'import-x/no-relative-packages': 'error',
 	'import-x/no-self-import': 'error',
-	'import-x/no-unresolved': [
-		'error',
-		{
-			caseSensitive: true,
-		},
-	],
+	'import-x/no-unresolved': ['error', { caseSensitive: true }],
 	'import-x/no-useless-path-segments': ['error', { noUselessIndex: true }],
 
 	// Turned off rules
@@ -161,17 +156,6 @@ const styleGuideRules = {
 		},
 	],
 	'import-x/no-unassigned-import': 'error',
-	'import-x/order': [
-		'error',
-		{
-			groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
-			'newlines-between': 'always',
-			alphabetize: {
-				order: 'asc',
-				caseInsensitive: true,
-			},
-		},
-	],
 
 	// Turned off rules
 	'import-x/dynamic-import-chunkname': 'off',
@@ -183,6 +167,17 @@ const styleGuideRules = {
 		},
 	],
 	'import-x/no-named-export': 'off',
+	'import-x/order': [
+		'off', // Use perfectionist's sort-imports rule instead
+		{
+			groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
+			'newlines-between': 'always',
+			alphabetize: {
+				order: 'asc',
+				caseInsensitive: true,
+			},
+		},
+	],
 	'import-x/prefer-default-export': 'off',
 	'import-x/prefer-namespace-import': 'off',
 };

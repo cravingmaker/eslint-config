@@ -203,12 +203,7 @@ const suggestionRules = {
 	'no-return-assign': ['error', 'always'],
 	'no-sequences': ['error', { allowInParentheses: false }],
 	'no-shadow': ['error', { ...noShadowOptions }],
-	'no-unused-expressions': [
-		'error',
-		{
-			...noUnusedExpressionsOptions,
-		},
-	],
+	'no-unused-expressions': ['error', { ...noUnusedExpressionsOptions }],
 	'no-void': ['error', { allowAsStatement: false }],
 	'object-shorthand': [
 		'error',

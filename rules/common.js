@@ -4,14 +4,11 @@ const classMethodsUseThisOptions = {
 	ignoreOverrideMethods: false,
 };
 
-const consistentReturnOptions = {
-	treatUndefinedAsUnspecified: false,
-};
+const consistentReturnOptions = { treatUndefinedAsUnspecified: false };
+
 const dotNotationOptions = { allowKeywords: true };
 
-const maxParamsOptions = {
-	max: 4,
-};
+const maxParamsOptions = { max: 4 };
 
 const noEmptyFunctionOptions = { allow: [] };
 
@@ -69,9 +66,7 @@ const preferDestructuring1stOptions = {
 
 const preferDestructuring2ndOptions = { enforceForRenamedProperties: false };
 
-const preferPromiseRejectErrorsOptions = {
-	allowEmptyReject: false,
-};
+const preferPromiseRejectErrorsOptions = { allowEmptyReject: false };
 
 export {
 	classMethodsUseThisOptions,
