@@ -39,7 +39,7 @@
     "typescript-eslint": "^8.58.1"
   },
   "devDependencies": {
-    "@cravingmaker/prettier-config": "^0.1.6",
+    "@cravingmaker/prettier-config": "^0.1.7",
     "prettier": "^3.8.2"
   },
   "peerDependencies": {
