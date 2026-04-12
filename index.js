@@ -9,10 +9,10 @@ import pluginHtml from '@html-eslint/eslint-plugin';
 import htmlParser from '@html-eslint/parser';
 import pluginJson from '@eslint/json';
 import { eslintCommentsRules } from './rules/plugins/eslint-comments.js';
-import { importXRules } from './rules/plugins/import-x.js';
+import { importxEslintRules } from './rules/plugins/import-x.js';
 import { possibleProblemRules } from './rules/js/possible-problems.js';
 import { suggestionRules } from './rules/js/suggestions.js';
-import { unusedImportsRules } from './rules/plugins/unused-imports.js';
+import { unusedImportsEslintRules } from './rules/plugins/unused-imports.js';
 import { tsEslintRules, tsEslintTypeCheckedRules } from './rules/ts/typescript-eslint.js';
 import { json5EslintRules, jsoncEslintRules, jsonEslintRules } from './rules/plugins/json.js';
 import { htmlEslintRules } from './rules/plugins/html.js';
@@ -61,8 +61,8 @@ export function createConfig({
 			rules: {
 				...possibleProblemRules,
 				...suggestionRules,
-				...unusedImportsRules,
-				...importXRules,
+				...unusedImportsEslintRules,
+				...importxEslintRules,
 				...eslintCommentsRules,
 				...jsRules,
 			},
@@ -98,8 +98,8 @@ export function createConfig({
 							...possibleProblemRules,
 							...suggestionRules,
 							...(tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules),
-							...unusedImportsRules,
-							...importXRules,
+							...unusedImportsEslintRules,
+							...importxEslintRules,
 							...eslintCommentsRules,
 							...tsRules,
 						},

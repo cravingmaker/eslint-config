@@ -187,11 +187,11 @@ const styleGuideRules = {
 	'import-x/prefer-namespace-import': 'off',
 };
 
-const importXRules = {
+const importxEslintRules = {
 	...helpfulWarningRules,
 	...moduleSystemRules,
 	...staticAnalysisRules,
 	...styleGuideRules,
 };
 
-export { importXRules };
+export { importxEslintRules };

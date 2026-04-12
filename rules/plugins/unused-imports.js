@@ -1,6 +1,6 @@
 import { noUnusedVarsOptions } from '../common.js';
 
-const unusedImportsRules = {
+const unusedImportsEslintRules = {
 	'unused-imports/no-unused-imports': 'error',
 
 	// Rules with overridden options
@@ -13,4 +13,4 @@ const unusedImportsRules = {
 	],
 };
 
-export { unusedImportsRules };
+export { unusedImportsEslintRules };
