@@ -305,25 +305,25 @@ const perfectionistEslintRules = {
 			],
 			customGroups: [
 				// #private static field
-				{ groupName: 'hash-private-static-field', selector: 'property', modifiers: ['#private', 'static'] },
+				{ groupName: 'hash-private-static-field', selector: 'property', modifiers: ['private', 'static'] },
 				// #private instance field
-				{ groupName: 'hash-private-field', selector: 'property', modifiers: ['#private'] },
+				{ groupName: 'hash-private-field', selector: 'property', modifiers: ['private'] },
 				// #private static auto-accessor
-				{ groupName: 'hash-private-static-accessor', selector: 'accessor-property', modifiers: ['#private', 'static'] },
+				{ groupName: 'hash-private-static-accessor', selector: 'accessor-property', modifiers: ['private', 'static'] },
 				// #private instance auto-accessor
-				{ groupName: 'hash-private-accessor', selector: 'accessor-property', modifiers: ['#private'] },
+				{ groupName: 'hash-private-accessor', selector: 'accessor-property', modifiers: ['private'] },
 				// #private static getter
-				{ groupName: 'hash-private-static-get-method', selector: 'get-method', modifiers: ['#private', 'static'] },
+				{ groupName: 'hash-private-static-get-method', selector: 'get-method', modifiers: ['private', 'static'] },
 				// #private instance getter
-				{ groupName: 'hash-private-get-method', selector: 'get-method', modifiers: ['#private'] },
+				{ groupName: 'hash-private-get-method', selector: 'get-method', modifiers: ['private'] },
 				// #private static setter
-				{ groupName: 'hash-private-static-set-method', selector: 'set-method', modifiers: ['#private', 'static'] },
+				{ groupName: 'hash-private-static-set-method', selector: 'set-method', modifiers: ['private', 'static'] },
 				// #private instance setter
-				{ groupName: 'hash-private-set-method', selector: 'set-method', modifiers: ['#private'] },
+				{ groupName: 'hash-private-set-method', selector: 'set-method', modifiers: ['private'] },
 				// #private static method
-				{ groupName: 'hash-private-static-method', selector: 'method', modifiers: ['#private', 'static'] },
+				{ groupName: 'hash-private-static-method', selector: 'method', modifiers: ['private', 'static'] },
 				// #private instance method
-				{ groupName: 'hash-private-method', selector: 'method', modifiers: ['#private'] },
+				{ groupName: 'hash-private-method', selector: 'method', modifiers: ['private'] },
 			],
 		},
 	],
@@ -338,7 +338,7 @@ const perfectionistEslintRules = {
 		'error',
 		{
 			...commonOptions,
-			newlinesBetween: 'always',
+			newlinesBetween: 1,
 			groups: [
 				['interface', 'type', 'declare-interface', 'declare-type'],
 				['enum', 'declare-enum'],

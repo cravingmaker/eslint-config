@@ -8,6 +8,7 @@ import pluginHtmlReact from '@html-eslint/eslint-plugin-react';
 import pluginHtml from '@html-eslint/eslint-plugin';
 import htmlParser from '@html-eslint/parser';
 import pluginJson from '@eslint/json';
+import pluginPerfectionist from 'eslint-plugin-perfectionist';
 import { eslintCommentsRules } from './rules/plugins/eslint-comments.js';
 import { importxEslintRules } from './rules/plugins/import-x.js';
 import { possibleProblemRules } from './rules/js/possible-problems.js';
@@ -17,6 +18,7 @@ import { tsEslintRules, tsEslintTypeCheckedRules } from './rules/ts/typescript-e
 import { json5EslintRules, jsoncEslintRules, jsonEslintRules } from './rules/plugins/json.js';
 import { htmlEslintRules } from './rules/plugins/html.js';
 import { htmlReactEslintRules } from './rules/plugins/html-react.js';
+import { perfectionistEslintRules } from './rules/plugins/perfectionist.js';
 
 /**
  * @param {Object} [options]
@@ -49,6 +51,7 @@ export function createConfig({
 				'unused-imports': pluginUnusedImports,
 				'import-x': pluginImportX,
 				'@eslint-community/eslint-comments': pluginEslintComments,
+				perfectionist: pluginPerfectionist,
 			},
 		},
 
@@ -64,6 +67,7 @@ export function createConfig({
 				...unusedImportsEslintRules,
 				...importxEslintRules,
 				...eslintCommentsRules,
+				...perfectionistEslintRules,
 				...jsRules,
 			},
 		},
@@ -101,6 +105,7 @@ export function createConfig({
 							...unusedImportsEslintRules,
 							...importxEslintRules,
 							...eslintCommentsRules,
+							...perfectionistEslintRules,
 							...tsRules,
 						},
 					},
@@ -132,7 +137,6 @@ export function createConfig({
 		{
 			files: ['**/*.html'],
 			plugins: { '@html-eslint': pluginHtml },
-			language: 'html/html',
 			languageOptions: {
 				parser: htmlParser,
 			},
@@ -145,7 +149,7 @@ export function createConfig({
 		{
 			files: ['**/*.json'],
 			ignores: ['**/package-lock.json', '**/yarn.lock'],
-			plugins: { pluginJson },
+			plugins: { json: pluginJson },
 			language: 'json/json',
 			rules: {
 				...jsonEslintRules,
@@ -155,7 +159,7 @@ export function createConfig({
 
 		{
 			files: ['**/*.jsonc', '**/tsconfig*.json', '**/.vscode/*.json', '**/.devcontainer/*.json'],
-			plugins: { pluginJson },
+			plugins: { json: pluginJson },
 			language: 'json/jsonc',
 			rules: {
 				...jsoncEslintRules,
@@ -165,7 +169,7 @@ export function createConfig({
 
 		{
 			files: ['**/*.json5'],
-			plugins: { pluginJson },
+			plugins: { json: pluginJson },
 			language: 'json/json5',
 			rules: {
 				...json5EslintRules,
