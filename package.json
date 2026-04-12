@@ -1,46 +1,54 @@
 {
-	"name": "@cravingmaker/eslint-config",
-	"version": "0.0.2",
-	"description": "Craving Maker's ESLint configuration (Flat Config)",
-	"keywords": [
-		"cravingmaker",
-		"eslint",
-		"eslintconfig",
-		"style",
-		"code-style",
-		"lint"
-	],
-	"homepage": "https://github.com/cravingmaker/eslint-config#readme",
-	"bugs": {
-		"url": "https://github.com/cravingmaker/eslint-config/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/cravingmaker/eslint-config.git"
-	},
-	"license": "MIT",
-	"author": "cravingmaker (https://github.com/cravingmaker)",
-	"type": "module",
-	"exports": "./index.js",
-	"files": [
-		"index.js",
-		"rules"
-	],
-	"peerDependencies": {
-		"eslint": ">=10.0.0"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"dependencies": {
-		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
-		"@eslint/json": "^1.2.0",
-		"@html-eslint/eslint-plugin": "^0.59.0",
-		"@html-eslint/eslint-plugin-react": "^0.59.0",
-		"@html-eslint/parser": "^0.59.0",
-		"eslint-import-resolver-typescript": "^3.6.1",
-		"eslint-plugin-import-x": "^4.16.2",
-		"eslint-plugin-unused-imports": "^4.4.1",
-		"typescript-eslint": "^8.58.1"
-	}
+  "name": "@cravingmaker/eslint-config",
+  "version": "0.0.2",
+  "description": "Craving Maker's ESLint configuration (Flat Config)",
+  "keywords": [
+    "cravingmaker",
+    "eslint",
+    "eslint-config",
+    "style",
+    "code-style",
+    "lint"
+  ],
+  "homepage": "https://github.com/cravingmaker/eslint-config#readme",
+  "bugs": {
+    "url": "https://github.com/cravingmaker/eslint-config/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cravingmaker/eslint-config.git"
+  },
+  "license": "MIT",
+  "author": "cravingmaker (https://github.com/cravingmaker)",
+  "type": "module",
+  "exports": "./index.js",
+  "files": [
+    "index.js",
+    "rules"
+  ],
+  "prettier": "@cravingmaker/prettier-config",
+  "dependencies": {
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
+    "@eslint/json": "^1.2.0",
+    "@html-eslint/eslint-plugin": "^0.59.0",
+    "@html-eslint/eslint-plugin-react": "^0.59.0",
+    "@html-eslint/parser": "^0.59.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import-x": "^4.16.2",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "typescript-eslint": "^8.58.1"
+  },
+  "devDependencies": {
+    "@cravingmaker/prettier-config": "^0.1.6",
+    "prettier": "^3.8.2"
+  },
+  "peerDependencies": {
+    "eslint": ">=10.0.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
