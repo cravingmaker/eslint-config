@@ -9,12 +9,15 @@ Install the configuration along with ESLint and Prettier using your favorite pac
 ```bash
 npm install --save-dev eslint prettier @cravingmaker/eslint-config @cravingmaker/prettier-config
 ```
+
 ```bash
 yarn add --dev eslint prettier @cravingmaker/eslint-config @cravingmaker/prettier-config
 ```
+
 ```bash
 pnpm add -D eslint prettier @cravingmaker/eslint-config @cravingmaker/prettier-config
 ```
+
 ```bash
 bun add -D eslint prettier @cravingmaker/eslint-config @cravingmaker/prettier-config
 ```
@@ -27,8 +30,8 @@ Create or update your `eslint.config.js` file:
 import cravingmakerConfig from '@cravingmaker/eslint-config';
 
 export default [
-  ...cravingmakerConfig,
-  // Add your own overrides here
+	...cravingmakerConfig,
+	// Add your own overrides here
 ];
 ```
 

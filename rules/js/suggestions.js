@@ -1,3 +1,16 @@
+import {
+	classMethodsUseThisOptions,
+	consistentReturnOptions,
+	dotNotationOptions,
+	maxParamsOptions,
+	noEmptyFunctionOptions,
+	noShadowOptions,
+	noUnusedExpressionsOptions,
+	preferDestructuring1stOptions,
+	preferDestructuring2ndOptions,
+	preferPromiseRejectErrorsOptions,
+} from '../common.js';
+
 const recommendedSuggestionRules = {
 	'no-case-declarations': 'error',
 	'no-delete-var': 'error',
@@ -44,6 +57,7 @@ const suggestionRules = {
 			properties: 'always',
 		},
 	],
+	'class-methods-use-this': ['error', { ...classMethodsUseThisOptions }],
 	complexity: [
 		'error',
 		{
@@ -53,7 +67,8 @@ const suggestionRules = {
 	],
 	'default-case': ['error', {}],
 	'default-case-last': 'error',
-	'dot-notation': ['error', { allowKeywords: true }],
+	'default-param-last': 'error',
+	'dot-notation': ['error', { ...dotNotationOptions }],
 	eqeqeq: ['error', 'always'],
 	'max-depth': ['error', { max: 4 }],
 	'no-alert': 'error',
@@ -66,6 +81,7 @@ const suggestionRules = {
 		},
 	],
 	'no-caller': 'error',
+	'no-empty-function': ['error', { ...noEmptyFunctionOptions }],
 	'no-eq-null': 'error',
 	'no-eval': ['error', { allowIndirect: false }],
 	'no-extend-native': ['error', { exceptions: [] }],
@@ -94,6 +110,7 @@ const suggestionRules = {
 	],
 	'no-lone-blocks': 'error',
 	'no-lonely-if': 'error',
+	'no-loop-func': 'error',
 	'no-multi-assign': ['error', { ignoreNonDeclaration: false }],
 	'no-multi-str': 'error',
 	'no-negated-condition': 'error',
@@ -140,7 +157,7 @@ const suggestionRules = {
 	'prefer-numeric-literals': 'error',
 	'prefer-object-has-own': 'error',
 	'prefer-object-spread': 'error',
-	'prefer-promise-reject-errors': ['error', { allowEmptyReject: false }],
+	'prefer-promise-reject-errors': ['error', { ...preferPromiseRejectErrorsOptions }],
 	'prefer-rest-params': 'error',
 	'prefer-spread': 'error',
 	'prefer-template': 'error',
@@ -153,6 +170,7 @@ const suggestionRules = {
 			onlyEquality: false,
 		},
 	],
+	'require-await': 'error',
 
 	// Rules with overridden options
 	'func-name-matching': [
@@ -180,26 +198,12 @@ const suggestionRules = {
 		},
 	],
 	'max-nested-callbacks': ['error', 4],
-	'max-params': [
-		'error',
-		{
-			countThis: 'except-void',
-			max: 4,
-		},
-	],
+	'max-params': ['error', { ...maxParamsOptions }],
 	'no-else-return': ['error', { allowElseIf: false }],
 	'no-return-assign': ['error', 'always'],
 	'no-sequences': ['error', { allowInParentheses: false }],
-	'no-unused-expressions': [
-		'error',
-		{
-			allowShortCircuit: false,
-			allowTaggedTemplates: false,
-			allowTernary: false,
-			enforceForJSX: true,
-			ignoreDirectives: false,
-		},
-	],
+	'no-shadow': ['error', { ...noShadowOptions }],
+	'no-unused-expressions': ['error', { ...noUnusedExpressionsOptions }],
 	'no-void': ['error', { allowAsStatement: false }],
 	'object-shorthand': [
 		'error',
@@ -218,25 +222,9 @@ const suggestionRules = {
 			ignoreReadBeforeAssign: false,
 		},
 	],
-	'prefer-destructuring': [
-		'error',
-		{
-			AssignmentExpression: {
-				array: false,
-				object: false,
-			},
-			VariableDeclarator: {
-				array: false,
-				object: true,
-			},
-		},
-		{ enforceForRenamedProperties: false },
-	],
+	'prefer-destructuring': ['error', { ...preferDestructuring1stOptions }, { ...preferDestructuring2ndOptions }],
 	'prefer-regex-literals': ['error', { disallowRedundantWrapping: true }],
 	'require-unicode-regexp': ['error', { requireFlag: 'v' }],
-
-	// Handled by Prettier
-	curly: ['off', 'all'],
 
 	// Turned off rules
 	'capitalized-comments': [
@@ -246,17 +234,9 @@ const suggestionRules = {
 			ignoreInlineComments: false,
 		},
 	],
-	'class-methods-use-this': [
-		'off',
-		{
-			enforceForClassFields: true,
-			exceptMethods: [],
-			ignoreOverrideMethods: false,
-		},
-	],
-	'consistent-return': ['off', { treatUndefinedAsUnspecified: false }],
+	'consistent-return': ['off', { ...consistentReturnOptions }],
 	'consistent-this': ['off', 'that'],
-	'default-param-last': 'off',
+	curly: ['off', 'all'], // Handled by Prettier
 	'guard-for-in': 'off',
 	'id-denylist': 'off',
 	'id-length': [
@@ -310,10 +290,8 @@ const suggestionRules = {
 	'no-console': ['off', { allow: [] }],
 	'no-continue': 'off',
 	'no-div-regex': 'off',
-	'no-empty-function': ['off', { allow: [] }],
 	'no-inline-comments': ['off', {}],
 	'no-invalid-this': ['off', { capIsConstructor: true }],
-	'no-loop-func': 'off',
 	'no-magic-numbers': [
 		'off',
 		{
@@ -333,17 +311,6 @@ const suggestionRules = {
 	'no-restricted-imports': ['off', {}],
 	'no-restricted-properties': 'off',
 	'no-restricted-syntax': 'off',
-	'no-shadow': [
-		'off',
-		{
-			allow: [],
-			builtinGlobals: false,
-			hoist: 'functions',
-			ignoreFunctionTypeParameterNameValueShadow: true,
-			ignoreOnInitialization: false,
-			ignoreTypeValueShadow: true,
-		},
-	],
 	'no-ternary': 'off',
 	'no-undefined': 'off',
 	'no-underscore-dangle': [
@@ -361,7 +328,6 @@ const suggestionRules = {
 		},
 	],
 	'prefer-named-capture-group': 'off',
-	'require-await': 'off',
 	'sort-imports': [
 		'off',
 		{
@@ -388,4 +354,4 @@ const suggestionRules = {
 	'vars-on-top': 'off',
 };
 
-export { recommendedSuggestionRules, suggestionRules };
+export { suggestionRules };
