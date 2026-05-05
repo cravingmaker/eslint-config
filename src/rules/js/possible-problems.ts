@@ -1,9 +1,12 @@
-import { noUnusedVarsOptions, noUseBeforeDefineOptions } from '../common.js';
+import type { Linter } from 'eslint';
 
-const recommendedPossibleProblemRules = {
+// eslint-disable-next-line unicorn/prevent-abbreviations -- This mirrors the ESLint `no-unused-vars` rule name
+import { noUnusedVarsOptions, noUseBeforeDefineOptions } from '../../options/common.js';
+
+const recommendedPossibleProblemRules: Linter.RulesRecord = {
 	'constructor-super': 'error',
 	'for-direction': 'error',
-	'getter-return': ['error', { allowImplicit: false }],
+
 	'no-async-promise-executor': 'error',
 	'no-class-assign': 'error',
 	'no-compare-neg-zero': 'error',
@@ -11,14 +14,13 @@ const recommendedPossibleProblemRules = {
 	'no-const-assign': 'error',
 	'no-constant-binary-expression': 'error',
 	'no-constant-condition': ['error', { checkLoops: 'allExceptWhileTrue' }],
-	'no-control-regex': 'error',
+	'no-control-regex': 'error', // Compatibility with `eslint-plugin-regexp`
 	'no-debugger': 'error',
 	'no-dupe-args': 'error',
 	'no-dupe-class-members': 'error',
 	'no-dupe-else-if': 'error',
 	'no-dupe-keys': 'error',
 	'no-duplicate-case': 'error',
-	'no-empty-character-class': 'error',
 	'no-empty-pattern': ['error', { allowObjectPatternsAsParameters: false }],
 	'no-ex-assign': 'error',
 	'no-fallthrough': [
@@ -30,7 +32,6 @@ const recommendedPossibleProblemRules = {
 	],
 	'no-func-assign': 'error',
 	'no-import-assign': 'error',
-	'no-invalid-regexp': ['error', {}],
 	'no-irregular-whitespace': [
 		'error',
 		{
@@ -42,7 +43,7 @@ const recommendedPossibleProblemRules = {
 		},
 	],
 	'no-loss-of-precision': 'error',
-	'no-misleading-character-class': ['error', { allowEscape: false }],
+	'no-misleading-character-class': ['error', { allowEscape: false }], // Compatibility with `eslint-plugin-regexp`
 	'no-new-native-nonconstructor': 'error',
 	'no-obj-calls': 'error',
 	'no-prototype-builtins': 'error',
@@ -54,7 +55,6 @@ const recommendedPossibleProblemRules = {
 	'no-unreachable': 'error',
 	'no-unsafe-finally': 'error',
 	'no-unused-private-class-members': 'error',
-	'no-useless-backreference': 'error',
 	'use-isnan': [
 		'error',
 		{
@@ -68,19 +68,24 @@ const recommendedPossibleProblemRules = {
 	'no-undef': ['error', { typeof: true }],
 	'no-unsafe-negation': ['error', { enforceForOrderingRelations: true }],
 	'no-unsafe-optional-chaining': ['error', { disallowArithmeticOperators: true }],
-	'no-unused-vars': [
+
+	'no-useless-assignment': 'off', // Often produces noise in control flow and refactoring patterns
+
+	'getter-return': [
 		'error',
 		{
-			...noUnusedVarsOptions,
+			allowImplicit: true, // Compatibility with `unicorn/no-useless-undefined` rule
 		},
 	],
 
-	// Turned off rules
-	'no-useless-assignment': 'off', // Often produces noise in control flow and refactoring patterns
-	'no-unexpected-multiline': 'off', // Handled by Prettier
-};
+	'no-empty-character-class': 'off', // Covered by `eslint-plugin-regexp/no-empty-character-class`
+	'no-invalid-regexp': 'off', // Covered by `eslint-plugin-regexp/no-invalid-regexp`
+	'no-unexpected-multiline': 'off', // Covered by `prettier`
+	'no-unused-vars': ['off', { ...noUnusedVarsOptions }], // Covered by `eslint-plugin-unused-imports`
+	'no-useless-backreference': 'off', // Covered by `eslint-plugin-regexp/no-useless-backreference`
+} as const;
 
-const possibleProblemRules = {
+const possibleProblemRules: Linter.RulesRecord = {
 	...recommendedPossibleProblemRules,
 
 	'no-await-in-loop': 'error',
@@ -93,17 +98,6 @@ const possibleProblemRules = {
 	'no-unreachable-loop': ['error', { ignore: [] }],
 	'no-use-before-define': ['error', { ...noUseBeforeDefineOptions }],
 
-	// Rules with overridden options
-	'array-callback-return': [
-		'error',
-		{
-			allowImplicit: true,
-			allowVoid: false,
-			checkForEach: false,
-		},
-	],
-
-	// Turned off rules
 	'no-duplicate-imports': [
 		'off',
 		{
@@ -112,6 +106,16 @@ const possibleProblemRules = {
 		},
 	],
 	'require-atomic-updates': ['off', { allowProperties: false }],
-};
+
+	// Rules with overridden options
+	'array-callback-return': [
+		'error',
+		{
+			allowImplicit: true, // Compatibility with `unicorn/no-useless-undefined` rule
+			allowVoid: false,
+			checkForEach: false,
+		},
+	],
+} as const;
 
 export { possibleProblemRules };

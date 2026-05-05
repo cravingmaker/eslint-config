@@ -1,29 +1,24 @@
+import type { Linter } from 'eslint';
+
 import {
 	classMethodsUseThisOptions,
 	consistentReturnOptions,
 	dotNotationOptions,
+	// eslint-disable-next-line unicorn/prevent-abbreviations -- This mirrors the ESLint `max-params` rule name
 	maxParamsOptions,
+	namingConventionOptions,
 	noEmptyFunctionOptions,
 	noShadowOptions,
 	noUnusedExpressionsOptions,
+	// eslint-disable-next-line unicorn/prevent-abbreviations -- This mirrors the ESLint `no-unused-vars` rule name
 	noUnusedVarsOptions,
 	noUseBeforeDefineOptions,
 	preferDestructuring1stOptions,
 	preferDestructuring2ndOptions,
 	preferPromiseRejectErrorsOptions,
-} from '../common.js';
+} from '../../options/common.js';
 
-const tsEslintDeprecatedConflictedEslintRecommendedRules = {
-	// "no-new-symbol" was deprecated in ESLint 9.0.0 and will be removed in
-	// ESLint v11.0.0. See:
-	// https://eslint.org/docs/latest/rules/no-new-symbol
-	// We need to keep the rule disabled until TSESLint drops support for
-	// ESlint 8. See:
-	// https://github.com/typescript-eslint/typescript-eslint/pull/8895
-	'no-new-symbol': 'off', // ts(7009)
-};
-
-const tsEslintConflictedEslintRecommendedRules = {
+const tsEslintConflictedEslintRecommendedRules: Linter.RulesRecord = {
 	'constructor-super': 'off', // ts(2335) & ts(2377)
 	'getter-return': 'off', // ts(2378)
 	'no-class-assign': 'off', // ts(2629)
@@ -42,11 +37,9 @@ const tsEslintConflictedEslintRecommendedRules = {
 	'no-unreachable': 'off', // ts(7027)
 	'no-unsafe-negation': 'off', // ts(2365) & ts(2322) & ts(2358)
 	'no-with': 'off', // ts(1101) & ts(2410)
+} as const;
 
-	...tsEslintDeprecatedConflictedEslintRecommendedRules,
-};
-
-const tsEslintRecommendedRules = {
+const tsEslintRecommendedRules: Linter.RulesRecord = {
 	'@typescript-eslint/no-duplicate-enum-values': 'error',
 	'@typescript-eslint/no-explicit-any': [
 		'error',
@@ -93,11 +86,11 @@ const tsEslintRecommendedRules = {
 	'@typescript-eslint/ban-ts-comment': [
 		'error',
 		{
+			minimumDescriptionLength: 10,
 			'ts-check': false,
 			'ts-expect-error': 'allow-with-description',
 			'ts-ignore': true,
 			'ts-nocheck': true,
-			minimumDescriptionLength: 10,
 		},
 	],
 	'@typescript-eslint/no-empty-object-type': [
@@ -121,10 +114,10 @@ const tsEslintRecommendedRules = {
 	'@typescript-eslint/no-unused-expressions': ['error', { ...noUnusedExpressionsOptions }],
 
 	'no-unused-vars': 'off',
-	'@typescript-eslint/no-unused-vars': ['error', { ...noUnusedVarsOptions }],
-};
+	'@typescript-eslint/no-unused-vars': ['off', { ...noUnusedVarsOptions }], // Covered by `eslint-plugin-unused-imports/no-unused-vars`
+} as const;
 
-const tsEslintRecommendedTypeCheckedOnlyRules = {
+const tsEslintRecommendedTypeCheckedOnlyRules: Linter.RulesRecord = {
 	'@typescript-eslint/await-thenable': 'error',
 	'@typescript-eslint/no-array-delete': 'error',
 	'@typescript-eslint/no-base-to-string': [
@@ -230,9 +223,9 @@ const tsEslintRecommendedTypeCheckedOnlyRules = {
 			allowThrowingUnknown: false,
 		},
 	],
-};
+} as const;
 
-const tsEslintStylisticRules = {
+const tsEslintStylisticRules: Linter.RulesRecord = {
 	'@typescript-eslint/ban-tslint-comment': 'error',
 	'@typescript-eslint/class-literal-property-style': ['error', 'fields'],
 	'@typescript-eslint/consistent-generic-constructors': ['error', 'constructor'],
@@ -263,11 +256,10 @@ const tsEslintStylisticRules = {
 	],
 	'@typescript-eslint/consistent-type-definitions': ['error', 'type'],
 
-	// Turned off rules
 	'@typescript-eslint/adjacent-overload-signatures': 'off', // Use ESLint's perfectionist/sort-object-types and perfectionist/sort-interfaces rule instead
-};
+} as const;
 
-const tsEslintStylisticTypeCheckedOnlyRules = {
+const tsEslintStylisticTypeCheckedOnlyRules: Linter.RulesRecord = {
 	'@typescript-eslint/non-nullable-type-assertion-style': 'error',
 	'@typescript-eslint/prefer-find': 'error',
 	'@typescript-eslint/prefer-includes': 'error',
@@ -308,17 +300,17 @@ const tsEslintStylisticTypeCheckedOnlyRules = {
 		{
 			allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing: false,
 			checkAny: true,
-			checkUnknown: true,
-			checkString: true,
-			checkNumber: true,
-			checkBoolean: true,
 			checkBigInt: true,
+			checkBoolean: true,
+			checkNumber: true,
+			checkString: true,
+			checkUnknown: true,
 			requireNullish: true,
 		},
 	],
-};
+} as const;
 
-const tsEslintStrictOnlyRules = {
+const tsEslintStrictOnlyRules: Linter.RulesRecord = {
 	'@typescript-eslint/no-dynamic-delete': 'error',
 	'@typescript-eslint/no-extraneous-class': [
 		'error',
@@ -351,9 +343,11 @@ const tsEslintStrictOnlyRules = {
 
 	// Rules with overridden options
 	'@typescript-eslint/prefer-literal-enum-member': ['error', { allowBitwiseExpressions: true }],
-};
+} as const;
 
-const tsEslintStrictTypeCheckedOnlyRules = {
+const tsEslintStrictTypeCheckedOnlyRules: Linter.RulesRecord = {
+	'@typescript-eslint/no-deprecated': ['warn', { allow: [] }],
+
 	'@typescript-eslint/no-confusing-void-expression': [
 		'error',
 		{
@@ -362,7 +356,6 @@ const tsEslintStrictTypeCheckedOnlyRules = {
 		},
 	],
 	'@typescript-eslint/no-meaningless-void-operator': ['error', { checkNever: false }],
-	'@typescript-eslint/no-deprecated': ['warn', { allow: [] }], // Warn only, never block compilation
 	'@typescript-eslint/no-misused-spread': ['error', { allow: [] }],
 	'@typescript-eslint/no-mixed-enums': 'error',
 	'@typescript-eslint/no-unnecessary-boolean-literal-compare': [
@@ -397,14 +390,14 @@ const tsEslintStrictTypeCheckedOnlyRules = {
 	// Rules with overridden options
 	'no-return-await': 'off',
 	'@typescript-eslint/return-await': ['error', 'always'],
-};
+} as const;
 
-const tsEslintDeprecatedOtherRules = {
+const tsEslintDeprecatedOtherRules: Linter.RulesRecord = {
 	'@typescript-eslint/no-empty-interface': 'off', // Deprecated in favor of  @typescript-eslint/no-empty-object-type rule
 	'@typescript-eslint/no-type-alias': 'off', // Deprecated in favor of the @typescript-eslint/consistent-type-definitions rule
+	'@typescript-eslint/no-var-requires': 'off', // Deprecated in favour of the @typescript-eslint/no-require-imports rule
 	'@typescript-eslint/prefer-ts-expect-error': 'off', // Deprecated in favor of @typescript-eslint/ban-ts-comment rule
 	'@typescript-eslint/sort-type-constituents': 'off', // Deprecated in favor of the perfectionist/sort-intersection-types and perfectionist/sort-union-types rule
-	'@typescript-eslint/no-var-requires': 'off', // Deprecated in favour of the @typescript-eslint/no-require-imports rule
 
 	'@typescript-eslint/no-loss-of-precision': 'off', // Deprecated because the base eslint/no-loss-of-precision added support for numeric separators
 
@@ -412,9 +405,9 @@ const tsEslintDeprecatedOtherRules = {
 	// Instead of enabling typedef, it is generally recommended to use the --noImplicitAny and
 	// --strictPropertyInitialization compiler options to enforce type annotations only when useful
 	'@typescript-eslint/typedef': 'off',
-};
+} as const;
 
-const tsEslintOtherRules = {
+const tsEslintOtherRules: Linter.RulesRecord = {
 	'@typescript-eslint/consistent-type-imports': [
 		'error',
 		{
@@ -486,7 +479,6 @@ const tsEslintOtherRules = {
 		},
 	],
 
-	// Turned off rules
 	'@typescript-eslint/member-ordering': [
 		'off', // Use perfectionist's sort-classes rule instead
 		{
@@ -632,9 +624,9 @@ const tsEslintOtherRules = {
 	'@typescript-eslint/no-restricted-imports': 'off',
 
 	...tsEslintDeprecatedOtherRules,
-};
+} as const;
 
-const tsEslintOtherTypeCheckedOnlyRules = {
+const tsEslintOtherTypeCheckedOnlyRules: Linter.RulesRecord = {
 	'@typescript-eslint/no-unnecessary-qualifier': 'error',
 	'@typescript-eslint/no-unsafe-type-assertion': 'error',
 	'@typescript-eslint/prefer-readonly': ['error', { onlyInlineLambdas: false }],
@@ -676,29 +668,7 @@ const tsEslintOtherTypeCheckedOnlyRules = {
 	],
 
 	camelcase: 'off',
-	'@typescript-eslint/naming-convention': [
-		'error',
-		{
-			selector: 'default',
-			format: ['camelCase'],
-			leadingUnderscore: 'allow',
-			trailingUnderscore: 'allow',
-		},
-		{
-			selector: 'import',
-			format: ['camelCase', 'PascalCase'],
-		},
-		{
-			selector: 'variable',
-			format: ['camelCase', 'UPPER_CASE'],
-			leadingUnderscore: 'allow',
-			trailingUnderscore: 'allow',
-		},
-		{
-			selector: 'typeLike',
-			format: ['PascalCase'],
-		},
-	],
+	'@typescript-eslint/naming-convention': ['error', ...namingConventionOptions],
 
 	// Rules with overridden options
 	'@typescript-eslint/consistent-type-exports': [
@@ -718,14 +688,13 @@ const tsEslintOtherTypeCheckedOnlyRules = {
 		},
 	],
 
-	// Turned off rules
 	'@typescript-eslint/prefer-readonly-parameter-types': 'off',
 
-	'consistent-return': 'off',
+	// 'consistent-return': 'off',  // Uncomment this if @typescript-eslint/consistent-return is enabled
 	'@typescript-eslint/consistent-return': ['off', { ...consistentReturnOptions }], // It's recommended to use tsconfig's noImplicitReturns option rather than this rule
-};
+} as const;
 
-const tsEslintDisableTypeChecked = {
+const tsEslintDisableTypeCheckedRules: Linter.RulesRecord = {
 	'@typescript-eslint/await-thenable': 'off',
 	'@typescript-eslint/consistent-return': 'off',
 	'@typescript-eslint/consistent-type-exports': 'off',
@@ -787,18 +756,18 @@ const tsEslintDisableTypeChecked = {
 	'@typescript-eslint/switch-exhaustiveness-check': 'off',
 	'@typescript-eslint/unbound-method': 'off',
 	'@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
-};
+} as const;
 
-const tsEslintRules = {
+const tsEslintRules: Linter.RulesRecord = {
 	...tsEslintConflictedEslintRecommendedRules,
 	...tsEslintRecommendedRules,
 	...tsEslintStrictOnlyRules,
 	...tsEslintStylisticRules,
 	...tsEslintOtherRules,
-	...tsEslintDisableTypeChecked,
-};
+	...tsEslintDisableTypeCheckedRules,
+} as const;
 
-const tsEslintTypeCheckedRules = {
+const tsEslintTypeCheckedRules: Linter.RulesRecord = {
 	...tsEslintConflictedEslintRecommendedRules,
 	...tsEslintRecommendedRules,
 	...tsEslintRecommendedTypeCheckedOnlyRules,
@@ -808,6 +777,6 @@ const tsEslintTypeCheckedRules = {
 	...tsEslintStylisticTypeCheckedOnlyRules,
 	...tsEslintOtherRules,
 	...tsEslintOtherTypeCheckedOnlyRules,
-};
+} as const;
 
 export { tsEslintRules, tsEslintTypeCheckedRules };

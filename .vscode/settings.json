@@ -1,0 +1,23 @@
+{
+	"cSpell.words": [
+		"bgcolor",
+		"callees",
+		"chunkname",
+		"cravingmaker",
+		"esmodule",
+		"fencedframe",
+		"formaction",
+		"HTMX",
+		"importx",
+		"lookarounds",
+		"mjsx",
+		"mtsx",
+		"noembed",
+		"nonconstructor",
+		"nonoctal",
+		"nums",
+		"Thenables",
+		"viewbox"
+	],
+	"typescript.tsdk": "node_modules/typescript/lib"
+}

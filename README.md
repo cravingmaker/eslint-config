@@ -1,37 +1,37 @@
 # @cravingmaker/eslint-config
 
-A highly opinionated, modern, and elegant ESLint configuration crafted by cravingmaker. ESM only. Best to be used with Prettier for the code formatter.
+A highly opinionated, modern, and elegant ESLint configuration crafted by [the cravingmaker](https://github.com/cravingmaker).
 
 ## Installation
 
-Install the configuration along with ESLint and Prettier using your favorite package manager:
+Install the configuration along with ESLint using your favorite package manager:
 
 ```bash
-npm install --save-dev eslint prettier @cravingmaker/eslint-config @cravingmaker/prettier-config
+npm install --save-dev --save-exact eslint @cravingmaker/eslint-config
 ```
 
 ```bash
-yarn add --dev eslint prettier @cravingmaker/eslint-config @cravingmaker/prettier-config
+yarn add --dev --exact eslint @cravingmaker/eslint-config
 ```
 
 ```bash
-pnpm add -D eslint prettier @cravingmaker/eslint-config @cravingmaker/prettier-config
+pnpm add --save-dev --save-exact eslint @cravingmaker/eslint-config
 ```
 
 ```bash
-bun add -D eslint prettier @cravingmaker/eslint-config @cravingmaker/prettier-config
+bun add --dev --exact eslint @cravingmaker/eslint-config
 ```
 
 ## Usage
 
-Create or update your `eslint.config.js` file:
+Export it from an `eslint.config.{js,mjs,ts,mts}` file:
 
 ```javascript
-import cravingmakerConfig from '@cravingmaker/eslint-config';
+import cravingmakerConfig from "@cravingmaker/eslint-config";
 
 export default [
-	...cravingmakerConfig,
-	// Add your own overrides here
+  ...cravingmakerConfig
+  // Add your own overrides here
 ];
 ```
 

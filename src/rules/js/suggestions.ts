@@ -1,7 +1,10 @@
+import type { Linter } from 'eslint';
+
 import {
 	classMethodsUseThisOptions,
 	consistentReturnOptions,
 	dotNotationOptions,
+	// eslint-disable-next-line unicorn/prevent-abbreviations -- This mirrors the ESLint `max-params` rule name
 	maxParamsOptions,
 	noEmptyFunctionOptions,
 	noShadowOptions,
@@ -9,9 +12,9 @@ import {
 	preferDestructuring1stOptions,
 	preferDestructuring2ndOptions,
 	preferPromiseRejectErrorsOptions,
-} from '../common.js';
+} from '../../options/common.js';
 
-const recommendedSuggestionRules = {
+const recommendedSuggestionRules: Linter.RulesRecord = {
 	'no-case-declarations': 'error',
 	'no-delete-var': 'error',
 	'no-empty-static-block': 'error',
@@ -20,7 +23,6 @@ const recommendedSuggestionRules = {
 	'no-nonoctal-decimal-escape': 'error',
 	'no-octal': 'error',
 	'no-redeclare': ['error', { builtinGlobals: true }],
-	'no-regex-spaces': 'error',
 	'no-shadow-restricted-names': ['error', { reportGlobalThis: true }],
 	'no-unused-labels': 'error',
 	'no-useless-catch': 'error',
@@ -31,9 +33,9 @@ const recommendedSuggestionRules = {
 
 	// Rules with overridden options
 	'no-empty': ['error', { allowEmptyCatch: true }],
-};
+} as const;
 
-const suggestionRules = {
+const suggestionRules: Linter.RulesRecord = {
 	...recommendedSuggestionRules,
 
 	'accessor-pairs': [
@@ -113,7 +115,6 @@ const suggestionRules = {
 	'no-loop-func': 'error',
 	'no-multi-assign': ['error', { ignoreNonDeclaration: false }],
 	'no-multi-str': 'error',
-	'no-negated-condition': 'error',
 	'no-new': 'error',
 	'no-new-func': 'error',
 	'no-new-wrappers': 'error',
@@ -137,14 +138,6 @@ const suggestionRules = {
 		},
 	],
 	'no-useless-return': 'error',
-	'no-var': 'error',
-	'no-warning-comments': [
-		'error',
-		{
-			location: 'start',
-			terms: ['todo', 'fixme', 'xxx'],
-		},
-	],
 	'operator-assignment': ['error', 'always'],
 	'prefer-arrow-callback': [
 		'error',
@@ -162,6 +155,7 @@ const suggestionRules = {
 	'prefer-spread': 'error',
 	'prefer-template': 'error',
 	radix: 'error',
+	'require-await': 'error',
 	yoda: [
 		'error',
 		'never',
@@ -170,7 +164,6 @@ const suggestionRules = {
 			onlyEquality: false,
 		},
 	],
-	'require-await': 'error',
 
 	// Rules with overridden options
 	'func-name-matching': [
@@ -215,18 +208,10 @@ const suggestionRules = {
 		},
 	],
 	'one-var': ['error', 'never'],
-	'prefer-const': [
-		'error',
-		{
-			destructuring: 'all',
-			ignoreReadBeforeAssign: false,
-		},
-	],
-	'prefer-destructuring': ['error', { ...preferDestructuring1stOptions }, { ...preferDestructuring2ndOptions }],
-	'prefer-regex-literals': ['error', { disallowRedundantWrapping: true }],
-	'require-unicode-regexp': ['error', { requireFlag: 'v' }],
 
-	// Turned off rules
+	'prefer-destructuring': ['error', { ...preferDestructuring1stOptions }, { ...preferDestructuring2ndOptions }],
+	'prefer-regex-literals': ['error', { disallowRedundantWrapping: true }], // Compatibility with `eslint-plugin-regexp`
+
 	'capitalized-comments': [
 		'off',
 		{
@@ -236,7 +221,6 @@ const suggestionRules = {
 	],
 	'consistent-return': ['off', { ...consistentReturnOptions }],
 	'consistent-this': ['off', 'that'],
-	curly: ['off', 'all'], // Handled by Prettier
 	'guard-for-in': 'off',
 	'id-denylist': 'off',
 	'id-length': [
@@ -244,7 +228,7 @@ const suggestionRules = {
 		{
 			exceptionPatterns: [],
 			exceptions: [],
-			max: Infinity,
+			max: Number.POSITIVE_INFINITY,
 			min: 2,
 			properties: 'always',
 		},
@@ -270,6 +254,7 @@ const suggestionRules = {
 	'max-lines-per-function': [
 		'off',
 		{
+			// eslint-disable-next-line @typescript-eslint/naming-convention -- ESLint rule options use PascalCase for AST node names
 			IIFEs: false,
 			max: 50,
 			skipBlankLines: true,
@@ -303,8 +288,7 @@ const suggestionRules = {
 			ignoreDefaultValues: false,
 		},
 	],
-	'no-nested-ternary': 'off',
-	'no-param-reassign': ['off', { props: false }],
+
 	'no-plusplus': ['off', { allowForLoopAfterthoughts: false }],
 	'no-restricted-exports': ['off', {}],
 	'no-restricted-globals': ['off', {}],
@@ -328,6 +312,7 @@ const suggestionRules = {
 		},
 	],
 	'prefer-named-capture-group': 'off',
+	'require-unicode-regexp': 'off',
 	'sort-imports': [
 		'off',
 		{
@@ -352,6 +337,22 @@ const suggestionRules = {
 	'sort-vars': ['off', { ignoreCase: false }],
 	strict: ['off', 'safe'],
 	'vars-on-top': 'off',
-};
+
+	'no-param-reassign': ['error', { props: false }], // Compatibility with `eslint-plugin-functional`
+	'no-regex-spaces': 'error', // Compatibility with `eslint-plugin-regexp`
+	'no-var': 'error', // Compatibility with `eslint-plugin-functional`
+	'prefer-const': [
+		'error', // Compatibility with `eslint-plugin-functional`
+		{
+			destructuring: 'all',
+			ignoreReadBeforeAssign: false,
+		},
+	],
+
+	curly: ['off', 'all'], // Covered by `prettier`
+	'no-negated-condition': 'off', // Covered by `unicorn/no-negated-condition`
+	'no-nested-ternary': 'off', // Covered by `unicorn/no-nested-ternary`
+	'no-warning-comments': 'off', // Covered by `unicorn/expiring-todo-comments`
+} as const;
 
 export { suggestionRules };

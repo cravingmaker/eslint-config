@@ -1,55 +1,112 @@
 {
-	"name": "@cravingmaker/eslint-config",
-	"version": "0.0.3",
-	"description": "Craving Maker's ESLint configuration (Flat Config)",
-	"keywords": [
-		"cravingmaker",
-		"eslint",
-		"eslint-config",
-		"style",
-		"code-style",
-		"lint"
-	],
-	"homepage": "https://github.com/cravingmaker/eslint-config#readme",
-	"bugs": {
-		"url": "https://github.com/cravingmaker/eslint-config/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/cravingmaker/eslint-config.git"
-	},
-	"license": "MIT",
-	"author": "cravingmaker (https://github.com/cravingmaker)",
-	"type": "module",
-	"exports": "./index.js",
-	"files": [
-		"index.js",
-		"rules"
-	],
-	"prettier": "@cravingmaker/prettier-config",
-	"dependencies": {
-		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
-		"@eslint/json": "^1.2.0",
-		"@html-eslint/eslint-plugin": "^0.59.0",
-		"@html-eslint/eslint-plugin-react": "^0.59.0",
-		"@html-eslint/parser": "^0.59.0",
-		"eslint-import-resolver-typescript": "^3.6.1",
-		"eslint-plugin-import-x": "^4.16.2",
-		"eslint-plugin-perfectionist": "^5.8.0",
-		"eslint-plugin-unused-imports": "^4.4.1",
-		"typescript-eslint": "^8.58.1"
-	},
-	"devDependencies": {
-		"@cravingmaker/prettier-config": "^0.1.7",
-		"prettier": "^3.8.2"
-	},
-	"peerDependencies": {
-		"eslint": ">=10.0.0"
-	},
-	"engines": {
-		"node": ">=22"
-	},
-	"publishConfig": {
-		"access": "public"
-	}
+  "name": "@cravingmaker/eslint-config",
+  "version": "0.0.3",
+  "private": false,
+  "description": "Craving Maker's ESLint configuration (Flat Config)",
+  "keywords": [
+    "cravingmaker",
+    "eslint",
+    "eslint-config",
+    "style",
+    "code-style",
+    "lint"
+  ],
+  "homepage": "https://github.com/cravingmaker/eslint-config#readme",
+  "bugs": {
+    "url": "https://github.com/cravingmaker/eslint-config/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cravingmaker/eslint-config.git"
+  },
+  "license": "MIT",
+  "author": "cravingmaker (https://github.com/cravingmaker)",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "clean": "rm -rf dist",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "prepublishOnly": "npm run clean && npm run build",
+    "typecheck": "tsc --noEmit"
+  },
+  "prettier": "@cravingmaker/prettier-config",
+  "dependencies": {
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.7.1",
+    "@eslint/json": "^1.2.0",
+    "@html-eslint/eslint-plugin": "0.60.0",
+    "@html-eslint/eslint-plugin-react": "0.60.0",
+    "@html-eslint/eslint-plugin-svelte": "0.60.0",
+    "@html-eslint/parser": "0.60.0",
+    "eslint-enforce-package-type": "^1.3.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-functional": "^9.0.4",
+    "eslint-plugin-import-x": "^4.16.2",
+    "eslint-plugin-n": "^18.0.1",
+    "eslint-plugin-package-json": "0.91.2",
+    "eslint-plugin-perfectionist": "^5.9.0",
+    "eslint-plugin-promise": "^7.3.0",
+    "eslint-plugin-regexp": "^3.1.0",
+    "eslint-plugin-security": "^4.0.0",
+    "eslint-plugin-unicorn": "^64.0.0",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "globals": "^17.6.0",
+    "jsonc-eslint-parser": "^3.1.0",
+    "svelte-eslint-parser": "1.6.1",
+    "typescript-eslint": "~8.59.2"
+  },
+  "devDependencies": {
+    "@cravingmaker/prettier-config": "0.1.11",
+    "@types/node": "^25.6.0",
+    "eslint": "^10.3.0",
+    "prettier": "^3.8.3",
+    "react": "^19.2.5",
+    "svelte": "^5.55.5",
+    "tsdown": "0.21.10",
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "eslint": "^10.0.0",
+    "react": "^19.0.0",
+    "svelte": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=22.0.0",
+      "onFail": "warn"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": "^11.0.0",
+      "onFail": "warn"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }
