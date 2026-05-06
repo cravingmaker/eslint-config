@@ -154,7 +154,7 @@ export function createConfig({
 				...suggestionRules,
 				...(tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules),
 				...unicornEslintRules,
-				...functionalTypeCheckedEslintRules,
+				...(tsTypeChecked ? functionalTypeCheckedEslintRules : functionalEslintRules),
 				...promiseEslintRules,
 				...regexpEslintRules,
 				...nEslintRules,
