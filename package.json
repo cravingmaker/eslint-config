@@ -1,6 +1,6 @@
 {
   "name": "@cravingmaker/eslint-config",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "private": false,
   "description": "Craving Maker's ESLint configuration (Flat Config)",
   "keywords": [
@@ -113,6 +113,8 @@
     "access": "public"
   },
   "vitest": {
-    "include": ["tests/**/*.test.ts"]
+    "include": [
+      "tests/**/*.test.ts"
+    ]
   }
 }
