@@ -62,10 +62,10 @@ const perfectionistEslintRules: Linter.RulesRecord = {
 		'error',
 		{
 			customGroups: [
-				// #private static field
-				{ groupName: 'hash-private-static-field', modifiers: ['private', 'static'], selector: 'property' },
-				// #private instance field
-				{ groupName: 'hash-private-field', modifiers: ['private'], selector: 'property' },
+				// #private static property
+				{ groupName: 'hash-private-static-property', modifiers: ['private', 'static'], selector: 'property' },
+				// #private instance property
+				{ groupName: 'hash-private-property', modifiers: ['private'], selector: 'property' },
 				// #private static auto-accessor
 				{ groupName: 'hash-private-static-accessor', modifiers: ['private', 'static'], selector: 'accessor-property' },
 				// #private instance auto-accessor
@@ -84,33 +84,32 @@ const perfectionistEslintRules: Linter.RulesRecord = {
 				{ groupName: 'hash-private-method', modifiers: ['private'], selector: 'method' },
 			],
 			groups: [
-				// Static fields
-				'public-static-field',
-				'protected-static-field',
-				'private-static-field',
-				'hash-private-static-field',
+				// Static properties
+				'public-static-property',
+				'protected-static-property',
+				'private-static-property',
+				'hash-private-static-property',
 
 				// Static initialization
 				'static-block',
 
-				// Instance decorated fields (metadata-bearing, declared first)
-				'public-decorated-field',
-				'protected-decorated-field',
-				'private-decorated-field',
+				// Instance decorated properties (metadata-bearing, declared first)
+				'public-decorated-property',
+				'protected-decorated-property',
+				'private-decorated-property',
 
-				// Instance regular fields
-				'public-field',
-				'protected-field',
-				'private-field',
-				'hash-private-field',
+				// Instance regular properties
+				'public-property',
+				'protected-property',
+				'private-property',
+				'hash-private-property',
 
-				// Abstract fields
-				'public-abstract-field',
-				'protected-abstract-field',
+				// Abstract properties
+				'public-abstract-property',
+				'protected-abstract-property',
 
 				// Structural signatures
 				'index-signature',
-				'call-signature',
 
 				// Constructors
 				'public-constructor',
@@ -118,9 +117,9 @@ const perfectionistEslintRules: Linter.RulesRecord = {
 				'private-constructor',
 
 				// Static auto-accessors (accessor keyword)
-				'public-static-accessor',
-				'protected-static-accessor',
-				'private-static-accessor',
+				'public-static-accessor-property',
+				'protected-static-accessor-property',
+				'private-static-accessor-property',
 				'hash-private-static-accessor',
 
 				// Static getters
@@ -142,19 +141,19 @@ const perfectionistEslintRules: Linter.RulesRecord = {
 				'hash-private-static-method',
 
 				// Instance decorated auto-accessors
-				'public-decorated-accessor',
-				'protected-decorated-accessor',
-				'private-decorated-accessor',
+				'public-decorated-accessor-property',
+				'protected-decorated-accessor-property',
+				'private-decorated-accessor-property',
 
 				// Instance regular auto-accessors
-				'public-accessor',
-				'protected-accessor',
-				'private-accessor',
+				'public-accessor-property',
+				'protected-accessor-property',
+				'private-accessor-property',
 				'hash-private-accessor',
 
 				// Abstract auto-accessors
-				'public-abstract-accessor',
-				'protected-abstract-accessor',
+				'public-abstract-accessor-property',
+				'protected-abstract-accessor-property',
 
 				// Instance decorated getters
 				'public-decorated-get-method',
@@ -273,7 +272,7 @@ const perfectionistEslintRules: Linter.RulesRecord = {
 					groupName: 'callback',
 				},
 			],
-			groups: ['multiline', 'unknown', 'shorthand', 'callback'],
+			groups: ['multiline-prop', 'prop', 'shorthand-prop', 'callback'],
 		},
 	],
 

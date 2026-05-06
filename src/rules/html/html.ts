@@ -32,7 +32,7 @@ const htmlEslintRules: Linter.RulesRecord = {
 		},
 	],
 	'@html-eslint/no-extra-spacing-text': ['error', { skip: ['pre', 'code', 'textarea'] }],
-	'@html-eslint/no-inline-styles': ['warn', { message: 'Use external CSS classes instead.' }],
+	'@html-eslint/no-inline-styles': 'warn',
 	'@html-eslint/no-multiple-empty-lines': ['error', { max: 1 }],
 	'@html-eslint/no-restricted-attr-values': [
 		'error',
@@ -103,7 +103,6 @@ const htmlEslintRules: Linter.RulesRecord = {
 	'@html-eslint/require-closing-tags': [
 		'warn',
 		{
-			message: 'Suitable only for web framework project. This rule can be safely ignored in plain HTML project.',
 			selfClosing: 'always',
 			selfClosingCustomPatterns: ['-'],
 		},
