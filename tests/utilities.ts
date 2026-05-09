@@ -23,7 +23,7 @@ type LintOptions = {
 async function expectLintError(code: string, ruleId: string, options: LintOptions): Promise<void> {
 	const { filePath, tsTypeChecked = false } = options;
 
-	const config = createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked });
+	const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked });
 
 	const eslint = new ESLint({
 		overrideConfig: config,
@@ -44,7 +44,7 @@ async function expectLintError(code: string, ruleId: string, options: LintOption
 async function expectNoLintError(code: string, ruleId: string, options: LintOptions): Promise<void> {
 	const { filePath, tsTypeChecked = false } = options;
 
-	const config = createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked });
+	const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked });
 
 	const eslint = new ESLint({
 		overrideConfig: config,

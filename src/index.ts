@@ -19,15 +19,10 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import pluginJson from '@eslint/json';
 import globals from 'globals';
 import pluginHtml from '@html-eslint/eslint-plugin';
-import pluginHtmlReact from '@html-eslint/eslint-plugin-react';
-import pluginHtmlSvelte from '@html-eslint/eslint-plugin-svelte';
 import htmlParser from '@html-eslint/parser';
 import * as jsoncParser from 'jsonc-eslint-parser';
-import svelteParser from 'svelte-eslint-parser';
 import { parser as tseslintParser, plugin as tseslintPlugin } from 'typescript-eslint';
 
-import { htmlReactEslintRules } from './rules/html/html-react.js';
-import { htmlSvelteEslintRules } from './rules/html/html-svelte.js';
 import { htmlEslintRules } from './rules/html/html.js';
 import { possibleProblemRules } from './rules/js/possible-problems.js';
 import { suggestionRules } from './rules/js/suggestions.js';
@@ -67,7 +62,15 @@ type RulesOptions = {
 	readonly ts?: Linter.RulesRecord;
 };
 
-export function createConfig({
+async function tryImport<T>(specifier: string): Promise<T | undefined> {
+	try {
+		return await import(specifier) as T;
+	} catch {
+		return undefined;
+	}
+}
+
+export async function createConfig({
 	ignores = [],
 	plugins = {},
 	rules = {},
@@ -85,6 +88,41 @@ export function createConfig({
 		svelte: svelteRuleOverrides = {},
 		ts: tsRuleOverrides = {},
 	} = rules;
+
+	const optionalConfigs: Linter.Config[] = [];
+
+	// React support (only if @html-eslint/eslint-plugin-react is available)
+	const pluginHtmlReact = await tryImport<{ default: typeof import('@html-eslint/eslint-plugin-react') }>('@html-eslint/eslint-plugin-react');
+	if (pluginHtmlReact) {
+		const { htmlReactEslintRules } = await import('./rules/html/html-react.js');
+		optionalConfigs.push({
+			files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
+			languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
+			plugins: { '@html-eslint/react': pluginHtmlReact.default },
+			rules: {
+				...htmlReactEslintRules,
+				...reactRuleOverrides,
+			},
+		});
+	}
+
+	// Svelte support (only if svelte-eslint-parser and @html-eslint/eslint-plugin-svelte are available)
+	const [pluginHtmlSvelte, svelteParserMod] = await Promise.all([
+		tryImport<{ default: Record<string, unknown> }>('@html-eslint/eslint-plugin-svelte'),
+		tryImport<{ default: Linter.Parser }>('svelte-eslint-parser'),
+	]);
+	if (pluginHtmlSvelte && svelteParserMod) {
+		const { htmlSvelteEslintRules } = await import('./rules/html/html-svelte.js');
+		optionalConfigs.push({
+			files: ['**/*.{svelte,svelte.js,svelte.mjs,svelte.ts, svelte.mts}'],
+			languageOptions: { parser: svelteParserMod.default },
+			plugins: { '@html-eslint/svelte': pluginHtmlSvelte.default },
+			rules: {
+				...htmlSvelteEslintRules,
+				...svelteRuleOverrides,
+			},
+		});
+	}
 
 	return defineConfig([
 		globalIgnores(['node_modules/', 'dist/', 'build/', 'coverage/', ...ignores]),
@@ -177,26 +215,6 @@ export function createConfig({
 		},
 
 		{
-			files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
-			languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
-			plugins: { '@html-eslint/react': pluginHtmlReact },
-			rules: {
-				...htmlReactEslintRules,
-				...reactRuleOverrides,
-			},
-		},
-
-		{
-			files: ['**/*.{svelte,svelte.js,svelte.mjs,svelte.ts, svelte.mts}'],
-			languageOptions: { parser: svelteParser },
-			plugins: { '@html-eslint/svelte': pluginHtmlSvelte },
-			rules: {
-				...htmlSvelteEslintRules,
-				...svelteRuleOverrides,
-			},
-		},
-
-		{
 			files: ['**/*.html'],
 			languageOptions: { parser: htmlParser },
 			plugins: { '@html-eslint': pluginHtml },
@@ -250,6 +268,8 @@ export function createConfig({
 				...json5RuleOverrides,
 			},
 		},
+
+		...optionalConfigs,
 	]);
 }
 
