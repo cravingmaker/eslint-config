@@ -1,6 +1,6 @@
 {
   "name": "@cravingmaker/eslint-config",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": false,
   "description": "Craving Maker's ESLint configuration (Flat Config)",
   "keywords": [
