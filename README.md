@@ -53,9 +53,9 @@ export default createConfig({
   // Optional: Override rules
   rules: {
     ts: {
-      "@typescript-eslint/no-explicit-any": "off",
-    },
-  },
+      "@typescript-eslint/no-explicit-any": "off"
+    }
+  }
 });
 ```
 

@@ -1,4 +1,6 @@
 import type { Linter } from 'eslint';
+import type eslintPluginExpressSecurity from 'eslint-plugin-express-security';
+import type eslintPluginHtmlReact from '@html-eslint/eslint-plugin-react';
 
 import process from 'node:process';
 
@@ -50,7 +52,20 @@ type CreateConfigOptions = {
 	readonly tsTypeChecked?: boolean;
 	readonly useThrow?: boolean;
 };
+type ResolvedRules = {
+	readonly express: Linter.RulesRecord;
+	readonly html: Linter.RulesRecord;
+	readonly js: Linter.RulesRecord;
+	readonly json: Linter.RulesRecord;
+	readonly json5: Linter.RulesRecord;
+	readonly jsonc: Linter.RulesRecord;
+	readonly packageJson: Linter.RulesRecord;
+	readonly react: Linter.RulesRecord;
+	readonly svelte: Linter.RulesRecord;
+	readonly ts: Linter.RulesRecord;
+};
 type RulesOptions = {
+	readonly express?: Linter.RulesRecord;
 	readonly html?: Linter.RulesRecord;
 	readonly js?: Linter.RulesRecord;
 	readonly json?: Linter.RulesRecord;
@@ -62,9 +77,63 @@ type RulesOptions = {
 	readonly ts?: Linter.RulesRecord;
 };
 
+// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
+async function buildExpressConfig(ruleOverrides: Readonly<Linter.RulesRecord>): Promise<Linter.Config | undefined> {
+	const plugin = await tryImport<{ default: typeof eslintPluginExpressSecurity }>('eslint-plugin-express-security');
+	if (plugin === undefined) return undefined;
+	const { expressSecurityEslintRules } = await import('./rules/node/express-security.js');
+	return {
+		files: ['**/*.{js,mjs,ts,mts}'],
+		plugins: { 'express-security': plugin.default },
+		rules: { ...expressSecurityEslintRules, ...ruleOverrides },
+	};
+}
+// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
+async function buildReactConfig(ruleOverrides: Readonly<Linter.RulesRecord>): Promise<Linter.Config | undefined> {
+	const plugin = await tryImport<{ default: typeof eslintPluginHtmlReact }>('@html-eslint/eslint-plugin-react');
+	if (plugin === undefined) return undefined;
+	const { htmlReactEslintRules } = await import('./rules/html/html-react.js');
+	return {
+		files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
+		languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
+		plugins: { '@html-eslint/react': plugin.default },
+		rules: { ...htmlReactEslintRules, ...ruleOverrides },
+	};
+}
+// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
+async function buildSvelteConfig(ruleOverrides: Readonly<Linter.RulesRecord>): Promise<Linter.Config | undefined> {
+	const [plugin, svelteParserModule] = await Promise.all([
+		tryImport<{ default: Record<string, unknown> }>('@html-eslint/eslint-plugin-svelte'),
+		tryImport<{ default: Linter.Parser }>('svelte-eslint-parser'),
+	]);
+	if (plugin === undefined || svelteParserModule === undefined) return undefined;
+	const { htmlSvelteEslintRules } = await import('./rules/html/html-svelte.js');
+	return {
+		files: ['**/*.{svelte,svelte.js,svelte.mjs,svelte.ts,svelte.mts}'],
+		languageOptions: { parser: svelteParserModule.default },
+		plugins: { '@html-eslint/svelte': plugin.default },
+		rules: { ...htmlSvelteEslintRules, ...ruleOverrides },
+	};
+}
+// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
+function resolveRules(rules: RulesOptions): ResolvedRules {
+	return {
+		express: rules.express ?? {},
+		html: rules.html ?? {},
+		js: rules.js ?? {},
+		json: rules.json ?? {},
+		json5: rules.json5 ?? {},
+		jsonc: rules.jsonc ?? {},
+		packageJson: rules.packageJson ?? {},
+		react: rules.react ?? {},
+		svelte: rules.svelte ?? {},
+		ts: rules.ts ?? {},
+	};
+}
 async function tryImport<T>(specifier: string): Promise<T | undefined> {
 	try {
-		return await import(specifier) as T;
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- dynamic import cannot be statically typed
+		return (await import(specifier)) as T;
 	} catch {
 		return undefined;
 	}
@@ -78,51 +147,31 @@ export async function createConfig({
 	tsTypeChecked = true,
 }: CreateConfigOptions = {}) {
 	const {
-		html: htmlRuleOverrides = {},
-		js: jsRuleOverrides = {},
-		json: jsonRuleOverrides = {},
-		json5: json5RuleOverrides = {},
-		jsonc: jsoncRuleOverrides = {},
-		packageJson: packageJsonRuleOverrides = {},
-		react: reactRuleOverrides = {},
-		svelte: svelteRuleOverrides = {},
-		ts: tsRuleOverrides = {},
-	} = rules;
+		express: expressRuleOverrides,
+		html: htmlRuleOverrides,
+		js: jsRuleOverrides,
+		json: jsonRuleOverrides,
+		json5: json5RuleOverrides,
+		jsonc: jsoncRuleOverrides,
+		packageJson: packageJsonRuleOverrides,
+		react: reactRuleOverrides,
+		svelte: svelteRuleOverrides,
+		ts: tsRuleOverrides,
+	} = resolveRules(rules);
 
-	const optionalConfigs: Linter.Config[] = [];
-
-	// React support (only if @html-eslint/eslint-plugin-react is available)
-	const pluginHtmlReact = await tryImport<{ default: typeof import('@html-eslint/eslint-plugin-react') }>('@html-eslint/eslint-plugin-react');
-	if (pluginHtmlReact) {
-		const { htmlReactEslintRules } = await import('./rules/html/html-react.js');
-		optionalConfigs.push({
-			files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
-			languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
-			plugins: { '@html-eslint/react': pluginHtmlReact.default },
-			rules: {
-				...htmlReactEslintRules,
-				...reactRuleOverrides,
-			},
-		});
-	}
-
-	// Svelte support (only if svelte-eslint-parser and @html-eslint/eslint-plugin-svelte are available)
-	const [pluginHtmlSvelte, svelteParserMod] = await Promise.all([
-		tryImport<{ default: Record<string, unknown> }>('@html-eslint/eslint-plugin-svelte'),
-		tryImport<{ default: Linter.Parser }>('svelte-eslint-parser'),
+	const optionalConfigResults = await Promise.all([
+		buildReactConfig(reactRuleOverrides),
+		buildSvelteConfig(svelteRuleOverrides),
+		buildExpressConfig(expressRuleOverrides),
 	]);
-	if (pluginHtmlSvelte && svelteParserMod) {
-		const { htmlSvelteEslintRules } = await import('./rules/html/html-svelte.js');
-		optionalConfigs.push({
-			files: ['**/*.{svelte,svelte.js,svelte.mjs,svelte.ts, svelte.mts}'],
-			languageOptions: { parser: svelteParserMod.default },
-			plugins: { '@html-eslint/svelte': pluginHtmlSvelte.default },
-			rules: {
-				...htmlSvelteEslintRules,
-				...svelteRuleOverrides,
-			},
-		});
-	}
+	const optionalConfigs = optionalConfigResults.filter((config): config is Linter.Config => config !== undefined);
+
+	const tsRules = tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules;
+	const functionalRules = tsTypeChecked ? functionalTypeCheckedEslintRules : functionalEslintRules;
+	const tsParserOptions = tsTypeChecked
+		? { projectService: true, sourceType: 'module' as const, tsconfigRootDir }
+		: { sourceType: 'module' as const };
+	const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
 
 	return defineConfig([
 		globalIgnores(['node_modules/', 'dist/', 'build/', 'coverage/', ...ignores]),
@@ -178,21 +227,15 @@ export async function createConfig({
 			languageOptions: {
 				globals: globals.builtin,
 				parser: tseslintParser,
-				parserOptions: tsTypeChecked
-					? {
-							projectService: true,
-							sourceType: 'module',
-							tsconfigRootDir,
-						}
-					: { sourceType: 'module' },
+				parserOptions: tsParserOptions,
 			},
 			plugins: { '@typescript-eslint': tseslintPlugin },
 			rules: {
 				...possibleProblemRules,
 				...suggestionRules,
-				...(tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules),
+				...tsRules,
 				...unicornEslintRules,
-				...(tsTypeChecked ? functionalTypeCheckedEslintRules : functionalEslintRules),
+				...functionalRules,
 				...promiseEslintRules,
 				...regexpEslintRules,
 				...nEslintRules,
@@ -207,7 +250,7 @@ export async function createConfig({
 				'import-x/resolver-next': [
 					createTypeScriptImportResolver({
 						alwaysTryTypes: true,
-						...(tsconfigRootDir ? { project: tsconfigRootDir } : {}),
+						...resolverProject,
 					}),
 					createNodeResolver(),
 				],

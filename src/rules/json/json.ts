@@ -6,9 +6,7 @@ import eslintPluginJson from '@eslint/json';
 function getRules() {
 	const rules = eslintPluginJson.rules as Record<string, unknown>;
 
-	return Object.fromEntries(
-		Object.keys(rules).map((key) => [`json/${key}`, 'error']),
-	) as Linter.RulesRecord;
+	return Object.fromEntries(Object.keys(rules).map((key) => [`json/${key}`, 'error'])) as Linter.RulesRecord;
 }
 
 const jsonEslintRules: Linter.RulesRecord = {

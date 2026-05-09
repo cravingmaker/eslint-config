@@ -16,4 +16,3 @@ const htmlSvelteEslintRules: Linter.RulesRecord = {
 } as const;
 
 export { htmlSvelteEslintRules };
-
