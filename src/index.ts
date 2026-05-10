@@ -1,6 +1,7 @@
 import type { Linter } from 'eslint';
 import type eslintPluginExpressSecurity from 'eslint-plugin-express-security';
 import type eslintPluginHtmlReact from '@html-eslint/eslint-plugin-react';
+import type { parser as tseslintParser, plugin as tseslintPlugin } from 'typescript-eslint';
 
 import process from 'node:process';
 
@@ -23,7 +24,6 @@ import globals from 'globals';
 import pluginHtml from '@html-eslint/eslint-plugin';
 import htmlParser from '@html-eslint/parser';
 import * as jsoncParser from 'jsonc-eslint-parser';
-import { parser as tseslintParser, plugin as tseslintPlugin } from 'typescript-eslint';
 
 import { htmlEslintRules } from './rules/html/html.js';
 import { possibleProblemRules } from './rules/js/possible-problems.js';
@@ -76,6 +76,13 @@ type RulesOptions = {
 	readonly svelte?: Linter.RulesRecord;
 	readonly ts?: Linter.RulesRecord;
 };
+type TsConfigOptions = {
+	readonly functionalRules: Readonly<Record<string, Linter.RuleEntry | undefined>>;
+	readonly resolverProject: Readonly<Record<string, unknown>>;
+	readonly ruleOverrides: Readonly<Linter.RulesRecord>;
+	readonly tsParserOptions: Readonly<Record<string, unknown>>;
+	readonly tsRules: Readonly<Linter.RulesRecord>;
+};
 
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 async function buildExpressConfig(ruleOverrides: Readonly<Linter.RulesRecord>): Promise<Linter.Config | undefined> {
@@ -113,6 +120,53 @@ async function buildSvelteConfig(ruleOverrides: Readonly<Linter.RulesRecord>): P
 		languageOptions: { parser: svelteParserModule.default },
 		plugins: { '@html-eslint/svelte': plugin.default },
 		rules: { ...htmlSvelteEslintRules, ...ruleOverrides },
+	};
+}
+// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
+async function buildTsConfig({
+	functionalRules,
+	resolverProject,
+	ruleOverrides,
+	tsParserOptions,
+	tsRules,
+}: TsConfigOptions): Promise<Linter.Config | undefined> {
+	const tseslint = await tryImport<{ parser: typeof tseslintParser; plugin: typeof tseslintPlugin }>(
+		'typescript-eslint',
+	);
+	if (tseslint === undefined) return undefined;
+	return {
+		files: ['**/*.{ts,mts,tsx,mtsx}'],
+		languageOptions: {
+			globals: globals.builtin,
+			parser: tseslint.parser,
+			parserOptions: tsParserOptions,
+		},
+		plugins: { '@typescript-eslint': tseslint.plugin },
+		rules: {
+			...possibleProblemRules,
+			...suggestionRules,
+			...tsRules,
+			...unicornEslintRules,
+			...functionalRules,
+			...promiseEslintRules,
+			...regexpEslintRules,
+			...nEslintRules,
+			...securityEslintRules,
+			...unusedImportsEslintRules,
+			...importxEslintRules,
+			...perfectionistEslintRules,
+			...eslintCommentsRules,
+			...ruleOverrides,
+		},
+		settings: {
+			'import-x/resolver-next': [
+				createTypeScriptImportResolver({
+					alwaysTryTypes: true,
+					...resolverProject,
+				}),
+				createNodeResolver(),
+			],
+		},
 	};
 }
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
@@ -159,19 +213,20 @@ export async function createConfig({
 		ts: tsRuleOverrides,
 	} = resolveRules(rules);
 
-	const optionalConfigResults = await Promise.all([
-		buildReactConfig(reactRuleOverrides),
-		buildSvelteConfig(svelteRuleOverrides),
-		buildExpressConfig(expressRuleOverrides),
-	]);
-	const optionalConfigs = optionalConfigResults.filter((config): config is Linter.Config => config !== undefined);
-
 	const tsRules = tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules;
 	const functionalRules = tsTypeChecked ? functionalTypeCheckedEslintRules : functionalEslintRules;
 	const tsParserOptions = tsTypeChecked
 		? { projectService: true, sourceType: 'module' as const, tsconfigRootDir }
 		: { sourceType: 'module' as const };
 	const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
+
+	const optionalConfigResults = await Promise.all([
+		buildReactConfig(reactRuleOverrides),
+		buildSvelteConfig(svelteRuleOverrides),
+		buildExpressConfig(expressRuleOverrides),
+		buildTsConfig({ functionalRules, resolverProject, ruleOverrides: tsRuleOverrides, tsParserOptions, tsRules }),
+	]);
+	const optionalConfigs = optionalConfigResults.filter((config): config is Linter.Config => config !== undefined);
 
 	return defineConfig([
 		globalIgnores(['node_modules/', 'dist/', 'build/', 'coverage/', ...ignores]),
@@ -219,41 +274,6 @@ export async function createConfig({
 				...perfectionistEslintRules,
 				...eslintCommentsRules,
 				...jsRuleOverrides,
-			},
-		},
-
-		{
-			files: ['**/*.{ts,mts,tsx,mtsx}'],
-			languageOptions: {
-				globals: globals.builtin,
-				parser: tseslintParser,
-				parserOptions: tsParserOptions,
-			},
-			plugins: { '@typescript-eslint': tseslintPlugin },
-			rules: {
-				...possibleProblemRules,
-				...suggestionRules,
-				...tsRules,
-				...unicornEslintRules,
-				...functionalRules,
-				...promiseEslintRules,
-				...regexpEslintRules,
-				...nEslintRules,
-				...securityEslintRules,
-				...unusedImportsEslintRules,
-				...importxEslintRules,
-				...perfectionistEslintRules,
-				...eslintCommentsRules,
-				...tsRuleOverrides,
-			},
-			settings: {
-				'import-x/resolver-next': [
-					createTypeScriptImportResolver({
-						alwaysTryTypes: true,
-						...resolverProject,
-					}),
-					createNodeResolver(),
-				],
 			},
 		},
 
