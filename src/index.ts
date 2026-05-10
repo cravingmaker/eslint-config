@@ -198,7 +198,7 @@ export async function createConfig({
 	plugins = {},
 	rules = {},
 	tsconfigRootDir = process.cwd(),
-	tsTypeChecked = true,
+	tsTypeChecked,
 }: CreateConfigOptions = {}) {
 	const {
 		express: expressRuleOverrides,
@@ -213,9 +213,10 @@ export async function createConfig({
 		ts: tsRuleOverrides,
 	} = resolveRules(rules);
 
-	const tsRules = tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules;
-	const functionalRules = tsTypeChecked ? functionalTypeCheckedEslintRules : functionalEslintRules;
-	const tsParserOptions = tsTypeChecked
+	const isTypeScript = tsTypeChecked ?? (await tryImport('typescript-eslint')) !== undefined;
+	const tsRules = isTypeScript ? tsEslintTypeCheckedRules : tsEslintRules;
+	const functionalRules = isTypeScript ? functionalTypeCheckedEslintRules : functionalEslintRules;
+	const tsParserOptions = isTypeScript
 		? { projectService: true, sourceType: 'module' as const, tsconfigRootDir }
 		: { sourceType: 'module' as const };
 	const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
