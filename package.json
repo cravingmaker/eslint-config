@@ -71,7 +71,7 @@
     "@cravingmaker/prettier-config": "0.1.11",
     "@html-eslint/eslint-plugin-react": "0.60.0",
     "@html-eslint/eslint-plugin-svelte": "0.60.0",
-    "@types/node": "25.6.0",
+    "@types/node": "25.6.2",
     "eslint": "10.3.0",
     "eslint-plugin-express-security": "1.2.3",
     "prettier": "3.8.3",
@@ -83,13 +83,13 @@
     "vitest": "4.1.5"
   },
   "peerDependencies": {
-    "@html-eslint/eslint-plugin-react": "0.60.0",
-    "@html-eslint/eslint-plugin-svelte": "0.60.0",
-    "eslint": "10.0.0",
-    "eslint-plugin-express-security": "1.2.3",
-    "react": "19.0.0",
-    "svelte": "5.0.0",
-    "svelte-eslint-parser": "1.6.0"
+    "@html-eslint/eslint-plugin-react": ">=0.60.0",
+    "@html-eslint/eslint-plugin-svelte": ">=0.60.0",
+    "eslint": ">=10.0.0",
+    "eslint-plugin-express-security": ">=1.2.0",
+    "react": ">=19.0.0",
+    "svelte": ">=5.0.0",
+    "svelte-eslint-parser": ">=1.6.0"
   },
   "peerDependenciesMeta": {
     "@html-eslint/eslint-plugin-react": {
@@ -112,12 +112,12 @@
     }
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": ">=22.0.0",
+      "version": ">=24.0.0",
       "onFail": "warn"
     },
     "packageManager": {
