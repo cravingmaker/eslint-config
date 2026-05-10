@@ -21,8 +21,14 @@ const packageJsonEslintRules: Linter.RulesRecord = {
 	'package-json/require-repository': ['error', { ignorePrivate: true }],
 	'package-json/require-sideEffects': ['error', { ignorePrivate: true }],
 	'package-json/require-types': ['error', { ignorePrivate: true }],
+	'package-json/restrict-dependency-ranges': [
+		'error',
+		{
+			forDependencyTypes: ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies'],
+			rangeType: 'pin',
+		},
+	],
 
-	'package-json/restrict-dependency-ranges': 'off', // Project specific
 	'package-json/restrict-top-level-properties': 'off', // Project specific
 
 	'package-json/require-bin': 'off', // Prefer optional
