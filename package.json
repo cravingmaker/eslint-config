@@ -40,10 +40,34 @@
     "clean": "rm -rf dist",
     "format": "prettier --write .",
     "lint": "eslint .",
+    "prepare": "husky",
     "prepublishOnly": "npm run clean && npm run build",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "package.json": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.md": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "eslint.config.{js,ts,mjs,mts}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "tsdown.config.{js,ts,mjs,mts}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   },
   "prettier": "@cravingmaker/prettier-config",
   "dependencies": {
@@ -74,6 +98,8 @@
     "@types/node": "25.6.2",
     "eslint": "10.3.0",
     "eslint-plugin-express-security": "1.2.3",
+    "husky": "9.1.7",
+    "lint-staged": "17.0.4",
     "prettier": "3.8.3",
     "react": "19.2.6",
     "svelte": "5.55.5",
