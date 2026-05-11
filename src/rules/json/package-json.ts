@@ -24,7 +24,7 @@ const packageJsonEslintRules: Linter.RulesRecord = {
 	'package-json/restrict-dependency-ranges': [
 		'error',
 		{
-			forDependencyTypes: ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies'],
+			forDependencyTypes: ['dependencies', 'devDependencies'],
 			rangeType: 'pin',
 		},
 	],
