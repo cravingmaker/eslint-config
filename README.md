@@ -44,9 +44,9 @@ Create an `eslint.config.js` file in your project root:
 import { createConfig } from "@cravingmaker/eslint-config";
 
 export default createConfig({
-  // Optional: Enable type-checked rules (defaults to true)
+  // Optional: Enable type-checked rules
   tsTypeChecked: true,
-  // Optional: Set the root directory for tsconfig (defaults to process.cwd())
+  // Optional: Set the root directory for tsconfig
   tsconfigRootDir: import.meta.dirname,
   // Optional: Add custom ignores
   ignores: ["dist/**"],
