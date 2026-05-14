@@ -96,6 +96,7 @@
     "@cravingmaker/prettier-config": "0.1.11",
     "@html-eslint/eslint-plugin-react": "0.60.0",
     "@html-eslint/eslint-plugin-svelte": "0.60.0",
+    "@types/eslint-plugin-security": "3.0.1",
     "@types/node": "25.6.2",
     "eslint": "10.3.0",
     "eslint-plugin-express-security": "1.2.3",

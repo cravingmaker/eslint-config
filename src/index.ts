@@ -249,7 +249,6 @@ export async function createConfig({
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- eslint-plugin-promise does not have types
 				promise: pluginPromise,
 
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- eslint-plugin-security does not have types
 				security: pluginSecurity,
 
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- @eslint/markdown Plugin type is not assignable to Linter.Plugin without assertion
