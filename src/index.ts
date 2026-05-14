@@ -20,6 +20,7 @@ import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import pluginJson from '@eslint/json';
+import pluginMarkdown from '@eslint/markdown';
 import globals from 'globals';
 import pluginHtml from '@html-eslint/eslint-plugin';
 import htmlParser from '@html-eslint/parser';
@@ -31,6 +32,7 @@ import { suggestionRules } from './rules/js/suggestions.js';
 import { enforcePackageTypeEslintRules } from './rules/json/enforce-package-type.js';
 import { jsonEslintRules } from './rules/json/json.js';
 import { packageJsonEslintRules } from './rules/json/package-json.js';
+import { markdownEslintRules } from './rules/markdown/markdown.js';
 import { eslintCommentsRules } from './rules/misc/eslint-comments.js';
 import { functionalEslintRules, functionalTypeCheckedEslintRules } from './rules/misc/functional.js';
 import { importxEslintRules } from './rules/misc/import-x.js';
@@ -250,6 +252,9 @@ export async function createConfig({
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- eslint-plugin-security does not have types
 				security: pluginSecurity,
 
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- @eslint/markdown Plugin type is not assignable to Linter.Plugin without assertion
+				markdown: pluginMarkdown as unknown as NonNullable<Linter.Config['plugins']>[string],
+
 				...plugins,
 			},
 		},
@@ -330,6 +335,20 @@ export async function createConfig({
 			rules: {
 				...jsonEslintRules,
 				...json5RuleOverrides,
+			},
+		},
+
+		{
+			files: ['**/*.md'],
+			language: 'markdown/gfm',
+			languageOptions: {
+				frontmatter: 'yaml',
+				math: true,
+			},
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- @eslint/markdown Plugin type is not assignable to Linter.Plugin without assertion
+			plugins: { markdown: pluginMarkdown as unknown as NonNullable<Linter.Config['plugins']>[string] },
+			rules: {
+				...markdownEslintRules,
 			},
 		},
 

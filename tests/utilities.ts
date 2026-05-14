@@ -1,3 +1,5 @@
+import { mkdir, rm, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 import process from 'node:process';
 
 import { ESLint } from 'eslint';
@@ -41,6 +43,33 @@ async function expectLintError(code: string, ruleId: string, options: LintOption
 		`Expected rule "${ruleId}" to fire.\nReported rules: [${matchingRuleIds.join(', ')}]`,
 	).toContain(ruleId);
 }
+/**
+ * Writes `code` to a real temp file (needed for language plugins like @eslint/markdown
+ * that don't support lintText with a virtual filePath), lints it, and asserts the rule fires.
+ */
+async function expectLintErrorInFile(code: string, ruleId: string, options: LintOptions): Promise<void> {
+	const { filePath, tsTypeChecked = false } = options;
+	const extension = filePath.slice(filePath.lastIndexOf('.'));
+	const directory = path.join(process.cwd(), `.tmp-lint-${Date.now()}`);
+	const file = path.join(directory, `test${extension}`);
+	try {
+		// eslint-disable-next-line functional/no-expression-statements, security/detect-non-literal-fs-filename -- Test utilities use dynamic temp file paths
+		await mkdir(directory);
+		// eslint-disable-next-line functional/no-expression-statements, security/detect-non-literal-fs-filename -- Test utilities need side effects for file operations
+		await writeFile(file, code);
+		const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked });
+		const eslint = new ESLint({ overrideConfig: config, overrideConfigFile: true });
+		const results = await eslint.lintFiles([file]);
+		const matchingRuleIds = results.flatMap((r) => r.messages).map((m) => m.ruleId);
+		expect(
+			matchingRuleIds,
+			`Expected rule "${ruleId}" to fire.\nReported rules: [${matchingRuleIds.join(', ')}]`,
+		).toContain(ruleId);
+	} finally {
+		// eslint-disable-next-line functional/no-expression-statements -- Test utilities need side effects for cleanup
+		await rm(directory, { recursive: true });
+	}
+}
 async function expectNoLintError(code: string, ruleId: string, options: LintOptions): Promise<void> {
 	const { filePath, tsTypeChecked = false } = options;
 
@@ -62,5 +91,28 @@ async function expectNoLintError(code: string, ruleId: string, options: LintOpti
 		`Expected rule "${ruleId}" not to fire.\nReported rules: [${matchingRuleIds.join(', ')}]`,
 	).not.toContain(ruleId);
 }
+async function expectNoLintErrorInFile(code: string, ruleId: string, options: LintOptions): Promise<void> {
+	const { filePath, tsTypeChecked = false } = options;
+	const extension = filePath.slice(filePath.lastIndexOf('.'));
+	const directory = path.join(process.cwd(), `.tmp-lint-${Date.now()}`);
+	const file = path.join(directory, `test${extension}`);
+	try {
+		// eslint-disable-next-line functional/no-expression-statements, security/detect-non-literal-fs-filename -- Test utilities use dynamic temp file paths
+		await mkdir(directory);
+		// eslint-disable-next-line functional/no-expression-statements, security/detect-non-literal-fs-filename -- Test utilities need side effects for file operations
+		await writeFile(file, code);
+		const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked });
+		const eslint = new ESLint({ overrideConfig: config, overrideConfigFile: true });
+		const results = await eslint.lintFiles([file]);
+		const matchingRuleIds = results.flatMap((r) => r.messages).map((m) => m.ruleId);
+		expect(
+			matchingRuleIds,
+			`Expected rule "${ruleId}" not to fire.\nReported rules: [${matchingRuleIds.join(', ')}]`,
+		).not.toContain(ruleId);
+	} finally {
+		// eslint-disable-next-line functional/no-expression-statements -- Test utilities need side effects for cleanup
+		await rm(directory, { recursive: true });
+	}
+}
 
-export { expectLintError, expectNoLintError };
+export { expectLintError, expectLintErrorInFile, expectNoLintError, expectNoLintErrorInFile };
