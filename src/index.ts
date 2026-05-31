@@ -1,8 +1,12 @@
 import type { Linter } from 'eslint';
 import type eslintPluginExpressSecurity from 'eslint-plugin-express-security';
+import type pluginReactHooks from 'eslint-plugin-react-hooks';
+import type { reactRefresh as ReactRefreshPlugin } from 'eslint-plugin-react-refresh';
 import type eslintPluginHtmlReact from '@html-eslint/eslint-plugin-react';
 import type { parser as tseslintParser, plugin as tseslintPlugin } from 'typescript-eslint';
 
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import process from 'node:process';
 
 import pluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments';
@@ -49,6 +53,7 @@ type CreateConfigOptions = {
 	readonly ignores?: readonly string[];
 	readonly oop?: boolean;
 	readonly plugins?: Linter.Config['plugins'];
+	readonly reactRefreshVariant?: 'generic' | 'next' | 'vite';
 	readonly rules?: RulesOptions;
 	readonly tsconfigRootDir?: string;
 	readonly tsTypeChecked?: boolean;
@@ -97,17 +102,49 @@ async function buildExpressConfig(ruleOverrides: Readonly<Linter.RulesRecord>): 
 		rules: { ...expressSecurityEslintRules, ...ruleOverrides },
 	};
 }
-// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
-async function buildReactConfig(ruleOverrides: Readonly<Linter.RulesRecord>): Promise<Linter.Config | undefined> {
-	const plugin = await tryImport<{ default: typeof eslintPluginHtmlReact }>('@html-eslint/eslint-plugin-react');
-	if (plugin === undefined) return undefined;
-	const { htmlReactEslintRules } = await import('./rules/html/html-react.js');
-	return {
-		files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
-		languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
-		plugins: { '@html-eslint/react': plugin.default },
-		rules: { ...htmlReactEslintRules, ...ruleOverrides },
-	};
+async function buildReactConfig(
+	variant: 'generic' | 'next' | 'vite',
+	// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
+	ruleOverrides: Readonly<Linter.RulesRecord>,
+): Promise<readonly Linter.Config[]> {
+	const [htmlReactPlugin, hooksPlugin, refreshModule] = await Promise.all([
+		tryImport<{ default: typeof eslintPluginHtmlReact }>('@html-eslint/eslint-plugin-react'),
+		tryImport<{ default: typeof pluginReactHooks }>('eslint-plugin-react-hooks'),
+		tryImport<{ reactRefresh: typeof ReactRefreshPlugin }>('eslint-plugin-react-refresh'),
+	]);
+
+	const [htmlReactRulesModule, hooksRulesModule, refreshRulesModule] = await Promise.all([
+		htmlReactPlugin === undefined ? undefined : import('./rules/html/html-react.js'),
+		hooksPlugin === undefined ? undefined : import('./rules/react/react-hooks.js'),
+		refreshModule === undefined ? undefined : import('./rules/react/react-refresh.js'),
+	]);
+
+	const reactConfigs: Array<Linter.Config | undefined> = [
+		htmlReactPlugin === undefined || htmlReactRulesModule === undefined
+			? undefined
+			: {
+					files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
+					languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
+					plugins: { '@html-eslint/react': htmlReactPlugin.default },
+					rules: { ...htmlReactRulesModule.htmlReactEslintRules, ...ruleOverrides },
+				},
+		hooksPlugin === undefined || hooksRulesModule === undefined
+			? undefined
+			: {
+					files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint-plugin-react-hooks configs.flat shape is not assignable to Linter.Plugin without assertion
+					plugins: { 'react-hooks': hooksPlugin.default as unknown as NonNullable<Linter.Config['plugins']>[string] },
+					rules: { ...hooksRulesModule.reactHooksEslintRules, ...ruleOverrides },
+				},
+		refreshModule === undefined || refreshRulesModule === undefined
+			? undefined
+			: {
+					files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
+					plugins: { 'react-refresh': refreshModule.reactRefresh.plugin },
+					rules: { ...refreshRulesModule.getReactRefreshEslintRules(variant), ...ruleOverrides },
+				},
+	];
+	return reactConfigs.filter((c): c is Linter.Config => c !== undefined);
 }
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 async function buildSvelteConfig(ruleOverrides: Readonly<Linter.RulesRecord>): Promise<Linter.Config | undefined> {
@@ -171,6 +208,25 @@ async function buildTsConfig({
 		},
 	};
 }
+// eslint-disable-next-line functional/functional-parameters -- Zero-parameter async function; detecting variant requires no inputs
+async function detectReactRefreshVariant(): Promise<'generic' | 'next' | 'vite'> {
+	try {
+		// eslint-disable-next-line security/detect-non-literal-fs-filename -- path.join with process.cwd() is a safe, well-known base path
+		const raw = await readFile(path.join(process.cwd(), 'package.json'), 'utf8');
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- JSON.parse returns `any`; immediately cast to a safe Record shape
+		const packageManifest = JSON.parse(raw) as Record<string, Record<string, unknown> | undefined>;
+		const deps: Record<string, unknown> = {
+			...packageManifest.dependencies,
+			...packageManifest.devDependencies,
+			...packageManifest.peerDependencies,
+		};
+		if ('next' in deps) return 'next';
+		if ('vite' in deps) return 'vite';
+		return 'generic';
+	} catch {
+		return 'generic';
+	}
+}
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 function resolveRules(rules: RulesOptions): ResolvedRules {
 	return {
@@ -198,6 +254,7 @@ async function tryImport<T>(specifier: string): Promise<T | undefined> {
 export async function createConfig({
 	ignores = [],
 	plugins = {},
+	reactRefreshVariant,
 	rules = {},
 	tsconfigRootDir = process.cwd(),
 	tsTypeChecked,
@@ -223,13 +280,18 @@ export async function createConfig({
 		: { sourceType: 'module' as const };
 	const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
 
-	const optionalConfigResults = await Promise.all([
-		buildReactConfig(reactRuleOverrides),
+	const resolvedVariant = reactRefreshVariant ?? (await detectReactRefreshVariant());
+
+	const [reactConfigs, svelteConfig, expressConfig, tsConfig] = await Promise.all([
+		buildReactConfig(resolvedVariant, reactRuleOverrides),
 		buildSvelteConfig(svelteRuleOverrides),
 		buildExpressConfig(expressRuleOverrides),
 		buildTsConfig({ functionalRules, resolverProject, ruleOverrides: tsRuleOverrides, tsParserOptions, tsRules }),
 	]);
-	const optionalConfigs = optionalConfigResults.filter((config): config is Linter.Config => config !== undefined);
+	const optionalConfigs = [
+		...reactConfigs,
+		...[svelteConfig, expressConfig, tsConfig].filter((c): c is Linter.Config => c !== undefined),
+	];
 
 	return defineConfig([
 		globalIgnores(['node_modules/', 'dist/', 'build/', 'coverage/', ...ignores]),

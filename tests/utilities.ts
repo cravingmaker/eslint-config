@@ -11,6 +11,8 @@ type LintOptions = {
 	/** The virtual file path used to select the correct config block (e.g. 'test.ts', 'test.js'). */
 	readonly filePath: string;
 
+	/** Override the react-refresh variant (auto-detected from package.json if omitted). */
+	readonly reactRefreshVariant?: 'generic' | 'next' | 'vite';
 	/** Whether to enable type-checked rules. Defaults to false for speed in most fixture tests. */
 	readonly tsTypeChecked?: boolean;
 };
@@ -23,9 +25,9 @@ type LintOptions = {
  * await expectLintError('const a = 1;\n', 'no-unused-vars', { filePath: 'test.js' });
  */
 async function expectLintError(code: string, ruleId: string, options: LintOptions): Promise<void> {
-	const { filePath, tsTypeChecked = false } = options;
+	const { filePath, reactRefreshVariant, tsTypeChecked = false } = options;
 
-	const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked });
+	const config = await createConfig({ reactRefreshVariant, tsconfigRootDir: process.cwd(), tsTypeChecked });
 
 	const eslint = new ESLint({
 		overrideConfig: config,
@@ -48,7 +50,7 @@ async function expectLintError(code: string, ruleId: string, options: LintOption
  * that don't support lintText with a virtual filePath), lints it, and asserts the rule fires.
  */
 async function expectLintErrorInFile(code: string, ruleId: string, options: LintOptions): Promise<void> {
-	const { filePath, tsTypeChecked = false } = options;
+	const { filePath, reactRefreshVariant, tsTypeChecked = false } = options;
 	const extension = filePath.slice(filePath.lastIndexOf('.'));
 	const directory = path.join(process.cwd(), `.tmp-lint-${Date.now()}`);
 	const file = path.join(directory, `test${extension}`);
@@ -57,7 +59,7 @@ async function expectLintErrorInFile(code: string, ruleId: string, options: Lint
 		await mkdir(directory);
 		// eslint-disable-next-line functional/no-expression-statements, security/detect-non-literal-fs-filename -- Test utilities need side effects for file operations
 		await writeFile(file, code);
-		const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked });
+		const config = await createConfig({ reactRefreshVariant, tsconfigRootDir: process.cwd(), tsTypeChecked });
 		const eslint = new ESLint({ overrideConfig: config, overrideConfigFile: true });
 		const results = await eslint.lintFiles([file]);
 		const matchingRuleIds = results.flatMap((r) => r.messages).map((m) => m.ruleId);
@@ -71,9 +73,9 @@ async function expectLintErrorInFile(code: string, ruleId: string, options: Lint
 	}
 }
 async function expectNoLintError(code: string, ruleId: string, options: LintOptions): Promise<void> {
-	const { filePath, tsTypeChecked = false } = options;
+	const { filePath, reactRefreshVariant, tsTypeChecked = false } = options;
 
-	const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked });
+	const config = await createConfig({ reactRefreshVariant, tsconfigRootDir: process.cwd(), tsTypeChecked });
 
 	const eslint = new ESLint({
 		overrideConfig: config,
@@ -92,7 +94,7 @@ async function expectNoLintError(code: string, ruleId: string, options: LintOpti
 	).not.toContain(ruleId);
 }
 async function expectNoLintErrorInFile(code: string, ruleId: string, options: LintOptions): Promise<void> {
-	const { filePath, tsTypeChecked = false } = options;
+	const { filePath, reactRefreshVariant, tsTypeChecked = false } = options;
 	const extension = filePath.slice(filePath.lastIndexOf('.'));
 	const directory = path.join(process.cwd(), `.tmp-lint-${Date.now()}`);
 	const file = path.join(directory, `test${extension}`);
@@ -101,7 +103,7 @@ async function expectNoLintErrorInFile(code: string, ruleId: string, options: Li
 		await mkdir(directory);
 		// eslint-disable-next-line functional/no-expression-statements, security/detect-non-literal-fs-filename -- Test utilities need side effects for file operations
 		await writeFile(file, code);
-		const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked });
+		const config = await createConfig({ reactRefreshVariant, tsconfigRootDir: process.cwd(), tsTypeChecked });
 		const eslint = new ESLint({ overrideConfig: config, overrideConfigFile: true });
 		const results = await eslint.lintFiles([file]);
 		const matchingRuleIds = results.flatMap((r) => r.messages).map((m) => m.ruleId);
