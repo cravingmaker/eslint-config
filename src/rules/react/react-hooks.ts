@@ -1,21 +1,25 @@
 import type { Linter } from 'eslint';
 
-import pluginReactHooks from 'eslint-plugin-react-hooks';
-
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	const rules = pluginReactHooks.rules as Record<string, unknown>;
-
-	return Object.fromEntries(Object.keys(rules).map((key) => [`react-hooks/${key}`, 'error'])) as Linter.RulesRecord;
-}
-
 const reactHooksEslintRules: Linter.RulesRecord = {
-	...getRules(),
+	// Core hooks rules
+	'react-hooks/exhaustive-deps': 'error',
+	'react-hooks/rules-of-hooks': 'error',
 
-	// Meta-internal rules: only meaningful inside Meta's infrastructure; always off for general projects
-	'react-hooks/fbt': 'off', // Requires Meta's FBT (Facebook Internationalization) library
-	'react-hooks/rule-suppression': 'off', // Meta-internal rule-suppression mechanism
-	'react-hooks/todo': 'off', // Meta-internal TODO tracking rule
+	// React Compiler rules
+	'react-hooks/config': 'error',
+	'react-hooks/error-boundaries': 'error',
+	'react-hooks/gating': 'error',
+	'react-hooks/globals': 'error',
+	'react-hooks/immutability': 'error',
+	'react-hooks/incompatible-library': 'error',
+	'react-hooks/preserve-manual-memoization': 'error',
+	'react-hooks/purity': 'error',
+	'react-hooks/refs': 'error',
+	'react-hooks/set-state-in-effect': 'error',
+	'react-hooks/set-state-in-render': 'error',
+	'react-hooks/static-components': 'error',
+	'react-hooks/unsupported-syntax': 'error',
+	'react-hooks/use-memo': 'error',
 } as const;
 
 export { reactHooksEslintRules };
