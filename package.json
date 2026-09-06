@@ -72,7 +72,7 @@
   "prettier": "@cravingmaker/prettier-config",
   "dependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "4.7.1",
-    "@eslint/json": "1.2.0",
+    "@eslint/json": "2.0.1",
     "@eslint/markdown": "8.0.2",
     "@html-eslint/eslint-plugin": "0.61.0",
     "@html-eslint/parser": "0.61.0",
