@@ -105,7 +105,7 @@
     "husky": "9.1.7",
     "lint-staged": "17.0.5",
     "prettier": "3.8.3",
-    "react": "19.2.6",
+    "react": "19.2.8",
     "svelte": "5.55.9",
     "svelte-eslint-parser": "1.6.1",
     "tsdown": "0.22.0",
