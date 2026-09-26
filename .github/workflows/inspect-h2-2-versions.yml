@@ -1,0 +1,34 @@
+name: Inspect H2.2 versions
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    if: github.head_ref == 'chore/modernize-framework-eslint-integrations'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24
+
+      - name: Inspect package versions and peer ranges
+        run: |
+          for pkg in             @html-eslint/eslint-plugin             @html-eslint/parser             @html-eslint/eslint-plugin-react             @html-eslint/eslint-plugin-svelte             eslint-plugin-react-hooks             eslint-plugin-react-refresh             eslint-plugin-express-security             svelte-eslint-parser; do
+            echo "=== $pkg ==="
+            npm view "$pkg" version
+            npm view "$pkg" peerDependencies --json || true
+          done
