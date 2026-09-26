@@ -347,6 +347,7 @@ const tsEslintStrictOnlyRules: Linter.RulesRecord = {
 
 const tsEslintStrictTypeCheckedOnlyRules: Linter.RulesRecord = {
 	'@typescript-eslint/no-deprecated': ['warn', { allow: [] }],
+	'@typescript-eslint/no-generated-empty-object-type': 'error',
 
 	'@typescript-eslint/no-confusing-void-expression': [
 		'error',
@@ -422,9 +423,6 @@ const tsEslintOtherRules: Linter.RulesRecord = {
 
 	'default-param-last': 'off',
 	'@typescript-eslint/default-param-last': 'error',
-
-	'no-loop-func': 'off',
-	'@typescript-eslint/no-loop-func': 'error',
 
 	// Rules with overridden options
 	'@typescript-eslint/explicit-member-accessibility': [
@@ -606,9 +604,6 @@ const tsEslintOtherRules: Linter.RulesRecord = {
 
 	// 'no-redeclare': 'off', // Uncomment this if @typescript-eslint/no-redeclare is enabled
 	'@typescript-eslint/no-redeclare': 'off', // Not recommended to enable this in new TypeScript projects
-
-	// 'no-restricted-imports': 'off', // Uncomment this if @typescript-eslint/no-restricted-imports is enabled
-	'@typescript-eslint/no-restricted-imports': 'off',
 } as const;
 
 const tsEslintOtherTypeCheckedOnlyRules: Linter.RulesRecord = {
@@ -692,6 +687,7 @@ const tsEslintDisableTypeCheckedRules: Linter.RulesRecord = {
 	'@typescript-eslint/no-duplicate-type-constituents': 'off',
 	'@typescript-eslint/no-floating-promises': 'off',
 	'@typescript-eslint/no-for-in-array': 'off',
+	'@typescript-eslint/no-generated-empty-object-type': 'off',
 	'@typescript-eslint/no-implied-eval': 'off',
 	'@typescript-eslint/no-meaningless-void-operator': 'off',
 	'@typescript-eslint/no-misused-promises': 'off',

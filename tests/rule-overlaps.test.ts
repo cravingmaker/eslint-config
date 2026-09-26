@@ -95,8 +95,8 @@ describe('overlapping rule policy', () => {
 		expect(rules['default-param-last']).toBe('off');
 		expect(rules['@typescript-eslint/default-param-last']).toBe('error');
 
-		expect(rules['no-loop-func']).toBe('off');
-		expect(rules['@typescript-eslint/no-loop-func']).toBe('error');
+		expect(rules['no-loop-func']).toBe('error');
+		expect(rules['@typescript-eslint/no-loop-func']).toBeUndefined();
 
 		expect(rules['no-shadow']).toBe('off');
 		expect(rules['@typescript-eslint/no-shadow']).toBeDefined();
