@@ -1,13 +1,7 @@
 import type { Linter } from 'eslint';
 
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginHtml from '@html-eslint/eslint-plugin';
-
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	const rules = eslintPluginHtml.rules as Record<string, unknown>;
-
-	return Object.fromEntries(Object.keys(rules).map((key) => [`@html-eslint/${key}`, 'error'])) as Linter.RulesRecord;
-}
 
 const newLineOptions = {
 	inline: ['$inline'],
@@ -15,7 +9,7 @@ const newLineOptions = {
 } as const;
 
 const htmlEslintRules: Linter.RulesRecord = {
-	...getRules(),
+	...getPluginRules('@html-eslint', eslintPluginHtml.rules),
 
 	'@html-eslint/attrs-newline': ['error', { ...newLineOptions }],
 	'@html-eslint/element-newline': ['error', { ...newLineOptions }],
