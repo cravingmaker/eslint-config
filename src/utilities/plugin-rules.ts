@@ -15,7 +15,7 @@ function getPluginRules(pluginName: string, rules: unknown): Linter.RulesRecord 
 		Object.entries(pluginRules)
 			.filter(([, rule]) => rule?.meta?.deprecated === undefined || rule.meta.deprecated === false)
 			.map(([ruleName]) => [`${pluginName}/${ruleName}`, 'error']),
-	) as Linter.RulesRecord;
+	);
 }
 
 export { getPluginRules };
