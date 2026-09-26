@@ -155,7 +155,7 @@ describe('published package', () => {
 
 				const detectedOptionalPlugins = optionalPluginNames.filter((name) => getPluginNames(untyped).has(name));
 				if (detectedOptionalPlugins.length !== 0) {
-					throw new Error(`Optional plugins were loaded unexpectedly: ${detectedOptionalPlugins.join(', ')}`);
+					throw new Error('Optional plugins were loaded unexpectedly: ' + detectedOptionalPlugins.join(', '));
 				}
 
 				const untypedTsConfig = getTypeScriptConfig(untyped);
@@ -208,7 +208,7 @@ describe('published package', () => {
 					'react-refresh',
 				]) {
 					if (!pluginNames.has(plugin)) {
-						throw new Error(`Optional plugin was not loaded: ${plugin}`);
+						throw new Error('Optional plugin was not loaded: ' + plugin);
 					}
 				}
 
