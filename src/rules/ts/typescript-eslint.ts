@@ -604,7 +604,6 @@ const tsEslintOtherRules: Linter.RulesRecord = {
 
 	// 'no-redeclare': 'off', // Uncomment this if @typescript-eslint/no-redeclare is enabled
 	'@typescript-eslint/no-redeclare': 'off', // Not recommended to enable this in new TypeScript projects
-
 } as const;
 
 const tsEslintOtherTypeCheckedOnlyRules: Linter.RulesRecord = {
