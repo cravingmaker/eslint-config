@@ -110,6 +110,7 @@ const suggestionRules: Linter.RulesRecord = {
 			allowSwitch: false,
 		},
 	],
+	'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: false }],
 	'no-lone-blocks': 'error',
 	'no-lonely-if': 'error',
 	'no-loop-func': 'error',
@@ -166,6 +167,8 @@ const suggestionRules: Linter.RulesRecord = {
 	],
 
 	// Rules with overridden options
+	'func-style': 'off', // Prefer allowing declarations and expressions based on local readability
+
 	'func-name-matching': [
 		'error',
 		'always',
@@ -336,6 +339,8 @@ const suggestionRules: Linter.RulesRecord = {
 	],
 	'sort-vars': ['off', { ignoreCase: false }],
 	strict: ['off', 'safe'],
+	'symbol-description': 'error',
+	'unicode-bom': ['error', 'never'],
 	'vars-on-top': 'off',
 
 	'no-param-reassign': ['error', { props: false }], // Compatibility with `eslint-plugin-functional`
