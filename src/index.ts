@@ -50,13 +50,11 @@ import { tsEslintRules, tsEslintTypeCheckedRules } from './rules/ts/typescript-e
 
 type CreateConfigOptions = {
 	readonly ignores?: readonly string[];
-	readonly oop?: boolean;
 	readonly plugins?: Linter.Config['plugins'];
 	readonly reactRefreshVariant?: 'generic' | 'next' | 'vite';
 	readonly rules?: RulesOptions;
 	readonly tsconfigRootDir?: string;
 	readonly tsTypeChecked?: boolean;
-	readonly useThrow?: boolean;
 };
 type ResolvedRules = {
 	readonly express: Linter.RulesRecord;
@@ -258,7 +256,7 @@ export async function createConfig({
 	reactRefreshVariant,
 	rules = {},
 	tsconfigRootDir = process.cwd(),
-	tsTypeChecked,
+	tsTypeChecked = false,
 }: CreateConfigOptions = {}) {
 	const {
 		express: expressRuleOverrides,
@@ -273,10 +271,9 @@ export async function createConfig({
 		ts: tsRuleOverrides,
 	} = resolveRules(rules);
 
-	const isTypeScript = tsTypeChecked ?? (await tryImport('typescript-eslint')) !== undefined;
-	const tsRules = isTypeScript ? tsEslintTypeCheckedRules : tsEslintRules;
-	const functionalRules = isTypeScript ? functionalTypeCheckedEslintRules : functionalEslintRules;
-	const tsParserOptions = isTypeScript
+	const tsRules = tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules;
+	const functionalRules = tsTypeChecked ? functionalTypeCheckedEslintRules : functionalEslintRules;
+	const tsParserOptions = tsTypeChecked
 		? { projectService: true, sourceType: 'module' as const, tsconfigRootDir }
 		: { sourceType: 'module' as const };
 	const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
