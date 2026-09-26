@@ -607,7 +607,6 @@ const tsEslintOtherRules: Linter.RulesRecord = {
 
 	// 'no-restricted-imports': 'off', // Uncomment this if @typescript-eslint/no-restricted-imports is enabled
 	'@typescript-eslint/no-restricted-imports': 'off',
-
 } as const;
 
 const tsEslintOtherTypeCheckedOnlyRules: Linter.RulesRecord = {
