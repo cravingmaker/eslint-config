@@ -8,12 +8,10 @@ import { describe, expect, it } from 'vitest';
 
 import { createConfig } from '../dist/index.mjs';
 
-function getJavaScriptRules(config: readonly Linter.Config[]): Linter.RulesRecord {
-	return (
-		config.find((entry) => entry.files?.some((pattern) => pattern === '**/*.{js,mjs,jsx,mjsx}'))?.rules ?? {}
-	);
+function getJavaScriptRules(config: readonly Linter.Config[]): NonNullable<Linter.Config['rules']> {
+	return config.find((entry) => entry.files?.some((pattern) => pattern === '**/*.{js,mjs,jsx,mjsx}'))?.rules ?? {};
 }
-function getTypeScriptRules(config: readonly Linter.Config[]): Linter.RulesRecord {
+function getTypeScriptRules(config: readonly Linter.Config[]): NonNullable<Linter.Config['rules']> {
 	return config.find((entry) => Object.hasOwn(entry.plugins ?? {}, '@typescript-eslint'))?.rules ?? {};
 }
 
