@@ -7,6 +7,14 @@ import { expectLintError } from '../../utilities.js';
 const htmlOptions = { filePath: 'index.html' } as const;
 
 describe('html rules', () => {
+	it('@html-eslint/no-extra-spacing-tags: reports extra spacing between attributes', async () => {
+		await expectLintError(
+			`<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<title>Home</title>\n</head>\n<body>\n\t<div id="app"  class="root">Hello</div>\n</body>\n</html>\n`,
+			'@html-eslint/no-extra-spacing-tags',
+			htmlOptions,
+		);
+	});
+
 	it('@html-eslint/require-doctype: reports missing document type declarations', async () => {
 		await expectLintError(
 			`<html lang="en">\n<head>\n\t<title>Home</title>\n</head>\n<body>\n\t<p>Hello</p>\n</body>\n</html>\n`,
