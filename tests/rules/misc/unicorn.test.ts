@@ -32,22 +32,22 @@ describe('unicorn rules', () => {
 		await expectNoLintError(`export const value = 1;\n`, 'unicorn/filename-case', { filePath: '001_init.js' });
 	});
 
-	it('unicorn/prevent-abbreviations: reports unapproved abbreviations', async () => {
-		await expectLintError(`const btn = 'save';\nconsole.log(btn);\n`, 'unicorn/prevent-abbreviations', jsOptions);
+	it('unicorn/name-replacements: reports unapproved abbreviations', async () => {
+		await expectLintError(`const btn = 'save';\nconsole.log(btn);\n`, 'unicorn/name-replacements', jsOptions);
 	});
 
-	it('unicorn/prevent-abbreviations: allows framework abbreviations from the replacement policy', async () => {
+	it('unicorn/name-replacements: allows framework abbreviations from the replacement policy', async () => {
 		await expectNoLintError(
 			`function handler(req, res, ctx) {\n\tconsole.log(req, res, ctx);\n}\nhandler('request', 'response', 'context');\n`,
-			'unicorn/prevent-abbreviations',
+			'unicorn/name-replacements',
 			jsOptions,
 		);
 	});
 
-	it('unicorn/prevent-abbreviations: allows configured allow-list identifiers', async () => {
+	it('unicorn/name-replacements: allows configured allow-list identifiers', async () => {
 		await expectNoLintError(
 			`const i18n = { locale: 'en' };\nconst i18nKey = 'common.ready';\nconst tsconfigRootDir = process.cwd();\nconsole.log(i18n, i18nKey, tsconfigRootDir);\n`,
-			'unicorn/prevent-abbreviations',
+			'unicorn/name-replacements',
 			jsOptions,
 		);
 	});
@@ -88,10 +88,10 @@ describe('unicorn rules', () => {
 		);
 	});
 
-	it('unicorn/prefer-json-parse-buffer: stays disabled for TypeScript compatibility', async () => {
+	it('unicorn/consistent-json-file-read: stays disabled for TypeScript compatibility', async () => {
 		await expectNoLintError(
 			`const payload = Buffer.from('{"ready":true}');\nconst value = JSON.parse(payload.toString());\nconsole.log(value);\n`,
-			'unicorn/prefer-json-parse-buffer',
+			'unicorn/consistent-json-file-read',
 			jsOptions,
 		);
 	});
