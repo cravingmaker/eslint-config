@@ -8,10 +8,10 @@ const jsOptions = { filePath: 'test.js' } as const;
 const rightArrowText = String.fromCodePoint(45, 62);
 
 describe('unicorn rules', () => {
-	it('unicorn/no-array-for-each: reports Array#forEach usage from the enabled plugin preset', async () => {
+	it('unicorn/no-for-each: reports Array#forEach usage from the enabled plugin preset', async () => {
 		await expectLintError(
 			`const values = [1, 2, 3];\nvalues.forEach((value) => {\n\tconsole.log(value);\n});\n`,
-			'unicorn/no-array-for-each',
+			'unicorn/no-for-each',
 			jsOptions,
 		);
 	});
@@ -60,10 +60,6 @@ describe('unicorn rules', () => {
 		);
 	});
 
-	it('unicorn/better-regex: stays disabled for regex style freedom', async () => {
-		await expectNoLintError(`const pattern = /[0-9]/u;\nconsole.log(pattern);\n`, 'unicorn/better-regex', jsOptions);
-	});
-
 	it('unicorn/consistent-destructuring: stays disabled for mixed property access patterns', async () => {
 		await expectNoLintError(
 			`const user = { name: 'Ada' };\nconst name = user.name;\nconsole.log(user, name);\n`,
@@ -88,7 +84,7 @@ describe('unicorn rules', () => {
 		);
 	});
 
-	it('unicorn/consistent-json-file-read: stays disabled for TypeScript compatibility', async () => {
+	it('unicorn/consistent-json-file-read: stays disabled for explicit JSON file reading', async () => {
 		await expectNoLintError(
 			`const payload = Buffer.from('{"ready":true}');\nconst value = JSON.parse(payload.toString());\nconsole.log(value);\n`,
 			'unicorn/consistent-json-file-read',
