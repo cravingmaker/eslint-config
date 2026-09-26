@@ -51,6 +51,8 @@ describe('deprecated rule handling', () => {
 			Object.keys(entry.rules ?? {}).filter((ruleId) => isDeprecatedConfiguredRule(ruleId, pluginNames, plugins)),
 		);
 
-		expect([...new Set(deprecatedRuleIds)].toSorted((left, right) => left.localeCompare(right))).toEqual([]);
+		expect(
+			[...new Set(deprecatedRuleIds)].toSorted((left, right) => left.localeCompare(right)),
+		).toEqual([]);
 	});
 });
