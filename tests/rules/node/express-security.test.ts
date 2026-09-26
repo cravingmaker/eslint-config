@@ -9,7 +9,7 @@ const expressOptions = { filePath: 'server.js' } as const;
 describe('express-security rules', () => {
 	it('express-security/require-helmet: reports missing helmet middleware', async () => {
 		await expectLintError(
-			`import express from 'express';\nconst app = express();\napp.get('/', (req, res) => res.send('ok'));\n`,
+			`import express from 'express';\nexpress().set('view engine', 'pug');\n`,
 			'express-security/require-helmet',
 			expressOptions,
 		);
