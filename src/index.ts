@@ -92,7 +92,9 @@ type TsConfigOptions = {
 
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 async function buildExpressConfig(ruleOverrides: Readonly<Linter.RulesRecord>): Promise<Linter.Config | undefined> {
-	const plugin = await tryImport<{ default: Linter.Plugin }>('eslint-plugin-express-security');
+	const plugin = await tryImport<{ default: NonNullable<Linter.Config['plugins']>[string] }>(
+		'eslint-plugin-express-security',
+	);
 	if (plugin === undefined) return undefined;
 	const { expressSecurityEslintRules } = await import('./rules/node/express-security.js');
 	return {
