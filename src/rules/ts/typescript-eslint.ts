@@ -4,13 +4,13 @@ import {
 	classMethodsUseThisOptions,
 	consistentReturnOptions,
 	dotNotationOptions,
-	// eslint-disable-next-line unicorn/prevent-abbreviations -- This mirrors the ESLint `max-params` rule name
+	// eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `max-params` rule name
 	maxParamsOptions,
 	namingConventionOptions,
 	noEmptyFunctionOptions,
 	noShadowOptions,
 	noUnusedExpressionsOptions,
-	// eslint-disable-next-line unicorn/prevent-abbreviations -- This mirrors the ESLint `no-unused-vars` rule name
+	// eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
 	noUnusedVarsOptions,
 	noUseBeforeDefineOptions,
 	preferDestructuring1stOptions,
