@@ -25,12 +25,11 @@ jobs:
         with:
           node-version: 24
 
-      - name: Inspect snapshot-compatible H1 versions
+      - name: Generate lockfile
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Print compressed lockfile
         run: |
-          npm view eslint version --before=2026-09-19T16:36:26Z
-          npm view typescript-eslint version --before=2026-09-19T16:36:26Z
-          npm view @eslint/json version --before=2026-09-19T16:36:26Z
-          npm view @eslint/markdown version --before=2026-09-19T16:36:26Z
-          npm view globals version --before=2026-09-19T16:36:26Z
-          npm view jsonc-eslint-parser version --before=2026-09-19T16:36:26Z
-          npm view eslint-import-resolver-typescript version --before=2026-09-19T16:36:26Z
+          printf 'LOCKFILE_GZIP_BASE64='
+          gzip -c package-lock.json | base64 -w0
+          printf '\n'
