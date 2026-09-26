@@ -105,7 +105,7 @@
     "@html-eslint/eslint-plugin-react": "0.66.1",
     "@html-eslint/eslint-plugin-svelte": "0.66.1",
     "@types/eslint-plugin-security": "3.0.1",
-    "@types/node": "25.9.1",
+    "@types/node": "26.6.3",
     "eslint": "10.11.0",
     "eslint-plugin-express-security": "3.2.4",
     "eslint-plugin-react-hooks": "7.1.1",
@@ -117,8 +117,8 @@
     "react": "19.2.6",
     "svelte": "5.55.9",
     "svelte-eslint-parser": "1.8.1",
-    "tsdown": "0.22.0",
-    "typescript": "6.0.3",
+    "tsdown": "0.23.0",
+    "typescript": "7.0.2",
     "vitest": "4.1.7"
   },
   "peerDependencies": {
