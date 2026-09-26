@@ -12,7 +12,6 @@ const projectDirectory = path.resolve(__dirname, '..');
 const runtimeDependencies = [
 	'@eslint-community/eslint-plugin-eslint-comments',
 	'@eslint/json',
-	'@eslint/markdown',
 	'eslint-enforce-package-type',
 	'eslint-import-resolver-typescript',
 	'eslint-plugin-functional',
@@ -25,6 +24,7 @@ const runtimeDependencies = [
 	'eslint-plugin-security',
 	'eslint-plugin-unicorn',
 	'eslint-plugin-unused-imports',
+	'@eslint/markdown',
 	'globals',
 	'@html-eslint/eslint-plugin',
 	'@html-eslint/parser',
