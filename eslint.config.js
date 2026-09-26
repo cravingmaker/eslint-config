@@ -5,6 +5,7 @@ import { namingConventionOptions } from './src/options/common.ts';
 
 // eslint-disable-next-line import-x/no-default-export -- ESLint flat config requires a default export
 export default createConfig({
+	tsTypeChecked: true,
 	rules: {
 		ts: {
 			// Rule definition files use ESLint plugin key notation (e.g. '@typescript-eslint/rule-name','plugin/rule')
