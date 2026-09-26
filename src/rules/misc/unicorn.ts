@@ -1,16 +1,10 @@
 import type { Linter } from 'eslint';
 
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	const rules = (eslintPluginUnicorn.rules ?? {}) as Record<string, unknown>;
-
-	return Object.fromEntries(Object.keys(rules).map((key) => [`unicorn/${key}`, 'error'])) as Linter.RulesRecord;
-}
-
 const unicornEslintRules: Linter.RulesRecord = {
-	...getRules(),
+	...getPluginRules('unicorn', eslintPluginUnicorn.rules ?? {}),
 
 	'unicorn/filename-case': [
 		'error',
@@ -79,10 +73,6 @@ const unicornEslintRules: Linter.RulesRecord = {
 	'unicorn/prefer-json-parse-buffer': 'off', // Prefer TypeScript, it's not compatible with TypeScript
 	'unicorn/require-post-message-target-origin': 'off', // It can't distinguish between window.postMessage() and other calls like Worker#postMessage(), MessagePort#postMessage(), Client#postMessage(), and BroadcastChannel#postMessage()
 
-	'unicorn/no-array-push-push': 'off', // Deprecated in favor of `unicorn/prefer-single-call` rule
-	'unicorn/no-instanceof-array': 'off', // Deprecated in favor of `unicorn/no-instanceof-builtins` rule
-	'unicorn/no-length-as-slice-end': 'off', // Deprecated in favor of `unicorn/no-unnecessary-slice-end` rule
-	'unicorn/refer-dom-node-dataset': 'off', // Deprecated in favor of `unicorn/dom-node-dataset` rule
 } as const;
 
 export { unicornEslintRules };
