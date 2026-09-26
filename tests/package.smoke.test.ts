@@ -136,6 +136,7 @@ describe('published package', () => {
 		const output = runConsumer(
 			consumerDirectory,
 			String.raw`
+				import { ESLint } from 'eslint';
 				import { createConfig } from '@cravingmaker/eslint-config';
 
 				const optionalPluginNames = [
@@ -180,6 +181,23 @@ describe('published package', () => {
 				if (defaultTsConfig.rules?.['@typescript-eslint/no-unsafe-assignment'] !== 'off') {
 					throw new Error('Default TypeScript config unexpectedly enabled type-aware rules');
 				}
+
+				if (defaultTsConfig.rules?.['n/no-sync'] !== 'off') {
+					throw new Error('Default TypeScript config unexpectedly enabled n/no-sync without type information');
+				}
+
+				if (typedTsConfig.rules?.['n/no-sync']?.[0] !== 'error') {
+					throw new Error('Typed TypeScript config did not enable n/no-sync');
+				}
+
+				const eslint = new ESLint({
+					overrideConfig: defaultConfig,
+					overrideConfigFile: true,
+				});
+				await eslint.lintText(
+					"import fs from 'node:fs';\nfs.readFileSync('fixture.txt', 'utf8');\n",
+					{ filePath: 'example.ts' },
+				);
 
 				if (untypedTsConfig.languageOptions?.parserOptions?.projectService !== undefined) {
 					throw new Error('Untyped TypeScript config unexpectedly enabled projectService');
