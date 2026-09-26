@@ -5,7 +5,7 @@ import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const unicornEslintRules: Linter.RulesRecord = {
-	...getPluginRules('unicorn', eslintPluginUnicorn.rules ?? {}),
+	...getPluginRules('unicorn', eslintPluginUnicorn.rules ?? {}, 'js/js'),
 
 	'unicorn/filename-case': [
 		'error',
