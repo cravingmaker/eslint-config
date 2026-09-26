@@ -27,29 +27,10 @@ jobs:
 
       - name: Inspect snapshot-compatible H1 versions
         run: |
-          node <<'NODE'
-          const { execFileSync } = require('node:child_process');
-          const packages = [
-            'eslint',
-            'typescript-eslint',
-            '@eslint/json',
-            '@eslint/markdown',
-            'globals',
-            'jsonc-eslint-parser',
-            'eslint-import-resolver-typescript',
-          ];
-          const cutoff = new Date('2026-09-19T16:36:26Z');
-          for (const pkg of packages) {
-            const raw = execFileSync('npm', ['view', pkg, 'time', '--json'], { encoding: 'utf8' });
-            const times = JSON.parse(raw);
-            const candidates = Object.entries(times)
-              .filter(([version, published]) => /^\\d+\\.\\d+\\.\\d+$/.test(version) && new Date(published) <= cutoff)
-              .map(([version]) => version)
-              .sort((a, b) => {
-                const aa = a.split('.').map(Number);
-                const bb = b.split('.').map(Number);
-                return aa[0] - bb[0] || aa[1] - bb[1] || aa[2] - bb[2];
-              });
-            console.log(`${pkg}=${candidates.at(-1)}`);
-          }
-          NODE
+          npm view eslint version --before=2026-09-19T16:36:26Z
+          npm view typescript-eslint version --before=2026-09-19T16:36:26Z
+          npm view @eslint/json version --before=2026-09-19T16:36:26Z
+          npm view @eslint/markdown version --before=2026-09-19T16:36:26Z
+          npm view globals version --before=2026-09-19T16:36:26Z
+          npm view jsonc-eslint-parser version --before=2026-09-19T16:36:26Z
+          npm view eslint-import-resolver-typescript version --before=2026-09-19T16:36:26Z
