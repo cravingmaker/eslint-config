@@ -1,7 +1,8 @@
 import type { Linter } from 'eslint';
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginN from 'eslint-plugin-n';
+
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const nEslintRules: Linter.RulesRecord = {
 	...getPluginRules('n', eslintPluginN.rules ?? {}),
