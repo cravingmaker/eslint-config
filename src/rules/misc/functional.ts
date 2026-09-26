@@ -2,7 +2,7 @@ import type { Linter } from 'eslint';
 
 import eslintPluginFunctional from 'eslint-plugin-functional';
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
+import { getPluginConfigRules, getPluginRules } from '../../utilities/plugin-rules.js';
 
 const functionalTypeCheckedEslintRules: Linter.RulesRecord = {
 	...getPluginRules('functional', eslintPluginFunctional.rules),
@@ -77,7 +77,11 @@ const functionalTypeCheckedEslintRules: Linter.RulesRecord = {
 
 const functionalEslintRules = {
 	...functionalTypeCheckedEslintRules,
-	...eslintPluginFunctional.configs.disableTypeChecked.rules,
+	...getPluginConfigRules(
+		'functional',
+		eslintPluginFunctional.rules,
+		eslintPluginFunctional.configs.disableTypeChecked.rules,
+	),
 } as const;
 
 export { functionalEslintRules, functionalTypeCheckedEslintRules };
