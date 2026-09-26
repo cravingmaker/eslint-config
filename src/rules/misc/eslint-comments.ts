@@ -2,17 +2,10 @@ import type { Linter } from 'eslint';
 
 import eslintPluginComments from '@eslint-community/eslint-plugin-eslint-comments';
 
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	const rules = eslintPluginComments.rules as Record<string, unknown>;
-
-	return Object.fromEntries(
-		Object.keys(rules).map((key) => [`@eslint-community/eslint-comments/${key}`, 'error']),
-	) as Linter.RulesRecord;
-}
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const eslintCommentsRules: Linter.RulesRecord = {
-	...getRules(),
+	...getPluginRules('@eslint-community/eslint-comments', eslintPluginComments.rules),
 
 	'@eslint-community/eslint-comments/disable-enable-pair': ['error', { allowWholeFile: true }],
 	'@eslint-community/eslint-comments/no-use': [

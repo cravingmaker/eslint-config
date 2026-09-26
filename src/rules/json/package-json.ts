@@ -2,15 +2,10 @@ import type { Linter } from 'eslint';
 
 import eslintPluginPackageJson from 'eslint-plugin-package-json';
 
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	const rules = eslintPluginPackageJson.rules as Record<string, unknown>;
-
-	return Object.fromEntries(Object.keys(rules).map((key) => [`package-json/${key}`, 'error'])) as Linter.RulesRecord;
-}
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const packageJsonEslintRules: Linter.RulesRecord = {
-	...getRules(),
+	...getPluginRules('package-json', eslintPluginPackageJson.rules),
 
 	'package-json/require-bugs': ['error', { ignorePrivate: true }],
 	'package-json/require-exports': ['error', { ignorePrivate: true }],
@@ -46,8 +41,6 @@ const packageJsonEslintRules: Linter.RulesRecord = {
 	'package-json/require-packageManager': 'off', // Prefer optional
 	'package-json/require-peerDependencies': 'off', // Prefer optional
 	'package-json/require-publishConfig': 'off', // Prefer optional
-
-	'package-json/valid-package-definition': 'off', //Deprecated
 } as const;
 
 export { packageJsonEslintRules };

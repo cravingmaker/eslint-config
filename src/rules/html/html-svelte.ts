@@ -2,17 +2,10 @@ import type { Linter } from 'eslint';
 
 import eslintPluginHtmlSvelte from '@html-eslint/eslint-plugin-svelte';
 
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	const rules = (eslintPluginHtmlSvelte.rules ?? {}) as Record<string, unknown>;
-
-	return Object.fromEntries(
-		Object.keys(rules).map((key) => [`@html-eslint/svelte/${key}`, 'error']),
-	) as Linter.RulesRecord;
-}
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const htmlSvelteEslintRules: Linter.RulesRecord = {
-	...getRules(),
+	...getPluginRules('@html-eslint/svelte', eslintPluginHtmlSvelte.rules ?? {}),
 } as const;
 
 export { htmlSvelteEslintRules };

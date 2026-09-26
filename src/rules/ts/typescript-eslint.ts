@@ -392,21 +392,6 @@ const tsEslintStrictTypeCheckedOnlyRules: Linter.RulesRecord = {
 	'@typescript-eslint/return-await': ['error', 'always'],
 } as const;
 
-const tsEslintDeprecatedOtherRules: Linter.RulesRecord = {
-	'@typescript-eslint/no-empty-interface': 'off', // Deprecated in favor of  @typescript-eslint/no-empty-object-type rule
-	'@typescript-eslint/no-type-alias': 'off', // Deprecated in favor of the @typescript-eslint/consistent-type-definitions rule
-	'@typescript-eslint/no-var-requires': 'off', // Deprecated in favour of the @typescript-eslint/no-require-imports rule
-	'@typescript-eslint/prefer-ts-expect-error': 'off', // Deprecated in favor of @typescript-eslint/ban-ts-comment rule
-	'@typescript-eslint/sort-type-constituents': 'off', // Deprecated in favor of the perfectionist/sort-intersection-types and perfectionist/sort-union-types rule
-
-	'@typescript-eslint/no-loss-of-precision': 'off', // Deprecated because the base eslint/no-loss-of-precision added support for numeric separators
-
-	// Will be removed in a future major version of typescript-eslint
-	// Instead of enabling typedef, it is generally recommended to use the --noImplicitAny and
-	// --strictPropertyInitialization compiler options to enforce type annotations only when useful
-	'@typescript-eslint/typedef': 'off',
-} as const;
-
 const tsEslintOtherRules: Linter.RulesRecord = {
 	'@typescript-eslint/consistent-type-imports': [
 		'error',
@@ -622,8 +607,6 @@ const tsEslintOtherRules: Linter.RulesRecord = {
 
 	// 'no-restricted-imports': 'off', // Uncomment this if @typescript-eslint/no-restricted-imports is enabled
 	'@typescript-eslint/no-restricted-imports': 'off',
-
-	...tsEslintDeprecatedOtherRules,
 } as const;
 
 const tsEslintOtherTypeCheckedOnlyRules: Linter.RulesRecord = {

@@ -2,15 +2,10 @@ import type { Linter } from 'eslint';
 
 import eslintPluginImportX from 'eslint-plugin-import-x';
 
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	const rules = eslintPluginImportX.rules as Record<string, unknown>;
-
-	return Object.fromEntries(Object.keys(rules).map((key) => [`import-x/${key}`, 'error'])) as Linter.RulesRecord;
-}
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const importxEslintRules: Linter.RulesRecord = {
-	...getRules(),
+	...getPluginRules('import-x', eslintPluginImportX.rules),
 
 	'import-x/extensions': [
 		'error',
@@ -129,8 +124,6 @@ const importxEslintRules: Linter.RulesRecord = {
 
 	'import-x/first': 'off', // Covered by `perfectionist/sort-imports` rule
 	'import-x/order': 'off', // Covered by `perfectionist/sort-imports` rule
-
-	'import-x/imports-first': 'off', // Deprecated in favor of `import-x/first`
 } as const;
 
 export { importxEslintRules };
