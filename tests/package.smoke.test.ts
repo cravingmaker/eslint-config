@@ -147,8 +147,9 @@ describe('published package', () => {
 					'react-refresh',
 				];
 
-				const getPluginNames = (config) =>
-					new Set(config.flatMap((entry) => Object.keys(entry.plugins ?? {})));
+				const getPluginNames = (config) => {
+					return new Set(config.flatMap((entry) => Object.keys(entry.plugins ?? {})));
+				};
 
 				const getTypeScriptConfig = (config) =>
 					config.find((entry) => Object.hasOwn(entry.plugins ?? {}, '@typescript-eslint'));
@@ -228,7 +229,7 @@ describe('published package', () => {
 
 		const output = runConsumer(
 			consumerDirectory,
-			String.raw`
+			`
 				import { createConfig } from '@cravingmaker/eslint-config';
 
 				const config = await createConfig({ tsTypeChecked: false });
