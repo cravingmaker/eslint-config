@@ -1,7 +1,8 @@
 import type { Linter } from 'eslint';
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginHtmlReact from '@html-eslint/eslint-plugin-react';
+
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const classNameOptions = { callees: ['classnames', 'clsx', 'cn', 'cva', 'tw', 'twMerge'] } as const;
 
