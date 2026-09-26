@@ -44,7 +44,7 @@ import { promiseEslintRules } from './rules/misc/promise.js';
 import { regexpEslintRules } from './rules/misc/regexp.js';
 import { unicornEslintRules } from './rules/misc/unicorn.js';
 import { unusedImportsEslintRules } from './rules/misc/unused-imports.js';
-import { nEslintRules } from './rules/node/n.js';
+import { nEslintRules, nUntypedTypeScriptEslintRules } from './rules/node/n.js';
 import { securityEslintRules } from './rules/node/security.js';
 import { tsEslintRules, tsEslintTypeCheckedRules } from './rules/ts/typescript-eslint.js';
 
@@ -82,6 +82,7 @@ type RulesOptions = {
 };
 type TsConfigOptions = {
 	readonly functionalRules: Readonly<Record<string, Linter.RuleEntry | undefined>>;
+	readonly nRules: Readonly<Linter.RulesRecord>;
 	readonly resolverProject: Readonly<Record<string, unknown>>;
 	readonly ruleOverrides: Readonly<Linter.RulesRecord>;
 	readonly tsParserOptions: Readonly<Record<string, unknown>>;
@@ -163,6 +164,7 @@ async function buildSvelteConfig(ruleOverrides: Readonly<Linter.RulesRecord>): P
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 async function buildTsConfig({
 	functionalRules,
+	nRules,
 	resolverProject,
 	ruleOverrides,
 	tsParserOptions,
@@ -188,7 +190,7 @@ async function buildTsConfig({
 			...functionalRules,
 			...promiseEslintRules,
 			...regexpEslintRules,
-			...nEslintRules,
+			...nRules,
 			...securityEslintRules,
 			...unusedImportsEslintRules,
 			...importxEslintRules,
@@ -273,6 +275,7 @@ export async function createConfig({
 
 	const tsRules = tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules;
 	const functionalRules = tsTypeChecked ? functionalTypeCheckedEslintRules : functionalEslintRules;
+	const nRules = tsTypeChecked ? nEslintRules : nUntypedTypeScriptEslintRules;
 	const tsParserOptions = tsTypeChecked
 		? { projectService: true, sourceType: 'module' as const, tsconfigRootDir }
 		: { sourceType: 'module' as const };
@@ -284,7 +287,7 @@ export async function createConfig({
 		buildReactConfig(resolvedVariant, reactRuleOverrides),
 		buildSvelteConfig(svelteRuleOverrides),
 		buildExpressConfig(expressRuleOverrides),
-		buildTsConfig({ functionalRules, resolverProject, ruleOverrides: tsRuleOverrides, tsParserOptions, tsRules }),
+		buildTsConfig({ functionalRules, nRules, resolverProject, ruleOverrides: tsRuleOverrides, tsParserOptions, tsRules }),
 	]);
 	const optionalConfigs = [
 		...reactConfigs,
