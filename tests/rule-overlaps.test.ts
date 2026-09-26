@@ -1,24 +1,26 @@
 /* eslint-disable functional/no-expression-statements, functional/no-return-void -- Vitest suites are side-effect driven */
 
+import type { Linter } from 'eslint';
+
 import process from 'node:process';
 
 import { describe, expect, it } from 'vitest';
 
 import { createConfig } from '../dist/index.mjs';
 
-function getRulesForFile(config: Awaited<ReturnType<typeof createConfig>>, filePath: string) {
-	return Object.assign(
-		{},
-		...config
-			.filter((entry) => entry.files === undefined || entry.files.some((pattern) => pattern.includes(filePath.split('.').at(-1) ?? '')))
-			.map((entry) => entry.rules ?? {}),
+function getJavaScriptRules(config: readonly Linter.Config[]): Linter.RulesRecord {
+	return (
+		config.find((entry) => entry.files?.some((pattern) => pattern === '**/*.{js,mjs,jsx,mjsx}'))?.rules ?? {}
 	);
+}
+function getTypeScriptRules(config: readonly Linter.Config[]): Linter.RulesRecord {
+	return config.find((entry) => Object.hasOwn(entry.plugins ?? {}, '@typescript-eslint'))?.rules ?? {};
 }
 
 describe('overlapping rule policy', () => {
 	it('uses the intended rule authority for JavaScript overlaps', async () => {
 		const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked: false });
-		const rules = getRulesForFile(config, 'test.js');
+		const rules = getJavaScriptRules(config);
 
 		expect(rules['no-duplicate-imports']).toEqual(['off', { allowSeparateTypeImports: false, includeExports: false }]);
 		expect(rules['import-x/no-duplicates']).toBe('error');
@@ -78,7 +80,7 @@ describe('overlapping rule policy', () => {
 
 	it('prefers TypeScript-aware extension rules in TypeScript files', async () => {
 		const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked: true });
-		const rules = getRulesForFile(config, 'test.ts');
+		const rules = getTypeScriptRules(config);
 
 		expect(rules['no-unused-private-class-members']).toBe('off');
 		expect(rules['@typescript-eslint/no-unused-private-class-members']).toBe('error');
