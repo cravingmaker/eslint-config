@@ -1,4 +1,4 @@
-name: Generate H3.1 lockfile
+name: Resolve H3.1 snapshot versions
 
 on:
   pull_request:
@@ -6,35 +6,35 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  lockfile:
+  resolve:
     if: github.head_ref == 'chore/modernize-typescript-build-toolchain'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Checkout feature branch
+      - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: chore/modernize-typescript-build-toolchain
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: 24
 
-      - name: Generate lockfile
-        run: npm install --package-lock-only --ignore-scripts
-
-      - name: Commit lockfile
+      - name: Resolve snapshot-compatible versions
         run: |
-          if git diff --quiet -- package-lock.json; then
-            exit 0
-          fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add package-lock.json
-          git commit -m "chore: refresh dependency lockfile"
-          git push origin HEAD:chore/modernize-typescript-build-toolchain
+          tmpdir="$(mktemp -d)"
+          cd "$tmpdir"
+          npm init -y >/dev/null
+          npm install --package-lock-only --ignore-scripts typescript@latest tsdown@latest @types/node@latest
+          node --input-type=module - <<'NODE'
+          import fs from 'node:fs';
+          const lock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
+          for (const name of ['typescript', 'tsdown', '@types/node']) {
+            console.log(name + '=' + lock.packages['node_modules/' + name].version);
+          }
+          NODE
