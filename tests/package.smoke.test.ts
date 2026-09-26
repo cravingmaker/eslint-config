@@ -13,8 +13,6 @@ const runtimeDependencies = [
 	'@eslint-community/eslint-plugin-eslint-comments',
 	'@eslint/json',
 	'@eslint/markdown',
-	'@html-eslint/eslint-plugin',
-	'@html-eslint/parser',
 	'eslint-enforce-package-type',
 	'eslint-import-resolver-typescript',
 	'eslint-plugin-functional',
@@ -28,6 +26,8 @@ const runtimeDependencies = [
 	'eslint-plugin-unicorn',
 	'eslint-plugin-unused-imports',
 	'globals',
+	'@html-eslint/eslint-plugin',
+	'@html-eslint/parser',
 	'jsonc-eslint-parser',
 	'typescript-eslint',
 ] as const;
@@ -42,25 +42,26 @@ const linkDependency = async (nodeModulesDirectory: string, dependency: string) 
 	await fs.symlink(source, destination, 'junction');
 };
 
-const createConsumer = async () => {
-	const consumerDirectory = path.join(temporaryDirectory, 'consumer');
+const createConsumer = async (baseDirectory: string) => {
+	const consumerDirectory = path.join(baseDirectory, 'consumer');
 	const nodeModulesDirectory = path.join(consumerDirectory, 'node_modules');
 	const packageDirectory = path.join(nodeModulesDirectory, '@cravingmaker', 'eslint-config');
 
 	await fs.mkdir(packageDirectory, { recursive: true });
 
-	execFileSync('npm', ['pack', '--ignore-scripts', '--pack-destination', temporaryDirectory], {
+	execFileSync('npm', ['pack', '--ignore-scripts', '--pack-destination', baseDirectory], {
 		cwd: projectDirectory,
 		encoding: 'utf8',
 	});
 
-	const tarballs = (await fs.readdir(temporaryDirectory)).filter((file) => file.endsWith('.tgz'));
+	const packedFiles = await fs.readdir(baseDirectory);
+	const tarballs = packedFiles.filter((file) => file.endsWith('.tgz'));
 	expect(tarballs).toHaveLength(1);
 
-	const tarball = path.join(temporaryDirectory, tarballs[0]);
+	const tarball = path.join(baseDirectory, tarballs[0]);
 
 	execFileSync('tar', ['-xzf', tarball, '--strip-components=1', '-C', packageDirectory], {
-		cwd: temporaryDirectory,
+		cwd: baseDirectory,
 	});
 
 	await Promise.all(
@@ -88,7 +89,7 @@ describe('published package', () => {
 	});
 
 	it('imports and creates a config from the packed tarball', async () => {
-		const consumerDirectory = await createConsumer();
+		const consumerDirectory = await createConsumer(temporaryDirectory);
 
 		const output = execFileSync(
 			process.execPath,
