@@ -16,7 +16,6 @@ type LintOptions = {
 	// Whether to enable type-checked rules. Defaults to false for speed in most fixture tests.
 	readonly tsTypeChecked?: boolean;
 };
-
 /**
 Lints `code` against the full `createConfig` output and asserts that at least one
 reported message matches the given `ruleId`.
