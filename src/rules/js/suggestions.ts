@@ -231,7 +231,7 @@ const suggestionRules: Linter.RulesRecord = {
 		{
 			exceptionPatterns: [],
 			exceptions: [],
-			max: Number.POSITIVE_INFINITY,
+			max: Infinity,
 			min: 2,
 			properties: 'always',
 		},
