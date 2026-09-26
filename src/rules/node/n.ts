@@ -44,7 +44,6 @@ const nEslintRules: Linter.RulesRecord = {
 	'n/no-restricted-require': 'off', // Irrelevant for ESM-only project
 	'n/no-top-level-await': 'off', // Irrelevant for ESM-only project
 	'n/no-unpublished-require': 'off', // Irrelevant for ESM-only project
-
 };
 
 const nUntypedTypeScriptEslintRules: Linter.RulesRecord = {
