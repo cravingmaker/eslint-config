@@ -1,7 +1,8 @@
 import type { Linter } from 'eslint';
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginHtml from '@html-eslint/eslint-plugin';
+
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const newLineOptions = {
 	inline: ['$inline'],
