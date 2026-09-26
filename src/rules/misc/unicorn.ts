@@ -5,7 +5,7 @@ import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const unicornEslintRules: Linter.RulesRecord = {
-	...getPluginRules('unicorn', eslintPluginUnicorn.rules ?? {}, 'js/js'),
+	...getPluginRules('unicorn', eslintPluginUnicorn.rules ?? {}, 'js/js', ['consistent-arrow-return-style']),
 
 	'unicorn/filename-case': [
 		'error',
@@ -68,7 +68,6 @@ const unicornEslintRules: Linter.RulesRecord = {
 	],
 
 	'unicorn/comment-content': 'off', // Avoid enforcing terminology and brand-name wording in comments
-	'unicorn/consistent-arrow-return-style': 'off', // Covered by core `arrow-body-style`
 	'unicorn/consistent-destructuring': 'off', // Prefer freedom with variable accessing patterns
 	'unicorn/consistent-json-file-read': 'off', // Prefer explicit JSON file reading behavior
 	'unicorn/no-keyword-prefix': 'off', // Prefer freedom with keywords / names
