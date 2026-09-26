@@ -1,7 +1,8 @@
 import type { Linter } from 'eslint';
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginHtmlSvelte from '@html-eslint/eslint-plugin-svelte';
+
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const htmlSvelteEslintRules: Linter.RulesRecord = {
 	...getPluginRules('@html-eslint/svelte', eslintPluginHtmlSvelte.rules ?? {}),
