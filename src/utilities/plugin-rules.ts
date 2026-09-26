@@ -21,12 +21,18 @@ function getPluginConfigRules(pluginName: string, rules: unknown, configuredRule
 
 	return Object.fromEntries(Object.entries(pluginConfigRules).filter(([ruleId]) => !deprecatedRuleIds.has(ruleId)));
 }
-function getPluginRules(pluginName: string, rules: unknown, language?: string): Linter.RulesRecord {
+function getPluginRules(
+	pluginName: string,
+	rules: unknown,
+	language?: string,
+	excludedRuleNames: readonly string[] = [],
+): Linter.RulesRecord {
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Plugin rule maps have inconsistent public typings across packages.
 	const pluginRules = rules as PluginRules;
 
 	return Object.fromEntries(
 		Object.entries(pluginRules)
+			.filter(([ruleName]) => !excludedRuleNames.includes(ruleName))
 			.filter(([, rule]) => rule?.meta?.deprecated === undefined || rule.meta.deprecated === false)
 			.filter(([, rule]) => {
 				if (language === undefined || rule?.meta?.languages === undefined) return true;
