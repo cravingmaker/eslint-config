@@ -9,9 +9,10 @@ import { afterAll, describe, expect, it } from 'vitest';
 
 type ConsumerOptions = {
 	readonly dependencies: readonly string[];
-	readonly manifestDevDependencies?: Readonly<Record<string, string>>;
 	readonly name: string;
 	readonly tarball: string;
+
+	readonly manifestDevelopmentDependencies?: Readonly<Record<string, string>>;
 };
 
 const projectDirectory = path.resolve(__dirname, '..');
@@ -70,13 +71,13 @@ const createPackedPackage = async (baseDirectory: string) => {
 	const tarballs = packedFiles.filter((file) => file.endsWith('.tgz'));
 	expect(tarballs).toHaveLength(1);
 
-	const [tarballFilename] = tarballs;
-	if (tarballFilename === undefined) throw new Error('Packed tarball was not created');
+	const [tarballFilename = ''] = tarballs;
+	expect(tarballFilename).not.toBe('');
 
 	return path.join(baseDirectory, tarballFilename);
 };
 
-const createConsumer = async ({ dependencies, manifestDevDependencies = {}, name, tarball }: ConsumerOptions) => {
+const createConsumer = async ({ dependencies, manifestDevelopmentDependencies = {}, name, tarball }: ConsumerOptions) => {
 	const consumerDirectory = path.join(temporaryDirectory, name);
 	const nodeModulesDirectory = path.join(consumerDirectory, 'node_modules');
 	const packageDirectory = path.join(nodeModulesDirectory, '@cravingmaker', 'eslint-config');
@@ -96,7 +97,7 @@ const createConsumer = async ({ dependencies, manifestDevDependencies = {}, name
 	await fs.writeFile(
 		path.join(consumerDirectory, 'package.json'),
 		JSON.stringify({
-			devDependencies: manifestDevDependencies,
+			devDependencies: manifestDevelopmentDependencies,
 			name: `eslint-config-${name}`,
 			private: true,
 			type: 'module',
@@ -187,7 +188,7 @@ describe('published package', () => {
 	it('loads optional integrations from the consumer and auto-detects Vite', async () => {
 		const consumerDirectory = await createConsumer({
 			dependencies: ['eslint', ...runtimeDependencies, ...optionalPeerDependencies],
-			manifestDevDependencies: { vite: '1.0.0' },
+			manifestDevelopmentDependencies: { vite: '1.0.0' },
 			name: 'full-consumer',
 			tarball,
 		});
