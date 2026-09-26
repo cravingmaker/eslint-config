@@ -99,7 +99,7 @@ const possibleProblemRules: Linter.RulesRecord = {
 	'no-use-before-define': ['error', { ...noUseBeforeDefineOptions }],
 
 	'no-duplicate-imports': [
-		'off',
+		'off', // Covered by `import-x/no-duplicates`
 		{
 			allowSeparateTypeImports: false,
 			includeExports: false,

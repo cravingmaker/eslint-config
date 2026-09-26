@@ -404,6 +404,8 @@ const tsEslintOtherRules: Linter.RulesRecord = {
 	'@typescript-eslint/method-signature-style': ['error', 'property'],
 	'@typescript-eslint/no-import-type-side-effects': 'error',
 	'@typescript-eslint/no-unnecessary-parameter-property-assignment': 'error',
+
+	'no-unused-private-class-members': 'off',
 	'@typescript-eslint/no-unused-private-class-members': 'error',
 	'@typescript-eslint/no-useless-empty-export': 'error',
 	'@typescript-eslint/prefer-enum-initializers': 'error',

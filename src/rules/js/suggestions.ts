@@ -314,7 +314,7 @@ const suggestionRules: Linter.RulesRecord = {
 	'prefer-named-capture-group': 'off',
 	'require-unicode-regexp': 'off',
 	'sort-imports': [
-		'off',
+		'off', // Covered by `perfectionist/sort-imports`
 		{
 			allowSeparatedGroups: false,
 			ignoreCase: false,
@@ -324,7 +324,7 @@ const suggestionRules: Linter.RulesRecord = {
 		},
 	],
 	'sort-keys': [
-		'off',
+		'off', // Covered by `perfectionist/sort-objects`
 		'asc',
 		{
 			allowLineSeparatedGroups: false,
