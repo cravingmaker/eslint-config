@@ -216,13 +216,13 @@ async function detectReactRefreshVariant(): Promise<'generic' | 'next' | 'vite'>
 		const raw = await readFile(path.join(process.cwd(), 'package.json'), 'utf8');
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- JSON.parse returns `any`; immediately cast to a safe Record shape
 		const packageManifest = JSON.parse(raw) as Record<string, Record<string, unknown> | undefined>;
-		const deps: Record<string, unknown> = {
+		const dependencies: Record<string, unknown> = {
 			...packageManifest.dependencies,
 			...packageManifest.devDependencies,
 			...packageManifest.peerDependencies,
 		};
-		if ('next' in deps) return 'next';
-		if ('vite' in deps) return 'vite';
+		if ('next' in dependencies) return 'next';
+		if ('vite' in dependencies) return 'vite';
 		return 'generic';
 	} catch {
 		return 'generic';
