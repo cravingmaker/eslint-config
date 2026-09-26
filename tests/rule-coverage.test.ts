@@ -4,6 +4,7 @@ import type { Linter } from 'eslint';
 
 import process from 'node:process';
 
+// eslint-disable-next-line @typescript-eslint/no-deprecated -- Coverage audit intentionally inspects ESLint's current builtin rule registry
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { describe, expect, it } from 'vitest';
 
