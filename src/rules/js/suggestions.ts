@@ -72,6 +72,7 @@ const suggestionRules: Linter.RulesRecord = {
 	'default-param-last': 'error',
 	'dot-notation': ['error', { ...dotNotationOptions }],
 	eqeqeq: ['error', 'always'],
+	'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: false }],
 	'max-depth': ['error', { max: 4 }],
 	'no-alert': 'error',
 	'no-array-constructor': 'error',
@@ -102,7 +103,6 @@ const suggestionRules: Linter.RulesRecord = {
 	'no-implicit-globals': ['error', { lexicalBindings: false }],
 	'no-implied-eval': 'error',
 	'no-iterator': 'error',
-	'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: false }],
 	'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: false }],
 	'no-label-var': 'error',
 	'no-labels': [
