@@ -8,14 +8,25 @@ import { describe, expect, it } from 'vitest';
 
 import { createConfig } from '../dist/index.mjs';
 
+type Plugin = NonNullable<Linter.Config['plugins']>[string];
+type PluginRule = {
+	readonly meta?: {
+		readonly deprecated?: unknown;
+	};
+};
+
 function findPluginName(ruleId: string, pluginNames: readonly string[]): string | undefined {
 	return pluginNames.find((name) => ruleId.startsWith(`${name}/`));
+}
+
+function isPluginRule(value: unknown): value is PluginRule {
+	return typeof value === 'object' && value !== null;
 }
 
 function isDeprecatedConfiguredRule(
 	ruleId: string,
 	pluginNames: readonly string[],
-	plugins: ReadonlyMap<string, Linter.Plugin>,
+	plugins: ReadonlyMap<string, Plugin>,
 ): boolean {
 	const pluginName = findPluginName(ruleId, pluginNames);
 	if (pluginName === undefined) return false;
@@ -23,8 +34,9 @@ function isDeprecatedConfiguredRule(
 	const plugin = plugins.get(pluginName);
 	const ruleName = ruleId.slice(pluginName.length + 1);
 	const rule = Object.entries(plugin?.rules ?? {}).find(([name]) => name === ruleName)?.[1];
+	if (!isPluginRule(rule)) return false;
 
-	return rule?.meta?.deprecated !== undefined && rule.meta.deprecated !== false;
+	return rule.meta?.deprecated !== undefined && rule.meta.deprecated !== false;
 }
 
 describe('deprecated rule handling', () => {
