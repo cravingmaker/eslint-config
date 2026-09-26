@@ -1,9 +1,8 @@
 import type { Linter } from 'eslint';
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
+import eslintPluginComments from '@eslint-community/eslint-plugin-eslint-comments';
 
 import { getPluginRules } from '../../utilities/plugin-rules.js';
-import eslintPluginComments from '@eslint-community/eslint-plugin-eslint-comments';
 
 const eslintCommentsRules: Linter.RulesRecord = {
 	...getPluginRules('@eslint-community/eslint-comments', eslintPluginComments.rules),
