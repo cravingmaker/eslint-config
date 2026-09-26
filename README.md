@@ -38,15 +38,15 @@ bun add --dev --exact eslint @cravingmaker/eslint-config
 
 ## Usage
 
-Create an `eslint.config.js` file in your project root:
+Create an `eslint.config.js` file in your project root. Type-checked TypeScript rules are disabled by default and must be enabled explicitly with `tsTypeChecked: true`.
 
 ```javascript
 import { createConfig } from "@cravingmaker/eslint-config";
 
 export default createConfig({
-  // Optional: Enable type-checked rules
+  // Optional (default: false): Enable type-checked TypeScript rules
   tsTypeChecked: true,
-  // Optional: Set the root directory for tsconfig
+  // Optional: Set the tsconfig root when type-checked rules are enabled
   tsconfigRootDir: import.meta.dirname,
   // Optional: Add custom ignores
   ignores: ["dist/**"],

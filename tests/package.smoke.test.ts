@@ -126,7 +126,7 @@ describe('published package', () => {
 		await fs.rm(temporaryDirectory, { force: true, recursive: true });
 	});
 
-	it('works without optional peers and switches TypeScript type checking explicitly', async () => {
+	it('works without optional peers and defaults TypeScript type checking to off', async () => {
 		const consumerDirectory = await createConsumer({
 			dependencies: ['eslint', ...runtimeDependencies],
 			name: 'base-consumer',
@@ -136,6 +136,7 @@ describe('published package', () => {
 		const output = runConsumer(
 			consumerDirectory,
 			String.raw`
+				import { ESLint } from 'eslint';
 				import { createConfig } from '@cravingmaker/eslint-config';
 
 				const optionalPluginNames = [
@@ -152,24 +153,51 @@ describe('published package', () => {
 				const getTypeScriptConfig = (config) =>
 					config.find((entry) => Object.hasOwn(entry.plugins ?? {}, '@typescript-eslint'));
 
+				const defaultConfig = await createConfig();
 				const untyped = await createConfig({ tsTypeChecked: false });
 				const typed = await createConfig({ tsTypeChecked: true });
 
-				if (!Array.isArray(untyped) || untyped.length === 0) {
+				if (!Array.isArray(defaultConfig) || defaultConfig.length === 0) {
 					throw new Error('createConfig did not return a non-empty flat config');
 				}
 
-				const detectedOptionalPlugins = optionalPluginNames.filter((name) => getPluginNames(untyped).has(name));
+				const detectedOptionalPlugins = optionalPluginNames.filter((name) => getPluginNames(defaultConfig).has(name));
 				if (detectedOptionalPlugins.length !== 0) {
 					throw new Error('Optional plugins were loaded unexpectedly: ' + detectedOptionalPlugins.join(', '));
 				}
 
+				const defaultTsConfig = getTypeScriptConfig(defaultConfig);
 				const untypedTsConfig = getTypeScriptConfig(untyped);
 				const typedTsConfig = getTypeScriptConfig(typed);
 
-				if (!untypedTsConfig || !typedTsConfig) {
+				if (!defaultTsConfig || !untypedTsConfig || !typedTsConfig) {
 					throw new Error('TypeScript config was not created');
 				}
+
+				if (defaultTsConfig.languageOptions?.parserOptions?.projectService !== undefined) {
+					throw new Error('Default TypeScript config unexpectedly enabled projectService');
+				}
+
+				if (defaultTsConfig.rules?.['@typescript-eslint/no-unsafe-assignment'] !== 'off') {
+					throw new Error('Default TypeScript config unexpectedly enabled type-aware rules');
+				}
+
+				if (defaultTsConfig.rules?.['n/no-sync'] !== 'off') {
+					throw new Error('Default TypeScript config unexpectedly enabled n/no-sync without type information');
+				}
+
+				if (typedTsConfig.rules?.['n/no-sync']?.[0] !== 'error') {
+					throw new Error('Typed TypeScript config did not enable n/no-sync');
+				}
+
+				const eslint = new ESLint({
+					overrideConfig: defaultConfig,
+					overrideConfigFile: true,
+				});
+				await eslint.lintText(
+					"import fs from 'node:fs';\nfs.readFileSync('fixture.txt', 'utf8');\n",
+					{ filePath: 'example.ts' },
+				);
 
 				if (untypedTsConfig.languageOptions?.parserOptions?.projectService !== undefined) {
 					throw new Error('Untyped TypeScript config unexpectedly enabled projectService');

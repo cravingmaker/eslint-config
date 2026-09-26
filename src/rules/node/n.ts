@@ -54,4 +54,9 @@ const nEslintRules: Linter.RulesRecord = {
 	'n/shebang': 'off', // Deprecated since v17.0.0
 };
 
-export { nEslintRules };
+const nUntypedTypeScriptEslintRules: Linter.RulesRecord = {
+	...nEslintRules,
+	'n/no-sync': 'off',
+} as const;
+
+export { nEslintRules, nUntypedTypeScriptEslintRules };
