@@ -73,7 +73,6 @@ const unicornEslintRules: Linter.RulesRecord = {
 	'unicorn/no-unused-properties': 'off', // Prefer freedom with properties
 	'unicorn/prefer-json-parse-buffer': 'off', // Prefer TypeScript, it's not compatible with TypeScript
 	'unicorn/require-post-message-target-origin': 'off', // It can't distinguish between window.postMessage() and other calls like Worker#postMessage(), MessagePort#postMessage(), Client#postMessage(), and BroadcastChannel#postMessage()
-
 } as const;
 
 export { unicornEslintRules };
