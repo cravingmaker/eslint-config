@@ -1,7 +1,8 @@
 import type { Linter } from 'eslint';
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginJson from '@eslint/json';
+
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const jsonEslintRules: Linter.RulesRecord = {
 	...getPluginRules('json', eslintPluginJson.rules),
