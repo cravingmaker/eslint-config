@@ -151,8 +151,9 @@ describe('published package', () => {
 					return new Set(config.flatMap((entry) => Object.keys(entry.plugins ?? {})));
 				};
 
-				const getTypeScriptConfig = (config) =>
-					config.find((entry) => Object.hasOwn(entry.plugins ?? {}, '@typescript-eslint'));
+				const getTypeScriptConfig = (config) => {
+					return config.find((entry) => Object.hasOwn(entry.plugins ?? {}, '@typescript-eslint'));
+				};
 
 				const defaultConfig = await createConfig();
 				const untyped = await createConfig({ tsTypeChecked: false });
