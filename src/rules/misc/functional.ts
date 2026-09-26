@@ -1,16 +1,10 @@
 import type { Linter } from 'eslint';
 
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginFunctional from 'eslint-plugin-functional';
 
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	return Object.fromEntries(
-		Object.keys(eslintPluginFunctional.rules).map((key) => [`functional/${key}`, 'error']),
-	) as Linter.RulesRecord;
-}
-
 const functionalTypeCheckedEslintRules: Linter.RulesRecord = {
-	...getRules(),
+	...getPluginRules('functional', eslintPluginFunctional.rules),
 
 	'functional/functional-parameters': ['error', { enforceParameterCount: { ignoreLambdaExpression: true } }],
 	'functional/no-conditional-statements': ['error', { allowReturningBranches: true }],
@@ -79,7 +73,6 @@ const functionalTypeCheckedEslintRules: Linter.RulesRecord = {
 
 	'functional/no-try-statements': 'off', // Prefer try statements
 
-	'functional/prefer-readonly-type': 'off', // Deprecated in favor of `functional/prefer-immutable-types` and `functional/type-declaration-immutability`
 } as const;
 
 const functionalEslintRules = {
