@@ -33,9 +33,10 @@ describe('rule coverage', () => {
 		const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked: true });
 		const rules = getJavaScriptRules(config);
 		// eslint-disable-next-line @typescript-eslint/no-deprecated -- Coverage audit intentionally inspects ESLint's current builtin rule registry
-		const unclassified = Array.from(builtinRules)
+		const unclassified = Iterator.from(builtinRules)
 			.filter(([ruleName, rule]) => !isDeprecated(rule) && !Object.hasOwn(rules, ruleName))
 			.map(([ruleName]) => ruleName)
+			.toArray()
 			.toSorted((left, right) => left.localeCompare(right));
 
 		expect(unclassified).toEqual([]);
