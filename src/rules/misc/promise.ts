@@ -1,6 +1,7 @@
 import type { Linter } from 'eslint';
 
 import { getPluginRules } from '../../utilities/plugin-rules.js';
+
 import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginPromise from 'eslint-plugin-promise';
 
