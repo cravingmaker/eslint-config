@@ -73,7 +73,6 @@ const functionalTypeCheckedEslintRules: Linter.RulesRecord = {
 	'functional/no-this-expressions': 'off', // Project specific
 
 	'functional/no-try-statements': 'off', // Prefer try statements
-
 } as const;
 
 const functionalEslintRules = {
