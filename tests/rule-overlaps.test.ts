@@ -20,6 +20,9 @@ describe('overlapping rule policy', () => {
 		const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked: false });
 		const rules = getJavaScriptRules(config);
 
+		expect(rules['arrow-body-style']).toEqual(['error', 'as-needed']);
+		expect(rules['unicorn/consistent-arrow-return-style']).toBe('off');
+
 		expect(rules['no-duplicate-imports']).toEqual(['off', { allowSeparateTypeImports: false, includeExports: false }]);
 		expect(rules['import-x/no-duplicates']).toBe('error');
 
