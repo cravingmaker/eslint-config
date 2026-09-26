@@ -41,7 +41,6 @@ const packageJsonEslintRules: Linter.RulesRecord = {
 	'package-json/require-packageManager': 'off', // Prefer optional
 	'package-json/require-peerDependencies': 'off', // Prefer optional
 	'package-json/require-publishConfig': 'off', // Prefer optional
-
 } as const;
 
 export { packageJsonEslintRules };
