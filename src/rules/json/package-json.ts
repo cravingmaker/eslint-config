@@ -27,12 +27,16 @@ const packageJsonEslintRules: Linter.RulesRecord = {
 	'package-json/restrict-top-level-properties': 'off', // Project specific
 
 	'package-json/require-bin': 'off', // Prefer optional
+	'package-json/require-browser': 'off', // Prefer optional; only relevant to browser-targeted packages
 	'package-json/require-bundleDependencies': 'off', // Prefer optional
+	'package-json/require-config': 'off', // Prefer optional; npm config defaults are package-specific
 	'package-json/require-contributors': 'off', // Prefer optional
 	'package-json/require-cpu': 'off', // Prefer optional
 	'package-json/require-dependencies': 'off', // Prefer optional
 	'package-json/require-directories': 'off', // Prefer optional
 	'package-json/require-funding': 'off', // Prefer optional
+	'package-json/require-gypfile': 'off', // Prefer optional; only relevant to native addon packages
+	'package-json/require-libc': 'off', // Prefer optional; only relevant to libc-specific packages
 	'package-json/require-main': 'off', // Prefer optional
 	'package-json/require-man': 'off', // Prefer optional
 	'package-json/require-module': 'off', // Prefer optional
