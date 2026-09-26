@@ -287,7 +287,14 @@ export async function createConfig({
 		buildReactConfig(resolvedVariant, reactRuleOverrides),
 		buildSvelteConfig(svelteRuleOverrides),
 		buildExpressConfig(expressRuleOverrides),
-		buildTsConfig({ functionalRules, nRules, resolverProject, ruleOverrides: tsRuleOverrides, tsParserOptions, tsRules }),
+		buildTsConfig({
+			functionalRules,
+			nRules,
+			resolverProject,
+			ruleOverrides: tsRuleOverrides,
+			tsParserOptions,
+			tsRules,
+		}),
 	]);
 	const optionalConfigs = [
 		...reactConfigs,
