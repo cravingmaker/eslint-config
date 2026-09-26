@@ -1,16 +1,10 @@
 import type { Linter } from 'eslint';
 
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginN from 'eslint-plugin-n';
 
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	const rules = (eslintPluginN.rules ?? {}) as Record<string, unknown>;
-
-	return Object.fromEntries(Object.keys(rules).map((key) => [`n/${key}`, 'error'])) as Linter.RulesRecord;
-}
-
 const nEslintRules: Linter.RulesRecord = {
-	...getRules(),
+	...getPluginRules('n', eslintPluginN.rules ?? {}),
 
 	'n/prefer-global/buffer': ['error', 'never'],
 	'n/prefer-global/crypto': ['error', 'never'],
@@ -50,8 +44,6 @@ const nEslintRules: Linter.RulesRecord = {
 	'n/no-top-level-await': 'off', // Irrelevant for ESM-only project
 	'n/no-unpublished-require': 'off', // Irrelevant for ESM-only project
 
-	'n/no-hide-core-modules': 'off', // Deprecated since v4.2.0
-	'n/shebang': 'off', // Deprecated since v17.0.0
 };
 
 const nUntypedTypeScriptEslintRules: Linter.RulesRecord = {
