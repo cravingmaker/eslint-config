@@ -1,7 +1,8 @@
 import type { Linter } from 'eslint';
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
+
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const unicornEslintRules: Linter.RulesRecord = {
 	...getPluginRules('unicorn', eslintPluginUnicorn.rules ?? {}),
