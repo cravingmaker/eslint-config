@@ -103,6 +103,7 @@ const suggestionRules: Linter.RulesRecord = {
 	'no-implied-eval': 'error',
 	'no-iterator': 'error',
 	'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: false }],
+	'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: false }],
 	'no-label-var': 'error',
 	'no-labels': [
 		'error',
