@@ -2,7 +2,7 @@
 
 import { describe, it } from 'vitest';
 
-import { expectLintError } from '../../utilities.js';
+import { expectLintError, expectNoLintError } from '../../utilities.js';
 
 describe('js suggestion rules', () => {
 	it('accessor-pairs: reports setters without getters on class members', async () => {
@@ -31,10 +31,26 @@ describe('js suggestion rules', () => {
 		);
 	});
 
+	it('func-style: stays disabled so declarations and expressions can coexist', async () => {
+		await expectNoLintError(
+			`function declared() {\n\treturn 'declared';\n}\nconst expressed = () => 'expressed';\nconsole.log(declared(), expressed());\n`,
+			'func-style',
+			{ filePath: 'test.js' },
+		);
+	});
+
 	it('grouped-accessor-pairs: reports accessors separated by another class member', async () => {
 		await expectLintError(
 			`const store = {\n\tget value() {\n\t\treturn this.current;\n\t},\n\treset() {\n\t\tthis.current = 0;\n\t},\n\tset value(value) {\n\t\tthis.current = value;\n\t},\n};\nconsole.log(store);\n`,
 			'grouped-accessor-pairs',
+			{ filePath: 'test.js' },
+		);
+	});
+
+	it('logical-assignment-operators: requires logical assignment shorthand', async () => {
+		await expectLintError(
+			`let value = '';\nvalue = value || 'fallback';\nconsole.log(value);\n`,
+			'logical-assignment-operators',
 			{ filePath: 'test.js' },
 		);
 	});
@@ -49,6 +65,18 @@ describe('js suggestion rules', () => {
 			'prefer-destructuring',
 			{ filePath: 'test.js' },
 		);
+	});
+
+	it('symbol-description: requires descriptions for created symbols', async () => {
+		await expectLintError(`const token = Symbol();\nconsole.log(token);\n`, 'symbol-description', {
+			filePath: 'test.js',
+		});
+	});
+
+	it('unicode-bom: rejects byte order marks in UTF-8 source', async () => {
+		await expectLintError(`\uFEFFconst value = 1;\nconsole.log(value);\n`, 'unicode-bom', {
+			filePath: 'test.js',
+		});
 	});
 
 	it('prefer-regex-literals: reports redundant RegExp constructors', async () => {
