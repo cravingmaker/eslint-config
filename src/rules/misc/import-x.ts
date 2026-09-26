@@ -1,9 +1,8 @@
 import type { Linter } from 'eslint';
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
+import eslintPluginImportX from 'eslint-plugin-import-x';
 
 import { getPluginRules } from '../../utilities/plugin-rules.js';
-import eslintPluginImportX from 'eslint-plugin-import-x';
 
 const importxEslintRules: Linter.RulesRecord = {
 	...getPluginRules('import-x', eslintPluginImportX.rules),
