@@ -74,7 +74,7 @@ describe('js suggestion rules', () => {
 	});
 
 	it('unicode-bom: rejects byte order marks in UTF-8 source', async () => {
-		await expectLintError(`\uFEFFconst value = 1;\nconsole.log(value);\n`, 'unicode-bom', {
+		await expectLintError(`\u{FEFF}const value = 1;\nconsole.log(value);\n`, 'unicode-bom', {
 			filePath: 'test.js',
 		});
 	});

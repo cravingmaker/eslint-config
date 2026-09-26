@@ -5,7 +5,7 @@ import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const unicornEslintRules: Linter.RulesRecord = {
-	...getPluginRules('unicorn', eslintPluginUnicorn.rules ?? {}),
+	...getPluginRules('unicorn', eslintPluginUnicorn.rules ?? {}, 'js/js', ['consistent-arrow-return-style']),
 
 	'unicorn/filename-case': [
 		'error',
@@ -17,7 +17,7 @@ const unicornEslintRules: Linter.RulesRecord = {
 			ignore: [/^\d+_/v], // Migration files like 001_init.js
 		},
 	],
-	'unicorn/prevent-abbreviations': [
+	'unicorn/name-replacements': [
 		'error',
 		{
 			allowList: {
@@ -67,12 +67,13 @@ const unicornEslintRules: Linter.RulesRecord = {
 		},
 	],
 
-	'unicorn/better-regex': 'off', // Prefer freedom with regexes
+	'unicorn/comment-content': 'off', // Avoid enforcing terminology and brand-name wording in comments
 	'unicorn/consistent-destructuring': 'off', // Prefer freedom with variable accessing patterns
+	'unicorn/consistent-json-file-read': 'off', // Prefer explicit JSON file reading behavior
 	'unicorn/no-keyword-prefix': 'off', // Prefer freedom with keywords / names
 	'unicorn/no-unused-properties': 'off', // Prefer freedom with properties
-	'unicorn/prefer-json-parse-buffer': 'off', // Prefer TypeScript, it's not compatible with TypeScript
 	'unicorn/require-post-message-target-origin': 'off', // It can't distinguish between window.postMessage() and other calls like Worker#postMessage(), MessagePort#postMessage(), Client#postMessage(), and BroadcastChannel#postMessage()
+	'unicorn/try-complexity': 'off', // Core complexity rules already provide a less restrictive complexity policy
 } as const;
 
 export { unicornEslintRules };
