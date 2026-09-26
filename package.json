@@ -48,7 +48,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "validate": "npm run typecheck && npm run format:check && npm run build && npm run lint:built && npm test"
+    "validate": "npm run format:check && npm run build && npm run typecheck && npm run lint:built && npm test"
   },
   "lint-staged": {
     "src/**/*.ts": [
