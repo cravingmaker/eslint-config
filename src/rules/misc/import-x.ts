@@ -124,7 +124,6 @@ const importxEslintRules: Linter.RulesRecord = {
 
 	'import-x/first': 'off', // Covered by `perfectionist/sort-imports` rule
 	'import-x/order': 'off', // Covered by `perfectionist/sort-imports` rule
-
 } as const;
 
 export { importxEslintRules };
