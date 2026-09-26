@@ -4,7 +4,7 @@ import {
 	classMethodsUseThisOptions,
 	consistentReturnOptions,
 	dotNotationOptions,
-	// eslint-disable-next-line unicorn/prevent-abbreviations -- This mirrors the ESLint `max-params` rule name
+	// eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `max-params` rule name
 	maxParamsOptions,
 	noEmptyFunctionOptions,
 	noShadowOptions,
