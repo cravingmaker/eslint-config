@@ -25,8 +25,13 @@ jobs:
         with:
           node-version: 24
 
-      - name: Generate lockfile
-        run: npm install --package-lock-only --ignore-scripts
+      - name: Generate fresh lockfile
+        run: |
+          tmpdir="$(mktemp -d)"
+          cp package.json "$tmpdir/package.json"
+          cd "$tmpdir"
+          npm install --package-lock-only --ignore-scripts
+          cp package-lock.json "$GITHUB_WORKSPACE/package-lock.json"
 
       - name: Commit lockfile
         run: |
