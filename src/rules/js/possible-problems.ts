@@ -1,6 +1,6 @@
 import type { Linter } from 'eslint';
 
-// eslint-disable-next-line unicorn/prevent-abbreviations -- This mirrors the ESLint `no-unused-vars` rule name
+// eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
 import { noUnusedVarsOptions, noUseBeforeDefineOptions } from '../../options/common.js';
 
 const recommendedPossibleProblemRules: Linter.RulesRecord = {
