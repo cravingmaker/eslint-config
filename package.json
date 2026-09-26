@@ -39,7 +39,7 @@
     "build": "npm run clean && tsdown",
     "clean": "node --input-type=module --eval \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\"",
     "format": "prettier --write .",
-    "format:check": "prettier --write tests/rule-overlaps.test.ts && git diff -- tests/rule-overlaps.test.ts",
+    "format:check": "prettier --check .",
     "lint": "npm run build && npm run lint:built",
     "lint:built": "eslint . --max-warnings 0",
     "lint:package": "npm run build && npm run lint:package:built",
