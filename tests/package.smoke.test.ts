@@ -113,11 +113,12 @@ const createConsumer = async ({
 	return consumerDirectory;
 };
 
-const runConsumer = (consumerDirectory: string, script: string) =>
-	execFileSync(process.execPath, ['--input-type=module', '--eval', script], {
+const runConsumer = (consumerDirectory: string, script: string) => {
+	return execFileSync(process.execPath, ['--input-type=module', '--eval', script], {
 		cwd: consumerDirectory,
 		encoding: 'utf8',
 	});
+};
 
 const tarball = await createPackedPackage(temporaryDirectory);
 
