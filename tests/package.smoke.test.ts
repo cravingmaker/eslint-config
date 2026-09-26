@@ -77,7 +77,12 @@ const createPackedPackage = async (baseDirectory: string) => {
 	return path.join(baseDirectory, tarballFilename);
 };
 
-const createConsumer = async ({ dependencies, manifestDevelopmentDependencies = {}, name, tarball }: ConsumerOptions) => {
+const createConsumer = async ({
+	dependencies,
+	manifestDevelopmentDependencies = {},
+	name,
+	tarball,
+}: ConsumerOptions) => {
 	const consumerDirectory = path.join(temporaryDirectory, name);
 	const nodeModulesDirectory = path.join(consumerDirectory, 'node_modules');
 	const packageDirectory = path.join(nodeModulesDirectory, '@cravingmaker', 'eslint-config');
