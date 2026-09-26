@@ -46,13 +46,14 @@ describe('deprecated rule handling', () => {
 			tsTypeChecked: true,
 		});
 		const plugins = new Map(config.flatMap((entry) => Object.entries(entry.plugins ?? {})));
-		const pluginNames = plugins.keys().toArray().toSorted((left, right) => right.length - left.length);
+		const pluginNames = plugins
+			.keys()
+			.toArray()
+			.toSorted((left, right) => right.length - left.length);
 		const deprecatedRuleIds = config.flatMap((entry) =>
 			Object.keys(entry.rules ?? {}).filter((ruleId) => isDeprecatedConfiguredRule(ruleId, pluginNames, plugins)),
 		);
 
-		expect(
-			[...new Set(deprecatedRuleIds)].toSorted((left, right) => left.localeCompare(right)),
-		).toEqual([]);
+		expect([...new Set(deprecatedRuleIds)].toSorted((left, right) => left.localeCompare(right))).toEqual([]);
 	});
 });
