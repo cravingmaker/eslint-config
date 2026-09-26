@@ -1,14 +1,10 @@
 import type { Linter } from 'eslint';
 
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 import { rules } from 'eslint-plugin-regexp';
 
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	return Object.fromEntries(Object.keys(rules).map((key) => [`regexp/${key}`, 'error'])) as Linter.RulesRecord;
-}
-
 const regexpEslintRules: Linter.RulesRecord = {
-	...getRules(),
+	...getPluginRules('regexp', rules),
 
 	'regexp/hexadecimal-escape': ['error', 'never'],
 	'regexp/prefer-character-class': ['error', { minAlternatives: 2 }],
