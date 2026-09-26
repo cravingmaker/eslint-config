@@ -4,7 +4,6 @@ import type { Linter } from 'eslint';
 
 import process from 'node:process';
 
-// eslint-disable-next-line @typescript-eslint/no-deprecated -- Coverage audit intentionally inspects ESLint's current builtin rule registry
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { describe, expect, it } from 'vitest';
 
@@ -33,6 +32,7 @@ describe('rule coverage', () => {
 	it('classifies every current non-deprecated ESLint core rule', async () => {
 		const config = await createConfig({ tsconfigRootDir: process.cwd(), tsTypeChecked: true });
 		const rules = getJavaScriptRules(config);
+		// eslint-disable-next-line @typescript-eslint/no-deprecated -- Coverage audit intentionally inspects ESLint's current builtin rule registry
 		const unclassified = [...builtinRules.entries()]
 			.filter(([ruleName, rule]) => !isDeprecated(rule) && !Object.hasOwn(rules, ruleName))
 			.map(([ruleName]) => ruleName)
