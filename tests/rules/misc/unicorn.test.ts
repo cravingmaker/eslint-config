@@ -104,28 +104,22 @@ describe('unicorn rules', () => {
 		);
 	});
 
-	it('deprecated unicorn rules stay disabled in favor of their replacements', async () => {
-		await expectNoLintError(
+	it('modern replacement rules remain enabled', async () => {
+		await expectLintError(
 			`const values = [];\nvalues.push(1);\nvalues.push(2);\nconsole.log(values);\n`,
-			'unicorn/no-array-push-push',
+			'unicorn/prefer-single-call',
 			jsOptions,
 		);
 
-		await expectNoLintError(
+		await expectLintError(
 			`function isArray(value) {\n\treturn value instanceof Array;\n}\nconsole.log(isArray([]));\n`,
-			'unicorn/no-instanceof-array',
+			'unicorn/no-instanceof-builtins',
 			jsOptions,
 		);
 
-		await expectNoLintError(
+		await expectLintError(
 			`const values = [1, 2, 3];\nconst tail = values.slice(1, values.length);\nconsole.log(tail);\n`,
-			'unicorn/no-length-as-slice-end',
-			jsOptions,
-		);
-
-		await expectNoLintError(
-			`const element = { dataset: { value: 'ready' } };\nconsole.log(element.dataset.value);\n`,
-			'unicorn/refer-dom-node-dataset',
+			'unicorn/no-unnecessary-slice-end',
 			jsOptions,
 		);
 	});
