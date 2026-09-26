@@ -1,16 +1,10 @@
 import type { Linter } from 'eslint';
 
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 import eslintPluginJson from '@eslint/json';
 
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter factory function; no meaningful parameter applies here
-function getRules() {
-	const rules = eslintPluginJson.rules as Record<string, unknown>;
-
-	return Object.fromEntries(Object.keys(rules).map((key) => [`json/${key}`, 'error'])) as Linter.RulesRecord;
-}
-
 const jsonEslintRules: Linter.RulesRecord = {
-	...getRules(),
+	...getPluginRules('json', eslintPluginJson.rules),
 
 	'json/sort-keys': [
 		'error',
