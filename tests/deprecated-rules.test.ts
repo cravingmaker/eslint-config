@@ -18,14 +18,10 @@ type PluginRule = {
 function findPluginName(ruleId: string, pluginNames: readonly string[]): string | undefined {
 	return pluginNames.find((name) => ruleId.startsWith(`${name}/`));
 }
-
-function isPluginRule(value: unknown): value is PluginRule {
-	return typeof value === 'object' && value !== null;
-}
-
 function isDeprecatedConfiguredRule(
 	ruleId: string,
 	pluginNames: readonly string[],
+	// eslint-disable-next-line functional/prefer-immutable-types -- ESLint plugin types are externally defined and not deeply readonly
 	plugins: ReadonlyMap<string, Plugin>,
 ): boolean {
 	const pluginName = findPluginName(ruleId, pluginNames);
@@ -37,6 +33,9 @@ function isDeprecatedConfiguredRule(
 	if (!isPluginRule(rule)) return false;
 
 	return rule.meta?.deprecated !== undefined && rule.meta.deprecated !== false;
+}
+function isPluginRule(value: unknown): value is PluginRule {
+	return typeof value === 'object' && value !== null;
 }
 
 describe('deprecated rule handling', () => {
