@@ -17,7 +17,7 @@ const htmlEslintRules: Linter.RulesRecord = {
 	'@html-eslint/id-naming-convention': ['error', 'kebab-case'],
 	'@html-eslint/indent': ['error', 2],
 	'@html-eslint/max-element-depth': ['error', { max: 6 }],
-	'@html-eslint/no-extra-spacing-attrs': [
+	'@html-eslint/no-extra-spacing-tags': [
 		'error',
 		{
 			disallowInAssignment: true,
