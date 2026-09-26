@@ -8,7 +8,7 @@ const consistentReturnOptions = { treatUndefinedAsUnspecified: false } as const;
 
 const dotNotationOptions = { allowKeywords: true } as const;
 
-// eslint-disable-next-line unicorn/prevent-abbreviations -- This mirrors the ESLint `max-params` rule name
+// eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `max-params` rule name
 const maxParamsOptions = { max: 4 } as const;
 
 const namingConventionOptions = [
@@ -53,7 +53,7 @@ const noUnusedExpressionsOptions = {
 	ignoreDirectives: false,
 } as const;
 
-// eslint-disable-next-line unicorn/prevent-abbreviations -- This mirrors the ESLint `no-unused-vars` rule name
+// eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
 const noUnusedVarsOptions = {
 	args: 'after-used',
 	argsIgnorePattern: '^_',
