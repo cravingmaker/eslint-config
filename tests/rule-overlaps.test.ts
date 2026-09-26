@@ -21,7 +21,7 @@ describe('overlapping rule policy', () => {
 		const rules = getJavaScriptRules(config);
 
 		expect(rules['arrow-body-style']).toEqual(['error', 'as-needed']);
-		expect(rules['unicorn/consistent-arrow-return-style']).toBe('off');
+		expect(rules['unicorn/consistent-arrow-return-style']).toBeUndefined();
 
 		expect(rules['no-duplicate-imports']).toEqual(['off', { allowSeparateTypeImports: false, includeExports: false }]);
 		expect(rules['import-x/no-duplicates']).toBe('error');
