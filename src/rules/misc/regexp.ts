@@ -1,7 +1,8 @@
 import type { Linter } from 'eslint';
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
 import { rules } from 'eslint-plugin-regexp';
+
+import { getPluginRules } from '../../utilities/plugin-rules.js';
 
 const regexpEslintRules: Linter.RulesRecord = {
 	...getPluginRules('regexp', rules),
