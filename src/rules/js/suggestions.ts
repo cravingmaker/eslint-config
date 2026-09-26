@@ -103,6 +103,7 @@ const suggestionRules: Linter.RulesRecord = {
 	'no-implied-eval': 'error',
 	'no-iterator': 'error',
 	'no-label-var': 'error',
+	'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: false }],
 	'no-labels': [
 		'error',
 		{
@@ -110,7 +111,6 @@ const suggestionRules: Linter.RulesRecord = {
 			allowSwitch: false,
 		},
 	],
-	'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: false }],
 	'no-lone-blocks': 'error',
 	'no-lonely-if': 'error',
 	'no-loop-func': 'error',
