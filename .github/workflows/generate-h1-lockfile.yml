@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   lockfile:
@@ -15,10 +15,10 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout
+      - name: Checkout feature branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          persist-credentials: false
+          ref: chore/modernize-eslint-core-dependencies
 
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -28,8 +28,13 @@ jobs:
       - name: Generate lockfile
         run: npm install --package-lock-only --ignore-scripts
 
-      - name: Print compressed lockfile
+      - name: Commit lockfile
         run: |
-          printf 'LOCKFILE_GZIP_BASE64='
-          gzip -c package-lock.json | base64 -w0
-          printf '\n'
+          if git diff --quiet -- package-lock.json; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add package-lock.json
+          git commit -m "chore: refresh dependency lockfile"
+          git push origin HEAD:chore/modernize-eslint-core-dependencies
