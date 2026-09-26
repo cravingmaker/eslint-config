@@ -26,10 +26,9 @@ describe('deprecated rule handling', () => {
 			tsconfigRootDir: process.cwd(),
 			tsTypeChecked: true,
 		});
-		const plugins = Object.assign(
-			{},
-			...config.map((entry) => entry.plugins ?? {}),
-		) as Readonly<Record<string, PluginWithRules>>;
+		const plugins = Object.assign({}, ...config.map((entry) => entry.plugins ?? {})) as Readonly<
+			Record<string, PluginWithRules>
+		>;
 
 		const pluginNames = Object.keys(plugins).toSorted((left, right) => right.length - left.length);
 		const deprecatedRuleIds = config.flatMap((entry) =>
