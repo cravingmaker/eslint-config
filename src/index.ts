@@ -1,5 +1,4 @@
 import type { Linter } from 'eslint';
-import type eslintPluginExpressSecurity from 'eslint-plugin-express-security';
 import type pluginReactHooks from 'eslint-plugin-react-hooks';
 import type { reactRefresh as ReactRefreshPlugin } from 'eslint-plugin-react-refresh';
 import type eslintPluginHtmlReact from '@html-eslint/eslint-plugin-react';
@@ -93,7 +92,7 @@ type TsConfigOptions = {
 
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 async function buildExpressConfig(ruleOverrides: Readonly<Linter.RulesRecord>): Promise<Linter.Config | undefined> {
-	const plugin = await tryImport<{ default: typeof eslintPluginExpressSecurity }>('eslint-plugin-express-security');
+	const plugin = await tryImport<{ default: Linter.Plugin }>('eslint-plugin-express-security');
 	if (plugin === undefined) return undefined;
 	const { expressSecurityEslintRules } = await import('./rules/node/express-security.js');
 	return {
