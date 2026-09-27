@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion, functional/no-expression-statements, functional/no-return-void, security/detect-non-literal-fs-filename -- Package contract tests intentionally read repository manifests and assert their published shape. */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-unsafe-type-assertion, functional/no-expression-statements, functional/no-return-void, functional/prefer-immutable-types, perfectionist/sort-arrays, perfectionist/sort-modules, perfectionist/sort-objects, security/detect-non-literal-fs-filename, security/detect-object-injection -- Package contract tests intentionally inspect dynamic repository manifest data and assert its published shape. */
 
 import { readFile } from 'node:fs/promises';
 
@@ -118,12 +118,12 @@ describe('package contract', () => {
 			),
 		).toEqual([]);
 
-		expect(
-			dependencyNames.filter((dependency) => Object.hasOwn(packageManifest.devDependencies, dependency)),
-		).toEqual([]);
-		expect(
-			dependencyNames.filter((dependency) => Object.hasOwn(packageManifest.peerDependencies, dependency)),
-		).toEqual([]);
+		expect(dependencyNames.filter((dependency) => Object.hasOwn(packageManifest.devDependencies, dependency))).toEqual(
+			[],
+		);
+		expect(dependencyNames.filter((dependency) => Object.hasOwn(packageManifest.peerDependencies, dependency))).toEqual(
+			[],
+		);
 		expect(
 			peerDependencyNames.filter((dependency) => !Object.hasOwn(packageManifest.devDependencies, dependency)),
 		).toEqual([]);
