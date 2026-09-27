@@ -45,14 +45,15 @@
     "lint:package": "npm run build && npm run lint:package:built",
     "lint:package:built": "publint --strict",
     "prepare": "husky",
-    "prepublishOnly": "npm run validate",
+    "prepublishOnly": "npm run release:check",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "typecheck:package": "npm run build && npm run typecheck:package:built",
     "typecheck:package:built": "attw --pack . --profile esm-only",
-    "validate": "npm run format:check && npm run build && npm run typecheck && npm run lint:built && npm test && npm run lint:package:built && npm run typecheck:package:built"
+    "validate": "npm run format:check && npm run build && npm run typecheck && npm run lint:built && npm test && npm run lint:package:built && npm run typecheck:package:built",
+    "release:check": "npm audit --audit-level=low && npm run validate && npm pack --dry-run --ignore-scripts"
   },
   "lint-staged": {
     "*.{ts,mts,tsx,js,mjs,jsx}": [
