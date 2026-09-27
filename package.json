@@ -69,6 +69,9 @@
     ]
   },
   "prettier": "@cravingmaker/prettier-config",
+  "overrides": {
+    "deepmerge-ts": "8.0.2"
+  },
   "dependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "4.8.1",
     "@eslint/json": "2.1.0",
@@ -163,8 +166,5 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
-  },
-  "overrides": {
-    "deepmerge-ts": "8.0.2"
   }
 }
