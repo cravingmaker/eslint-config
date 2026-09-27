@@ -46,6 +46,11 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      - name: Format H4 package contract test
+        run: |
+          npx prettier --write tests/package-contract.test.ts
+          git diff -- tests/package-contract.test.ts
+
       - name: Validate
         run: npm run validate
 
