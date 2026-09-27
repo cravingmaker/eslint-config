@@ -46,10 +46,5 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Format H5.2 package manifest
-        run: |
-          npx prettier --write package.json
-          git diff -- package.json
-
       - name: Verify release readiness
         run: npm run release:check
