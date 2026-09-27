@@ -16,6 +16,13 @@ A highly opinionated, modern, and elegant ESLint configuration crafted by [the c
 - **Best Practices**: Integrated plugins for security, promise handling, regular expressions, and functional programming.
 - **Opinionated & Consistent**: Strict rules for code style and consistency using `perfectionist`, `unicorn`, and more.
 
+## Requirements
+
+- Node.js `>=24.15.0`
+- ESLint `>=10.4.0 <11`
+
+React, Svelte, and Express integrations are optional and activate only when their corresponding peer packages are installed.
+
 ## Installation
 
 Install the configuration along with ESLint using your favorite package manager:
