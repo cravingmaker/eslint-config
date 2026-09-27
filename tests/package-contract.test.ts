@@ -118,8 +118,12 @@ describe('package contract', () => {
 			),
 		).toEqual([]);
 
-		expect(dependencyNames.filter((dependency) => Object.hasOwn(packageManifest.devDependencies, dependency))).toEqual([]);
-		expect(dependencyNames.filter((dependency) => Object.hasOwn(packageManifest.peerDependencies, dependency))).toEqual([]);
+		expect(
+			dependencyNames.filter((dependency) => Object.hasOwn(packageManifest.devDependencies, dependency)),
+		).toEqual([]);
+		expect(
+			dependencyNames.filter((dependency) => Object.hasOwn(packageManifest.peerDependencies, dependency)),
+		).toEqual([]);
 		expect(
 			peerDependencyNames.filter((dependency) => !Object.hasOwn(packageManifest.devDependencies, dependency)),
 		).toEqual([]);
