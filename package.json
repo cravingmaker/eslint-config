@@ -55,7 +55,7 @@
     "validate": "npm run format:check && npm run build && npm run typecheck && npm run lint:built && npm test && npm run lint:package:built && npm run typecheck:package:built"
   },
   "lint-staged": {
-    "src/**/*.ts": [
+    "*.{ts,mts,tsx,js,mjs,jsx}": [
       "prettier --write",
       "eslint --fix"
     ],
@@ -64,14 +64,6 @@
       "eslint --fix"
     ],
     "*.md": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "eslint.config.{js,ts,mjs,mts}": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "tsdown.config.{js,ts,mjs,mts}": [
       "prettier --write",
       "eslint --fix"
     ]
@@ -111,8 +103,8 @@
     "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-react-refresh": "0.5.7",
     "husky": "9.1.7",
-    "lint-staged": "17.0.5",
-    "prettier": "3.8.3",
+    "lint-staged": "17.6.0",
+    "prettier": "3.9.9",
     "publint": "0.3.24",
     "react": "19.2.6",
     "svelte": "5.55.9",
