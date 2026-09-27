@@ -69,6 +69,9 @@
     ]
   },
   "prettier": "@cravingmaker/prettier-config",
+  "overrides": {
+    "deepmerge-ts": "8.0.2"
+  },
   "dependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "4.8.1",
     "@eslint/json": "2.1.0",
@@ -111,7 +114,7 @@
     "svelte-eslint-parser": "1.8.1",
     "tsdown": "0.23.0",
     "typescript": "6.0.3",
-    "vitest": "4.1.7"
+    "vitest": "4.1.11"
   },
   "peerDependencies": {
     "@html-eslint/eslint-plugin-react": ">=0.60.0 <1",
