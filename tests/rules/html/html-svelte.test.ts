@@ -9,7 +9,7 @@ const svelteOptions = { filePath: 'component.svelte' } as const;
 describe('html svelte rules', () => {
 	it('parses TypeScript script blocks before applying Svelte rules', async () => {
 		await expectLintError(
-			`<script lang="ts">\n\tconst count: number = 1;\n</script>\n<div class="stack  center">{count}</div>\n`,
+			'<script lang="ts">\n\tconst count: number = 1;\n</script>\n<div class="stack  center">{count}</div>\n',
 			'@html-eslint/svelte/class-spacing',
 			svelteOptions,
 		);
