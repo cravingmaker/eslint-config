@@ -148,8 +148,8 @@ async function buildReactConfig(
 	return reactConfigs.filter((c): c is Linter.Config => c !== undefined);
 }
 async function buildSvelteConfig(
+	// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint.
 	ruleOverrides: Readonly<Linter.RulesRecord>,
-	// eslint-disable-next-line functional/prefer-immutable-types -- ESLint parser objects are mutable external API values.
 	tsParser: typeof tseslintParser,
 ): Promise<Linter.Config | undefined> {
 	const [plugin, svelteParserModule] = await Promise.all([
@@ -233,6 +233,15 @@ async function detectReactRefreshVariant(): Promise<'generic' | 'next' | 'vite'>
 		return 'generic';
 	}
 }
+function resolveOptionalImport(specifier: string): string | undefined {
+	try {
+		return import.meta.resolve(specifier);
+	} catch (error) {
+		if (Error.isError(error) && 'code' in error && error.code === 'ERR_MODULE_NOT_FOUND') return undefined;
+		// eslint-disable-next-line functional/no-throw-statements -- Unexpected resolution failures must remain visible.
+		throw error;
+	}
+}
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 function resolveRules(rules: RulesOptions): ResolvedRules {
 	return {
@@ -247,15 +256,6 @@ function resolveRules(rules: RulesOptions): ResolvedRules {
 		svelte: rules.svelte ?? {},
 		ts: rules.ts ?? {},
 	};
-}
-function resolveOptionalImport(specifier: string): string | undefined {
-	try {
-		return import.meta.resolve(specifier);
-	} catch (error) {
-		if (Error.isError(error) && 'code' in error && error.code === 'ERR_MODULE_NOT_FOUND') return undefined;
-		// eslint-disable-next-line functional/no-throw-statements -- Unexpected resolution failures must remain visible.
-		throw error;
-	}
 }
 async function tryImport<T>(specifier: string): Promise<T | undefined> {
 	const resolvedSpecifier = resolveOptionalImport(specifier);
