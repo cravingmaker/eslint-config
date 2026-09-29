@@ -328,7 +328,7 @@ describe('published package', () => {
 
 		const output = runConsumer(
 			consumerDirectory,
-			String.raw`
+			`
 				import path from 'node:path';
 				import { ESLint } from 'eslint';
 				import { createConfig } from '@cravingmaker/eslint-config';
