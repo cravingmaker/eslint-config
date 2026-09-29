@@ -113,6 +113,22 @@ const createConsumer = async ({
 	return consumerDirectory;
 };
 
+const createBrokenPackage = async (consumerDirectory: string, packageName: string) => {
+	const packageDirectory = path.join(consumerDirectory, 'node_modules', packageName);
+	await fs.mkdir(packageDirectory, { recursive: true });
+	await fs.writeFile(
+		path.join(packageDirectory, 'package.json'),
+		JSON.stringify({
+			exports: './index.mjs',
+			name: packageName,
+			type: 'module',
+			version: '1.0.0',
+		}),
+		'utf8',
+	);
+	await fs.writeFile(path.join(packageDirectory, 'index.mjs'), `throw new Error('broken optional peer');\n`, 'utf8');
+};
+
 const runConsumer = (consumerDirectory: string, script: string) =>
 	execFileSync(process.execPath, ['--input-type=module', '--eval', script], {
 		cwd: consumerDirectory,
@@ -198,6 +214,15 @@ describe('published package', () => {
 					"import fs from 'node:fs';\nfs.readFileSync('fixture.txt', 'utf8');\n",
 					{ filePath: 'example.ts' },
 				);
+				const jsxResults = await eslint.lintText(
+					"const element = <div>Hello</div>;\nconsole.log(element);\n",
+					{ filePath: 'component.jsx' },
+				);
+				const jsxParsingErrors = jsxResults.flatMap((result) => result.messages).filter((message) => message.fatal);
+
+				if (jsxParsingErrors.length !== 0) {
+					throw new Error('JSX did not parse without optional React peers');
+				}
 
 				if (untypedTsConfig.languageOptions?.parserOptions?.projectService !== undefined) {
 					throw new Error('Untyped TypeScript config unexpectedly enabled projectService');
@@ -249,6 +274,23 @@ describe('published package', () => {
 				const refreshConfig = config.find((entry) => Object.hasOwn(entry.plugins ?? {}, 'react-refresh'));
 				const refreshRule = refreshConfig?.rules?.['react-refresh/only-export-components'];
 
+				const { ESLint } = await import('eslint');
+				const eslint = new ESLint({ overrideConfig: config, overrideConfigFile: true });
+				const svelteConfig = await eslint.calculateConfigForFile('component.svelte');
+				const svelteTsConfig = await eslint.calculateConfigForFile('component.svelte.ts');
+
+				if (svelteConfig?.languageOptions?.parser?.meta?.name !== 'svelte-eslint-parser') {
+					throw new Error('Svelte parser was not selected for .svelte files');
+				}
+
+				if (svelteTsConfig?.languageOptions?.parser?.meta?.name !== 'svelte-eslint-parser') {
+					throw new Error('Svelte parser was not the final parser for .svelte.ts files');
+				}
+
+				if (svelteConfig?.languageOptions?.parserOptions?.parser?.meta?.name !== 'typescript-eslint/parser') {
+					throw new Error('Svelte parser was not configured to delegate TypeScript script blocks');
+				}
+
 				if (!Array.isArray(refreshRule) || refreshRule[0] !== 'warn') {
 					throw new Error('React Refresh rule was not configured');
 				}
@@ -262,5 +304,24 @@ describe('published package', () => {
 		);
 
 		expect(output).toBe('ok');
+	});
+
+	it('surfaces initialization failures from installed optional integrations', async () => {
+		const consumerDirectory = await createConsumer({
+			dependencies: ['eslint', ...runtimeDependencies],
+			name: 'broken-optional-peer-consumer',
+			tarball,
+		});
+		await createBrokenPackage(consumerDirectory, 'eslint-plugin-express-security');
+
+		expect(() =>
+			runConsumer(
+				consumerDirectory,
+				`
+					import { createConfig } from '@cravingmaker/eslint-config';
+					await createConfig();
+				`,
+			),
+		).toThrow(/broken optional peer/u);
 	});
 });
