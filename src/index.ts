@@ -173,12 +173,12 @@ async function buildSvelteConfig(
 	const { htmlSvelteEslintRules } = await import('./rules/html/html-svelte.js');
 	return {
 		files: ['**/*.{svelte,svelte.js,svelte.mjs,svelte.ts,svelte.mts}'],
-		name: '@cravingmaker/eslint-config/svelte',
 		languageOptions: {
 			globals,
 			parser: svelteParserModule.default,
 			parserOptions: { parser: tsParser },
 		},
+		name: '@cravingmaker/eslint-config/svelte',
 		plugins: { '@html-eslint/svelte': plugin.default },
 		rules: { ...htmlSvelteEslintRules, ...ruleOverrides },
 	};
@@ -197,12 +197,12 @@ function buildTsConfig({
 }: TsConfigOptions): Linter.Config {
 	return {
 		files: ['**/*.{ts,mts,cts,tsx,mtsx}'],
-		name: '@cravingmaker/eslint-config/typescript',
 		languageOptions: {
 			globals,
 			parser,
 			parserOptions: tsParserOptions,
 		},
+		name: '@cravingmaker/eslint-config/typescript',
 		plugins: { '@typescript-eslint': plugin },
 		rules: {
 			...possibleProblemRules,
@@ -254,14 +254,16 @@ function resolveGlobalVariables(
 	// eslint-disable-next-line functional/prefer-immutable-types -- ESLint global records are not deeply readonly; external type constraint.
 	globals: Readonly<Linter.Globals>,
 ): Readonly<Linter.Globals> {
-	const environmentGlobals = Object.assign(
+	const environmentGlobals: Readonly<Linter.Globals> = Object.assign(
 		{},
-		...environments.map(
-			// eslint-disable-next-line security/detect-object-injection -- Environment is constrained to keys exported by the globals package.
-			(environment) => globalVariables[environment],
-		),
+		...environments.map((environment) => {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, security/detect-object-injection -- The globals package exposes environment records through CommonJS typings; the key is constrained to its exported environment names.
+			return globalVariables[environment] as Readonly<Linter.Globals>;
+		}),
 	);
-	return { ...globalVariables.builtin, ...environmentGlobals, ...globals };
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The globals package's builtin record uses CommonJS typings; normalize it at this external boundary.
+	const builtinGlobals = globalVariables.builtin as Readonly<Linter.Globals>;
+	return { ...builtinGlobals, ...environmentGlobals, ...globals };
 }
 function resolveOptionalImport(specifier: string): string | undefined {
 	try {
@@ -383,12 +385,12 @@ export async function createConfig({
 
 		{
 			files: ['**/*.{js,mjs,cjs,jsx,mjsx}'],
-			name: '@cravingmaker/eslint-config/javascript',
 			languageOptions: {
 				ecmaVersion: 'latest',
 				globals: resolvedGlobals,
 				sourceType: 'module',
 			},
+			name: '@cravingmaker/eslint-config/javascript',
 			rules: {
 				...possibleProblemRules,
 				...suggestionRules,
@@ -408,14 +410,14 @@ export async function createConfig({
 
 		{
 			files: ['**/*.{jsx,mjsx}'],
-			name: '@cravingmaker/eslint-config/jsx',
 			languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
+			name: '@cravingmaker/eslint-config/jsx',
 		},
 
 		{
 			files: ['**/*.html'],
-			name: '@cravingmaker/eslint-config/html',
 			languageOptions: { parser: htmlParser },
+			name: '@cravingmaker/eslint-config/html',
 			plugins: { '@html-eslint': pluginHtml },
 			rules: {
 				...htmlEslintRules,
@@ -425,10 +427,10 @@ export async function createConfig({
 
 		{
 			files: ['**/package.json'],
-			name: '@cravingmaker/eslint-config/package-json',
 			languageOptions: {
 				parser: jsoncParser,
 			},
+			name: '@cravingmaker/eslint-config/package-json',
 			plugins: {
 				'enforce-package-type': enforcePackageType,
 				'package-json': packageJson,
@@ -442,9 +444,9 @@ export async function createConfig({
 
 		{
 			files: ['**/*.json'],
-			name: '@cravingmaker/eslint-config/json',
 			ignores: ['**/package.json', '**/package-lock.json', '**/yarn.lock'],
 			language: 'json/json',
+			name: '@cravingmaker/eslint-config/json',
 			plugins: { json: pluginJson },
 			rules: {
 				...jsonEslintRules,
@@ -453,8 +455,8 @@ export async function createConfig({
 		},
 		{
 			files: ['**/*.jsonc', '**/tsconfig*.json', '**/.vscode/*.json', '**/.devcontainer/*.json'],
-			name: '@cravingmaker/eslint-config/jsonc',
 			language: 'json/jsonc',
+			name: '@cravingmaker/eslint-config/jsonc',
 			plugins: { json: pluginJson },
 			rules: {
 				...jsonEslintRules,
@@ -463,8 +465,8 @@ export async function createConfig({
 		},
 		{
 			files: ['**/*.json5'],
-			name: '@cravingmaker/eslint-config/json5',
 			language: 'json/json5',
+			name: '@cravingmaker/eslint-config/json5',
 			plugins: { json: pluginJson },
 			rules: {
 				...jsonEslintRules,
@@ -474,12 +476,12 @@ export async function createConfig({
 
 		{
 			files: ['**/*.md'],
-			name: '@cravingmaker/eslint-config/markdown',
 			language: 'markdown/gfm',
 			languageOptions: {
 				frontmatter: 'yaml',
 				math: true,
 			},
+			name: '@cravingmaker/eslint-config/markdown',
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- @eslint/markdown Plugin type is not assignable to Linter.Plugin without assertion
 			plugins: { markdown: pluginMarkdown as unknown as NonNullable<Linter.Config['plugins']>[string] },
 			rules: {
@@ -492,14 +494,14 @@ export async function createConfig({
 
 		{
 			files: ['**/*.cjs'],
-			name: '@cravingmaker/eslint-config/commonjs/javascript',
 			languageOptions: { sourceType: 'commonjs' },
+			name: '@cravingmaker/eslint-config/commonjs/javascript',
 		},
 
 		{
 			files: ['**/*.cts'],
-			name: '@cravingmaker/eslint-config/commonjs/typescript',
 			languageOptions: { sourceType: 'commonjs' },
+			name: '@cravingmaker/eslint-config/commonjs/typescript',
 		},
 	]);
 }
