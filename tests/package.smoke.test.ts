@@ -359,10 +359,10 @@ describe('published package', () => {
 					throw new Error('.cts did not use CommonJS source type');
 				}
 
-				const cjsResult = await eslint.lintText("module.exports = require('node:path');\n", {
+				const cjsResult = await eslint.lintText("module.exports = require('node:path');", {
 					filePath: 'scripts/example.cjs',
 				});
-				const ctsResult = await eslint.lintText("module.exports = require('node:path');\n", {
+				const ctsResult = await eslint.lintText("module.exports = require('node:path');", {
 					filePath: 'scripts/example.cts',
 				});
 				const commonJsFatalErrors = cjsResult.concat(ctsResult)
