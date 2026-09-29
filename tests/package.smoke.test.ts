@@ -253,7 +253,7 @@ describe('published package', () => {
 
 		const output = runConsumer(
 			consumerDirectory,
-			`
+			String.raw`
 				import { createConfig } from '@cravingmaker/eslint-config';
 
 				const config = await createConfig({ tsTypeChecked: false });
