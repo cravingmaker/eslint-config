@@ -411,13 +411,13 @@ describe('published package', () => {
 				const eslint = new ESLint({ overrideConfig: config, overrideConfigFile: true });
 				const jsConfig = await eslint.calculateConfigForFile('browser.js');
 				const tsConfig = await eslint.calculateConfigForFile('browser.ts');
-				const markdownConfig = await eslint.calculateConfigForFile('README.md');
+				const markdownConfig = config.find((entry) => entry.name === '@cravingmaker/eslint-config/markdown');
 
 				if (jsConfig?.languageOptions?.globals?.window === undefined) throw new Error('Browser globals missing from JS');
 				if (tsConfig?.languageOptions?.globals?.window === undefined) throw new Error('Browser globals missing from TS');
 				if (jsConfig?.languageOptions?.globals?.MY_GLOBAL !== 'readonly') throw new Error('Custom global missing from JS');
 				if (tsConfig?.languageOptions?.globals?.MY_GLOBAL !== 'readonly') throw new Error('Custom global missing from TS');
-				if (markdownConfig?.rules?.['markdown/no-missing-label-refs'] !== 0) throw new Error('Markdown override missing');
+				if (markdownConfig?.rules?.['markdown/no-missing-label-refs'] !== 'off') throw new Error('Markdown override missing');
 
 				process.stdout.write('ok');
 			`,
