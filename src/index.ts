@@ -349,10 +349,7 @@ export async function createConfig({
 	];
 
 	return defineConfig([
-		globalIgnores(
-			['**/dist/', '**/build/', '**/coverage/', ...ignores],
-			'@cravingmaker/eslint-config/ignores',
-		),
+		globalIgnores(['**/dist/', '**/build/', '**/coverage/', ...ignores], '@cravingmaker/eslint-config/ignores'),
 
 		{
 			name: '@cravingmaker/eslint-config/plugins',
