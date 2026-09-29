@@ -48,3 +48,76 @@ jobs:
 
       - name: Verify release readiness
         run: npm run release:check
+
+  minimum-peers:
+    name: Minimum peer compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      HUSKY: 0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.15.0
+          cache: npm
+
+      - name: Build package
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+
+      - name: Install advertised minimum peers
+        run: |
+          TARBALL="$(npm pack --ignore-scripts --silent)"
+          mkdir -p .tmp/minimum-peer-consumer
+          cd .tmp/minimum-peer-consumer
+          npm init --yes >/dev/null
+          npm pkg set type=module >/dev/null
+          npm install --ignore-scripts --save-exact "$GITHUB_WORKSPACE/$TARBALL" eslint@10.4.0 @html-eslint/eslint-plugin-react@0.60.0 @html-eslint/eslint-plugin-svelte@0.60.0 eslint-plugin-express-security@1.2.0 eslint-plugin-react-hooks@7.1.0 eslint-plugin-react-refresh@0.5.0 react@19.0.0 svelte@5.0.0 svelte-eslint-parser@1.6.0
+          npm ls --all
+
+      - name: Verify minimum peer integrations
+        working-directory: .tmp/minimum-peer-consumer
+        run: |
+          node --input-type=module <<'NODE'
+          import { ESLint } from 'eslint';
+          import { createConfig } from '@cravingmaker/eslint-config';
+
+          const config = await createConfig({ reactRefreshVariant: 'vite' });
+          const pluginNames = new Set(config.flatMap((entry) => Object.keys(entry.plugins ?? {})));
+
+          for (const plugin of [
+            '@html-eslint/react',
+            '@html-eslint/svelte',
+            'express-security',
+            'react-hooks',
+            'react-refresh',
+          ]) {
+            if (!pluginNames.has(plugin)) {
+              throw new Error(`Minimum peer integration was not loaded: ${plugin}`);
+            }
+          }
+
+          const eslint = new ESLint({ overrideConfig: config, overrideConfigFile: true });
+          const fixtures = [
+            ['component.jsx', 'export default function Component() { return <div />; }'],
+            ['component.svelte', '<script lang="ts">const value: number = 1;</script><p>{value}</p>'],
+            ['server.js', 'export const app = {};'],
+          ];
+
+          for (const [filePath, code] of fixtures) {
+            const results = await eslint.lintText(code, { filePath });
+            const fatalMessages = results.flatMap((result) => result.messages).filter((message) => message.fatal);
+            if (fatalMessages.length !== 0) {
+              throw new Error(`${filePath} failed with the advertised minimum peers`);
+            }
+          }
+          NODE
