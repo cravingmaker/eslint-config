@@ -51,7 +51,7 @@ import { tsEslintRules, tsEslintTypeCheckedRules } from './rules/ts/typescript-e
 type CreateConfigOptions = {
 	readonly ignores?: readonly string[];
 	readonly plugins?: Linter.Config['plugins'];
-	readonly projectRootDir?: string;
+	readonly projectRootDirectory?: string;
 	readonly reactRefreshVariant?: 'generic' | 'next' | 'vite';
 	readonly rules?: RulesOptions;
 	readonly tsconfigRootDir?: string;
@@ -215,11 +215,10 @@ function buildTsConfig({
 		},
 	};
 }
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter async function; detecting variant requires no inputs
-async function detectReactRefreshVariant(projectRootDir: string): Promise<'generic' | 'next' | 'vite'> {
+async function detectReactRefreshVariant(projectRootDirectory: string): Promise<'generic' | 'next' | 'vite'> {
 	try {
-		// eslint-disable-next-line security/detect-non-literal-fs-filename -- projectRootDir is an explicit caller-controlled project base path.
-		const raw = await readFile(path.join(projectRootDir, 'package.json'), 'utf8');
+		// eslint-disable-next-line security/detect-non-literal-fs-filename -- projectRootDirectory is an explicit caller-controlled project base path.
+		const raw = await readFile(path.join(projectRootDirectory, 'package.json'), 'utf8');
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- JSON.parse returns `any`; immediately cast to a safe Record shape
 		const packageManifest = JSON.parse(raw) as Record<string, Record<string, unknown> | undefined>;
 		const dependencies: Record<string, unknown> = {
@@ -269,10 +268,10 @@ async function tryImport<T>(specifier: string): Promise<T | undefined> {
 export async function createConfig({
 	ignores = [],
 	plugins = {},
-	projectRootDir = process.cwd(),
+	projectRootDirectory = process.cwd(),
 	reactRefreshVariant,
 	rules = {},
-	tsconfigRootDir = projectRootDir,
+	tsconfigRootDir = projectRootDirectory,
 	tsTypeChecked = false,
 }: CreateConfigOptions = {}) {
 	const {
@@ -294,7 +293,7 @@ export async function createConfig({
 	const tsParserOptions = tsTypeChecked ? { projectService: true, tsconfigRootDir } : {};
 	const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
 
-	const resolvedVariant = reactRefreshVariant ?? (await detectReactRefreshVariant(projectRootDir));
+	const resolvedVariant = reactRefreshVariant ?? (await detectReactRefreshVariant(projectRootDirectory));
 	const tseslint = await import('typescript-eslint');
 	const tsConfig = buildTsConfig({
 		functionalRules,
