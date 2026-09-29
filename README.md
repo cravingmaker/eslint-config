@@ -57,10 +57,19 @@ export default createConfig({
   projectRootDirectory: import.meta.dirname,
   // Optional: Override the tsconfig root; defaults to projectRootDirectory
   tsconfigRootDir: import.meta.dirname,
+  // Optional: Enable runtime globals from the bundled globals package
+  environments: ["browser"],
+  // Optional: Add or override individual globals
+  globals: {
+    MY_GLOBAL: "readonly"
+  },
   // Optional: Add custom ignores
   ignores: ["dist/**"],
   // Optional: Override rules
   rules: {
+    markdown: {
+      "markdown/no-missing-label-refs": "off"
+    },
     ts: {
       "@typescript-eslint/no-explicit-any": "off"
     }
