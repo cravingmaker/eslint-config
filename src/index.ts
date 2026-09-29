@@ -291,9 +291,7 @@ export async function createConfig({
 	const tsRules = tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules;
 	const functionalRules = tsTypeChecked ? functionalTypeCheckedEslintRules : functionalEslintRules;
 	const nRules = tsTypeChecked ? nEslintRules : nUntypedTypeScriptEslintRules;
-	const tsParserOptions = tsTypeChecked
-		? { projectService: true, sourceType: 'module' as const, tsconfigRootDir }
-		: { sourceType: 'module' as const };
+	const tsParserOptions = tsTypeChecked ? { projectService: true, tsconfigRootDir } : {};
 	const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
 
 	const resolvedVariant = reactRefreshVariant ?? (await detectReactRefreshVariant(projectRootDir));
@@ -372,16 +370,6 @@ export async function createConfig({
 		},
 
 		{
-			files: ['**/*.cjs'],
-			languageOptions: { sourceType: 'commonjs' },
-		},
-
-		{
-			files: ['**/*.cts'],
-			languageOptions: { sourceType: 'commonjs' },
-		},
-
-		{
 			files: ['**/*.{jsx,mjsx}'],
 			languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
 		},
@@ -456,6 +444,16 @@ export async function createConfig({
 		},
 
 		...optionalConfigs,
+
+		{
+			files: ['**/*.cjs'],
+			languageOptions: { sourceType: 'commonjs' },
+		},
+
+		{
+			files: ['**/*.cts'],
+			languageOptions: { sourceType: 'commonjs' },
+		},
 	]);
 }
 
