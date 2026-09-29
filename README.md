@@ -54,8 +54,8 @@ export default createConfig({
   // Optional (default: false): Enable type-checked TypeScript rules
   tsTypeChecked: true,
   // Optional: Set the project root used for framework/package auto-detection
-  projectRootDir: import.meta.dirname,
-  // Optional: Override the tsconfig root; defaults to projectRootDir
+  projectRootDirectory: import.meta.dirname,
+  // Optional: Override the tsconfig root; defaults to projectRootDirectory
   tsconfigRootDir: import.meta.dirname,
   // Optional: Add custom ignores
   ignores: ["dist/**"],
