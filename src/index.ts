@@ -24,7 +24,7 @@ import pluginUnusedImports from 'eslint-plugin-unused-imports';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import pluginJson from '@eslint/json';
 import pluginMarkdown from '@eslint/markdown';
-import globals from 'globals';
+import globalVariables from 'globals';
 import pluginHtml from '@html-eslint/eslint-plugin';
 import htmlParser from '@html-eslint/parser';
 import * as jsoncParser from 'jsonc-eslint-parser';
@@ -48,7 +48,10 @@ import { nEslintRules, nUntypedTypeScriptEslintRules } from './rules/node/n.js';
 import { securityEslintRules } from './rules/node/security.js';
 import { tsEslintRules, tsEslintTypeCheckedRules } from './rules/ts/typescript-eslint.js';
 
+type GlobalEnvironment = keyof typeof globalVariables;
 type CreateConfigOptions = {
+	readonly environments?: readonly GlobalEnvironment[];
+	readonly globals?: Linter.Globals;
 	readonly ignores?: readonly string[];
 	readonly plugins?: Linter.Config['plugins'];
 	readonly projectRootDirectory?: string;
@@ -64,6 +67,7 @@ type ResolvedRules = {
 	readonly json: Linter.RulesRecord;
 	readonly json5: Linter.RulesRecord;
 	readonly jsonc: Linter.RulesRecord;
+	readonly markdown: Linter.RulesRecord;
 	readonly packageJson: Linter.RulesRecord;
 	readonly react: Linter.RulesRecord;
 	readonly svelte: Linter.RulesRecord;
@@ -76,6 +80,7 @@ type RulesOptions = {
 	readonly json?: Linter.RulesRecord;
 	readonly json5?: Linter.RulesRecord;
 	readonly jsonc?: Linter.RulesRecord;
+	readonly markdown?: Linter.RulesRecord;
 	readonly packageJson?: Linter.RulesRecord;
 	readonly react?: Linter.RulesRecord;
 	readonly svelte?: Linter.RulesRecord;
@@ -83,6 +88,7 @@ type RulesOptions = {
 };
 type TsConfigOptions = {
 	readonly functionalRules: Readonly<Record<string, Linter.RuleEntry | undefined>>;
+	readonly globals: Readonly<Linter.Globals>;
 	readonly nRules: Readonly<Linter.RulesRecord>;
 	readonly parser: typeof tseslintParser;
 	readonly plugin: typeof tseslintPlugin;
@@ -100,6 +106,7 @@ async function buildExpressConfig(ruleOverrides: Readonly<Linter.RulesRecord>): 
 	if (plugin === undefined) return undefined;
 	const { expressSecurityEslintRules } = await import('./rules/node/express-security.js');
 	return {
+		name: '@cravingmaker/eslint-config/express',
 		files: ['**/*.{js,mjs,ts,mts}'],
 		plugins: { 'express-security': plugin.default },
 		rules: { ...expressSecurityEslintRules, ...ruleOverrides },
@@ -126,6 +133,7 @@ async function buildReactConfig(
 		htmlReactPlugin === undefined || htmlReactRulesModule === undefined
 			? undefined
 			: {
+					name: '@cravingmaker/eslint-config/react/html',
 					files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
 					plugins: { '@html-eslint/react': htmlReactPlugin.default },
 					rules: { ...htmlReactRulesModule.htmlReactEslintRules, ...ruleOverrides },
@@ -133,6 +141,7 @@ async function buildReactConfig(
 		hooksPlugin === undefined || hooksRulesModule === undefined
 			? undefined
 			: {
+					name: '@cravingmaker/eslint-config/react/hooks',
 					files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
 					// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint-plugin-react-hooks configs.flat shape is not assignable to Linter.Plugin without assertion
 					plugins: { 'react-hooks': hooksPlugin.default as unknown as NonNullable<Linter.Config['plugins']>[string] },
@@ -141,6 +150,7 @@ async function buildReactConfig(
 		refreshModule === undefined || refreshRulesModule === undefined
 			? undefined
 			: {
+					name: '@cravingmaker/eslint-config/react/refresh',
 					files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
 					plugins: { 'react-refresh': refreshModule.reactRefresh.plugin },
 					rules: { ...refreshRulesModule.getReactRefreshEslintRules(variant), ...ruleOverrides },
@@ -149,7 +159,8 @@ async function buildReactConfig(
 	return reactConfigs.filter((c): c is Linter.Config => c !== undefined);
 }
 async function buildSvelteConfig(
-	// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint.
+	// eslint-disable-next-line functional/prefer-immutable-types -- ESLint global and rule records are not deeply readonly; external type constraint.
+	globals: Readonly<Linter.Globals>,
 	ruleOverrides: Readonly<Linter.RulesRecord>,
 	tsParser: typeof tseslintParser,
 ): Promise<Linter.Config | undefined> {
@@ -160,8 +171,10 @@ async function buildSvelteConfig(
 	if (plugin === undefined || svelteParserModule === undefined) return undefined;
 	const { htmlSvelteEslintRules } = await import('./rules/html/html-svelte.js');
 	return {
+		name: '@cravingmaker/eslint-config/svelte',
 		files: ['**/*.{svelte,svelte.js,svelte.mjs,svelte.ts,svelte.mts}'],
 		languageOptions: {
+			globals,
 			parser: svelteParserModule.default,
 			parserOptions: { parser: tsParser },
 		},
@@ -172,6 +185,7 @@ async function buildSvelteConfig(
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 function buildTsConfig({
 	functionalRules,
+	globals,
 	nRules,
 	parser,
 	plugin,
@@ -181,9 +195,10 @@ function buildTsConfig({
 	tsRules,
 }: TsConfigOptions): Linter.Config {
 	return {
+		name: '@cravingmaker/eslint-config/typescript',
 		files: ['**/*.{ts,mts,cts,tsx,mtsx}'],
 		languageOptions: {
-			globals: globals.builtin,
+			globals,
 			parser,
 			parserOptions: tsParserOptions,
 		},
@@ -233,6 +248,16 @@ async function detectReactRefreshVariant(projectRootDirectory: string): Promise<
 		return 'generic';
 	}
 }
+function resolveGlobalVariables(
+	environments: readonly GlobalEnvironment[],
+	globals: Readonly<Linter.Globals>,
+): Readonly<Linter.Globals> {
+	const environmentGlobals = environments.reduce<Readonly<Linter.Globals>>(
+		(resolved, environment) => ({ ...resolved, ...globalVariables[environment] }),
+		{},
+	);
+	return { ...globalVariables.builtin, ...environmentGlobals, ...globals };
+}
 function resolveOptionalImport(specifier: string): string | undefined {
 	try {
 		return import.meta.resolve(specifier);
@@ -251,6 +276,7 @@ function resolveRules(rules: RulesOptions): ResolvedRules {
 		json: rules.json ?? {},
 		json5: rules.json5 ?? {},
 		jsonc: rules.jsonc ?? {},
+		markdown: rules.markdown ?? {},
 		packageJson: rules.packageJson ?? {},
 		react: rules.react ?? {},
 		svelte: rules.svelte ?? {},
@@ -266,6 +292,8 @@ async function tryImport<T>(specifier: string): Promise<T | undefined> {
 }
 
 export async function createConfig({
+	environments = [],
+	globals: customGlobals = {},
 	ignores = [],
 	plugins = {},
 	projectRootDirectory = process.cwd(),
@@ -281,12 +309,14 @@ export async function createConfig({
 		json: jsonRuleOverrides,
 		json5: json5RuleOverrides,
 		jsonc: jsoncRuleOverrides,
+		markdown: markdownRuleOverrides,
 		packageJson: packageJsonRuleOverrides,
 		react: reactRuleOverrides,
 		svelte: svelteRuleOverrides,
 		ts: tsRuleOverrides,
 	} = resolveRules(rules);
 
+	const resolvedGlobals = resolveGlobalVariables(environments, customGlobals);
 	const tsRules = tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules;
 	const functionalRules = tsTypeChecked ? functionalTypeCheckedEslintRules : functionalEslintRules;
 	const nRules = tsTypeChecked ? nEslintRules : nUntypedTypeScriptEslintRules;
@@ -297,6 +327,7 @@ export async function createConfig({
 	const tseslint = await import('typescript-eslint');
 	const tsConfig = buildTsConfig({
 		functionalRules,
+		globals: resolvedGlobals,
 		nRules,
 		parser: tseslint.parser,
 		plugin: tseslint.plugin,
@@ -308,7 +339,7 @@ export async function createConfig({
 
 	const [reactConfigs, svelteConfig, expressConfig] = await Promise.all([
 		buildReactConfig(resolvedVariant, reactRuleOverrides),
-		buildSvelteConfig(svelteRuleOverrides, tseslint.parser),
+		buildSvelteConfig(resolvedGlobals, svelteRuleOverrides, tseslint.parser),
 		buildExpressConfig(expressRuleOverrides),
 	]);
 	const optionalConfigs = [
@@ -318,9 +349,13 @@ export async function createConfig({
 	];
 
 	return defineConfig([
-		globalIgnores(['**/dist/', '**/build/', '**/coverage/', ...ignores]),
+		globalIgnores(
+			['**/dist/', '**/build/', '**/coverage/', ...ignores],
+			'@cravingmaker/eslint-config/ignores',
+		),
 
 		{
+			name: '@cravingmaker/eslint-config/plugins',
 			plugins: {
 				'@eslint-community/eslint-comments': pluginEslintComments,
 				functional: pluginFunctional,
@@ -345,10 +380,11 @@ export async function createConfig({
 		},
 
 		{
+			name: '@cravingmaker/eslint-config/javascript',
 			files: ['**/*.{js,mjs,cjs,jsx,mjsx}'],
 			languageOptions: {
 				ecmaVersion: 'latest',
-				globals: globals.builtin,
+				globals: resolvedGlobals,
 				sourceType: 'module',
 			},
 			rules: {
@@ -369,11 +405,13 @@ export async function createConfig({
 		},
 
 		{
+			name: '@cravingmaker/eslint-config/jsx',
 			files: ['**/*.{jsx,mjsx}'],
 			languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
 		},
 
 		{
+			name: '@cravingmaker/eslint-config/html',
 			files: ['**/*.html'],
 			languageOptions: { parser: htmlParser },
 			plugins: { '@html-eslint': pluginHtml },
@@ -384,6 +422,7 @@ export async function createConfig({
 		},
 
 		{
+			name: '@cravingmaker/eslint-config/package-json',
 			files: ['**/package.json'],
 			languageOptions: {
 				parser: jsoncParser,
@@ -400,6 +439,7 @@ export async function createConfig({
 		},
 
 		{
+			name: '@cravingmaker/eslint-config/json',
 			files: ['**/*.json'],
 			ignores: ['**/package.json', '**/package-lock.json', '**/yarn.lock'],
 			language: 'json/json',
@@ -410,6 +450,7 @@ export async function createConfig({
 			},
 		},
 		{
+			name: '@cravingmaker/eslint-config/jsonc',
 			files: ['**/*.jsonc', '**/tsconfig*.json', '**/.vscode/*.json', '**/.devcontainer/*.json'],
 			language: 'json/jsonc',
 			plugins: { json: pluginJson },
@@ -419,6 +460,7 @@ export async function createConfig({
 			},
 		},
 		{
+			name: '@cravingmaker/eslint-config/json5',
 			files: ['**/*.json5'],
 			language: 'json/json5',
 			plugins: { json: pluginJson },
@@ -429,6 +471,7 @@ export async function createConfig({
 		},
 
 		{
+			name: '@cravingmaker/eslint-config/markdown',
 			files: ['**/*.md'],
 			language: 'markdown/gfm',
 			languageOptions: {
@@ -439,21 +482,24 @@ export async function createConfig({
 			plugins: { markdown: pluginMarkdown as unknown as NonNullable<Linter.Config['plugins']>[string] },
 			rules: {
 				...markdownEslintRules,
+				...markdownRuleOverrides,
 			},
 		},
 
 		...optionalConfigs,
 
 		{
+			name: '@cravingmaker/eslint-config/commonjs/javascript',
 			files: ['**/*.cjs'],
 			languageOptions: { sourceType: 'commonjs' },
 		},
 
 		{
+			name: '@cravingmaker/eslint-config/commonjs/typescript',
 			files: ['**/*.cts'],
 			languageOptions: { sourceType: 'commonjs' },
 		},
 	]);
 }
 
-export type { CreateConfigOptions, RulesOptions };
+export type { CreateConfigOptions, GlobalEnvironment, RulesOptions };
