@@ -385,6 +385,47 @@ describe('published package', () => {
 		expect(output).toBe('ok');
 	});
 
+	it('exposes environments, custom globals, markdown overrides, and config names', async () => {
+		const consumerDirectory = await createConsumer({
+			dependencies: ['eslint', ...runtimeDependencies],
+			name: 'api-completeness-consumer',
+			tarball,
+		});
+
+		const output = runConsumer(
+			consumerDirectory,
+			`
+				import { ESLint } from 'eslint';
+				import { createConfig } from '@cravingmaker/eslint-config';
+
+				const config = await createConfig({
+					environments: ['browser'],
+					globals: { MY_GLOBAL: 'readonly' },
+					rules: { markdown: { 'markdown/no-missing-label-refs': 'off' } },
+				});
+				const names = config.map((entry) => entry.name).filter(Boolean);
+
+				if (names.length !== config.length) throw new Error('Every config block must have a name');
+				if (new Set(names).size !== names.length) throw new Error('Config block names must be unique');
+
+				const eslint = new ESLint({ overrideConfig: config, overrideConfigFile: true });
+				const jsConfig = await eslint.calculateConfigForFile('browser.js');
+				const tsConfig = await eslint.calculateConfigForFile('browser.ts');
+				const markdownConfig = await eslint.calculateConfigForFile('README.md');
+
+				if (jsConfig?.languageOptions?.globals?.window === undefined) throw new Error('Browser globals missing from JS');
+				if (tsConfig?.languageOptions?.globals?.window === undefined) throw new Error('Browser globals missing from TS');
+				if (jsConfig?.languageOptions?.globals?.MY_GLOBAL !== 'readonly') throw new Error('Custom global missing from JS');
+				if (tsConfig?.languageOptions?.globals?.MY_GLOBAL !== 'readonly') throw new Error('Custom global missing from TS');
+				if (markdownConfig?.rules?.['markdown/no-missing-label-refs'] !== 0) throw new Error('Markdown override missing');
+
+				process.stdout.write('ok');
+			`,
+		);
+
+		expect(output).toBe('ok');
+	});
+
 	it('surfaces initialization failures from installed optional integrations', async () => {
 		const consumerDirectory = await createConsumer({
 			dependencies: ['eslint', ...runtimeDependencies],
