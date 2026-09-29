@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { createConfig } from '../dist/index.mjs';
 
 function getJavaScriptRules(config: readonly Linter.Config[]): NonNullable<Linter.Config['rules']> {
-	return config.find((entry) => entry.files?.includes('**/*.{js,mjs,jsx,mjsx}') === true)?.rules ?? {};
+	return config.find((entry) => entry.files?.includes('**/*.{js,mjs,cjs,jsx,mjsx}') === true)?.rules ?? {};
 }
 function getTypeScriptRules(config: readonly Linter.Config[]): NonNullable<Linter.Config['rules']> {
 	return config.find((entry) => Object.hasOwn(entry.plugins ?? {}, '@typescript-eslint'))?.rules ?? {};
