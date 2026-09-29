@@ -334,14 +334,14 @@ describe('published package', () => {
 				import { createConfig } from '@cravingmaker/eslint-config';
 
 				const appRoot = path.join(process.cwd(), 'apps', 'web');
-				const config = await createConfig({ projectRootDir: appRoot });
+				const config = await createConfig({ projectRootDirectory: appRoot });
 				const eslint = new ESLint({ overrideConfig: config, overrideConfigFile: true });
 
 				const refreshConfig = config.find((entry) => Object.hasOwn(entry.plugins ?? {}, 'react-refresh'));
 				const refreshRule = refreshConfig?.rules?.['react-refresh/only-export-components'];
 
 				if (!Array.isArray(refreshRule) || refreshRule[1]?.allowConstantExport !== true) {
-					throw new Error('Vite was not detected from projectRootDir');
+					throw new Error('Vite was not detected from projectRootDirectory');
 				}
 
 				const nestedPackageConfig = await eslint.calculateConfigForFile('apps/web/package.json');
@@ -365,7 +365,7 @@ describe('published package', () => {
 				const ctsResult = await eslint.lintText("module.exports = require('node:path');\n", {
 					filePath: 'scripts/example.cts',
 				});
-				const commonJsFatalErrors = [...cjsResult, ...ctsResult]
+				const commonJsFatalErrors = cjsResult.concat(ctsResult)
 					.flatMap((result) => result.messages)
 					.filter((message) => message.fatal);
 
