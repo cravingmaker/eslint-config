@@ -7,6 +7,14 @@ import { expectLintError } from '../../utilities.js';
 const svelteOptions = { filePath: 'component.svelte' } as const;
 
 describe('html svelte rules', () => {
+	it('parses TypeScript script blocks before applying Svelte rules', async () => {
+		await expectLintError(
+			`<script lang="ts">\n\tconst count: number = 1;\n</script>\n<div class="stack  center">{count}</div>\n`,
+			'@html-eslint/svelte/class-spacing',
+			svelteOptions,
+		);
+	});
+
 	it('@html-eslint/svelte/class-spacing: reports repeated spacing in class attributes', async () => {
 		await expectLintError(
 			`<div class="stack  center">Hello</div>\n`,
