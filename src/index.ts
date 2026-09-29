@@ -147,9 +147,9 @@ async function buildReactConfig(
 	];
 	return reactConfigs.filter((c): c is Linter.Config => c !== undefined);
 }
-// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 async function buildSvelteConfig(
 	ruleOverrides: Readonly<Linter.RulesRecord>,
+	// eslint-disable-next-line functional/prefer-immutable-types -- ESLint parser objects are mutable external API values.
 	tsParser: typeof tseslintParser,
 ): Promise<Linter.Config | undefined> {
 	const [plugin, svelteParserModule] = await Promise.all([
@@ -248,17 +248,21 @@ function resolveRules(rules: RulesOptions): ResolvedRules {
 		ts: rules.ts ?? {},
 	};
 }
-async function tryImport<T>(specifier: string): Promise<T | undefined> {
+function resolveOptionalImport(specifier: string): string | undefined {
 	try {
-		void import.meta.resolve(specifier);
+		return import.meta.resolve(specifier);
 	} catch (error) {
-		if (error instanceof Error && 'code' in error && error.code === 'ERR_MODULE_NOT_FOUND') return undefined;
-		// eslint-disable-next-line functional/no-throw-statements -- Installed optional peers must surface initialization failures.
+		if (Error.isError(error) && 'code' in error && error.code === 'ERR_MODULE_NOT_FOUND') return undefined;
+		// eslint-disable-next-line functional/no-throw-statements -- Unexpected resolution failures must remain visible.
 		throw error;
 	}
+}
+async function tryImport<T>(specifier: string): Promise<T | undefined> {
+	const resolvedSpecifier = resolveOptionalImport(specifier);
+	if (resolvedSpecifier === undefined) return undefined;
 
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- dynamic import cannot be statically typed
-	return (await import(specifier)) as T;
+	return (await import(resolvedSpecifier)) as T;
 }
 
 export async function createConfig({
