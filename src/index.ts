@@ -83,6 +83,8 @@ type RulesOptions = {
 type TsConfigOptions = {
 	readonly functionalRules: Readonly<Record<string, Linter.RuleEntry | undefined>>;
 	readonly nRules: Readonly<Linter.RulesRecord>;
+	readonly parser: typeof tseslintParser;
+	readonly plugin: typeof tseslintPlugin;
 	readonly resolverProject: Readonly<Record<string, unknown>>;
 	readonly ruleOverrides: Readonly<Linter.RulesRecord>;
 	readonly tsParserOptions: Readonly<Record<string, unknown>>;
@@ -124,7 +126,6 @@ async function buildReactConfig(
 			? undefined
 			: {
 					files: ['**/*.{jsx,mjsx,tsx,mtsx}'],
-					languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
 					plugins: { '@html-eslint/react': htmlReactPlugin.default },
 					rules: { ...htmlReactRulesModule.htmlReactEslintRules, ...ruleOverrides },
 				},
@@ -146,8 +147,11 @@ async function buildReactConfig(
 	];
 	return reactConfigs.filter((c): c is Linter.Config => c !== undefined);
 }
-// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
-async function buildSvelteConfig(ruleOverrides: Readonly<Linter.RulesRecord>): Promise<Linter.Config | undefined> {
+async function buildSvelteConfig(
+	// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint.
+	ruleOverrides: Readonly<Linter.RulesRecord>,
+	tsParser: typeof tseslintParser,
+): Promise<Linter.Config | undefined> {
 	const [plugin, svelteParserModule] = await Promise.all([
 		tryImport<{ default: Record<string, unknown> }>('@html-eslint/eslint-plugin-svelte'),
 		tryImport<{ default: Linter.Parser }>('svelte-eslint-parser'),
@@ -156,32 +160,33 @@ async function buildSvelteConfig(ruleOverrides: Readonly<Linter.RulesRecord>): P
 	const { htmlSvelteEslintRules } = await import('./rules/html/html-svelte.js');
 	return {
 		files: ['**/*.{svelte,svelte.js,svelte.mjs,svelte.ts,svelte.mts}'],
-		languageOptions: { parser: svelteParserModule.default },
+		languageOptions: {
+			parser: svelteParserModule.default,
+			parserOptions: { parser: tsParser },
+		},
 		plugins: { '@html-eslint/svelte': plugin.default },
 		rules: { ...htmlSvelteEslintRules, ...ruleOverrides },
 	};
 }
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
-async function buildTsConfig({
+function buildTsConfig({
 	functionalRules,
 	nRules,
+	parser,
+	plugin,
 	resolverProject,
 	ruleOverrides,
 	tsParserOptions,
 	tsRules,
-}: TsConfigOptions): Promise<Linter.Config | undefined> {
-	const tseslint = await tryImport<{ parser: typeof tseslintParser; plugin: typeof tseslintPlugin }>(
-		'typescript-eslint',
-	);
-	if (tseslint === undefined) return undefined;
+}: TsConfigOptions): Linter.Config {
 	return {
 		files: ['**/*.{ts,mts,tsx,mtsx}'],
 		languageOptions: {
 			globals: globals.builtin,
-			parser: tseslint.parser,
+			parser,
 			parserOptions: tsParserOptions,
 		},
-		plugins: { '@typescript-eslint': tseslint.plugin },
+		plugins: { '@typescript-eslint': plugin },
 		rules: {
 			...possibleProblemRules,
 			...suggestionRules,
@@ -228,6 +233,15 @@ async function detectReactRefreshVariant(): Promise<'generic' | 'next' | 'vite'>
 		return 'generic';
 	}
 }
+function resolveOptionalImport(specifier: string): string | undefined {
+	try {
+		return import.meta.resolve(specifier);
+	} catch (error) {
+		if (Error.isError(error) && 'code' in error && error.code === 'ERR_MODULE_NOT_FOUND') return undefined;
+		// eslint-disable-next-line functional/no-throw-statements -- Unexpected resolution failures must remain visible.
+		throw error;
+	}
+}
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 function resolveRules(rules: RulesOptions): ResolvedRules {
 	return {
@@ -244,12 +258,11 @@ function resolveRules(rules: RulesOptions): ResolvedRules {
 	};
 }
 async function tryImport<T>(specifier: string): Promise<T | undefined> {
-	try {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- dynamic import cannot be statically typed
-		return (await import(specifier)) as T;
-	} catch {
-		return undefined;
-	}
+	const resolvedSpecifier = resolveOptionalImport(specifier);
+	if (resolvedSpecifier === undefined) return undefined;
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- dynamic import cannot be statically typed
+	return (await import(resolvedSpecifier)) as T;
 }
 
 export async function createConfig({
@@ -282,23 +295,27 @@ export async function createConfig({
 	const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
 
 	const resolvedVariant = reactRefreshVariant ?? (await detectReactRefreshVariant());
+	const tseslint = await import('typescript-eslint');
+	const tsConfig = buildTsConfig({
+		functionalRules,
+		nRules,
+		parser: tseslint.parser,
+		plugin: tseslint.plugin,
+		resolverProject,
+		ruleOverrides: tsRuleOverrides,
+		tsParserOptions,
+		tsRules,
+	});
 
-	const [reactConfigs, svelteConfig, expressConfig, tsConfig] = await Promise.all([
+	const [reactConfigs, svelteConfig, expressConfig] = await Promise.all([
 		buildReactConfig(resolvedVariant, reactRuleOverrides),
-		buildSvelteConfig(svelteRuleOverrides),
+		buildSvelteConfig(svelteRuleOverrides, tseslint.parser),
 		buildExpressConfig(expressRuleOverrides),
-		buildTsConfig({
-			functionalRules,
-			nRules,
-			resolverProject,
-			ruleOverrides: tsRuleOverrides,
-			tsParserOptions,
-			tsRules,
-		}),
 	]);
 	const optionalConfigs = [
+		tsConfig,
 		...reactConfigs,
-		...[svelteConfig, expressConfig, tsConfig].filter((c): c is Linter.Config => c !== undefined),
+		...[expressConfig, svelteConfig].filter((c): c is Linter.Config => c !== undefined),
 	];
 
 	return defineConfig([
@@ -350,6 +367,11 @@ export async function createConfig({
 				...eslintCommentsRules,
 				...jsRuleOverrides,
 			},
+		},
+
+		{
+			files: ['**/*.{jsx,mjsx}'],
+			languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
 		},
 
 		{
