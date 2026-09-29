@@ -254,15 +254,15 @@ function resolveGlobalVariables(
 	// eslint-disable-next-line functional/prefer-immutable-types -- ESLint global records are not deeply readonly; external type constraint.
 	globals: Readonly<Linter.Globals>,
 ): Readonly<Linter.Globals> {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Object.assign widens the globals package's environment-record union through its external CommonJS typings.
 	const environmentGlobals: Readonly<Linter.Globals> = Object.assign(
 		{},
-		...environments.map((environment) => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, security/detect-object-injection -- The globals package exposes environment records through CommonJS typings; the key is constrained to its exported environment names.
-			return globalVariables[environment] as Readonly<Linter.Globals>;
-		}),
+		...environments.map(
+			// eslint-disable-next-line security/detect-object-injection -- Environment is constrained to keys exported by the globals package.
+			(environment) => globalVariables[environment],
+		),
 	);
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The globals package's builtin record uses CommonJS typings; normalize it at this external boundary.
-	const builtinGlobals = globalVariables.builtin as Readonly<Linter.Globals>;
+	const builtinGlobals: Readonly<Linter.Globals> = globalVariables.builtin;
 	return { ...builtinGlobals, ...environmentGlobals, ...globals };
 }
 function resolveOptionalImport(specifier: string): string | undefined {
