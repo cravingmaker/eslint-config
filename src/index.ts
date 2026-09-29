@@ -51,6 +51,7 @@ import { tsEslintRules, tsEslintTypeCheckedRules } from './rules/ts/typescript-e
 type CreateConfigOptions = {
 	readonly ignores?: readonly string[];
 	readonly plugins?: Linter.Config['plugins'];
+	readonly projectRootDirectory?: string;
 	readonly reactRefreshVariant?: 'generic' | 'next' | 'vite';
 	readonly rules?: RulesOptions;
 	readonly tsconfigRootDir?: string;
@@ -180,7 +181,7 @@ function buildTsConfig({
 	tsRules,
 }: TsConfigOptions): Linter.Config {
 	return {
-		files: ['**/*.{ts,mts,tsx,mtsx}'],
+		files: ['**/*.{ts,mts,cts,tsx,mtsx}'],
 		languageOptions: {
 			globals: globals.builtin,
 			parser,
@@ -214,11 +215,10 @@ function buildTsConfig({
 		},
 	};
 }
-// eslint-disable-next-line functional/functional-parameters -- Zero-parameter async function; detecting variant requires no inputs
-async function detectReactRefreshVariant(): Promise<'generic' | 'next' | 'vite'> {
+async function detectReactRefreshVariant(projectRootDirectory: string): Promise<'generic' | 'next' | 'vite'> {
 	try {
-		// eslint-disable-next-line security/detect-non-literal-fs-filename -- path.join with process.cwd() is a safe, well-known base path
-		const raw = await readFile(path.join(process.cwd(), 'package.json'), 'utf8');
+		// eslint-disable-next-line security/detect-non-literal-fs-filename -- projectRootDirectory is an explicit caller-controlled project base path.
+		const raw = await readFile(path.join(projectRootDirectory, 'package.json'), 'utf8');
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- JSON.parse returns `any`; immediately cast to a safe Record shape
 		const packageManifest = JSON.parse(raw) as Record<string, Record<string, unknown> | undefined>;
 		const dependencies: Record<string, unknown> = {
@@ -268,9 +268,10 @@ async function tryImport<T>(specifier: string): Promise<T | undefined> {
 export async function createConfig({
 	ignores = [],
 	plugins = {},
+	projectRootDirectory = process.cwd(),
 	reactRefreshVariant,
 	rules = {},
-	tsconfigRootDir = process.cwd(),
+	tsconfigRootDir = projectRootDirectory,
 	tsTypeChecked = false,
 }: CreateConfigOptions = {}) {
 	const {
@@ -289,12 +290,10 @@ export async function createConfig({
 	const tsRules = tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules;
 	const functionalRules = tsTypeChecked ? functionalTypeCheckedEslintRules : functionalEslintRules;
 	const nRules = tsTypeChecked ? nEslintRules : nUntypedTypeScriptEslintRules;
-	const tsParserOptions = tsTypeChecked
-		? { projectService: true, sourceType: 'module' as const, tsconfigRootDir }
-		: { sourceType: 'module' as const };
+	const tsParserOptions = tsTypeChecked ? { projectService: true, tsconfigRootDir } : {};
 	const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
 
-	const resolvedVariant = reactRefreshVariant ?? (await detectReactRefreshVariant());
+	const resolvedVariant = reactRefreshVariant ?? (await detectReactRefreshVariant(projectRootDirectory));
 	const tseslint = await import('typescript-eslint');
 	const tsConfig = buildTsConfig({
 		functionalRules,
@@ -319,7 +318,7 @@ export async function createConfig({
 	];
 
 	return defineConfig([
-		globalIgnores(['node_modules/', 'dist/', 'build/', 'coverage/', ...ignores]),
+		globalIgnores(['**/dist/', '**/build/', '**/coverage/', ...ignores]),
 
 		{
 			plugins: {
@@ -346,7 +345,7 @@ export async function createConfig({
 		},
 
 		{
-			files: ['**/*.{js,mjs,jsx,mjsx}'],
+			files: ['**/*.{js,mjs,cjs,jsx,mjsx}'],
 			languageOptions: {
 				ecmaVersion: 'latest',
 				globals: globals.builtin,
@@ -385,7 +384,7 @@ export async function createConfig({
 		},
 
 		{
-			files: ['package.json'],
+			files: ['**/package.json'],
 			languageOptions: {
 				parser: jsoncParser,
 			},
@@ -444,6 +443,16 @@ export async function createConfig({
 		},
 
 		...optionalConfigs,
+
+		{
+			files: ['**/*.cjs'],
+			languageOptions: { sourceType: 'commonjs' },
+		},
+
+		{
+			files: ['**/*.cts'],
+			languageOptions: { sourceType: 'commonjs' },
+		},
 	]);
 }
 

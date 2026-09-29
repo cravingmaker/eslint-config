@@ -21,7 +21,7 @@ A highly opinionated, modern, and elegant ESLint configuration crafted by [the c
 - Node.js `>=24.15.0`
 - ESLint `>=10.4.0 <11`
 
-React, Svelte, and Express integrations are optional and activate only when their corresponding peer packages are installed.
+React, Svelte, and Express integrations are optional and activate only when their corresponding peer packages are installed. JavaScript and TypeScript support includes ESM and CommonJS extensions (`.mjs`/`.mts` and `.cjs`/`.cts`).
 
 ## Installation
 
@@ -53,7 +53,9 @@ import { createConfig } from "@cravingmaker/eslint-config";
 export default createConfig({
   // Optional (default: false): Enable type-checked TypeScript rules
   tsTypeChecked: true,
-  // Optional: Set the tsconfig root when type-checked rules are enabled
+  // Optional: Set the project root used for framework/package auto-detection
+  projectRootDirectory: import.meta.dirname,
+  // Optional: Override the tsconfig root; defaults to projectRootDirectory
   tsconfigRootDir: import.meta.dirname,
   // Optional: Add custom ignores
   ignores: ["dist/**"],

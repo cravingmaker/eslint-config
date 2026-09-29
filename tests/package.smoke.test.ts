@@ -306,6 +306,85 @@ describe('published package', () => {
 		expect(output).toBe('ok');
 	});
 
+	it('supports monorepo paths, project-root detection, and CommonJS extensions', async () => {
+		const consumerDirectory = await createConsumer({
+			dependencies: ['eslint', ...runtimeDependencies, ...optionalPeerDependencies],
+			name: 'monorepo-consumer',
+			tarball,
+		});
+		const appDirectory = path.join(consumerDirectory, 'apps', 'web');
+		await fs.mkdir(path.join(appDirectory, 'dist'), { recursive: true });
+		await fs.writeFile(
+			path.join(appDirectory, 'package.json'),
+			JSON.stringify({
+				devDependencies: { vite: '1.0.0' },
+				name: 'web-app',
+				private: true,
+				type: 'module',
+			}),
+			'utf8',
+		);
+		await fs.writeFile(path.join(appDirectory, 'dist', 'ignored.js'), 'const unused = 1;\n', 'utf8');
+
+		const output = runConsumer(
+			consumerDirectory,
+			`
+				import path from 'node:path';
+				import { ESLint } from 'eslint';
+				import { createConfig } from '@cravingmaker/eslint-config';
+
+				const appRoot = path.join(process.cwd(), 'apps', 'web');
+				const config = await createConfig({ projectRootDirectory: appRoot });
+				const eslint = new ESLint({ overrideConfig: config, overrideConfigFile: true });
+
+				const refreshConfig = config.find((entry) => Object.hasOwn(entry.plugins ?? {}, 'react-refresh'));
+				const refreshRule = refreshConfig?.rules?.['react-refresh/only-export-components'];
+
+				if (!Array.isArray(refreshRule) || refreshRule[1]?.allowConstantExport !== true) {
+					throw new Error('Vite was not detected from projectRootDirectory');
+				}
+
+				const nestedPackageConfig = await eslint.calculateConfigForFile('apps/web/package.json');
+				if (!nestedPackageConfig?.plugins?.['package-json']) {
+					throw new Error('Nested package.json did not receive package-specific rules');
+				}
+
+				const cjsConfig = await eslint.calculateConfigForFile('scripts/example.cjs');
+				if (cjsConfig?.languageOptions?.sourceType !== 'commonjs') {
+					throw new Error('.cjs did not use CommonJS source type');
+				}
+
+				const ctsConfig = await eslint.calculateConfigForFile('scripts/example.cts');
+				if (ctsConfig?.languageOptions?.sourceType !== 'commonjs') {
+					throw new Error('.cts did not use CommonJS source type');
+				}
+
+				const cjsResult = await eslint.lintText("module.exports = require('node:path');", {
+					filePath: 'scripts/example.cjs',
+				});
+				const ctsResult = await eslint.lintText("module.exports = require('node:path');", {
+					filePath: 'scripts/example.cts',
+				});
+				const commonJsFatalErrors = cjsResult.concat(ctsResult)
+					.flatMap((result) => result.messages)
+					.filter((message) => message.fatal);
+
+				if (commonJsFatalErrors.length !== 0) {
+					throw new Error('CommonJS extensions failed to parse');
+				}
+
+				const ignored = await eslint.isPathIgnored(path.join(appRoot, 'dist', 'ignored.js'));
+				if (!ignored) {
+					throw new Error('Nested dist directory was not globally ignored');
+				}
+
+				process.stdout.write('ok');
+			`,
+		);
+
+		expect(output).toBe('ok');
+	});
+
 	it('surfaces initialization failures from installed optional integrations', async () => {
 		const consumerDirectory = await createConsumer({
 			dependencies: ['eslint', ...runtimeDependencies],

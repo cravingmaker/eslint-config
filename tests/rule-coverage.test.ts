@@ -19,7 +19,7 @@ type RulePlugin = {
 };
 
 function getJavaScriptRules(config: readonly Linter.Config[]): NonNullable<Linter.Config['rules']> {
-	return config.find((entry) => entry.files?.includes('**/*.{js,mjs,jsx,mjsx}') === true)?.rules ?? {};
+	return config.find((entry) => entry.files?.includes('**/*.{js,mjs,cjs,jsx,mjsx}') === true)?.rules ?? {};
 }
 function getTypeScriptConfig(config: readonly Linter.Config[]): Linter.Config | undefined {
 	return config.find((entry) => Object.hasOwn(entry.plugins ?? {}, '@typescript-eslint'));
