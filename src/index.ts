@@ -253,7 +253,8 @@ async function tryImport<T>(specifier: string): Promise<T | undefined> {
 		void import.meta.resolve(specifier);
 	} catch (error) {
 		if (error instanceof Error && 'code' in error && error.code === 'ERR_MODULE_NOT_FOUND') return undefined;
-		return Promise.reject(error);
+		// eslint-disable-next-line functional/no-throw-statements -- Installed optional peers must surface initialization failures.
+		throw error;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- dynamic import cannot be statically typed
