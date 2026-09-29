@@ -172,8 +172,8 @@ async function buildSvelteConfig(
 	if (plugin === undefined || svelteParserModule === undefined) return undefined;
 	const { htmlSvelteEslintRules } = await import('./rules/html/html-svelte.js');
 	return {
-		name: '@cravingmaker/eslint-config/svelte',
 		files: ['**/*.{svelte,svelte.js,svelte.mjs,svelte.ts,svelte.mts}'],
+		name: '@cravingmaker/eslint-config/svelte',
 		languageOptions: {
 			globals,
 			parser: svelteParserModule.default,
@@ -196,8 +196,8 @@ function buildTsConfig({
 	tsRules,
 }: TsConfigOptions): Linter.Config {
 	return {
-		name: '@cravingmaker/eslint-config/typescript',
 		files: ['**/*.{ts,mts,cts,tsx,mtsx}'],
+		name: '@cravingmaker/eslint-config/typescript',
 		languageOptions: {
 			globals,
 			parser,
