@@ -1,16 +1,20 @@
-import type { RuleOptionOf, Rules } from "../../types.js";
+import type { Linter } from "eslint";
+import type { FeatureOptions, RuleOptionOf, Rules } from "../types.js";
 
-import eslintPluginHtml from "@html-eslint/eslint-plugin";
+import pluginHtml from "@html-eslint/eslint-plugin";
+import htmlParser from "@html-eslint/parser";
 
-import { getPluginRules } from "../../utilities/plugin-rules.js";
+import { htmlFiles } from "../globs.js";
+import { enableAllRules } from "../utilities/all-rules.js";
 
 const newLineOptions = {
   inline: ["$inline"],
   skip: ["pre", "code", "textarea"],
 } satisfies RuleOptionOf<"@html-eslint/element-newline">;
 
-const htmlEslintRules: Rules = {
-  ...getPluginRules("@html-eslint", eslintPluginHtml.rules),
+// Policy for @html-eslint/eslint-plugin.
+const htmlRules: Rules = {
+  ...enableAllRules("@html-eslint", pluginHtml.rules),
 
   "@html-eslint/attrs-newline": ["error", { ...newLineOptions }],
   "@html-eslint/element-newline": ["error", { ...newLineOptions }],
@@ -169,4 +173,22 @@ const htmlEslintRules: Rules = {
   ],
 } as const;
 
-export { htmlEslintRules };
+// Builds the flat config for HTML files.
+function html({
+  files = htmlFiles,
+  ignores = [],
+  overrides = {},
+}: FeatureOptions = {}): Linter.Config[] {
+  return [
+    {
+      files: [...files],
+      ignores: [...ignores],
+      languageOptions: { parser: htmlParser },
+      name: "@cravingmaker/eslint-config/html/rules",
+      plugins: { "@html-eslint": pluginHtml },
+      rules: { ...htmlRules, ...overrides },
+    },
+  ];
+}
+
+export { html };

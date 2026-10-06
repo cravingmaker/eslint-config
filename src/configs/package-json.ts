@@ -1,11 +1,21 @@
-import type { Rules } from "../../types.js";
+import type { Linter } from "eslint";
+import type { FeatureOptions, Rules } from "../types.js";
 
-import eslintPluginPackageJson from "eslint-plugin-package-json";
+import pluginEnforcePackageType from "eslint-enforce-package-type";
+import pluginPackageJson from "eslint-plugin-package-json";
+import * as jsoncParser from "jsonc-eslint-parser";
 
-import { getPluginRules } from "../../utilities/plugin-rules.js";
+import { packageJsonFiles } from "../globs.js";
+import { enableAllRules } from "../utilities/all-rules.js";
 
-const packageJsonEslintRules: Rules = {
-  ...getPluginRules("package-json", eslintPluginPackageJson.rules),
+// Policy for package.json files, from eslint-plugin-package-json and eslint-enforce-package-type.
+const packageJsonRules: Rules = {
+  ...enableAllRules("package-json", pluginPackageJson.rules),
+
+  "enforce-package-type/enforce-package-type": [
+    "error",
+    { enforceType: "module" },
+  ],
 
   "package-json/require-bugs": ["error", { ignorePrivate: true }],
   "package-json/require-exports": ["error", { ignorePrivate: true }],
@@ -47,4 +57,26 @@ const packageJsonEslintRules: Rules = {
   "package-json/require-publishConfig": "off", // Prefer optional
 } as const;
 
-export { packageJsonEslintRules };
+// Builds the flat config for package.json files.
+function packageJson({
+  files = packageJsonFiles,
+  ignores = [],
+  overrides = {},
+}: FeatureOptions = {}): Linter.Config[] {
+  return [
+    {
+      name: "@cravingmaker/eslint-config/package-json/setup",
+      plugins: { "package-json": pluginPackageJson },
+    },
+    {
+      files: [...files],
+      ignores: [...ignores],
+      languageOptions: { parser: jsoncParser },
+      name: "@cravingmaker/eslint-config/package-json/rules",
+      plugins: { "enforce-package-type": pluginEnforcePackageType },
+      rules: { ...packageJsonRules, ...overrides },
+    },
+  ];
+}
+
+export { packageJson };

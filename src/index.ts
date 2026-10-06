@@ -8,21 +8,18 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 
-import enforcePackageType from "eslint-enforce-package-type";
-import packageJson from "eslint-plugin-package-json";
 import { defineConfig, globalIgnores } from "eslint/config";
-import pluginJson from "@eslint/json";
-import pluginMarkdown from "@eslint/markdown";
 import globalVariables from "globals";
-import pluginHtml from "@html-eslint/eslint-plugin";
-import htmlParser from "@html-eslint/parser";
-import * as jsoncParser from "jsonc-eslint-parser";
 
 import { comments } from "./configs/comments.js";
 import { functional } from "./configs/functional.js";
+import { html } from "./configs/html.js";
 import { imports } from "./configs/imports.js";
 import { javascript } from "./configs/javascript/index.js";
+import { json } from "./configs/json.js";
+import { markdown } from "./configs/markdown.js";
 import { node } from "./configs/node.js";
+import { packageJson } from "./configs/package-json.js";
 import { perfectionist } from "./configs/perfectionist.js";
 import { promise } from "./configs/promise.js";
 import { regexp } from "./configs/regexp.js";
@@ -31,11 +28,6 @@ import { typescript } from "./configs/typescript/index.js";
 import { unicorn } from "./configs/unicorn.js";
 import { unusedImports } from "./configs/unused-imports.js";
 import { createContext } from "./context.js";
-import { htmlEslintRules } from "./rules/html/html.js";
-import { enforcePackageTypeEslintRules } from "./rules/json/enforce-package-type.js";
-import { jsonEslintRules } from "./rules/json/json.js";
-import { packageJsonEslintRules } from "./rules/json/package-json.js";
-import { markdownEslintRules } from "./rules/markdown/markdown.js";
 
 type CreateConfigOptions = {
   readonly environments?: readonly GlobalEnvironment[];
@@ -77,7 +69,7 @@ type RulesOptions = {
 };
 
 async function buildExpressConfig(
-  // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
+   
   ruleOverrides: Readonly<Linter.RulesRecord>,
 ): Promise<Linter.Config | undefined> {
   const plugin = await tryImport<{
@@ -94,7 +86,7 @@ async function buildExpressConfig(
 }
 async function buildReactConfig(
   variant: "generic" | "next" | "vite",
-  // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
+   
   ruleOverrides: Readonly<Linter.RulesRecord>,
 ): Promise<readonly Linter.Config[]> {
   const [htmlReactPlugin, hooksPlugin, refreshModule] = await Promise.all([
@@ -165,9 +157,9 @@ async function buildReactConfig(
   return reactConfigs.filter((c): c is Linter.Config => c !== undefined);
 }
 async function buildSvelteConfig(
-  // eslint-disable-next-line functional/prefer-immutable-types -- ESLint global records are not deeply readonly; external type constraint.
+   
   globals: Readonly<Linter.Globals>,
-  // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint.
+   
   ruleOverrides: Readonly<Linter.RulesRecord>,
   tsParser: typeof tseslintParser,
 ): Promise<Linter.Config | undefined> {
@@ -220,7 +212,7 @@ async function detectReactRefreshVariant(
 }
 function resolveGlobalVariables(
   environments: readonly GlobalEnvironment[],
-  // eslint-disable-next-line functional/prefer-immutable-types -- ESLint global records are not deeply readonly; external type constraint.
+   
   globals: Readonly<Linter.Globals>,
 ): Readonly<Linter.Globals> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Object.assign widens the globals package's environment-record union through its external CommonJS typings.
@@ -333,16 +325,7 @@ export async function createConfig({
 
     {
       name: "@cravingmaker/eslint-config/plugins",
-      plugins: {
-        "package-json": packageJson,
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- @eslint/markdown Plugin type is not assignable to Linter.Plugin without assertion
-        markdown: pluginMarkdown as unknown as NonNullable<
-          Linter.Config["plugins"]
-        >[string],
-
-        ...plugins,
-      },
+      plugins: { ...plugins },
     },
 
     ...javascript({ globals: resolvedGlobals, overrides: jsRuleOverrides }),
@@ -363,90 +346,14 @@ export async function createConfig({
       name: "@cravingmaker/eslint-config/jsx",
     },
 
-    {
-      files: ["**/*.html"],
-      languageOptions: { parser: htmlParser },
-      name: "@cravingmaker/eslint-config/html",
-      plugins: { "@html-eslint": pluginHtml },
-      rules: {
-        ...htmlEslintRules,
-        ...htmlRuleOverrides,
-      },
-    },
-
-    {
-      files: ["**/package.json"],
-      languageOptions: {
-        parser: jsoncParser,
-      },
-      name: "@cravingmaker/eslint-config/package-json",
-      plugins: {
-        "enforce-package-type": enforcePackageType,
-        "package-json": packageJson,
-      },
-      rules: {
-        ...enforcePackageTypeEslintRules,
-        ...packageJsonEslintRules,
-        ...packageJsonRuleOverrides,
-      },
-    },
-
-    {
-      files: ["**/*.json"],
-      ignores: ["**/package.json", "**/package-lock.json", "**/yarn.lock"],
-      language: "json/json",
-      name: "@cravingmaker/eslint-config/json",
-      plugins: { json: pluginJson },
-      rules: {
-        ...jsonEslintRules,
-        ...jsonRuleOverrides,
-      },
-    },
-    {
-      files: [
-        "**/*.jsonc",
-        "**/tsconfig*.json",
-        "**/.vscode/*.json",
-        "**/.devcontainer/*.json",
-      ],
-      language: "json/jsonc",
-      name: "@cravingmaker/eslint-config/jsonc",
-      plugins: { json: pluginJson },
-      rules: {
-        ...jsonEslintRules,
-        ...jsoncRuleOverrides,
-      },
-    },
-    {
-      files: ["**/*.json5"],
-      language: "json/json5",
-      name: "@cravingmaker/eslint-config/json5",
-      plugins: { json: pluginJson },
-      rules: {
-        ...jsonEslintRules,
-        ...json5RuleOverrides,
-      },
-    },
-
-    {
-      files: ["**/*.md"],
-      language: "markdown/gfm",
-      languageOptions: {
-        frontmatter: "yaml",
-        math: true,
-      },
-      name: "@cravingmaker/eslint-config/markdown",
-      plugins: {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- @eslint/markdown Plugin type is not assignable to Linter.Plugin without assertion
-        markdown: pluginMarkdown as unknown as NonNullable<
-          Linter.Config["plugins"]
-        >[string],
-      },
-      rules: {
-        ...markdownEslintRules,
-        ...markdownRuleOverrides,
-      },
-    },
+    ...html({ overrides: htmlRuleOverrides }),
+    ...packageJson({ overrides: packageJsonRuleOverrides }),
+    ...json({
+      overrides: jsonRuleOverrides,
+      overridesJson5: json5RuleOverrides,
+      overridesJsonc: jsoncRuleOverrides,
+    }),
+    ...markdown({ overrides: markdownRuleOverrides }),
 
     ...optionalConfigs,
 
