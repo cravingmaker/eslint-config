@@ -53,10 +53,10 @@ Audit findings re-checked against this baseline:
 | Formatting                   | Prettier runs separately. Layout rules are turned off in the rule maps and guarded by a test       |
 | Scope anchoring              | No `basePath`. `projectRootDirectory` is used for the manifest, tsconfig, and import resolver only |
 
-Two decisions are still waiting for the maintainer. Until they are answered, follow the recommendation:
+Two questions about existing options were settled by the maintainer on 6 October 2026:
 
-1. **`environments` and `globals`.** 0.1.0 ships them as two top-level options applied to every JavaScript, TypeScript, and Svelte block. Recommendation: keep them as they are.
-2. **`plugins`.** Recommendation: remove it. Extra plugins belong in `userConfigs`, where they can be scoped with `files`.
+- **`environments` and `globals` stay.** 0.1.0 ships them as two top-level options applied to every JavaScript, TypeScript, and Svelte block, and the rewrite keeps that behavior.
+- **`plugins` is removed.** Extra plugins go in `userConfigs`, where they can be scoped with `files`.
 
 The rewrite changes the public options and removes CommonJS support, so it ships as a breaking release after 0.1.0. Release Please is configured with `bump-minor-pre-major`, which makes that 0.2.0.
 
@@ -123,8 +123,8 @@ type Feature<Extra = object> = boolean | (FeatureOptions & Extra);
 type Options = {
   projectRootDirectory?: string; // default: process.cwd()
   ignores?: string[]; // extra global ignores
-  environments?: GlobalEnvironment[]; // see pending decision 1
-  globals?: Linter.Globals; // see pending decision 1
+  environments?: GlobalEnvironment[]; // unchanged from 0.1.0
+  globals?: Linter.Globals; // unchanged from 0.1.0
 
   javascript?: FeatureOptions; // always on
   typescript?: Feature<{
@@ -166,7 +166,7 @@ function createConfig(
 
 The semantics are the same for every feature: `false` removes its blocks, `true` uses the defaults, an object enables it with options. `"auto"` exists only for `react`, `svelte`, and `express`, and is their default. Every other feature defaults to `true`.
 
-Mapping from the current options: `tsTypeChecked` becomes `typescript.typeChecked`, `tsconfigRootDir` becomes `typescript.tsconfigRootDir`, `reactRefreshVariant` becomes `react.refresh`, and each `rules.<group>` becomes that feature's `overrides`.
+Mapping from the current options: `tsTypeChecked` becomes `typescript.typeChecked`, `tsconfigRootDir` becomes `typescript.tsconfigRootDir`, `reactRefreshVariant` becomes `react.refresh`, and each `rules.<group>` becomes that feature's `overrides`. `plugins` has no replacement option: pass a config object that registers the plugin in `userConfigs`.
 
 ### Internal builders
 
