@@ -77,8 +77,9 @@ function describeGlobals(globals: unknown): string {
     .join(" ");
 }
 function describeParser(parser: unknown): string {
-  const meta = isRecord(parser) ? parser.meta : undefined;
-  const name = isRecord(meta) ? meta.name : undefined;
+  if (!isRecord(parser)) return "[Parser unnamed]";
+  // Espree exposes its name on the module itself instead of `meta`.
+  const name = isRecord(parser.meta) ? parser.meta.name : parser.name;
   return `[Parser ${typeof name === "string" ? name : "unnamed"}]`;
 }
 function describeRule(
