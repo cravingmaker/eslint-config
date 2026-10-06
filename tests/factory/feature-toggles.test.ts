@@ -1,14 +1,26 @@
+/* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
+
 import type { Linter } from "eslint";
 import type { Feature, Options } from "../../src/types.js";
 
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import process from "node:process";
 
 import { ESLint } from "eslint";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { describeEffectiveConfig } from "../policy/effective-config.js";
 import { createConfig } from "../../src/factory.js";
 
+// What the tests compare between values of a feature: the block names, the resolved configuration
+// of a file that the feature lints, and the severity of its rule there.
+type Resolved = {
+  readonly description: string;
+  readonly names: ReadonlyArray<string | undefined>;
+  readonly severity: unknown;
+};
 type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 // A feature that `false` turns off.
 type ToggledFeature = Exclude<
@@ -175,8 +187,40 @@ const features = [
 // The features whose default is `"auto"`.
 const autoFeatures = new Set<ToggledFeature>(["express", "react", "svelte"]);
 
+const temporaryDirectory = await mkdtemp(
+  path.join(os.tmpdir(), "eslint-config-feature-toggles-"),
+);
+/*
+Project roots for the `"auto"` default: one whose manifest declares every framework, and one whose
+manifest declares none. Every optional peer is installed in this repository, so the second shows
+that installed plugins turn nothing on.
+*/
+const declaredRoot = await createProject("declared", [
+  "express",
+  "react",
+  "svelte",
+]);
+const undeclaredRoot = await createProject("undeclared", []);
+
 function createEslint(configs: readonly Linter.Config[]): ESLint {
   return new ESLint({ overrideConfig: [...configs], overrideConfigFile: true });
+}
+// A project root whose manifest declares `dependencies`.
+async function createProject(
+  name: string,
+  dependencies: readonly string[],
+): Promise<string> {
+  const directory = path.join(temporaryDirectory, name);
+  const devDependencies = Object.fromEntries(
+    dependencies.map((dependency) => [dependency, "1.0.0"]),
+  );
+  await mkdir(directory);
+  await writeFile(
+    path.join(directory, "package.json"),
+    JSON.stringify({ devDependencies }),
+    "utf8",
+  );
+  return directory;
 }
 /*
 The configuration that ESLint resolves for `filePath`, as reviewable text without the plugins
@@ -295,6 +339,64 @@ describe.each(features)(
         await getSeverity(createEslint(narrowed), `app/${fileName}`, ruleId),
       ).toBe(0);
       expect(narrowedElsewhere).toEqual(offElsewhere);
+    });
+  },
+);
+
+afterAll(async () => {
+  await rm(temporaryDirectory, { force: true, recursive: true });
+});
+
+describe.each(features.filter(({ feature }) => autoFeatures.has(feature)))(
+  "$feature feature with auto",
+  ({ feature, fileNames, ruleId }) => {
+    const [fileName] = fileNames;
+    const filePath = `src/${fileName}`;
+
+    // What `values` of the feature resolve to in `projectRootDirectory`.
+    async function resolveValues(
+      projectRootDirectory: string,
+      values: ReadonlyArray<Feature | "auto" | undefined>,
+    ): Promise<readonly Resolved[]> {
+      return await Promise.all(
+        values.map(async (value) => {
+          const configs = await createConfig(
+            withFeature(
+              { ...baseOptions, projectRootDirectory },
+              feature,
+              value,
+            ),
+          );
+          const eslint = createEslint(configs);
+          return {
+            description: await describeFile(eslint, filePath),
+            names: configs.map((config) => config.name),
+            severity: await getSeverity(eslint, filePath, ruleId),
+          };
+        }),
+      );
+    }
+
+    it("is on by default and with auto when the project declares it, as with true", async () => {
+      const [enabled, ...detected] = await resolveValues(declaredRoot, [
+        true,
+        "auto",
+        undefined,
+      ]);
+
+      expect(enabled.severity).toBeOneOf([1, 2]);
+      expect(detected).toEqual([enabled, enabled]);
+    });
+
+    it("is off by default and with auto when the project does not declare it, as with false", async () => {
+      const [disabled, ...detected] = await resolveValues(undeclaredRoot, [
+        false,
+        "auto",
+        undefined,
+      ]);
+
+      expect(disabled.severity).toBeUndefined();
+      expect(detected).toEqual([disabled, disabled]);
     });
   },
 );

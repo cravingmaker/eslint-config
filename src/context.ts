@@ -5,7 +5,6 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { resolveOptions } from "./options.js";
-import { isPeerInstalled } from "./utilities/import-peer.js";
 
 /**
 Builds the context for `options` in a project whose manifest declares `dependencies`.
@@ -36,32 +35,27 @@ async function createContext(options: Options = {}): Promise<Context> {
   return buildContext(options, await readDependencies(projectRootDirectory));
 }
 /**
-Detects what the `"auto"` defaults of `react`, `svelte`, and `express` turn on, as 0.1.0 does: a
-framework is detected when its plugins are installed, and React Refresh follows the bundler that
-the project declares.
+Detects what the `"auto"` defaults of `react`, `svelte`, and `express` turn on from the package
+names that the project declares: a framework is detected when the project declares its package,
+whatever plugins are installed, and React Refresh follows the bundler that the project declares.
 */
 function detectFeatures(dependencies: ReadonlySet<string>): Detection {
   return {
-    express: isPeerInstalled("eslint-plugin-express-security"),
-    react:
-      isPeerInstalled("@html-eslint/eslint-plugin-react") ||
-      isPeerInstalled("eslint-plugin-react-hooks") ||
-      isPeerInstalled("eslint-plugin-react-refresh"),
+    express: dependencies.has("express"),
+    react: dependencies.has("react"),
     reactRefresh: detectReactRefreshVariant(dependencies),
-    svelte:
-      isPeerInstalled("@html-eslint/eslint-plugin-svelte") &&
-      isPeerInstalled("svelte-eslint-parser"),
+    svelte: dependencies.has("svelte"),
   };
 }
 /**
-Picks the React Refresh variant for the declared dependencies: Next.js first, then Vite,
-otherwise the generic variant.
+Picks the React Refresh variant for the declared dependencies: Next.js first, then Vite.
+Without either, React Refresh is off.
 */
 function detectReactRefreshVariant(
   dependencies: ReadonlySet<string>,
-): ReactRefreshVariant {
+): ReactRefreshVariant | false {
   if (dependencies.has("next")) return "next";
-  return dependencies.has("vite") ? "vite" : "generic";
+  return dependencies.has("vite") ? "vite" : false;
 }
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return typeof value === "object" && value !== null && !Array.isArray(value);

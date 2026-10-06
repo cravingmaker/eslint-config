@@ -91,7 +91,7 @@ jobs:
           import { ESLint } from 'eslint';
           import { createConfig } from '@cravingmaker/eslint-config';
 
-          const config = await createConfig({ react: { refresh: 'vite' } });
+          const config = await createConfig({ express: true, react: { refresh: 'vite' }, svelte: true });
           const pluginNames = new Set(config.flatMap((entry) => Object.keys(entry.plugins ?? {})));
 
           for (const plugin of [

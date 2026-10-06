@@ -46,7 +46,9 @@ describe("generated rule types", () => {
         .map((match) => match.groups?.ruleId),
     );
     const config = await createConfig({
+      express: true,
       react: { refresh: "generic" },
+      svelte: true,
       typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
     });
     const configuredRuleIds = new Set(

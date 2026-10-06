@@ -30,7 +30,7 @@ import { overlapConfigs } from "./overlaps.js";
 
 /**
 Builds the ESLint flat config. Every feature is on unless it is `false`, except `react`,
-`svelte`, and `express`, which are on when the project uses them. Their plugins are optional
+`svelte`, and `express`, which are on when the project declares them. Their plugins are optional
 peer dependencies: when one of these features is on and a peer it needs is not installed, the
 returned promise rejects with a message that names the package. The blocks come in a fixed
 order: global ignores, JavaScript and the code-quality plugins, TypeScript, frameworks, file

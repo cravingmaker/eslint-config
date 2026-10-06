@@ -11,14 +11,15 @@ type LintOptions = {
   // The virtual file path used to select the correct config block (e.g. 'test.ts', 'test.js').
   readonly filePath: string;
 
-  // Override the react-refresh variant (auto-detected from package.json if omitted).
+  // Override the react-refresh variant (generic if omitted).
   readonly reactRefreshVariant?: "generic" | "next" | "vite";
   // Whether to enable type-checked rules. Defaults to false for speed in most fixture tests.
   readonly tsTypeChecked?: boolean;
 };
 /**
 Lints `code` against the full `createConfig` output and asserts that at least one
-reported message matches the given `ruleId`.
+reported message matches the given `ruleId`. The helpers turn every framework on, so that
+the result does not depend on the frameworks that this repository's manifest declares.
 
 @example
 await expectLintError('const a = 1;\n', 'no-unused-vars', { filePath: 'test.js' });
@@ -31,7 +32,9 @@ async function expectLintError(
   const { filePath, reactRefreshVariant, tsTypeChecked = false } = options;
 
   const config = await createConfig({
-    react: { refresh: reactRefreshVariant ?? "auto" },
+    express: true,
+    react: { refresh: reactRefreshVariant ?? "generic" },
+    svelte: true,
     typescript: { tsconfigRootDir: process.cwd(), typeChecked: tsTypeChecked },
   });
 
@@ -70,7 +73,9 @@ async function expectLintErrorInFile(
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- Test utilities need side effects for file operations
     await writeFile(file, code);
     const config = await createConfig({
-      react: { refresh: reactRefreshVariant ?? "auto" },
+      express: true,
+      react: { refresh: reactRefreshVariant ?? "generic" },
+      svelte: true,
       typescript: {
         tsconfigRootDir: process.cwd(),
         typeChecked: tsTypeChecked,
@@ -100,7 +105,9 @@ async function expectNoLintError(
   const { filePath, reactRefreshVariant, tsTypeChecked = false } = options;
 
   const config = await createConfig({
-    react: { refresh: reactRefreshVariant ?? "auto" },
+    express: true,
+    react: { refresh: reactRefreshVariant ?? "generic" },
+    svelte: true,
     typescript: { tsconfigRootDir: process.cwd(), typeChecked: tsTypeChecked },
   });
 
@@ -135,7 +142,9 @@ async function expectNoLintErrorInFile(
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- Test utilities need side effects for file operations
     await writeFile(file, code);
     const config = await createConfig({
-      react: { refresh: reactRefreshVariant ?? "auto" },
+      express: true,
+      react: { refresh: reactRefreshVariant ?? "generic" },
+      svelte: true,
       typescript: {
         tsconfigRootDir: process.cwd(),
         typeChecked: tsTypeChecked,
