@@ -7,7 +7,12 @@ import process from "node:process";
 
 import { afterAll, describe, expect, it } from "vitest";
 
-import { createContext, detectReactRefreshVariant } from "../../src/context.js";
+import {
+  createContext,
+  defaultContext,
+  detectFeatures,
+  detectReactRefreshVariant,
+} from "../../src/context.js";
 
 const temporaryDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-context-"),
@@ -68,14 +73,41 @@ describe("createContext", () => {
 
     expect(context.projectRootDirectory).toBe(projectRootDirectory);
     expect(context.globals.process).toBe(false);
+    expect(context.tsconfigRootDir).toBe(projectRootDirectory);
     expect(context.typeAware).toEqual({ files: ["src/**/*.ts"], ignores: [] });
+  });
+
+  it("uses the tsconfig directory of the TypeScript options when it is set", async () => {
+    const projectRootDirectory = await createProject("tsconfig", "{}");
+    const tsconfigRootDir = path.join(projectRootDirectory, "packages", "app");
+
+    const configured = await createContext({
+      projectRootDirectory,
+      typescript: { tsconfigRootDir },
+    });
+    const withoutTypeScript = await createContext({
+      projectRootDirectory,
+      typescript: false,
+    });
+
+    expect(configured.tsconfigRootDir).toBe(tsconfigRootDir);
+    expect(withoutTypeScript.tsconfigRootDir).toBe(projectRootDirectory);
   });
 
   it("uses the working directory as the default project root", async () => {
     const context = await createContext();
 
     expect(context.projectRootDirectory).toBe(process.cwd());
+    expect(context.tsconfigRootDir).toBe(process.cwd());
     expect(context.typeAware).toBeUndefined();
+  });
+});
+
+describe("defaultContext", () => {
+  it("describes createConfig without options in a project without dependencies", async () => {
+    const context = await createContext();
+
+    expect(defaultContext).toEqual({ ...context, dependencies: new Set() });
   });
 });
 
@@ -86,5 +118,16 @@ describe("detectReactRefreshVariant", () => {
     [["react"], "generic"],
   ])("detects the variant for %j as %s", (dependencies, variant) => {
     expect(detectReactRefreshVariant(new Set(dependencies))).toBe(variant);
+  });
+});
+
+describe("detectFeatures", () => {
+  it("detects the frameworks whose plugins are installed and the React Refresh variant", () => {
+    expect(detectFeatures(new Set(["vite"]))).toEqual({
+      express: true,
+      react: true,
+      reactRefresh: "vite",
+      svelte: true,
+    });
   });
 });

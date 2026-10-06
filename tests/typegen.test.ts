@@ -48,9 +48,8 @@ describe("generated rule types", () => {
         .map((match) => match.groups?.ruleId),
     );
     const config = await createConfig({
-      reactRefreshVariant: "generic",
-      tsconfigRootDir: process.cwd(),
-      tsTypeChecked: true,
+      react: { refresh: "generic" },
+      typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
     });
     const configuredRuleIds = new Set(
       config.flatMap((entry) => Object.keys(entry.rules ?? {})),

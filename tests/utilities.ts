@@ -31,9 +31,8 @@ async function expectLintError(
   const { filePath, reactRefreshVariant, tsTypeChecked = false } = options;
 
   const config = await createConfig({
-    reactRefreshVariant,
-    tsconfigRootDir: process.cwd(),
-    tsTypeChecked,
+    react: { refresh: reactRefreshVariant ?? "auto" },
+    typescript: { tsconfigRootDir: process.cwd(), typeChecked: tsTypeChecked },
   });
 
   const eslint = new ESLint({
@@ -71,9 +70,11 @@ async function expectLintErrorInFile(
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- Test utilities need side effects for file operations
     await writeFile(file, code);
     const config = await createConfig({
-      reactRefreshVariant,
-      tsconfigRootDir: process.cwd(),
-      tsTypeChecked,
+      react: { refresh: reactRefreshVariant ?? "auto" },
+      typescript: {
+        tsconfigRootDir: process.cwd(),
+        typeChecked: tsTypeChecked,
+      },
     });
     const eslint = new ESLint({
       overrideConfig: config,
@@ -99,9 +100,8 @@ async function expectNoLintError(
   const { filePath, reactRefreshVariant, tsTypeChecked = false } = options;
 
   const config = await createConfig({
-    reactRefreshVariant,
-    tsconfigRootDir: process.cwd(),
-    tsTypeChecked,
+    react: { refresh: reactRefreshVariant ?? "auto" },
+    typescript: { tsconfigRootDir: process.cwd(), typeChecked: tsTypeChecked },
   });
 
   const eslint = new ESLint({
@@ -135,9 +135,11 @@ async function expectNoLintErrorInFile(
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- Test utilities need side effects for file operations
     await writeFile(file, code);
     const config = await createConfig({
-      reactRefreshVariant,
-      tsconfigRootDir: process.cwd(),
-      tsTypeChecked,
+      react: { refresh: reactRefreshVariant ?? "auto" },
+      typescript: {
+        tsconfigRootDir: process.cwd(),
+        typeChecked: tsTypeChecked,
+      },
     });
     const eslint = new ESLint({
       overrideConfig: config,

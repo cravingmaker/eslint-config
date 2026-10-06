@@ -46,9 +46,8 @@ function isPluginRule(value: unknown): value is PluginRule {
 describe("deprecated rule handling", () => {
   it("does not configure deprecated plugin rules", async () => {
     const config = await createConfig({
-      reactRefreshVariant: "generic",
-      tsconfigRootDir: process.cwd(),
-      tsTypeChecked: true,
+      react: { refresh: "generic" },
+      typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
     });
     const plugins = new Map(
       config.flatMap((entry) => Object.entries(entry.plugins ?? {})),

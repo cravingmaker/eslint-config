@@ -1,22 +1,56 @@
+import type { Detection } from "./options.js";
 import type { Context, Options, ReactRefreshVariant } from "./types.js";
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { resolveOptions } from "./options.js";
+import { isPeerInstalled } from "./utilities/import-peer.js";
 
 /**
-Builds the context that every feature builder receives: the project root, the package names
-that its manifest declares, the resolved globals, and the type-aware scope.
+Builds the context for `options` in a project whose manifest declares `dependencies`.
 */
-async function createContext(options: Options = {}): Promise<Context> {
-  const { globals, projectRootDirectory, typeAware } = resolveOptions(options);
+function buildContext(
+  options: Options = {},
+  dependencies: ReadonlySet<string> = new Set(),
+): Context {
+  const { globals, projectRootDirectory, typeAware, typescript } =
+    resolveOptions(options);
 
   return {
-    dependencies: await readDependencies(projectRootDirectory),
+    dependencies,
     globals,
     projectRootDirectory,
+    tsconfigRootDir: typescript?.tsconfigRootDir ?? projectRootDirectory,
     typeAware,
+  };
+}
+/**
+Builds the context that every feature builder receives: the project root, the package names
+that its manifest declares, the resolved globals, the tsconfig directory, and the type-aware
+scope.
+*/
+async function createContext(options: Options = {}): Promise<Context> {
+  const { projectRootDirectory } = resolveOptions(options);
+
+  return buildContext(options, await readDependencies(projectRootDirectory));
+}
+/**
+Detects what the `"auto"` defaults of `react`, `svelte`, and `express` turn on, as 0.1.0 does: a
+framework is detected when its plugins are installed, and React Refresh follows the bundler that
+the project declares.
+*/
+function detectFeatures(dependencies: ReadonlySet<string>): Detection {
+  return {
+    express: isPeerInstalled("eslint-plugin-express-security"),
+    react:
+      isPeerInstalled("@html-eslint/eslint-plugin-react") ||
+      isPeerInstalled("eslint-plugin-react-hooks") ||
+      isPeerInstalled("eslint-plugin-react-refresh"),
+    reactRefresh: detectReactRefreshVariant(dependencies),
+    svelte:
+      isPeerInstalled("@html-eslint/eslint-plugin-svelte") &&
+      isPeerInstalled("svelte-eslint-parser"),
   };
 }
 /**
@@ -60,4 +94,15 @@ async function readDependencies(
   }
 }
 
-export { createContext, detectReactRefreshVariant };
+/**
+The context of `createConfig()` without options in a project that declares no dependencies.
+Feature builders fall back to it when they are called on their own, as in tests.
+*/
+const defaultContext: Context = buildContext();
+
+export {
+  createContext,
+  defaultContext,
+  detectFeatures,
+  detectReactRefreshVariant,
+};

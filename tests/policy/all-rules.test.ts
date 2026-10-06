@@ -2,7 +2,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { enableAllRules } from "../../src/utilities/all-rules.js";
+import {
+  disableConfigRules,
+  enableAllRules,
+} from "../../src/utilities/all-rules.js";
 
 const rules = {
   current: { meta: {} },
@@ -52,5 +55,18 @@ describe("enableAllRules", () => {
       "example/jsonOnly",
       "example/notDeprecated",
     ]);
+  });
+});
+
+describe("disableConfigRules", () => {
+  it("turns off every rule that the config sets, except deprecated rules", () => {
+    expect(
+      disableConfigRules("example", rules, {
+        "example/current": "off",
+        "example/deprecatedFlag": "off",
+        "example/deprecatedInfo": "off",
+        "example/withoutMeta": "warn",
+      }),
+    ).toEqual({ "example/current": "off", "example/withoutMeta": "off" });
   });
 });

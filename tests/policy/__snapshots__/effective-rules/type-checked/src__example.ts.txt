@@ -199,7 +199,7 @@ functional/prefer-property-signatures: error
 functional/prefer-tacit: error
 functional/readonly-type: error ["keyword"]
 functional/type-declaration-immutability: error [{"rules":[{"comparator":"AtLeast","identifiers":"I?Immutable.+","immutability":"Immutable"},{"comparator":"AtLeast","identifiers":"I?ReadonlyDeep.+","immutability":"ReadonlyDeep"},{"comparator":"AtLeast","fixer":[{"pattern":"^(Array|Map|Set)<(.+)>$","replace":"Readonly$1<$2>"},{"pattern":"^(.+)$","replace":"Readonly<$1>"}],"identifiers":"I?Readonly.+","immutability":"ReadonlyShallow"},{"comparator":"AtMost","fixer":[{"pattern":"^Readonly(Array|Map|Set)<(.+)>$","replace":"$1<$2>"},{"pattern":"^Readonly<(.+)>$","replace":"$1"}],"identifiers":"I?Mutable.+","immutability":"Mutable"}]}]
-getter-return: off [{"allowImplicit":false}]
+getter-return: off [{"allowImplicit":true}]
 grouped-accessor-pairs: error ["getBeforeSet",{"enforceForTSTypes":false}]
 guard-for-in: off
 id-denylist: off
@@ -258,7 +258,7 @@ max-depth: error [{"max":4}]
 max-lines: error [{"max":1500,"skipBlankLines":true,"skipComments":true}]
 max-lines-per-function: off [{"IIFEs":false,"max":50,"skipBlankLines":true,"skipComments":true}]
 max-nested-callbacks: error [4]
-max-params: off [3]
+max-params: off [{"max":4}]
 max-statements: off [10]
 n/callback-return: error
 n/exports-style: off
@@ -404,7 +404,7 @@ no-ternary: off
 no-this-before-super: off
 no-throw-literal: off
 no-unassigned-vars: error
-no-undef: off [{"typeof":false}]
+no-undef: off [{"typeof":true}]
 no-undef-init: error
 no-undefined: off
 no-underscore-dangle: off [{"allow":[],"allowAfterSuper":false,"allowAfterThis":false,"allowAfterThisConstructor":false,"allowFunctionParams":true,"allowInArrayDestructuring":true,"allowInObjectDestructuring":true,"enforceInClassFields":false,"enforceInMethodNames":false}]
@@ -414,12 +414,12 @@ no-unneeded-ternary: error [{"defaultAssignment":true}]
 no-unreachable: off
 no-unreachable-loop: error [{"ignore":[]}]
 no-unsafe-finally: error
-no-unsafe-negation: off [{"enforceForOrderingRelations":false}]
+no-unsafe-negation: off [{"enforceForOrderingRelations":true}]
 no-unsafe-optional-chaining: error [{"disallowArithmeticOperators":true}]
-no-unused-expressions: off [{"allowShortCircuit":false,"allowTaggedTemplates":false,"allowTernary":false,"enforceForJSX":false,"ignoreDirectives":false}]
+no-unused-expressions: off [{"allowShortCircuit":true,"allowTaggedTemplates":true,"allowTernary":true,"enforceForJSX":true,"ignoreDirectives":false}]
 no-unused-labels: error
 no-unused-private-class-members: off
-no-unused-vars: off [{"args":"after-used","caughtErrors":"all","ignoreClassWithStaticInitBlock":false,"ignoreRestSiblings":false,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"vars":"all"}]
+no-unused-vars: off [{"args":"after-used","argsIgnorePattern":"^_","caughtErrors":"all","caughtErrorsIgnorePattern":"^_","destructuredArrayIgnorePattern":"^_","ignoreClassWithStaticInitBlock":false,"ignoreRestSiblings":true,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"vars":"all","varsIgnorePattern":"^_"}]
 no-use-before-define: off [{"allowNamedExports":false,"classes":true,"enums":true,"functions":true,"ignoreTypeReferences":true,"typedefs":true,"variables":true}]
 no-useless-assignment: off
 no-useless-backreference: off
@@ -463,7 +463,7 @@ perfectionist/sort-union-types: error [{"fallbackSort":{"type":"unsorted"},"grou
 perfectionist/sort-variable-declarations: off
 prefer-arrow-callback: error [{"allowNamedFunctions":false,"allowUnboundThis":true}]
 prefer-const: error [{"destructuring":"all","ignoreReadBeforeAssign":false}]
-prefer-destructuring: off
+prefer-destructuring: off [{"AssignmentExpression":{"array":false,"object":false},"VariableDeclarator":{"array":false,"object":true}},{"enforceForRenamedProperties":false}]
 prefer-exponentiation-operator: error
 prefer-named-capture-group: off
 prefer-numeric-literals: error
