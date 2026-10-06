@@ -5,8 +5,8 @@ This document lets a new session, local or cloud, continue the rewrite of `@crav
 ## Where things stand
 
 - **Released:** 0.1.0 is on npm. It has the pre-rewrite structure: one large `src/index.ts` plus rule maps under `src/rules/`.
-- **Done:** stages 0 and 1. The effective lint policy is snapshotted in `tests/policy/`, and the core JavaScript rules live in `src/configs/javascript/` behind an internal `javascript()` builder. The rule maps are typed with generated rule types, and the option, context, and peer modules that stage 2 wires in exist but are not used yet.
-- **Next:** stage 2 (extraction with identical results), then stages 3–5 in order. Each stage depends on the one before it. Read the notes at the end of stage 1 in the plan first.
+- **Done:** stages 0, 1, and 2. The effective lint policy is snapshotted in `tests/policy/`. `src/factory.ts` composes the config from one internal builder per feature under `src/configs/`, rule overlaps live in `src/overlaps.ts`, and `createConfig` takes the per-feature options of the plan.
+- **Next:** stage 3 (behavior changes), one item per commit in the order the plan records, then stages 4 and 5. Each stage depends on the one before it. Read the notes at the end of stage 2 in the plan first.
 - **Decisions:** every design question in the plan is settled. Nothing is waiting for the maintainer.
 
 ## Working on a stage
@@ -50,6 +50,7 @@ Stop and ask the maintainer when:
 - **Internal builders are tested from source.** Feature builders are not exported from the package root. Tests for them import from `src/`, as `tests/configs/javascript.test.ts` does.
 - **`functional/prefer-immutable-types` is unstable.** It reports different results depending on which files are linted together. `eslint .` can pass while linting one file alone fails, and the pre-commit hook lints only staged files. For a parameter of an ESLint type such as `readonly Linter.Config[]`, do not add a disable comment: in the runs where the rule stays silent, the comment is reported as unused. Restructure instead, for example by having the helper build its own config. Check both `npx eslint .` and `npx eslint <the files you changed>` before committing.
 - **`eslint --fix` reorders literals.** Perfectionist sorts object keys and some arrays. Do not encode meaning in the order of an array literal that a fix may sort.
+- **A severity-only entry keeps earlier options.** When a later block sets a rule to only `"off"` or `"error"`, ESLint keeps the options from an earlier block, and the snapshots record them. Inside one block, an object spread replaces the whole entry instead. This is why moving a rule between blocks can change a snapshot line even when the rule stays off.
 - **Snapshots are `.txt` on purpose.** That keeps ESLint and Prettier away from them.
 - **Releases.** Release Please opens or updates a release pull request when a `feat`, `fix`, or breaking commit reaches `main`. Opening that pull request publishes nothing. Merging it creates a GitHub Release, and the release triggers `npm publish`. Leave release pull requests, tags, and GitHub Releases to the maintainer. Use honest conventional types in titles; do not pick a type to steer the release.
 

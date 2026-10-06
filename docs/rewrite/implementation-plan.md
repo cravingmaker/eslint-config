@@ -1,6 +1,6 @@
 # Rewrite implementation plan
 
-Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stage 1 is done. Stages 2–5 are not started.
+Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stages 1 and 2 are done. Stages 3–5 are not started.
 
 To continue the work, start with [handoff.md](./handoff.md). It explains how to pick up a stage and how to run one in a Claude Code cloud session.
 
@@ -170,7 +170,7 @@ Mapping from the current options: `tsTypeChecked` becomes `typescript.typeChecke
 
 ### Internal builders
 
-Each feature is one function, `(options, context) => Linter.Config[] | Promise<Linter.Config[]>`. `context` carries the project root, the consumer's declared dependencies, the resolved globals, and the type-aware scope (`files` and `ignores`, or `undefined` when typed linting is off). Features that own type-aware rules (`typescript`, `functional`, `node`) use that scope for their own type-aware block.
+Each feature is one function, `(options, context) => Linter.Config[] | Promise<Linter.Config[]>`. `context` carries the project root, the consumer's declared dependencies, the resolved globals, the tsconfig directory, and the type-aware scope (`files` and `ignores`, or `undefined` when typed linting is off). Features that own type-aware rules (`typescript`, `functional`, `node`) use that scope for their own type-aware block.
 
 Blocks are named `@cravingmaker/eslint-config/<feature>/<part>`, where the part is `setup` (plugin registration, no `files`), `parser`, `rules`, or `rules-type-aware`. A feature's user overrides are merged at the end of its `rules` block.
 
@@ -181,7 +181,7 @@ Blocks are named `@cravingmaker/eslint-config/<feature>/<part>`, where the part 
 3. `typescript`: parser, core → `@typescript-eslint` replacements, rules, type-aware rules.
 4. Frameworks: `react`, `svelte`, `express`.
 5. Formats: `html`, `json`, `packageJson`, `markdown`.
-6. `@cravingmaker/eslint-config/overlaps`.
+6. `@cravingmaker/eslint-config/overlaps/*`.
 7. `@cravingmaker/eslint-config/exceptions/*`.
 8. `userConfigs`, in the order given.
 
@@ -189,17 +189,17 @@ The JavaScript and code-quality rule blocks use one source glob covering JavaScr
 
 ### Overlap table
 
-`src/overlaps.ts` lists each owner and the rules it replaces. A replaced rule is written as enabled in its own feature's rule map. The factory turns it off in the `overlaps` block when the owning feature is enabled, the replaced rule's feature is enabled, and the user has not overridden that rule explicitly.
+`src/overlaps.ts` lists each owner, the rules it replaces, and the owner's rules that cover them. A replaced rule is written as enabled in its own feature's rule map. The factory turns it off in an `overlaps/<feature>` block, over the files of the feature that holds the rule, when the owning feature is enabled, the replaced rule's feature is enabled, and that feature's overrides do not set the rule.
 
-| Owner           | Replaced rules                                                                                                    |
-| --------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                                       |
-| `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                             |
-| `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import`             |
-| `unicorn`       | `no-negated-condition`, `no-nested-ternary`, `no-warning-comments`, `n/no-process-exit`, `n/prefer-node-protocol` |
-| `perfectionist` | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/member-ordering`             |
+| Owner           | Replaced rules                                                                                                                                           |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                                                                              |
+| `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                                                                    |
+| `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import`                                                    |
+| `unicorn`       | `no-negated-condition`, `no-nested-ternary`, `no-warning-comments`, `n/no-process-exit`, `n/prefer-node-protocol`                                        |
+| `perfectionist` | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/member-ordering`, `@typescript-eslint/adjacent-overload-signatures` |
 
-The list was read from an older commit and must be re-derived from the current rule maps when stage 2 reaches it. Core → `@typescript-eslint` replacements stay in `configs/typescript/replacements.ts`, because both sides belong to one feature. Rules that are off because Prettier owns them stay `"off"` in their rule map with the reason. `tests/policy/overlaps.test.ts` reads the same table and checks that exactly one side is active, with the owner on and with the owner off.
+Stage 2 re-derived the list from the rule maps, which added `@typescript-eslint/adjacent-overload-signatures`. Overlaps owned by the `javascript` feature stay in their rule maps with their reasons, because it is always on and no toggle can bring the replaced rule back: `perfectionist/sort-variable-declarations` (`one-var`), `unicorn/try-complexity` (the core complexity rules), and the excluded `unicorn/consistent-arrow-return-style` (`arrow-body-style`). Core → `@typescript-eslint` replacements stay in `configs/typescript/replacements.ts`, because both sides belong to one feature. Rules that are off because Prettier owns them stay `"off"` in their rule map with the reason. `tests/policy/overlaps.test.ts` reads the same table and checks that exactly one side is active, with the owner on and with the owner off.
 
 ## Stages
 
@@ -244,7 +244,7 @@ Twelve commits; `npm run validate` passes with 36 test files and 254 tests. What
 - **Builder parameters and `functional/prefer-immutable-types`.** A parameter typed `Context`, `Options`, `FeatureOptions`, `Rules`, or a readonly record such as `Readonly<Linter.Globals>` is reported or not depending on which files are linted together. `context: Context` passed when linted alone and failed with all of `src/` or the whole repository, also with the globals as a `ReadonlyMap`. With `ignoreInferredTypes: true`, the rule skips a parameter that has a default value, because the default moves the type annotation off the parameter node. The new modules rely on that, and a builder declared as `(options: FeatureOptions = {}, context: Context = <default>)` passed in all three runs. The other way out is a repository-only `ignoreTypePattern` in `eslint.config.js`; the published options stay a stage 3 decision.
 - **`npm run inspect`** builds the package and starts the config inspector, which loads 23 config items and 1,302 rules. Use it to compare block names and order while composition moves into `factory.ts`.
 
-### Stage 2: extraction with identical results
+### Stage 2: extraction with identical results (done)
 
 One commit per group. No commit may change a snapshot.
 
@@ -257,22 +257,36 @@ One commit per group. No commit may change a snapshot.
 
 Gate: snapshots identical to stage 0. `src/rules/`, `src/options/`, and `src/utilities/plugin-rules.ts` are gone. `src/index.ts` contains only exports.
 
+Seven commits; `npm run validate` passes with 41 test files and 339 tests. The cloud session was pinned to the branch `claude/loving-fermi-id06n8`, so the stage did not use `refactor/rewrite-stage-2`. What stage 3 needs to know:
+
+- **One approved snapshot change.** The composition above cannot keep the TypeScript snapshots identical. When a later block sets a rule to only `"off"`, ESLint keeps the options of the earlier block. A core rule that TypeScript replaces now comes from the shared JavaScript block with its options, so the snapshots record those options instead of ESLint's defaults. The maintainer approved the change in its own commit, `refactor: share one source glob between JavaScript and TypeScript`. It changes 7 lines in each of the 6 TypeScript snapshots, and every changed line is a rule that stays off. The TypeScript split before it is byte-identical, and no other commit changes a snapshot.
+- **Type-aware rules.** The hand-written list of rules disabled for untyped linting is gone. typescript-eslint's own `disableTypeChecked` config turns off the same 62 rules in the `typescript/rules` block. The maintainer chose this over dropping them, so untyped snapshots still list them as off. `typescript`, `functional`, and `node` set their type-aware rules in a `<feature>/rules-type-aware` block from `utilities/type-aware.ts`. The block covers `context.typeAware`, narrowed to the feature's own `files` with AND patterns when those are set, and it leaves out the feature's `ignores`. A feature's `overrides` apply again after its type-aware rules, and `typescript.overridesTypeAware` applies last. `node/rules-typescript` keeps `n/no-sync` off in TypeScript files outside the type-aware scope, as 0.1.0 does.
+- **Type-aware scope (F9) is half done.** The type-aware blocks already follow `filesTypeAware` and `ignoresTypeAware`. What remains is that `typescript/parser` still sets `projectService` for every TypeScript file when typed linting is on.
+- **Block names and plugin scopes.** Without type information the config has 45 blocks, and with it 48. Plugins keep the registration scope of 0.1.0, which the snapshots record. A feature whose plugin was registered for every file has a `setup` block; that covers the code-quality features, `package-json`, and `markdown`. typescript-eslint, `@eslint/json`, `@html-eslint`, `eslint-enforce-package-type`, and the framework plugins stay registered in the block for their files. Names outside the four planned parts are `javascript/jsx`, `javascript/commonjs`, `imports/resolver` (TypeScript files only, as before), `node/rules-typescript`, `json/rules-jsonc`, `json/rules-json5`, `react/html`, `react/hooks`, `react/refresh`, and `overlaps/<feature>`.
+- **Context, detection, and peers.** The context also carries `tsconfigRootDir`, because the import resolver uses it as 0.1.0 does. `detectFeatures` in `context.ts` still detects a framework by its installed plugins. The framework builders load peers with `importOptionalPeer`, which skips a missing peer, and `importPeer` is still unused. Peer loading (F1) switches the builders to `importPeer`. Detection (F8) then replaces the plugin checks in `detectFeatures` with `context.dependencies` and returns `false` for Refresh without Next.js or Vite.
+- **Overrides.** A feature's `overrides` apply only to its own blocks, so a plugin rule must be overridden in its plugin's feature. For example, `javascript.overrides` cannot turn off `unicorn/no-null`, because the unicorn block comes later. In 0.1.0, `rules.js` reached every JavaScript block, so the migration notes in stage 5 must say this. An overlap counts as overridden only when the feature that holds the replaced rule sets it; for `typescript` that means `overrides` or `overridesTypeAware`.
+- **Where the other stage 3 items start.** CommonJS (F6) lives in `javascript/commonjs`, `commonjsFiles`, and `sourceFiles`, which still includes `.cjs` and `.cts`. The React blocks use `reactFiles` for hooks scope (F3). Svelte is one `svelte/rules` block over `svelteFiles`, whose parser hands scripts to the typescript-eslint parser, for Svelte scripts (F4). Feature toggles (F7) already work: `tests/factory/factory.test.ts` covers the order and a few toggles, and `tests/policy/overlaps.test.ts` covers rule recovery for every overlap.
+- **Public API.** `src/index.ts` exports `createConfig` and the types `Feature`, `FeatureOptions`, `GlobalEnvironment`, `JsonOptions`, `Options`, `ReactOptions`, `ReactRefreshVariant`, `Rules`, and `TypeScriptOptions`, with a described `unicorn/no-barrel-files` disable. `dist/index.d.mts` is now about 672 KB, and Publint and attw pass. The rest parameter of `createConfig` has a described disable for `functional/functional-parameters` and `functional/prefer-immutable-types`; the latter reports a mutable array in every run, so the comment is never unused.
+- **The README still documents the 0.1.0 options.** The stage is a breaking change, so Release Please proposes 0.2.0 after the merge. The README rewrite is stage 5.
+
 ### Stage 3: behavior changes
 
 One commit per item. Each item has a test that fails before the change, and its snapshot diff is reviewed as part of the commit.
 
+Work the items in the order of the table, which the maintainer set on 6 October 2026. Peer loading must come before detection, and type-aware scope before Svelte scripts.
+
 | Item                      | Change                                                                                                                    |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Parameter immutability    | Decide the `functional/prefer-immutable-types` options whose results are unstable                                         |
+| File-role exceptions      | `exceptions.ts`, with the initial content below                                                                           |
+| CommonJS (F6)             | `.cjs` and `.cts` support is removed and the README says so                                                               |
+| Feature toggles (F7)      | Tests for `false`, `true`, and object on every feature, including rule recovery through the overlap table                 |
 | Peer loading (F1)         | An enabled feature with a missing peer fails with an install message instead of being skipped                             |
 | Detection (F8)            | `"auto"` reads the dependencies declared at the project root, not plugin presence. Refresh is off without a known bundler |
 | Hooks scope (F3)          | Hooks rules apply to `.js` and `.ts`, not only JSX and TSX                                                                |
-| Svelte scripts (F4)       | JavaScript and TypeScript rules apply to the script in `.svelte` files                                                    |
-| CommonJS (F6)             | `.cjs` and `.cts` support is removed and the README says so                                                               |
 | Type-aware scope (F9)     | `filesTypeAware` and `ignoresTypeAware` work; typed sources and untyped scripts can be separated                          |
-| Feature toggles (F7)      | Tests for `false`, `true`, and object on every feature, including rule recovery through the overlap table                 |
-| File-role exceptions      | `exceptions.ts`, with the initial content below                                                                           |
 | Formatter ownership (F11) | HTML layout rules are turned off; the formatter test below is added                                                       |
-| Parameter immutability    | Decide the `functional/prefer-immutable-types` options whose results are unstable                                         |
+| Svelte scripts (F4)       | JavaScript and TypeScript rules apply to the script in `.svelte` files                                                    |
 
 Initial content of `exceptions.ts`, taken from the suppressions in this repository:
 
