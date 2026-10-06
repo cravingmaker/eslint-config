@@ -48,9 +48,14 @@ This runs formatting checks, a build, typechecking, linting, tests, and
 package integrity checks. Package smoke tests exercise the tarball in
 temporary consumer projects.
 
-The pre-commit hook runs ESLint fixes and Prettier on staged files, and the
-pre-push hook runs `npm test`. Full validation runs through
-`npm run validate` and in CI.
+For faster feedback, run `npm run test:unit` for unit tests or
+`npm run test:package` for package consumer tests. Both commands build the
+package first; their `:built` variants reuse an existing build.
+
+The pre-commit hook runs `npm run check:commit`, which invokes
+`npm run lint:staged` to build the package and apply Prettier and ESLint
+fixes to staged files. The pre-push hook runs the full test suite through
+`npm test`. Full validation runs through `npm run validate` and in CI.
 
 ## Releases
 
