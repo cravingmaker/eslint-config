@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  importOptionalPeer,
   importPeer,
+  isPeerInstalled,
 } from "../../src/utilities/import-peer.js";
 
 describe("importPeer", () => {
@@ -30,6 +30,18 @@ describe("importPeer", () => {
     );
   });
 
+  it("names the option to turn off instead when only that option needs the peer", async () => {
+    await expect(
+      importPeer(
+        "@cravingmaker/eslint-config-missing-peer",
+        "react",
+        "refresh",
+      ),
+    ).rejects.toThrow(
+      'The "react" feature needs "@cravingmaker/eslint-config-missing-peer", which is not installed. Install it, or set `react: { refresh: false }` to turn `refresh` off.',
+    );
+  });
+
   it("does not catch an error that the peer throws while it loads", async () => {
     await expect(
       importPeer(
@@ -46,26 +58,14 @@ describe("importPeer", () => {
   });
 });
 
-describe("importOptionalPeer", () => {
-  it("imports an installed peer", async () => {
-    const module = await importOptionalPeer<{
-      readonly reactRefresh?: unknown;
-    }>("eslint-plugin-react-refresh");
-
-    expect(module?.reactRefresh).toBeDefined();
+describe("isPeerInstalled", () => {
+  it("is true for an installed peer", () => {
+    expect(isPeerInstalled("eslint-plugin-react-refresh")).toBe(true);
   });
 
-  it("returns undefined when the peer is missing", async () => {
-    await expect(
-      importOptionalPeer("@cravingmaker/eslint-config-missing-peer"),
-    ).resolves.toBeUndefined();
-  });
-
-  it("does not catch an error that the peer throws while it loads", async () => {
-    await expect(
-      importOptionalPeer(
-        "data:text/javascript,throw new Error('broken optional peer')",
-      ),
-    ).rejects.toThrow("broken optional peer");
+  it("is false for a missing peer", () => {
+    expect(isPeerInstalled("@cravingmaker/eslint-config-missing-peer")).toBe(
+      false,
+    );
   });
 });

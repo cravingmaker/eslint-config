@@ -11,7 +11,7 @@ import type {
 
 import { reactFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
-import { importOptionalPeer } from "../utilities/import-peer.js";
+import { importPeer } from "../utilities/import-peer.js";
 
 type ReactFeatureOptions = FeatureOptions & {
   /**
@@ -101,8 +101,9 @@ const refreshOptions = {
   RuleOptionOf<"react-refresh/only-export-components">
 >;
 
-// Builds the flat config for React components. Each block is added only when its plugin is
-// installed.
+// Builds the flat config for React components: one block for the @html-eslint React rules, one
+// for the hooks rules, and one for React Refresh unless `refresh` is `false`. A missing plugin
+// fails with a message that names it.
 async function react({
   files = reactFiles,
   ignores = [],
@@ -110,53 +111,46 @@ async function react({
   refresh = "generic",
 }: ReactFeatureOptions = {}): Promise<Linter.Config[]> {
   const [htmlReact, hooks, refreshModule] = await Promise.all([
-    importOptionalPeer<{ readonly default: typeof pluginHtmlReact }>(
+    importPeer<{ readonly default: typeof pluginHtmlReact }>(
       "@html-eslint/eslint-plugin-react",
+      "react",
     ),
-    importOptionalPeer<{ readonly default: typeof pluginReactHooks }>(
+    importPeer<{ readonly default: typeof pluginReactHooks }>(
       "eslint-plugin-react-hooks",
+      "react",
     ),
     refresh === false
       ? undefined
-      : importOptionalPeer<{
-          readonly reactRefresh: typeof pluginReactRefresh;
-        }>("eslint-plugin-react-refresh"),
+      : importPeer<{ readonly reactRefresh: typeof pluginReactRefresh }>(
+          "eslint-plugin-react-refresh",
+          "react",
+          "refresh",
+        ),
   ]);
   const scope = { files: [...files], ignores: [...ignores] };
 
   return [
-    ...(htmlReact === undefined
-      ? []
-      : [
-          {
-            ...scope,
-            name: "@cravingmaker/eslint-config/react/html",
-            plugins: { "@html-eslint/react": htmlReact.default },
-            rules: {
-              ...enableAllRules(
-                "@html-eslint/react",
-                htmlReact.default.rules ?? {},
-              ),
-              ...htmlReactRules,
-              ...overrides,
-            },
-          },
-        ]),
-    ...(hooks === undefined
-      ? []
-      : [
-          {
-            ...scope,
-            name: "@cravingmaker/eslint-config/react/hooks",
-            plugins: {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint-plugin-react-hooks configs.flat shape is not assignable to Linter.Plugin without assertion
-              "react-hooks": hooks.default as unknown as NonNullable<
-                Linter.Config["plugins"]
-              >[string],
-            },
-            rules: { ...hooksRules, ...overrides },
-          },
-        ]),
+    {
+      ...scope,
+      name: "@cravingmaker/eslint-config/react/html",
+      plugins: { "@html-eslint/react": htmlReact.default },
+      rules: {
+        ...enableAllRules("@html-eslint/react", htmlReact.default.rules ?? {}),
+        ...htmlReactRules,
+        ...overrides,
+      },
+    },
+    {
+      ...scope,
+      name: "@cravingmaker/eslint-config/react/hooks",
+      plugins: {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint-plugin-react-hooks configs.flat shape is not assignable to Linter.Plugin without assertion
+        "react-hooks": hooks.default as unknown as NonNullable<
+          Linter.Config["plugins"]
+        >[string],
+      },
+      rules: { ...hooksRules, ...overrides },
+    },
     ...(refreshModule === undefined || refresh === false
       ? []
       : [

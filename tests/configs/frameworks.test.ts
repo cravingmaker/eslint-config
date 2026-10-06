@@ -26,7 +26,7 @@ async function getEffectiveConfig(
 }
 
 describe("react feature", () => {
-  it("adds one block per installed React plugin for component files", async () => {
+  it("adds one block per React plugin for component files", async () => {
     const configs = await react();
     const eslint = new ESLint({
       overrideConfig: configs,

@@ -2,7 +2,7 @@ import type { Linter } from "eslint";
 import type { FeatureOptions, Rules } from "../types.js";
 
 import { expressFiles } from "../globs.js";
-import { importOptionalPeer } from "../utilities/import-peer.js";
+import { importPeer } from "../utilities/import-peer.js";
 
 // Policy for eslint-plugin-express-security, an optional peer.
 const expressRules: Rules = {
@@ -19,17 +19,16 @@ const expressRules: Rules = {
   "express-security/no-exposed-debug-endpoints": "off", // Project specific
 } as const;
 
-// Builds the flat config for Express apps, or none when eslint-plugin-express-security is not
-// installed.
+// Builds the flat config for Express apps. A missing eslint-plugin-express-security fails with a
+// message that names it.
 async function express({
   files = expressFiles,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Promise<Linter.Config[]> {
-  const plugin = await importOptionalPeer<{
+  const plugin = await importPeer<{
     readonly default: NonNullable<Linter.Config["plugins"]>[string];
-  }>("eslint-plugin-express-security");
-  if (plugin === undefined) return [];
+  }>("eslint-plugin-express-security", "express");
 
   return [
     {
