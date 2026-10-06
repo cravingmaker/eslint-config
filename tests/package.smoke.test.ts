@@ -163,6 +163,30 @@ const runConsumer = (consumerDirectory: string, script: string) =>
     encoding: "utf8",
   });
 
+/*
+A consumer script that calls `createConfig` with each set of options and prints, for each, the
+names of the framework blocks it returns or the message it fails with.
+*/
+const createFrameworkScript = (
+  cases: Readonly<Record<string, Readonly<Record<string, unknown>>>>,
+) => `
+				import { createConfig } from '@cravingmaker/eslint-config';
+
+				const results = {};
+				for (const [name, options] of Object.entries(${JSON.stringify(cases)})) {
+					try {
+						const config = await createConfig(options);
+						results[name] = config
+							.map((entry) => entry.name)
+							.filter((blockName) => ['express', 'react', 'svelte'].includes(blockName.split('/')[2]));
+					} catch (error) {
+						results[name] = error.message;
+					}
+				}
+
+				process.stdout.write(JSON.stringify(results));
+			`;
+
 const tarball = await createPackedPackage(temporaryDirectory);
 
 describe("published package", () => {
@@ -473,5 +497,74 @@ describe("published package", () => {
 				`,
       ),
     ).toThrow(/broken optional peer/u);
+  });
+
+  it("fails with an install message when a framework is on without its peers", async () => {
+    const consumerDirectory = await createConsumer({
+      dependencies: ["eslint", ...runtimeDependencies],
+      name: "missing-peers-consumer",
+      tarball,
+    });
+
+    const results: unknown = JSON.parse(
+      runConsumer(
+        consumerDirectory,
+        createFrameworkScript({
+          express: { express: true },
+          react: { react: true },
+          svelte: { svelte: true },
+        }),
+      ),
+    );
+
+    expect(results).toEqual({
+      express:
+        'The "express" feature needs "eslint-plugin-express-security", which is not installed. Install it, or set `express: false` to turn the feature off.',
+      react:
+        'The "react" feature needs "@html-eslint/eslint-plugin-react", which is not installed. Install it, or set `react: false` to turn the feature off.',
+      svelte:
+        'The "svelte" feature needs "@html-eslint/eslint-plugin-svelte", which is not installed. Install it, or set `svelte: false` to turn the feature off.',
+    });
+  });
+
+  it("fails with an install message for a partial peer set, unless the option that needs the missing peer is off", async () => {
+    const consumerDirectory = await createConsumer({
+      dependencies: [
+        "eslint",
+        ...runtimeDependencies,
+        "@html-eslint/eslint-plugin-react",
+        "@html-eslint/eslint-plugin-svelte",
+        "eslint-plugin-react-hooks",
+      ],
+      name: "partial-peers-consumer",
+      tarball,
+    });
+    const refreshMessage =
+      'The "react" feature needs "eslint-plugin-react-refresh", which is not installed. Install it, or set `react: { refresh: false }` to turn `refresh` off.';
+
+    const results: unknown = JSON.parse(
+      runConsumer(
+        consumerDirectory,
+        createFrameworkScript({
+          // React is detected from its installed plugins, and React Refresh falls back to the
+          // generic variant.
+          detected: {},
+          react: { react: true },
+          reactWithoutRefresh: { react: { refresh: false } },
+          svelte: { react: false, svelte: true },
+        }),
+      ),
+    );
+
+    expect(results).toEqual({
+      detected: refreshMessage,
+      react: refreshMessage,
+      reactWithoutRefresh: [
+        "@cravingmaker/eslint-config/react/html",
+        "@cravingmaker/eslint-config/react/hooks",
+      ],
+      svelte:
+        'The "svelte" feature needs "svelte-eslint-parser", which is not installed. Install it, or set `svelte: false` to turn the feature off.',
+    });
   });
 });
