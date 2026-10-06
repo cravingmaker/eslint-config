@@ -71,7 +71,10 @@
   },
   "prettier": "@cravingmaker/prettier-config",
   "overrides": {
-    "deepmerge-ts": "8.0.2"
+    "deepmerge-ts": "8.0.2",
+    "micromark-extension-math@3.1.0": {
+      "katex": "0.18.2"
+    }
   },
   "dependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "4.8.1",
