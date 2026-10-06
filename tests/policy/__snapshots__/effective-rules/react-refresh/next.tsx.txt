@@ -1,0 +1,1 @@
+react-refresh/only-export-components: warn [{"allowConstantExport":false,"allowExportNames":["dynamic","dynamicParams","experimental_ppr","fetchCache","maxDuration","preferredRegion","revalidate","runtime","generateMetadata","metadata","generateViewport","viewport","generateImageMetadata","generateSitemaps","generateStaticParams"],"checkJS":false}]

@@ -1,0 +1,3 @@
+path: packages/app/dist/generated.js
+ignored: true
+config: none

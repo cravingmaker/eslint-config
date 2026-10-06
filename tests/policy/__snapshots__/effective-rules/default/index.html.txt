@@ -1,0 +1,80 @@
+path: index.html
+ignored: false
+language: @/js
+processor: none
+plugins: @ @eslint-community/eslint-comments @html-eslint functional import-x markdown n package-json perfectionist promise regexp security unicorn unused-imports
+languageOptions:
+  ecmaVersion: 2026
+  parser: "[Parser @html-eslint/parser]"
+  parserOptions: {}
+  sourceType: "module"
+linterOptions:
+  reportUnusedDisableDirectives: 1
+settings: null
+rules: 65 (error 61, off 0, warn 4)
+
+@html-eslint/attrs-newline: error [{"inline":["$inline"],"skip":["pre","code","textarea"]}]
+@html-eslint/class-spacing: error
+@html-eslint/css-no-empty-blocks: error
+@html-eslint/element-newline: error [{"inline":["$inline"],"skip":["pre","code","textarea"]}]
+@html-eslint/head-order: error
+@html-eslint/id-naming-convention: error ["kebab-case"]
+@html-eslint/indent: error [2]
+@html-eslint/lowercase: error
+@html-eslint/max-element-depth: error [{"max":6}]
+@html-eslint/no-abstract-roles: error
+@html-eslint/no-accesskey-attrs: error
+@html-eslint/no-aria-hidden-body: error
+@html-eslint/no-aria-hidden-on-focusable: error
+@html-eslint/no-duplicate-attrs: error
+@html-eslint/no-duplicate-class: error
+@html-eslint/no-duplicate-id: error
+@html-eslint/no-duplicate-in-head: error
+@html-eslint/no-empty-headings: error
+@html-eslint/no-extra-spacing-tags: error [{"disallowInAssignment":true,"disallowMissing":true,"disallowTabs":true,"enforceBeforeSelfClose":true}]
+@html-eslint/no-extra-spacing-text: error [{"skip":["pre","code","textarea"]}]
+@html-eslint/no-heading-inside-button: error
+@html-eslint/no-ineffective-attrs: error
+@html-eslint/no-inline-styles: warn
+@html-eslint/no-invalid-attr-value: error
+@html-eslint/no-invalid-entity: error
+@html-eslint/no-invalid-role: error
+@html-eslint/no-multiple-empty-lines: error [{"max":1}]
+@html-eslint/no-multiple-h1: error
+@html-eslint/no-nested-interactive: error
+@html-eslint/no-non-scalable-viewport: error
+@html-eslint/no-obsolete-attrs: error
+@html-eslint/no-obsolete-tags: error
+@html-eslint/no-positive-tabindex: error
+@html-eslint/no-redundant-role: error
+@html-eslint/no-restricted-attr-values: error [{"attrPatterns":["href","src","action","formaction"],"attrValuePatterns":["^\\s*javascript:","^\\s*vbscript:","^\\s*data:text/html"],"message":"Inline scripts and data URIs in navigation attributes pose a severe security risk. Use addEventListener() and strict CSP."}]
+@html-eslint/no-restricted-attrs: warn [{"attrPatterns":["^on[a-z]+$"],"message":"Use addEventListener() instead.","tagPatterns":[".*"]}]
+@html-eslint/no-restricted-tags: warn [{"message":"Use semantic alternatives or CSS instead.","tagPatterns":["^(b|i|s|u)$"]}]
+@html-eslint/no-script-style-type: error
+@html-eslint/no-skip-heading-levels: error
+@html-eslint/no-target-blank: error
+@html-eslint/no-trailing-spaces: error
+@html-eslint/no-whitespace-only-children: error
+@html-eslint/prefer-https: error
+@html-eslint/quotes: error ["double",{"enforceTemplatedAttrValue":true}]
+@html-eslint/require-attrs: error [{"attr":"alt","message":"Add an alt attribute to images to support screen readers and ensure accessibility.","tag":"img"},{"attr":"width","message":"Set the width attribute on images to reserve space and prevent page layout shifting as the image loads.","tag":"img"},{"attr":"height","message":"Set the height attribute on images to reserve space and prevent page layout shifting as the image loads.","tag":"img"},{"attr":"loading","message":"Include the loading attribute to control image load priority and improve initial page performance.","tag":"img"},{"attr":"decoding","message":"Include the decoding attribute to optimize how the browser renders the image.","tag":"img"},{"attr":"title","message":"Add a title attribute to iframes to describe the nested content for screen readers.","tag":"iframe"},{"attr":"type","message":"Set the type attribute on input fields to ensure predictable user input handling and mobile keyboard behavior.","tag":"input"}]
+@html-eslint/require-button-type: error
+@html-eslint/require-closing-tags: warn [{"selfClosing":"always","selfClosingCustomPatterns":["-"]}]
+@html-eslint/require-content: error
+@html-eslint/require-details-summary: error
+@html-eslint/require-doctype: error
+@html-eslint/require-explicit-size: error
+@html-eslint/require-form-method: error
+@html-eslint/require-frame-title: error
+@html-eslint/require-img-alt: error
+@html-eslint/require-input-label: error
+@html-eslint/require-lang: error
+@html-eslint/require-li-container: error
+@html-eslint/require-meta-charset: error
+@html-eslint/require-meta-description: error
+@html-eslint/require-meta-viewport: error
+@html-eslint/require-open-graph-protocol: error [["og:title","og:type","og:url","og:image","og:description"]]
+@html-eslint/require-title: error
+@html-eslint/sort-attrs: error [{"priority":[{"pattern":"client:.*"},{"pattern":"(is|set):.*"},{"pattern":"bind:.*"},{"pattern":"on:.*"},{"pattern":"use:.*"},{"pattern":"(transition|in|out|animate):.*"},{"pattern":"(class|style):.*"},{"pattern":"v-.*"},{"pattern":"x-.*"},{"pattern":"hx-.*"},"id","class","name","type","for","href","src","value","alt","title","role",{"pattern":"aria-.*"},"disabled","readonly","required",{"pattern":"data-.*"},{"pattern":"on.*"},"style"]}]
+@html-eslint/svg-require-viewbox: error
+@html-eslint/use-baseline: error
