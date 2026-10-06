@@ -3,7 +3,7 @@ import type { FeatureOptions, Rules } from "../types.js";
 
 import pluginPromise from "eslint-plugin-promise";
 
-import { javascriptFiles } from "../globs.js";
+import { sourceFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 
 // Policy for eslint-plugin-promise.
@@ -24,7 +24,7 @@ const promiseRules: Rules = {
 
 // Builds the flat config for eslint-plugin-promise.
 function promise({
-  files = javascriptFiles,
+  files = sourceFiles,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Linter.Config[] {

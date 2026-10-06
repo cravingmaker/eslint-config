@@ -3,7 +3,7 @@ import type { FeatureOptions, Rules } from "../types.js";
 
 import pluginComments from "@eslint-community/eslint-plugin-eslint-comments";
 
-import { javascriptFiles } from "../globs.js";
+import { sourceFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 
 // Policy for ESLint directive comments, from @eslint-community/eslint-plugin-eslint-comments.
@@ -24,7 +24,7 @@ const commentsRules: Rules = {
 
 // Builds the flat config for ESLint directive comments.
 function comments({
-  files = javascriptFiles,
+  files = sourceFiles,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Linter.Config[] {

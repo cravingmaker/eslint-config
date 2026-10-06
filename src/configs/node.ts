@@ -1,10 +1,12 @@
 import type { Linter } from "eslint";
-import type { FeatureOptions, Rules } from "../types.js";
+import type { Context, FeatureOptions, Rules } from "../types.js";
 
 import pluginNode from "eslint-plugin-n";
 
-import { javascriptFiles } from "../globs.js";
+import { defaultContext } from "../context.js";
+import { sourceFiles, typescriptFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles, typeAwareConfig } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-n.
 const nodeRules: Rules = {
@@ -25,7 +27,7 @@ const nodeRules: Rules = {
     },
   ],
   "n/no-deprecated-api": ["error", { ignoreIndirectDependencies: true }],
-  "n/no-sync": ["error", { allowAtRootLevel: true }],
+  "n/no-sync": ["error", { allowAtRootLevel: true }], // Needs type information in TypeScript files
 
   "n/no-process-env": ["warn", { allowedVariables: ["NODE_ENV"] }],
 
@@ -48,25 +50,43 @@ const nodeRules: Rules = {
   "n/no-top-level-await": "off", // Irrelevant for ESM-only project
   "n/no-unpublished-require": "off", // Irrelevant for ESM-only project
 };
+// The rules that need type information in TypeScript files.
+const typeAwareRules: Rules = { "n/no-sync": nodeRules["n/no-sync"] };
 
-// Builds the flat config for eslint-plugin-n.
-function node({
-  files = javascriptFiles,
-  ignores = [],
-  overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+// Builds the flat config for eslint-plugin-n. In TypeScript files, `n/no-sync` is off unless
+// they are in the type-aware scope.
+function node(
+  options: FeatureOptions = {},
+  { typeAware }: Context = defaultContext,
+): Linter.Config[] {
+  const { files, ignores = [], overrides = {} } = options;
+
   return [
     {
       name: "@cravingmaker/eslint-config/node/setup",
       plugins: { n: pluginNode },
     },
     {
-      files: [...files],
+      files: [...(files ?? sourceFiles)],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/node/rules",
       rules: { ...nodeRules, ...overrides },
     },
+    {
+      files: narrowFiles(typescriptFiles, files),
+      ignores: [...ignores],
+      name: "@cravingmaker/eslint-config/node/rules-typescript",
+      rules: { "n/no-sync": "off", ...overrides },
+    },
+    ...(typeAware === undefined
+      ? []
+      : [
+          typeAwareConfig("node", typeAware, options, {
+            ...typeAwareRules,
+            ...overrides,
+          }),
+        ]),
   ];
 }
 
-export { node, nodeRules };
+export { node };

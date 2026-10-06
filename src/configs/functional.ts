@@ -1,10 +1,12 @@
 import type { Linter } from "eslint";
-import type { FeatureOptions, Rules } from "../types.js";
+import type { Context, FeatureOptions, Rules } from "../types.js";
 
 import pluginFunctional from "eslint-plugin-functional";
 
-import { javascriptFiles } from "../globs.js";
+import { defaultContext } from "../context.js";
+import { sourceFiles } from "../globs.js";
 import { disableConfigRules, enableAllRules } from "../utilities/all-rules.js";
+import { typeAwareConfig } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-functional, including the rules that need type information.
 const functionalRules: Rules = {
@@ -84,23 +86,27 @@ const functionalRules: Rules = {
   "functional/no-try-statements": "off", // Prefer try statements
 } as const;
 
-// The same policy with the rules that need type information turned off, as the plugin's
-// `disableTypeChecked` config does.
-const functionalUntypedRules: Rules = {
-  ...functionalRules,
-  ...disableConfigRules(
-    "functional",
-    pluginFunctional.rules,
-    pluginFunctional.configs.disableTypeChecked.rules,
+// The rules that need type information, off as in the plugin's `disableTypeChecked` config.
+const typeAwareRulesOff = disableConfigRules(
+  "functional",
+  pluginFunctional.rules,
+  pluginFunctional.configs.disableTypeChecked.rules,
+);
+// The policy for the rules that need type information.
+const typeAwareRules: Rules = Object.fromEntries(
+  Object.entries(functionalRules).filter(([ruleId]) =>
+    Object.hasOwn(typeAwareRulesOff, ruleId),
   ),
-} as const;
+);
 
-// Builds the flat config for eslint-plugin-functional.
-function functional({
-  files = javascriptFiles,
-  ignores = [],
-  overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+// Builds the flat config for eslint-plugin-functional. The rules that need type information
+// are off, and turned on again for the type-aware scope when typed linting is on.
+function functional(
+  options: FeatureOptions = {},
+  { typeAware }: Context = defaultContext,
+): Linter.Config[] {
+  const { files = sourceFiles, ignores = [], overrides = {} } = options;
+
   return [
     {
       name: "@cravingmaker/eslint-config/functional/setup",
@@ -110,9 +116,17 @@ function functional({
       files: [...files],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/functional/rules",
-      rules: { ...functionalUntypedRules, ...overrides },
+      rules: { ...functionalRules, ...typeAwareRulesOff, ...overrides },
     },
+    ...(typeAware === undefined
+      ? []
+      : [
+          typeAwareConfig("functional", typeAware, options, {
+            ...typeAwareRules,
+            ...overrides,
+          }),
+        ]),
   ];
 }
 
-export { functional, functionalRules, functionalUntypedRules };
+export { functional };

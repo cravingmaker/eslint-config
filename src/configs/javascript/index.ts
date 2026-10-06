@@ -1,7 +1,7 @@
 import type { Linter } from "eslint";
 import type { Rules } from "../../types.js";
 
-import { javascriptFiles } from "../../globs.js";
+import { sourceFiles } from "../../globs.js";
 import { possibleProblemRules } from "./possible-problems.js";
 import { suggestionRules } from "./suggestions.js";
 
@@ -24,7 +24,7 @@ const javascriptRules: Rules = {
 
 // Builds the flat config for ESLint's built-in rules on JavaScript files.
 function javascript({
-  files = javascriptFiles,
+  files = sourceFiles,
   globals = {},
   ignores = [],
   overrides = {},

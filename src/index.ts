@@ -18,24 +18,19 @@ import pluginHtml from "@html-eslint/eslint-plugin";
 import htmlParser from "@html-eslint/parser";
 import * as jsoncParser from "jsonc-eslint-parser";
 
-import { comments, commentsRules } from "./configs/comments.js";
-import {
-  functional,
-  functionalRules as functionalTypeCheckedRules,
-  functionalUntypedRules,
-} from "./configs/functional.js";
-import { imports, importsRules } from "./configs/imports.js";
-import { javascript, javascriptRules } from "./configs/javascript/index.js";
-import { node, nodeRules } from "./configs/node.js";
-import { perfectionist, perfectionistRules } from "./configs/perfectionist.js";
-import { promise, promiseRules } from "./configs/promise.js";
-import { regexp, regexpRules } from "./configs/regexp.js";
-import { security, securityRules } from "./configs/security.js";
+import { comments } from "./configs/comments.js";
+import { functional } from "./configs/functional.js";
+import { imports } from "./configs/imports.js";
+import { javascript } from "./configs/javascript/index.js";
+import { node } from "./configs/node.js";
+import { perfectionist } from "./configs/perfectionist.js";
+import { promise } from "./configs/promise.js";
+import { regexp } from "./configs/regexp.js";
+import { security } from "./configs/security.js";
 import { typescript } from "./configs/typescript/index.js";
-import { unicorn, unicornRules } from "./configs/unicorn.js";
-import { unusedImports, unusedImportsRules } from "./configs/unused-imports.js";
+import { unicorn } from "./configs/unicorn.js";
+import { unusedImports } from "./configs/unused-imports.js";
 import { createContext } from "./context.js";
-import { javascriptFiles } from "./globs.js";
 import { htmlEslintRules } from "./rules/html/html.js";
 import { enforcePackageTypeEslintRules } from "./rules/json/enforce-package-type.js";
 import { jsonEslintRules } from "./rules/json/json.js";
@@ -309,47 +304,13 @@ export async function createConfig({
     projectRootDirectory,
     typescript: { tsconfigRootDir, typeChecked: tsTypeChecked },
   });
-  const functionalRules = tsTypeChecked
-    ? functionalTypeCheckedRules
-    : functionalUntypedRules;
-  // Without type information, `n/no-sync` stays off in TypeScript files.
-  const nRules = tsTypeChecked
-    ? nodeRules
-    : { ...nodeRules, "n/no-sync": "off" as const };
-  const codeQualityOptions = {
-    files: javascriptFiles,
-    overrides: jsRuleOverrides,
-  };
+  const codeQualityOptions = { overrides: jsRuleOverrides };
 
   const resolvedVariant =
     reactRefreshVariant ??
     (await detectReactRefreshVariant(projectRootDirectory));
   const tseslint = await import("typescript-eslint");
-  const [typescriptParser, typescriptRules] = await typescript(
-    { overrides: tsRuleOverrides },
-    context,
-  );
-  // TypeScript files repeat the JavaScript and code-quality rules until those features cover them.
-  const tsConfigs = [
-    typescriptParser,
-    {
-      ...typescriptRules,
-      rules: {
-        ...javascriptRules,
-        ...unicornRules,
-        ...functionalRules,
-        ...promiseRules,
-        ...regexpRules,
-        ...nRules,
-        ...securityRules,
-        ...unusedImportsRules,
-        ...importsRules,
-        ...perfectionistRules,
-        ...commentsRules,
-        ...typescriptRules.rules,
-      },
-    },
-  ];
+  const tsConfigs = await typescript({ overrides: tsRuleOverrides }, context);
 
   const [reactConfigs, svelteConfig, expressConfig] = await Promise.all([
     buildReactConfig(resolvedVariant, reactRuleOverrides),
@@ -386,14 +347,14 @@ export async function createConfig({
 
     ...javascript({ globals: resolvedGlobals, overrides: jsRuleOverrides }),
     ...comments(codeQualityOptions),
-    ...node(codeQualityOptions),
+    ...node(codeQualityOptions, context),
     ...security(codeQualityOptions),
     ...imports(codeQualityOptions, context),
     ...unusedImports(codeQualityOptions),
     ...promise(codeQualityOptions),
     ...regexp(codeQualityOptions),
     ...unicorn(codeQualityOptions),
-    ...functional(codeQualityOptions),
+    ...functional(codeQualityOptions, context),
     ...perfectionist(codeQualityOptions),
 
     {

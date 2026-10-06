@@ -95,4 +95,33 @@ describe("typescript feature", () => {
     expect(excluded).toBeUndefined();
     expect(outside).toBeUndefined();
   });
+
+  it("sets the rules that need type information in a type-aware block after the overrides", async () => {
+    const configs = await typescript(
+      {
+        overrides: { "@typescript-eslint/no-floating-promises": "warn" },
+        overridesTypeAware: { "@typescript-eslint/await-thenable": "warn" },
+      },
+      { ...typedContext, typeAware: { files: ["src/**"], ignores: [] } },
+    );
+    const eslint = new ESLint({
+      overrideConfig: configs,
+      overrideConfigFile: true,
+    });
+    const [inside, outside] = await Promise.all([
+      getEffectiveConfig(eslint, "src/example.ts"),
+      getEffectiveConfig(eslint, "scripts/example.ts"),
+    ]);
+
+    expect(configs.map((config) => config.name)).toEqual([
+      "@cravingmaker/eslint-config/typescript/parser",
+      "@cravingmaker/eslint-config/typescript/rules",
+      "@cravingmaker/eslint-config/typescript/rules-type-aware",
+    ]);
+    expect(inside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual([
+      1,
+    ]);
+    expect(inside?.rules?.["@typescript-eslint/await-thenable"]).toEqual([1]);
+    expect(outside?.rules?.["@typescript-eslint/await-thenable"]).toEqual([0]);
+  });
 });

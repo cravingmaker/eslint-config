@@ -3,7 +3,7 @@ import type { FeatureOptions, Rules } from "../types.js";
 
 import pluginUnusedImports from "eslint-plugin-unused-imports";
 
-import { javascriptFiles } from "../globs.js";
+import { sourceFiles } from "../globs.js";
 import {
   // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
   noUnusedVarsOptions,
@@ -19,7 +19,7 @@ const unusedImportsRules: Rules = {
 
 // Builds the flat config for eslint-plugin-unused-imports.
 function unusedImports({
-  files = javascriptFiles,
+  files = sourceFiles,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Linter.Config[] {

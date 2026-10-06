@@ -3,7 +3,7 @@ import type { FeatureOptions, Rules } from "../types.js";
 
 import pluginRegexp from "eslint-plugin-regexp";
 
-import { javascriptFiles } from "../globs.js";
+import { sourceFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 
 // Policy for eslint-plugin-regexp.
@@ -28,7 +28,7 @@ const regexpRules: Rules = {
 
 // Builds the flat config for eslint-plugin-regexp.
 function regexp({
-  files = javascriptFiles,
+  files = sourceFiles,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Linter.Config[] {

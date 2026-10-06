@@ -3,7 +3,7 @@ import type { FeatureOptions, Rules } from "../types.js";
 
 import pluginUnicorn from "eslint-plugin-unicorn";
 
-import { javascriptFiles } from "../globs.js";
+import { sourceFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 
 // Policy for eslint-plugin-unicorn.
@@ -85,7 +85,7 @@ const unicornRules: Rules = {
 
 // Builds the flat config for eslint-plugin-unicorn.
 function unicorn({
-  files = javascriptFiles,
+  files = sourceFiles,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Linter.Config[] {

@@ -5,7 +5,7 @@ import { createTypeScriptImportResolver } from "eslint-import-resolver-typescrip
 import pluginImportX, { createNodeResolver } from "eslint-plugin-import-x";
 
 import { defaultContext } from "../context.js";
-import { javascriptFiles, typescriptFiles } from "../globs.js";
+import { sourceFiles, typescriptFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 
 // Policy for eslint-plugin-import-x.
@@ -134,11 +134,7 @@ const importsRules: Rules = {
 // Builds the flat config for eslint-plugin-import-x. TypeScript files resolve imports through
 // the TypeScript resolver first, with the project's tsconfig.
 function imports(
-  {
-    files = javascriptFiles,
-    ignores = [],
-    overrides = {},
-  }: FeatureOptions = {},
+  { files = sourceFiles, ignores = [], overrides = {} }: FeatureOptions = {},
   { tsconfigRootDir }: Context = defaultContext,
 ): Linter.Config[] {
   const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};

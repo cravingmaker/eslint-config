@@ -3,7 +3,7 @@ import type { FeatureOptions, RuleOptionOf, Rules } from "../types.js";
 
 import pluginPerfectionist from "eslint-plugin-perfectionist";
 
-import { javascriptFiles } from "../globs.js";
+import { sourceFiles } from "../globs.js";
 
 const commonOptions = {
   fallbackSort: { type: "unsorted" },
@@ -395,7 +395,7 @@ const perfectionistRules: Rules = {
 
 // Builds the flat config for eslint-plugin-perfectionist.
 function perfectionist({
-  files = javascriptFiles,
+  files = sourceFiles,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Linter.Config[] {

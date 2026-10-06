@@ -3,7 +3,7 @@ import type { FeatureOptions, Rules } from "../types.js";
 
 import pluginSecurity from "eslint-plugin-security";
 
-import { javascriptFiles } from "../globs.js";
+import { sourceFiles } from "../globs.js";
 
 // Policy for eslint-plugin-security: its recommended config.
 const securityRules: Rules = {
@@ -13,7 +13,7 @@ const securityRules: Rules = {
 
 // Builds the flat config for eslint-plugin-security.
 function security({
-  files = javascriptFiles,
+  files = sourceFiles,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Linter.Config[] {

@@ -189,7 +189,7 @@ functional/prefer-property-signatures: off
 functional/prefer-tacit: off
 functional/readonly-type: off
 functional/type-declaration-immutability: off
-getter-return: off [{"allowImplicit":false}]
+getter-return: off [{"allowImplicit":true}]
 grouped-accessor-pairs: error ["getBeforeSet",{"enforceForTSTypes":false}]
 guard-for-in: off
 id-denylist: off
@@ -248,7 +248,7 @@ max-depth: error [{"max":4}]
 max-lines: error [{"max":1500,"skipBlankLines":true,"skipComments":true}]
 max-lines-per-function: off [{"IIFEs":false,"max":50,"skipBlankLines":true,"skipComments":true}]
 max-nested-callbacks: error [4]
-max-params: off [3]
+max-params: off [{"max":4}]
 max-statements: off [10]
 n/callback-return: error
 n/exports-style: off
@@ -270,7 +270,7 @@ n/no-process-env: warn [{"allowedVariables":["NODE_ENV"]}]
 n/no-process-exit: off
 n/no-restricted-import: off
 n/no-restricted-require: off
-n/no-sync: off
+n/no-sync: off [{"allowAtRootLevel":true}]
 n/no-top-level-await: off
 n/no-unpublished-bin: error
 n/no-unpublished-import: error
@@ -393,7 +393,7 @@ no-ternary: off
 no-this-before-super: off
 no-throw-literal: error
 no-unassigned-vars: error
-no-undef: off [{"typeof":false}]
+no-undef: off [{"typeof":true}]
 no-undef-init: error
 no-undefined: off
 no-underscore-dangle: off [{"allow":[],"allowAfterSuper":false,"allowAfterThis":false,"allowAfterThisConstructor":false,"allowFunctionParams":true,"allowInArrayDestructuring":true,"allowInObjectDestructuring":true,"enforceInClassFields":false,"enforceInMethodNames":false}]
@@ -403,12 +403,12 @@ no-unneeded-ternary: error [{"defaultAssignment":true}]
 no-unreachable: off
 no-unreachable-loop: error [{"ignore":[]}]
 no-unsafe-finally: error
-no-unsafe-negation: off [{"enforceForOrderingRelations":false}]
+no-unsafe-negation: off [{"enforceForOrderingRelations":true}]
 no-unsafe-optional-chaining: error [{"disallowArithmeticOperators":true}]
-no-unused-expressions: off [{"allowShortCircuit":false,"allowTaggedTemplates":false,"allowTernary":false,"enforceForJSX":false,"ignoreDirectives":false}]
+no-unused-expressions: off [{"allowShortCircuit":true,"allowTaggedTemplates":true,"allowTernary":true,"enforceForJSX":true,"ignoreDirectives":false}]
 no-unused-labels: error
 no-unused-private-class-members: off
-no-unused-vars: off [{"args":"after-used","caughtErrors":"all","ignoreClassWithStaticInitBlock":false,"ignoreRestSiblings":false,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"vars":"all"}]
+no-unused-vars: off [{"args":"after-used","argsIgnorePattern":"^_","caughtErrors":"all","caughtErrorsIgnorePattern":"^_","destructuredArrayIgnorePattern":"^_","ignoreClassWithStaticInitBlock":false,"ignoreRestSiblings":true,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"vars":"all","varsIgnorePattern":"^_"}]
 no-use-before-define: off [{"allowNamedExports":false,"classes":true,"enums":true,"functions":true,"ignoreTypeReferences":true,"typedefs":true,"variables":true}]
 no-useless-assignment: off
 no-useless-backreference: off
