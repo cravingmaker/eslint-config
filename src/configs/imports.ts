@@ -7,6 +7,7 @@ import pluginImportX, { createNodeResolver } from "eslint-plugin-import-x";
 import { defaultContext } from "../context.js";
 import { sourceFiles, typescriptFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-import-x.
 const importsRules: Rules = {
@@ -132,12 +133,13 @@ const importsRules: Rules = {
   "import-x/order": "error",
 } as const;
 
-// Builds the flat config for eslint-plugin-import-x. TypeScript files resolve imports through
-// the TypeScript resolver first, with the project's tsconfig.
+// Builds the flat config for eslint-plugin-import-x. TypeScript files within the feature's files
+// resolve imports through the TypeScript resolver first, with the project's tsconfig.
 function imports(
-  { files = sourceFiles, ignores = [], overrides = {} }: FeatureOptions = {},
+  options: FeatureOptions = {},
   { tsconfigRootDir }: Context = defaultContext,
 ): Linter.Config[] {
+  const { files, ignores = [], overrides = {} } = options;
   const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
 
   return [
@@ -146,13 +148,13 @@ function imports(
       plugins: { "import-x": pluginImportX },
     },
     {
-      files: [...files],
+      files: [...(files ?? sourceFiles)],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/imports/rules",
       rules: { ...importsRules, ...overrides },
     },
     {
-      files: [...typescriptFiles],
+      files: narrowFiles(typescriptFiles, files),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/imports/resolver",
       settings: {
