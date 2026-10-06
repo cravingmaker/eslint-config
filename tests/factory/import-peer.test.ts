@@ -1,5 +1,3 @@
-/* eslint-disable functional/no-expression-statements, functional/no-return-void -- Vitest suites are side-effect driven */
-
 import { describe, expect, it } from "vitest";
 
 import {

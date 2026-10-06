@@ -1,4 +1,4 @@
-/* eslint-disable functional/no-expression-statements, functional/no-return-void, n/no-sync, security/detect-non-literal-fs-filename -- Packed-package smoke tests intentionally perform filesystem and process side effects. */
+/* eslint-disable n/no-sync, security/detect-non-literal-fs-filename -- Packed-package smoke tests intentionally perform filesystem and process side effects. */
 
 import { execFileSync } from "node:child_process";
 import fs from "node:fs/promises";

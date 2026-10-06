@@ -1,5 +1,3 @@
-/* eslint-disable functional/no-expression-statements, functional/no-return-void -- Vitest suites are side-effect driven */
-
 import { execFileSync } from "node:child_process";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";

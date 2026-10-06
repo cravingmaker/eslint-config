@@ -1,5 +1,3 @@
-/* eslint-disable functional/no-expression-statements, functional/no-return-void -- Vitest suites are side-effect driven */
-
 import process from "node:process";
 
 import { ESLint } from "eslint";
@@ -34,6 +32,7 @@ const suites = [
       "src/example.ts",
       "src/example.cts",
       "src/example.tsx",
+      "eslint.config.js",
       "src/Component.svelte",
       "src/state.svelte.js",
       "src/state.svelte.ts",
@@ -54,7 +53,7 @@ const suites = [
     options: baseOptions,
   },
   {
-    filePaths: ["src/example.ts", "src/example.tsx"],
+    filePaths: ["src/example.ts", "src/example.tsx", "src/example.test.ts"],
     name: "type-checked",
     options: {
       ...baseOptions,
