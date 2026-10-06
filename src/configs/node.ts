@@ -1,11 +1,14 @@
-import type { Rules } from "../../types.js";
+import type { Linter } from "eslint";
+import type { FeatureOptions, Rules } from "../types.js";
 
-import eslintPluginN from "eslint-plugin-n";
+import pluginNode from "eslint-plugin-n";
 
-import { getPluginRules } from "../../utilities/plugin-rules.js";
+import { javascriptFiles } from "../globs.js";
+import { enableAllRules } from "../utilities/all-rules.js";
 
-const nEslintRules: Rules = {
-  ...getPluginRules("n", eslintPluginN.rules ?? {}),
+// Policy for eslint-plugin-n.
+const nodeRules: Rules = {
+  ...enableAllRules("n", pluginNode.rules ?? {}),
 
   "n/prefer-global/buffer": ["error", "never"],
   "n/prefer-global/crypto": ["error", "never"],
@@ -46,9 +49,24 @@ const nEslintRules: Rules = {
   "n/no-unpublished-require": "off", // Irrelevant for ESM-only project
 };
 
-const nUntypedTypeScriptEslintRules: Rules = {
-  ...nEslintRules,
-  "n/no-sync": "off",
-} as const;
+// Builds the flat config for eslint-plugin-n.
+function node({
+  files = javascriptFiles,
+  ignores = [],
+  overrides = {},
+}: FeatureOptions = {}): Linter.Config[] {
+  return [
+    {
+      name: "@cravingmaker/eslint-config/node/setup",
+      plugins: { n: pluginNode },
+    },
+    {
+      files: [...files],
+      ignores: [...ignores],
+      name: "@cravingmaker/eslint-config/node/rules",
+      rules: { ...nodeRules, ...overrides },
+    },
+  ];
+}
 
-export { nEslintRules, nUntypedTypeScriptEslintRules };
+export { node, nodeRules };

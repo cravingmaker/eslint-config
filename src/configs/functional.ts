@@ -1,14 +1,14 @@
-import type { Rules } from "../../types.js";
+import type { Linter } from "eslint";
+import type { FeatureOptions, Rules } from "../types.js";
 
-import eslintPluginFunctional from "eslint-plugin-functional";
+import pluginFunctional from "eslint-plugin-functional";
 
-import {
-  getPluginConfigRules,
-  getPluginRules,
-} from "../../utilities/plugin-rules.js";
+import { javascriptFiles } from "../globs.js";
+import { disableConfigRules, enableAllRules } from "../utilities/all-rules.js";
 
-const functionalTypeCheckedEslintRules: Rules = {
-  ...getPluginRules("functional", eslintPluginFunctional.rules),
+// Policy for eslint-plugin-functional, including the rules that need type information.
+const functionalRules: Rules = {
+  ...enableAllRules("functional", pluginFunctional.rules),
 
   "functional/functional-parameters": [
     "error",
@@ -84,13 +84,35 @@ const functionalTypeCheckedEslintRules: Rules = {
   "functional/no-try-statements": "off", // Prefer try statements
 } as const;
 
-const functionalEslintRules: Rules = {
-  ...functionalTypeCheckedEslintRules,
-  ...getPluginConfigRules(
+// The same policy with the rules that need type information turned off, as the plugin's
+// `disableTypeChecked` config does.
+const functionalUntypedRules: Rules = {
+  ...functionalRules,
+  ...disableConfigRules(
     "functional",
-    eslintPluginFunctional.rules,
-    eslintPluginFunctional.configs.disableTypeChecked.rules,
+    pluginFunctional.rules,
+    pluginFunctional.configs.disableTypeChecked.rules,
   ),
 } as const;
 
-export { functionalEslintRules, functionalTypeCheckedEslintRules };
+// Builds the flat config for eslint-plugin-functional.
+function functional({
+  files = javascriptFiles,
+  ignores = [],
+  overrides = {},
+}: FeatureOptions = {}): Linter.Config[] {
+  return [
+    {
+      name: "@cravingmaker/eslint-config/functional/setup",
+      plugins: { functional: pluginFunctional },
+    },
+    {
+      files: [...files],
+      ignores: [...ignores],
+      name: "@cravingmaker/eslint-config/functional/rules",
+      rules: { ...functionalUntypedRules, ...overrides },
+    },
+  ];
+}
+
+export { functional, functionalRules, functionalUntypedRules };

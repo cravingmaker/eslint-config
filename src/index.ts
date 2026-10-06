@@ -12,19 +12,8 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 
-import pluginEslintComments from "@eslint-community/eslint-plugin-eslint-comments";
 import enforcePackageType from "eslint-enforce-package-type";
-import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
-import pluginFunctional from "eslint-plugin-functional";
-import pluginImportX, { createNodeResolver } from "eslint-plugin-import-x";
-import pluginN from "eslint-plugin-n";
 import packageJson from "eslint-plugin-package-json";
-import pluginPerfectionist from "eslint-plugin-perfectionist";
-import pluginPromise from "eslint-plugin-promise";
-import pluginRegexp from "eslint-plugin-regexp";
-import pluginSecurity from "eslint-plugin-security";
-import eslintPluginUnicorn from "eslint-plugin-unicorn";
-import pluginUnusedImports from "eslint-plugin-unused-imports";
 import { defineConfig, globalIgnores } from "eslint/config";
 import pluginJson from "@eslint/json";
 import pluginMarkdown from "@eslint/markdown";
@@ -33,26 +22,28 @@ import pluginHtml from "@html-eslint/eslint-plugin";
 import htmlParser from "@html-eslint/parser";
 import * as jsoncParser from "jsonc-eslint-parser";
 
+import { comments, commentsRules } from "./configs/comments.js";
+import {
+  functional,
+  functionalRules as functionalTypeCheckedRules,
+  functionalUntypedRules,
+} from "./configs/functional.js";
+import { imports, importsRules } from "./configs/imports.js";
 import { javascript, javascriptRules } from "./configs/javascript/index.js";
+import { node, nodeRules } from "./configs/node.js";
+import { perfectionist, perfectionistRules } from "./configs/perfectionist.js";
+import { promise, promiseRules } from "./configs/promise.js";
+import { regexp, regexpRules } from "./configs/regexp.js";
+import { security, securityRules } from "./configs/security.js";
+import { unicorn, unicornRules } from "./configs/unicorn.js";
+import { unusedImports, unusedImportsRules } from "./configs/unused-imports.js";
+import { createContext } from "./context.js";
 import { javascriptFiles } from "./globs.js";
 import { htmlEslintRules } from "./rules/html/html.js";
 import { enforcePackageTypeEslintRules } from "./rules/json/enforce-package-type.js";
 import { jsonEslintRules } from "./rules/json/json.js";
 import { packageJsonEslintRules } from "./rules/json/package-json.js";
 import { markdownEslintRules } from "./rules/markdown/markdown.js";
-import { eslintCommentsRules } from "./rules/misc/eslint-comments.js";
-import {
-  functionalEslintRules,
-  functionalTypeCheckedEslintRules,
-} from "./rules/misc/functional.js";
-import { importxEslintRules } from "./rules/misc/import-x.js";
-import { perfectionistEslintRules } from "./rules/misc/perfectionist.js";
-import { promiseEslintRules } from "./rules/misc/promise.js";
-import { regexpEslintRules } from "./rules/misc/regexp.js";
-import { unicornEslintRules } from "./rules/misc/unicorn.js";
-import { unusedImportsEslintRules } from "./rules/misc/unused-imports.js";
-import { nEslintRules, nUntypedTypeScriptEslintRules } from "./rules/node/n.js";
-import { securityEslintRules } from "./rules/node/security.js";
 import {
   tsEslintRules,
   tsEslintTypeCheckedRules,
@@ -102,7 +93,6 @@ type TsConfigOptions = {
   readonly nRules: Rules;
   readonly parser: typeof tseslintParser;
   readonly plugin: typeof tseslintPlugin;
-  readonly resolverProject: Readonly<Record<string, unknown>>;
   readonly ruleOverrides: Readonly<Linter.RulesRecord>;
   readonly tsParserOptions: Readonly<Record<string, unknown>>;
   readonly tsRules: Rules;
@@ -116,13 +106,12 @@ async function buildExpressConfig(
     default: NonNullable<Linter.Config["plugins"]>[string];
   }>("eslint-plugin-express-security");
   if (plugin === undefined) return undefined;
-  const { expressSecurityEslintRules } =
-    await import("./rules/node/express-security.js");
+  const { expressRules } = await import("./configs/express.js");
   return {
     files: ["**/*.{js,mjs,ts,mts}"],
     name: "@cravingmaker/eslint-config/express",
     plugins: { "express-security": plugin.default },
-    rules: { ...expressSecurityEslintRules, ...ruleOverrides },
+    rules: { ...expressRules, ...ruleOverrides },
   };
 }
 async function buildReactConfig(
@@ -232,7 +221,6 @@ function buildTsConfig({
   nRules,
   parser,
   plugin,
-  resolverProject,
   ruleOverrides,
   tsParserOptions,
   tsRules,
@@ -249,26 +237,17 @@ function buildTsConfig({
     rules: {
       ...javascriptRules,
       ...tsRules,
-      ...unicornEslintRules,
+      ...unicornRules,
       ...functionalRules,
-      ...promiseEslintRules,
-      ...regexpEslintRules,
+      ...promiseRules,
+      ...regexpRules,
       ...nRules,
-      ...securityEslintRules,
-      ...unusedImportsEslintRules,
-      ...importxEslintRules,
-      ...perfectionistEslintRules,
-      ...eslintCommentsRules,
+      ...securityRules,
+      ...unusedImportsRules,
+      ...importsRules,
+      ...perfectionistRules,
+      ...commentsRules,
       ...ruleOverrides,
-    },
-    settings: {
-      "import-x/resolver-next": [
-        createTypeScriptImportResolver({
-          alwaysTryTypes: true,
-          ...resolverProject,
-        }),
-        createNodeResolver(),
-      ],
     },
   };
 }
@@ -378,15 +357,27 @@ export async function createConfig({
   } = resolveRules(rules);
 
   const resolvedGlobals = resolveGlobalVariables(environments, customGlobals);
+  const context = await createContext({
+    environments,
+    globals: customGlobals,
+    projectRootDirectory,
+    typescript: { tsconfigRootDir, typeChecked: tsTypeChecked },
+  });
   const tsRules = tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules;
   const functionalRules = tsTypeChecked
-    ? functionalTypeCheckedEslintRules
-    : functionalEslintRules;
-  const nRules = tsTypeChecked ? nEslintRules : nUntypedTypeScriptEslintRules;
+    ? functionalTypeCheckedRules
+    : functionalUntypedRules;
+  // Without type information, `n/no-sync` stays off in TypeScript files.
+  const nRules = tsTypeChecked
+    ? nodeRules
+    : { ...nodeRules, "n/no-sync": "off" as const };
   const tsParserOptions = tsTypeChecked
     ? { projectService: true, tsconfigRootDir }
     : {};
-  const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
+  const codeQualityOptions = {
+    files: javascriptFiles,
+    overrides: jsRuleOverrides,
+  };
 
   const resolvedVariant =
     reactRefreshVariant ??
@@ -398,7 +389,6 @@ export async function createConfig({
     nRules,
     parser: tseslint.parser,
     plugin: tseslint.plugin,
-    resolverProject,
     ruleOverrides: tsRuleOverrides,
     tsParserOptions,
     tsRules,
@@ -426,20 +416,7 @@ export async function createConfig({
     {
       name: "@cravingmaker/eslint-config/plugins",
       plugins: {
-        "@eslint-community/eslint-comments": pluginEslintComments,
-        functional: pluginFunctional,
-        "import-x": pluginImportX,
-        n: pluginN,
         "package-json": packageJson,
-        perfectionist: pluginPerfectionist,
-        regexp: pluginRegexp,
-        unicorn: eslintPluginUnicorn,
-        "unused-imports": pluginUnusedImports,
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- eslint-plugin-promise does not have types
-        promise: pluginPromise,
-
-        security: pluginSecurity,
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- @eslint/markdown Plugin type is not assignable to Linter.Plugin without assertion
         markdown: pluginMarkdown as unknown as NonNullable<
@@ -451,23 +428,16 @@ export async function createConfig({
     },
 
     ...javascript({ globals: resolvedGlobals, overrides: jsRuleOverrides }),
-    {
-      files: [...javascriptFiles],
-      name: "@cravingmaker/eslint-config/javascript/plugin-rules",
-      rules: {
-        ...unicornEslintRules,
-        ...functionalEslintRules,
-        ...promiseEslintRules,
-        ...regexpEslintRules,
-        ...nEslintRules,
-        ...securityEslintRules,
-        ...unusedImportsEslintRules,
-        ...importxEslintRules,
-        ...perfectionistEslintRules,
-        ...eslintCommentsRules,
-        ...jsRuleOverrides,
-      },
-    },
+    ...comments(codeQualityOptions),
+    ...node(codeQualityOptions),
+    ...security(codeQualityOptions),
+    ...imports(codeQualityOptions, context),
+    ...unusedImports(codeQualityOptions),
+    ...promise(codeQualityOptions),
+    ...regexp(codeQualityOptions),
+    ...unicorn(codeQualityOptions),
+    ...functional(codeQualityOptions),
+    ...perfectionist(codeQualityOptions),
 
     {
       files: ["**/*.{jsx,mjsx}"],

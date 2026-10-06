@@ -12,7 +12,7 @@ import {
   preferDestructuring1stOptions,
   preferDestructuring2ndOptions,
   preferPromiseRejectErrorsOptions,
-} from "../../options/common.js";
+} from "../shared-options.js";
 
 const recommendedSuggestionRules: Rules = {
   "no-case-declarations": "error",

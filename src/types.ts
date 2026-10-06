@@ -19,6 +19,10 @@ type Context = {
   */
   readonly projectRootDirectory: string;
   /**
+  The directory that holds `tsconfig.json`: `typescript.tsconfigRootDir`, or the project root.
+  */
+  readonly tsconfigRootDir: string;
+  /**
   Files that receive type-aware rules, or `undefined` when typed linting is off.
   */
   readonly typeAware: TypeAwareScope | undefined;

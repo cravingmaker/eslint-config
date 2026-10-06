@@ -1,7 +1,7 @@
 // @ts-check
 
 import { createConfig } from "./dist/index.mjs";
-import { namingConventionOptions } from "./src/options/common.ts";
+import { namingConventionOptions } from "./src/configs/shared-options.ts";
 
 // eslint-disable-next-line import-x/no-default-export -- ESLint flat config requires a default export
 export default createConfig({

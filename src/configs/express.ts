@@ -1,6 +1,7 @@
-import type { Rules } from "../../types.js";
+import type { Rules } from "../types.js";
 
-const expressSecurityEslintRules: Rules = {
+// Policy for eslint-plugin-express-security, an optional peer.
+const expressRules: Rules = {
   "express-security/no-cors-credentials-wildcard": "error",
   "express-security/no-express-unsafe-regex-route": "error",
   "express-security/no-graphql-introspection-production": "error",
@@ -14,4 +15,4 @@ const expressSecurityEslintRules: Rules = {
   "express-security/no-exposed-debug-endpoints": "off", // Project specific
 } as const;
 
-export { expressSecurityEslintRules };
+export { expressRules };

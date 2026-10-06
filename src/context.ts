@@ -6,18 +6,32 @@ import path from "node:path";
 import { resolveOptions } from "./options.js";
 
 /**
-Builds the context that every feature builder receives: the project root, the package names
-that its manifest declares, the resolved globals, and the type-aware scope.
+Builds the context for `options` in a project whose manifest declares `dependencies`.
 */
-async function createContext(options: Options = {}): Promise<Context> {
-  const { globals, projectRootDirectory, typeAware } = resolveOptions(options);
+function buildContext(
+  options: Options = {},
+  dependencies: ReadonlySet<string> = new Set(),
+): Context {
+  const { globals, projectRootDirectory, typeAware, typescript } =
+    resolveOptions(options);
 
   return {
-    dependencies: await readDependencies(projectRootDirectory),
+    dependencies,
     globals,
     projectRootDirectory,
+    tsconfigRootDir: typescript?.tsconfigRootDir ?? projectRootDirectory,
     typeAware,
   };
+}
+/**
+Builds the context that every feature builder receives: the project root, the package names
+that its manifest declares, the resolved globals, the tsconfig directory, and the type-aware
+scope.
+*/
+async function createContext(options: Options = {}): Promise<Context> {
+  const { projectRootDirectory } = resolveOptions(options);
+
+  return buildContext(options, await readDependencies(projectRootDirectory));
 }
 /**
 Picks the React Refresh variant for the declared dependencies: Next.js first, then Vite,
@@ -60,4 +74,10 @@ async function readDependencies(
   }
 }
 
-export { createContext, detectReactRefreshVariant };
+/**
+The context of `createConfig()` without options in a project that declares no dependencies.
+Feature builders fall back to it when they are called on their own, as in tests.
+*/
+const defaultContext: Context = buildContext();
+
+export { createContext, defaultContext, detectReactRefreshVariant };

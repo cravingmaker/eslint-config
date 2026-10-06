@@ -14,6 +14,31 @@ type PluginRule = {
 };
 
 /**
+Turns off every rule that a plugin config sets, except deprecated rules. With a plugin's
+`disableTypeChecked` config, this turns off the rules that need type information.
+*/
+function disableConfigRules(
+  pluginName: string,
+  rules: unknown,
+  configRules: unknown,
+): Rules {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Plugin rule maps have inconsistent public typings across packages.
+  const pluginRules = rules as Readonly<Record<string, PluginRule | undefined>>;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Plugin config rule maps have inconsistent public typings across packages.
+  const ruleIds = Object.keys(configRules as Readonly<Record<string, unknown>>);
+  const deprecatedRuleIds = new Set(
+    Object.entries(pluginRules)
+      .filter(([, rule]) => isDeprecated(rule))
+      .map(([ruleName]) => `${pluginName}/${ruleName}`),
+  );
+
+  return Object.fromEntries(
+    ruleIds
+      .filter((ruleId) => !deprecatedRuleIds.has(ruleId))
+      .map((ruleId): readonly [string, "off"] => [ruleId, "off"]),
+  );
+}
+/**
 Turns on every rule of a plugin as an error, except deprecated rules, rules for other
 languages, and excluded rules. Rules that a new plugin version adds are turned on as well;
 the policy snapshots show them for review.
@@ -57,4 +82,4 @@ function isLanguageSupported(
   );
 }
 
-export { enableAllRules };
+export { disableConfigRules, enableAllRules };

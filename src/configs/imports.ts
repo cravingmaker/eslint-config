@@ -1,11 +1,16 @@
-import type { Rules } from "../../types.js";
+import type { Linter } from "eslint";
+import type { Context, FeatureOptions, Rules } from "../types.js";
 
-import eslintPluginImportX from "eslint-plugin-import-x";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import pluginImportX, { createNodeResolver } from "eslint-plugin-import-x";
 
-import { getPluginRules } from "../../utilities/plugin-rules.js";
+import { defaultContext } from "../context.js";
+import { javascriptFiles, typescriptFiles } from "../globs.js";
+import { enableAllRules } from "../utilities/all-rules.js";
 
-const importxEslintRules: Rules = {
-  ...getPluginRules("import-x", eslintPluginImportX.rules),
+// Policy for eslint-plugin-import-x.
+const importsRules: Rules = {
+  ...enableAllRules("import-x", pluginImportX.rules),
 
   "import-x/extensions": [
     "error",
@@ -126,4 +131,44 @@ const importxEslintRules: Rules = {
   "import-x/order": "off", // Covered by `perfectionist/sort-imports` rule
 } as const;
 
-export { importxEslintRules };
+// Builds the flat config for eslint-plugin-import-x. TypeScript files resolve imports through
+// the TypeScript resolver first, with the project's tsconfig.
+function imports(
+  {
+    files = javascriptFiles,
+    ignores = [],
+    overrides = {},
+  }: FeatureOptions = {},
+  { tsconfigRootDir }: Context = defaultContext,
+): Linter.Config[] {
+  const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
+
+  return [
+    {
+      name: "@cravingmaker/eslint-config/imports/setup",
+      plugins: { "import-x": pluginImportX },
+    },
+    {
+      files: [...files],
+      ignores: [...ignores],
+      name: "@cravingmaker/eslint-config/imports/rules",
+      rules: { ...importsRules, ...overrides },
+    },
+    {
+      files: [...typescriptFiles],
+      ignores: [...ignores],
+      name: "@cravingmaker/eslint-config/imports/resolver",
+      settings: {
+        "import-x/resolver-next": [
+          createTypeScriptImportResolver({
+            alwaysTryTypes: true,
+            ...resolverProject,
+          }),
+          createNodeResolver(),
+        ],
+      },
+    },
+  ];
+}
+
+export { imports, importsRules };

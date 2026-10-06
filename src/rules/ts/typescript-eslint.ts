@@ -16,7 +16,7 @@ import {
   preferDestructuring1stOptions,
   preferDestructuring2ndOptions,
   preferPromiseRejectErrorsOptions,
-} from "../../options/common.js";
+} from "../../configs/shared-options.js";
 
 const tsEslintConflictedEslintRecommendedRules: Rules = {
   "constructor-super": "off", // ts(2335) & ts(2377)

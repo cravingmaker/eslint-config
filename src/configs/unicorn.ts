@@ -1,13 +1,17 @@
-import type { Rules } from "../../types.js";
+import type { Linter } from "eslint";
+import type { FeatureOptions, Rules } from "../types.js";
 
-import eslintPluginUnicorn from "eslint-plugin-unicorn";
+import pluginUnicorn from "eslint-plugin-unicorn";
 
-import { getPluginRules } from "../../utilities/plugin-rules.js";
+import { javascriptFiles } from "../globs.js";
+import { enableAllRules } from "../utilities/all-rules.js";
 
-const unicornEslintRules: Rules = {
-  ...getPluginRules("unicorn", eslintPluginUnicorn.rules ?? {}, "js/js", [
-    "consistent-arrow-return-style",
-  ]),
+// Policy for eslint-plugin-unicorn.
+const unicornRules: Rules = {
+  ...enableAllRules("unicorn", pluginUnicorn.rules ?? {}, {
+    exclude: ["consistent-arrow-return-style"],
+    language: "js/js",
+  }),
 
   "unicorn/filename-case": [
     "error",
@@ -79,4 +83,24 @@ const unicornEslintRules: Rules = {
   "unicorn/try-complexity": "off", // Core complexity rules already provide a less restrictive complexity policy
 } as const;
 
-export { unicornEslintRules };
+// Builds the flat config for eslint-plugin-unicorn.
+function unicorn({
+  files = javascriptFiles,
+  ignores = [],
+  overrides = {},
+}: FeatureOptions = {}): Linter.Config[] {
+  return [
+    {
+      name: "@cravingmaker/eslint-config/unicorn/setup",
+      plugins: { unicorn: pluginUnicorn },
+    },
+    {
+      files: [...files],
+      ignores: [...ignores],
+      name: "@cravingmaker/eslint-config/unicorn/rules",
+      rules: { ...unicornRules, ...overrides },
+    },
+  ];
+}
+
+export { unicorn, unicornRules };

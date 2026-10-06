@@ -4,7 +4,7 @@ import {
   // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
   noUnusedVarsOptions,
   noUseBeforeDefineOptions,
-} from "../../options/common.js";
+} from "../shared-options.js";
 
 const recommendedPossibleProblemRules: Rules = {
   "constructor-super": "error",
