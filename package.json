@@ -42,6 +42,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "gen": "node scripts/typegen.ts",
+    "inspect": "npm run build && eslint-config-inspector",
     "lint": "npm run build && npm run lint:built",
     "lint:built": "eslint . --max-warnings 0",
     "lint:package": "npm run build && npm run lint:package:built",
