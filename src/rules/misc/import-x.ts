@@ -1,10 +1,10 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import eslintPluginImportX from "eslint-plugin-import-x";
 
 import { getPluginRules } from "../../utilities/plugin-rules.js";
 
-const importxEslintRules: Linter.RulesRecord = {
+const importxEslintRules: Rules = {
   ...getPluginRules("import-x", eslintPluginImportX.rules),
 
   "import-x/extensions": [

@@ -1,10 +1,10 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import { rules } from "eslint-plugin-regexp";
 
 import { getPluginRules } from "../../utilities/plugin-rules.js";
 
-const regexpEslintRules: Linter.RulesRecord = {
+const regexpEslintRules: Rules = {
   ...getPluginRules("regexp", rules),
 
   "regexp/hexadecimal-escape": ["error", "never"],

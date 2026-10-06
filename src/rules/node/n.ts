@@ -1,10 +1,10 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import eslintPluginN from "eslint-plugin-n";
 
 import { getPluginRules } from "../../utilities/plugin-rules.js";
 
-const nEslintRules: Linter.RulesRecord = {
+const nEslintRules: Rules = {
   ...getPluginRules("n", eslintPluginN.rules ?? {}),
 
   "n/prefer-global/buffer": ["error", "never"],
@@ -46,7 +46,7 @@ const nEslintRules: Linter.RulesRecord = {
   "n/no-unpublished-require": "off", // Irrelevant for ESM-only project
 };
 
-const nUntypedTypeScriptEslintRules: Linter.RulesRecord = {
+const nUntypedTypeScriptEslintRules: Rules = {
   ...nEslintRules,
   "n/no-sync": "off",
 } as const;

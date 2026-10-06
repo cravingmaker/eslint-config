@@ -1,6 +1,6 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
-const reactHooksEslintRules: Linter.RulesRecord = {
+const reactHooksEslintRules: Rules = {
   // Core hooks rules
   "react-hooks/exhaustive-deps": "error",
   "react-hooks/rules-of-hooks": "error",

@@ -1,10 +1,8 @@
-import type { Linter } from "eslint";
+import type { RuleOptionOf, Rules } from "../../types.js";
 
 type ReactRefreshVariant = "generic" | "next" | "vite";
 
-function getReactRefreshEslintRules(
-  variant: ReactRefreshVariant,
-): Linter.RulesRecord {
+function getReactRefreshEslintRules(variant: ReactRefreshVariant): Rules {
   const variantOptionsMap = {
     generic: {
       allowConstantExport: false,
@@ -44,7 +42,10 @@ function getReactRefreshEslintRules(
       checkJS: false,
     },
     vite: { allowConstantExport: true, allowExportNames: [], checkJS: false },
-  } as const;
+  } satisfies Record<
+    ReactRefreshVariant,
+    RuleOptionOf<"react-refresh/only-export-components">
+  >;
 
   // eslint-disable-next-line security/detect-object-injection -- variant is a string-literal union; not user-controlled input
   const variantOptions = variantOptionsMap[variant];

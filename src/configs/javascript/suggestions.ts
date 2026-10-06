@@ -1,4 +1,4 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import {
   classMethodsUseThisOptions,
@@ -14,7 +14,7 @@ import {
   preferPromiseRejectErrorsOptions,
 } from "../../options/common.js";
 
-const recommendedSuggestionRules: Linter.RulesRecord = {
+const recommendedSuggestionRules: Rules = {
   "no-case-declarations": "error",
   "no-delete-var": "error",
   "no-empty-static-block": "error",
@@ -35,7 +35,7 @@ const recommendedSuggestionRules: Linter.RulesRecord = {
   "no-empty": ["error", { allowEmptyCatch: true }],
 } as const;
 
-const suggestionRules: Linter.RulesRecord = {
+const suggestionRules: Rules = {
   ...recommendedSuggestionRules,
 
   "accessor-pairs": [

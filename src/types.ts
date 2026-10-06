@@ -120,6 +120,19 @@ A React Refresh rule variant, which decides the exports that are allowed next to
 */
 type ReactRefreshVariant = "generic" | "next" | "vite";
 /**
+An option of a rule with generated types: its options object, or one entry of a rule that
+accepts a list of options objects.
+*/
+type RuleOptionOf<RuleId extends keyof RuleOptions> =
+  RuleOptionsOf<RuleId>[number];
+/**
+The options that follow the severity in the settings of a rule with generated types.
+*/
+type RuleOptionsOf<RuleId extends keyof RuleOptions> =
+  NonNullable<RuleOptions[RuleId]> extends Linter.RuleEntry<infer OptionList>
+    ? OptionList
+    : never;
+/**
 Rule settings by rule ID. Rules of the bundled plugins are checked against their option
 schemas; any other rule ID is accepted, for plugins added in user configs.
 */
@@ -166,6 +179,8 @@ export type {
   Options,
   ReactOptions,
   ReactRefreshVariant,
+  RuleOptionOf,
+  RuleOptionsOf,
   Rules,
   TypeAwareScope,
   TypeScriptOptions,

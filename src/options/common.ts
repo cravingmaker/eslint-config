@@ -1,8 +1,10 @@
+import type { RuleOptionOf, RuleOptionsOf } from "../types.js";
+
 const classMethodsUseThisOptions = {
   enforceForClassFields: true,
   exceptMethods: [],
   ignoreOverrideMethods: false,
-} as const;
+} satisfies RuleOptionOf<"class-methods-use-this">;
 
 const consistentReturnOptions = { treatUndefinedAsUnspecified: false } as const;
 
@@ -32,9 +34,11 @@ const namingConventionOptions = [
     format: ["PascalCase"],
     selector: "typeLike",
   },
-] as const;
+] satisfies RuleOptionsOf<"@typescript-eslint/naming-convention">;
 
-const noEmptyFunctionOptions = { allow: [] } as const;
+const noEmptyFunctionOptions = {
+  allow: [],
+} satisfies RuleOptionOf<"no-empty-function">;
 
 const noShadowOptions = {
   allow: [],
@@ -43,7 +47,7 @@ const noShadowOptions = {
   ignoreFunctionTypeParameterNameValueShadow: true,
   ignoreOnInitialization: false,
   ignoreTypeValueShadow: true,
-} as const;
+} satisfies RuleOptionOf<"no-shadow">;
 
 const noUnusedExpressionsOptions = {
   allowShortCircuit: true,

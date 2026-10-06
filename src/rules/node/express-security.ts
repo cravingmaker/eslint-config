@@ -1,6 +1,6 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
-const expressSecurityEslintRules: Linter.RulesRecord = {
+const expressSecurityEslintRules: Rules = {
   "express-security/no-cors-credentials-wildcard": "error",
   "express-security/no-express-unsafe-regex-route": "error",
   "express-security/no-graphql-introspection-production": "error",
