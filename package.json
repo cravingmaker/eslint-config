@@ -97,7 +97,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
-    "@cravingmaker/prettier-config": "0.1.12",
+    "@cravingmaker/prettier-config": "0.3.1",
     "@html-eslint/eslint-plugin-react": "0.66.1",
     "@html-eslint/eslint-plugin-svelte": "0.66.1",
     "@types/eslint-plugin-security": "3.0.1",
