@@ -2,7 +2,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { importPeer } from "../../src/utilities/import-peer.js";
+import {
+  importOptionalPeer,
+  importPeer,
+} from "../../src/utilities/import-peer.js";
 
 describe("importPeer", () => {
   it("imports an installed peer", async () => {
@@ -42,5 +45,29 @@ describe("importPeer", () => {
     await expect(
       importPeer("eslint-plugin-react-refresh/not-exported", "react"),
     ).rejects.toHaveProperty("code", "ERR_PACKAGE_PATH_NOT_EXPORTED");
+  });
+});
+
+describe("importOptionalPeer", () => {
+  it("imports an installed peer", async () => {
+    const module = await importOptionalPeer<{
+      readonly reactRefresh?: unknown;
+    }>("eslint-plugin-react-refresh");
+
+    expect(module?.reactRefresh).toBeDefined();
+  });
+
+  it("returns undefined when the peer is missing", async () => {
+    await expect(
+      importOptionalPeer("@cravingmaker/eslint-config-missing-peer"),
+    ).resolves.toBeUndefined();
+  });
+
+  it("does not catch an error that the peer throws while it loads", async () => {
+    await expect(
+      importOptionalPeer(
+        "data:text/javascript,throw new Error('broken optional peer')",
+      ),
+    ).rejects.toThrow("broken optional peer");
   });
 });

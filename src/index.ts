@@ -1,8 +1,4 @@
 import type { Linter } from "eslint";
-import type pluginReactHooks from "eslint-plugin-react-hooks";
-import type { reactRefresh as ReactRefreshPlugin } from "eslint-plugin-react-refresh";
-import type eslintPluginHtmlReact from "@html-eslint/eslint-plugin-react";
-import type { parser as tseslintParser } from "typescript-eslint";
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -12,6 +8,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import globalVariables from "globals";
 
 import { comments } from "./configs/comments.js";
+import { express } from "./configs/express.js";
 import { functional } from "./configs/functional.js";
 import { html } from "./configs/html.js";
 import { imports } from "./configs/imports.js";
@@ -22,8 +19,10 @@ import { node } from "./configs/node.js";
 import { packageJson } from "./configs/package-json.js";
 import { perfectionist } from "./configs/perfectionist.js";
 import { promise } from "./configs/promise.js";
+import { react } from "./configs/react.js";
 import { regexp } from "./configs/regexp.js";
 import { security } from "./configs/security.js";
+import { svelte } from "./configs/svelte.js";
 import { typescript } from "./configs/typescript/index.js";
 import { unicorn } from "./configs/unicorn.js";
 import { unusedImports } from "./configs/unused-imports.js";
@@ -68,122 +67,6 @@ type RulesOptions = {
   readonly ts?: Linter.RulesRecord;
 };
 
-async function buildExpressConfig(
-   
-  ruleOverrides: Readonly<Linter.RulesRecord>,
-): Promise<Linter.Config | undefined> {
-  const plugin = await tryImport<{
-    default: NonNullable<Linter.Config["plugins"]>[string];
-  }>("eslint-plugin-express-security");
-  if (plugin === undefined) return undefined;
-  const { expressRules } = await import("./configs/express.js");
-  return {
-    files: ["**/*.{js,mjs,ts,mts}"],
-    name: "@cravingmaker/eslint-config/express",
-    plugins: { "express-security": plugin.default },
-    rules: { ...expressRules, ...ruleOverrides },
-  };
-}
-async function buildReactConfig(
-  variant: "generic" | "next" | "vite",
-   
-  ruleOverrides: Readonly<Linter.RulesRecord>,
-): Promise<readonly Linter.Config[]> {
-  const [htmlReactPlugin, hooksPlugin, refreshModule] = await Promise.all([
-    tryImport<{ default: typeof eslintPluginHtmlReact }>(
-      "@html-eslint/eslint-plugin-react",
-    ),
-    tryImport<{ default: typeof pluginReactHooks }>(
-      "eslint-plugin-react-hooks",
-    ),
-    tryImport<{ reactRefresh: typeof ReactRefreshPlugin }>(
-      "eslint-plugin-react-refresh",
-    ),
-  ]);
-
-  const [htmlReactRulesModule, hooksRulesModule, refreshRulesModule] =
-    await Promise.all([
-      htmlReactPlugin === undefined
-        ? undefined
-        : import("./rules/html/html-react.js"),
-      hooksPlugin === undefined
-        ? undefined
-        : import("./rules/react/react-hooks.js"),
-      refreshModule === undefined
-        ? undefined
-        : import("./rules/react/react-refresh.js"),
-    ]);
-
-  const reactConfigs: Array<Linter.Config | undefined> = [
-    htmlReactPlugin === undefined || htmlReactRulesModule === undefined
-      ? undefined
-      : {
-          files: ["**/*.{jsx,mjsx,tsx,mtsx}"],
-          name: "@cravingmaker/eslint-config/react/html",
-          plugins: { "@html-eslint/react": htmlReactPlugin.default },
-          rules: {
-            ...htmlReactRulesModule.htmlReactEslintRules,
-            ...ruleOverrides,
-          },
-        },
-    hooksPlugin === undefined || hooksRulesModule === undefined
-      ? undefined
-      : {
-          files: ["**/*.{jsx,mjsx,tsx,mtsx}"],
-          name: "@cravingmaker/eslint-config/react/hooks",
-          plugins: {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint-plugin-react-hooks configs.flat shape is not assignable to Linter.Plugin without assertion
-            "react-hooks": hooksPlugin.default as unknown as NonNullable<
-              Linter.Config["plugins"]
-            >[string],
-          },
-          rules: {
-            ...hooksRulesModule.reactHooksEslintRules,
-            ...ruleOverrides,
-          },
-        },
-    refreshModule === undefined || refreshRulesModule === undefined
-      ? undefined
-      : {
-          files: ["**/*.{jsx,mjsx,tsx,mtsx}"],
-          name: "@cravingmaker/eslint-config/react/refresh",
-          plugins: { "react-refresh": refreshModule.reactRefresh.plugin },
-          rules: {
-            ...refreshRulesModule.getReactRefreshEslintRules(variant),
-            ...ruleOverrides,
-          },
-        },
-  ];
-  return reactConfigs.filter((c): c is Linter.Config => c !== undefined);
-}
-async function buildSvelteConfig(
-   
-  globals: Readonly<Linter.Globals>,
-   
-  ruleOverrides: Readonly<Linter.RulesRecord>,
-  tsParser: typeof tseslintParser,
-): Promise<Linter.Config | undefined> {
-  const [plugin, svelteParserModule] = await Promise.all([
-    tryImport<{ default: Record<string, unknown> }>(
-      "@html-eslint/eslint-plugin-svelte",
-    ),
-    tryImport<{ default: Linter.Parser }>("svelte-eslint-parser"),
-  ]);
-  if (plugin === undefined || svelteParserModule === undefined)
-    return undefined;
-  const { htmlSvelteEslintRules } = await import("./rules/html/html-svelte.js");
-  return {
-    files: ["**/*.{svelte,svelte.js,svelte.mjs,svelte.ts,svelte.mts}"],
-    languageOptions: {
-      globals,
-      parser: svelteParserModule.default,
-      parserOptions: { parser: tsParser },
-    },
-    name: "@cravingmaker/eslint-config/svelte",
-    plugins: { "@html-eslint/svelte": plugin.default },
-    rules: { ...htmlSvelteEslintRules, ...ruleOverrides },
-  };
-}
 async function detectReactRefreshVariant(
   projectRootDirectory: string,
 ): Promise<"generic" | "next" | "vite"> {
@@ -212,7 +95,7 @@ async function detectReactRefreshVariant(
 }
 function resolveGlobalVariables(
   environments: readonly GlobalEnvironment[],
-   
+
   globals: Readonly<Linter.Globals>,
 ): Readonly<Linter.Globals> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- Object.assign widens the globals package's environment-record union through its external CommonJS typings.
@@ -225,20 +108,6 @@ function resolveGlobalVariables(
   );
   const builtinGlobals: Readonly<Linter.Globals> = globalVariables.builtin;
   return { ...builtinGlobals, ...environmentGlobals, ...globals };
-}
-function resolveOptionalImport(specifier: string): string | undefined {
-  try {
-    return import.meta.resolve(specifier);
-  } catch (error) {
-    if (
-      Error.isError(error) &&
-      "code" in error &&
-      error.code === "ERR_MODULE_NOT_FOUND"
-    )
-      return undefined;
-    // eslint-disable-next-line functional/no-throw-statements -- Unexpected resolution failures must remain visible.
-    throw error;
-  }
 }
 // eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
 function resolveRules(rules: RulesOptions): ResolvedRules {
@@ -255,13 +124,6 @@ function resolveRules(rules: RulesOptions): ResolvedRules {
     svelte: rules.svelte ?? {},
     ts: rules.ts ?? {},
   };
-}
-async function tryImport<T>(specifier: string): Promise<T | undefined> {
-  const resolvedSpecifier = resolveOptionalImport(specifier);
-  if (resolvedSpecifier === undefined) return undefined;
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- dynamic import cannot be statically typed
-  return (await import(resolvedSpecifier)) as T;
 }
 
 export async function createConfig({
@@ -301,20 +163,18 @@ export async function createConfig({
   const resolvedVariant =
     reactRefreshVariant ??
     (await detectReactRefreshVariant(projectRootDirectory));
-  const tseslint = await import("typescript-eslint");
-  const tsConfigs = await typescript({ overrides: tsRuleOverrides }, context);
-
-  const [reactConfigs, svelteConfig, expressConfig] = await Promise.all([
-    buildReactConfig(resolvedVariant, reactRuleOverrides),
-    buildSvelteConfig(resolvedGlobals, svelteRuleOverrides, tseslint.parser),
-    buildExpressConfig(expressRuleOverrides),
-  ]);
+  const [tsConfigs, reactConfigs, svelteConfigs, expressConfigs] =
+    await Promise.all([
+      typescript({ overrides: tsRuleOverrides }, context),
+      react({ overrides: reactRuleOverrides, refresh: resolvedVariant }),
+      svelte({ overrides: svelteRuleOverrides }, context),
+      express({ overrides: expressRuleOverrides }),
+    ]);
   const optionalConfigs = [
     ...tsConfigs,
     ...reactConfigs,
-    ...[expressConfig, svelteConfig].filter(
-      (c): c is Linter.Config => c !== undefined,
-    ),
+    ...svelteConfigs,
+    ...expressConfigs,
   ];
 
   return defineConfig([
