@@ -22,8 +22,23 @@ The suites turn every framework on, and every optional peer is installed in this
 repository, so these snapshots describe the configuration with all integrations
 active. Update them with `vitest -u` only after reviewing the diff: a changed
 line is a changed lint policy.
+
+The narrowed-owners suite limits each feature that replaces rules of other
+features to `src/`, and records files outside it.
 */
 const suites = [
+  {
+    filePaths: ["scripts/example.js", "scripts/example.ts"],
+    name: "narrowed-owners",
+    options: {
+      ...baseOptions,
+      imports: { files: ["src/**"] },
+      perfectionist: { files: ["src/**"] },
+      regexp: { files: ["src/**"] },
+      unicorn: { files: ["src/**"] },
+      unusedImports: { files: ["src/**"] },
+    },
+  },
   {
     filePaths: [
       "src/example.js",
