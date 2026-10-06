@@ -13,7 +13,7 @@ linterOptions:
   reportUnusedDisableDirectives: 1
 settings:
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 926 (error 767, off 143, warn 16)
+rules: 926 (error 765, off 145, warn 16)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -185,12 +185,12 @@ functional/immutable-data: error
 functional/no-class-inheritance: error
 functional/no-classes: error
 functional/no-conditional-statements: error [{"allowReturningBranches":true}]
-functional/no-expression-statements: error [{"ignoreVoid":true}]
+functional/no-expression-statements: off [{"ignoreVoid":true}]
 functional/no-let: error [{"allowInForLoopInit":true}]
 functional/no-loop-statements: error
 functional/no-mixed-types: error
 functional/no-promise-reject: error
-functional/no-return-void: error
+functional/no-return-void: off
 functional/no-this-expressions: off
 functional/no-throw-statements: error
 functional/no-try-statements: off

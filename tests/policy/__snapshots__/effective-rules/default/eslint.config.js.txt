@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 799 (error 679, off 105, warn 15)
+rules: 799 (error 678, off 106, warn 15)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -95,7 +95,7 @@ import-x/no-amd: error
 import-x/no-anonymous-default-export: error
 import-x/no-commonjs: error [{"allowConditionalRequire":false,"allowPrimitiveModules":false,"allowRequire":false}]
 import-x/no-cycle: off
-import-x/no-default-export: error
+import-x/no-default-export: off
 import-x/no-deprecated: error
 import-x/no-duplicates: error
 import-x/no-dynamic-require: error

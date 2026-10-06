@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-unsafe-type-assertion, functional/no-expression-statements, functional/no-return-void, functional/prefer-immutable-types, perfectionist/sort-arrays, perfectionist/sort-modules, perfectionist/sort-objects, security/detect-non-literal-fs-filename, security/detect-object-injection -- Package contract tests intentionally inspect dynamic repository manifest data and assert its published shape. */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-unsafe-type-assertion, functional/prefer-immutable-types, perfectionist/sort-arrays, perfectionist/sort-modules, perfectionist/sort-objects, security/detect-non-literal-fs-filename, security/detect-object-injection -- Package contract tests intentionally inspect dynamic repository manifest data and assert its published shape. */
 
 import { readFile } from "node:fs/promises";
 

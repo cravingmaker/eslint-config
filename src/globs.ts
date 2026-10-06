@@ -33,8 +33,15 @@ const jsoncFiles = [
 ] as const;
 const json5Files = ["**/*.json5"] as const;
 
+// Test files, named with the infix that test runners look for. Like `configFiles`, this matches
+// any file type; `configs/exceptions.ts` narrows both to `sourceFiles`.
+const testFiles = ["**/*.{test,spec}.*"] as const;
+// Config files of tools such as ESLint, Vite, and Vitest.
+const configFiles = ["**/*.config.*"] as const;
+
 export {
   commonjsFiles,
+  configFiles,
   expressFiles,
   htmlFiles,
   javascriptFiles,
@@ -48,5 +55,6 @@ export {
   reactFiles,
   sourceFiles,
   svelteFiles,
+  testFiles,
   typescriptFiles,
 };

@@ -4,6 +4,7 @@ import type { Options } from "./types.js";
 import { defineConfig } from "eslint/config";
 
 import { comments } from "./configs/comments.js";
+import { exceptions } from "./configs/exceptions.js";
 import { express } from "./configs/express.js";
 import { functional } from "./configs/functional.js";
 import { html } from "./configs/html.js";
@@ -31,8 +32,8 @@ import { overlapConfigs } from "./overlaps.js";
 Builds the ESLint flat config. Every feature is on unless it is `false`, except `react`,
 `svelte`, and `express`, which are on when the project uses them. The blocks come in a fixed
 order: global ignores, JavaScript and the code-quality plugins, TypeScript, frameworks, file
-formats, and the rules that other features replace, followed by `userConfigs` in the order
-given.
+formats, the rules that other features replace, and the rules that test and config files turn
+off, followed by `userConfigs` in the order given.
 */
 async function createConfig(
   options: Options = {},
@@ -91,6 +92,7 @@ async function createConfig(
     ...(resolved.markdown === undefined ? [] : markdown(resolved.markdown)),
 
     ...overlapConfigs(resolved),
+    ...exceptions(resolved),
 
     ...userConfigs,
   ]);

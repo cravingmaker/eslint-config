@@ -1,4 +1,4 @@
-/* eslint-disable functional/no-expression-statements, functional/no-return-void, security/detect-non-literal-fs-filename -- Vitest suites are side-effect driven, and the fixtures are written to a temporary directory. */
+/* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
 
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
