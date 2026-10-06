@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 310 (error 215, off 80, warn 15)
+rules: 310 (error 230, off 65, warn 15)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -89,22 +89,22 @@ max-params: error [{"max":4}]
 max-statements: off [10]
 n/callback-return: error
 n/exports-style: off
-n/file-extension-in-import: off
+n/file-extension-in-import: error
 n/global-require: off
 n/handle-callback-err: error
 n/hashbang: error [{"executableMap":{".js":"node",".mjs":"node"},"ignoreUnpublished":true}]
 n/no-callback-literal: error
 n/no-deprecated-api: error [{"ignoreIndirectDependencies":true}]
 n/no-exports-assign: off
-n/no-extraneous-import: off
+n/no-extraneous-import: error
 n/no-extraneous-require: off
-n/no-missing-import: off
+n/no-missing-import: error
 n/no-missing-require: off
 n/no-mixed-requires: off
 n/no-new-require: off
 n/no-path-concat: error
 n/no-process-env: warn [{"allowedVariables":["NODE_ENV"]}]
-n/no-process-exit: off
+n/no-process-exit: error
 n/no-restricted-import: off
 n/no-restricted-require: off
 n/no-sync: error [{"allowAtRootLevel":true,"ignores":[]}]
@@ -125,7 +125,7 @@ n/prefer-global/timers: error
 n/prefer-global/url: error
 n/prefer-global/url-search-params: error
 n/prefer-import/assert-strict: error
-n/prefer-node-protocol: off
+n/prefer-node-protocol: error
 n/prefer-process-get-builtin-module: error
 n/prefer-promises/dns: error
 n/prefer-promises/fs: error
@@ -156,10 +156,10 @@ no-dupe-class-members: error
 no-dupe-else-if: error
 no-dupe-keys: error
 no-duplicate-case: error
-no-duplicate-imports: off [{"allowSeparateTypeImports":false,"includeExports":false}]
+no-duplicate-imports: error [{"allowSeparateTypeImports":false,"includeExports":false}]
 no-else-return: error [{"allowElseIf":false}]
 no-empty: error [{"allowEmptyCatch":true}]
-no-empty-character-class: off
+no-empty-character-class: error
 no-empty-function: error [{"allow":[]}]
 no-empty-pattern: error [{"allowObjectPatternsAsParameters":false}]
 no-empty-static-block: error
@@ -179,7 +179,7 @@ no-implied-eval: error
 no-import-assign: error
 no-inline-comments: off [{}]
 no-inner-declarations: error ["functions",{"blockScopedFunctions":"allow"}]
-no-invalid-regexp: off [{}]
+no-invalid-regexp: error [{}]
 no-invalid-this: off [{"capIsConstructor":true}]
 no-irregular-whitespace: error [{"skipComments":false,"skipJSXText":false,"skipRegExps":false,"skipStrings":true,"skipTemplates":false}]
 no-iterator: error
@@ -193,8 +193,8 @@ no-magic-numbers: off [{"detectObjects":false,"enforceConst":false,"ignore":[],"
 no-misleading-character-class: error [{"allowEscape":false}]
 no-multi-assign: error [{"ignoreNonDeclaration":false}]
 no-multi-str: error
-no-negated-condition: off
-no-nested-ternary: off
+no-negated-condition: error
+no-nested-ternary: error
 no-new: error
 no-new-func: error
 no-new-native-nonconstructor: error
@@ -245,10 +245,10 @@ no-unsafe-optional-chaining: error [{"disallowArithmeticOperators":true}]
 no-unused-expressions: error [{"allowShortCircuit":true,"allowTaggedTemplates":true,"allowTernary":true,"enforceForJSX":true,"ignoreDirectives":false}]
 no-unused-labels: error
 no-unused-private-class-members: error
-no-unused-vars: off [{"args":"after-used","argsIgnorePattern":"^_","caughtErrors":"all","caughtErrorsIgnorePattern":"^_","destructuredArrayIgnorePattern":"^_","ignoreClassWithStaticInitBlock":false,"ignoreRestSiblings":true,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"vars":"all","varsIgnorePattern":"^_"}]
+no-unused-vars: error [{"args":"after-used","argsIgnorePattern":"^_","caughtErrors":"all","caughtErrorsIgnorePattern":"^_","destructuredArrayIgnorePattern":"^_","ignoreClassWithStaticInitBlock":false,"ignoreRestSiblings":true,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"vars":"all","varsIgnorePattern":"^_"}]
 no-use-before-define: error [{"allowNamedExports":false,"classes":true,"enums":true,"functions":true,"ignoreTypeReferences":true,"typedefs":true,"variables":true}]
 no-useless-assignment: off
-no-useless-backreference: off
+no-useless-backreference: error
 no-useless-call: error
 no-useless-catch: error
 no-useless-computed-key: error [{"enforceForClassMembers":true}]
@@ -259,7 +259,7 @@ no-useless-rename: error [{"ignoreDestructuring":false,"ignoreExport":false,"ign
 no-useless-return: error
 no-var: error
 no-void: error [{"allowAsStatement":false}]
-no-warning-comments: off [{"location":"start","terms":["todo","fixme","xxx"]}]
+no-warning-comments: error [{"location":"start","terms":["todo","fixme","xxx"]}]
 no-with: error
 object-shorthand: error ["always",{"avoidExplicitReturnArrows":true,"avoidQuotes":false,"ignoreConstructors":false}]
 one-var: error ["never"]
@@ -314,8 +314,8 @@ security/detect-object-injection: warn
 security/detect-possible-timing-attacks: warn
 security/detect-pseudoRandomBytes: warn
 security/detect-unsafe-regex: warn
-sort-imports: off [{"allowSeparatedGroups":false,"ignoreCase":false,"ignoreDeclarationSort":false,"ignoreMemberSort":false,"memberSyntaxSortOrder":["none","all","multiple","single"]}]
-sort-keys: off ["asc",{"allowLineSeparatedGroups":false,"caseSensitive":true,"ignoreComputedKeys":false,"minKeys":2,"natural":false}]
+sort-imports: error [{"allowSeparatedGroups":false,"ignoreCase":false,"ignoreDeclarationSort":false,"ignoreMemberSort":false,"memberSyntaxSortOrder":["none","all","multiple","single"]}]
+sort-keys: error ["asc",{"allowLineSeparatedGroups":false,"caseSensitive":true,"ignoreComputedKeys":false,"minKeys":2,"natural":false}]
 sort-vars: off [{"ignoreCase":false}]
 strict: off ["safe"]
 symbol-description: error

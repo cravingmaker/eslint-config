@@ -25,6 +25,21 @@ const withoutOwner = {
 const optionsWithoutOwner = new Map<string, Options>(
   Object.entries(withoutOwner),
 );
+// The options that limit each owner to `src/` and leave its generated files out.
+const ownerScope = {
+  files: ["src/**"],
+  ignores: ["**/*.generated.*"],
+} as const;
+const withNarrowedOwner = {
+  imports: { ...baseOptions, imports: ownerScope },
+  perfectionist: { ...baseOptions, perfectionist: ownerScope },
+  regexp: { ...baseOptions, regexp: ownerScope },
+  unicorn: { ...baseOptions, unicorn: ownerScope },
+  unusedImports: { ...baseOptions, unusedImports: ownerScope },
+} as const satisfies Readonly<Record<keyof typeof overlaps, Options>>;
+const optionsWithNarrowedOwner = new Map<string, Options>(
+  Object.entries(withNarrowedOwner),
+);
 const cases = Object.entries(overlaps).flatMap(([owner, replacedRules]) =>
   Object.entries(replacedRules).map(([replaced, ownerRules]) => ({
     owner,
@@ -67,6 +82,33 @@ describe("overlap table", () => {
       ).toBe(true);
       expect(ownerOff.get(replaced)?.[0]).toBe(2);
       expect(ownerRules.filter((ruleId) => ownerOff.has(ruleId))).toEqual([]);
+    },
+  );
+
+  it.each(cases)(
+    "$owner replaces $replaced only in its own files, without its ignores",
+    async ({ owner, ownerRules, replaced }) => {
+      const extension = featureOf(replaced) === "typescript" ? "ts" : "js";
+      const options = optionsWithNarrowedOwner.get(owner) ?? {};
+      const [inside, outside, ignored] = await Promise.all(
+        [
+          `src/example.${extension}`,
+          `scripts/example.${extension}`,
+          `src/example.generated.${extension}`,
+        ].map(async (filePath) => await getRules(options, filePath)),
+      );
+
+      expect(inside.get(replaced)?.[0]).toBe(0);
+      expect(
+        ownerRules.some((ruleId) => (inside.get(ruleId)?.[0] ?? 0) !== 0),
+      ).toBe(true);
+      expect(outside.get(replaced)?.[0]).toBe(2);
+      expect(ignored.get(replaced)?.[0]).toBe(2);
+      expect(
+        ownerRules.filter(
+          (ruleId) => outside.has(ruleId) || ignored.has(ruleId),
+        ),
+      ).toEqual([]);
     },
   );
 

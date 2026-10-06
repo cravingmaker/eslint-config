@@ -1,8 +1,10 @@
 import type { Linter } from "eslint";
 import type { ResolvedOptions } from "./options.js";
+import type { FeatureOptions } from "./types.js";
 
 import { sourceFiles, typescriptFiles } from "./globs.js";
 import { resolveOptions } from "./options.js";
+import { narrowFiles } from "./utilities/type-aware.js";
 
 /**
 A feature whose rules replace rules of other features.
@@ -16,8 +18,8 @@ type ReplacedFeature = "imports" | "javascript" | "node" | "typescript";
 
 /**
 Each owner, the rules it replaces, and its own rules that cover them. A replaced rule is on in
-its own feature's rule map. While its owner is on, the factory turns it off, unless the user sets
-it in that feature's overrides.
+its own feature's rule map. While its owner is on, the factory turns it off in the files that
+both features lint, unless the user sets it in that feature's overrides.
 */
 const overlaps: Readonly<
   Record<Owner, Readonly<Record<string, readonly string[]>>>
@@ -72,20 +74,47 @@ function featureOf(ruleId: string): ReplacedFeature | undefined {
   return featuresByPlugin.get(ruleId.slice(0, slash));
 }
 /**
-Builds the blocks that turn off replaced rules: one for each feature that holds such rules,
-over that feature's files, with every replaced rule whose owner is on and that the feature's
-overrides do not set.
+Whether a feature's options give it files or ignores of its own.
+*/
+function hasOwnScope({ files, ignores = [] }: FeatureOptions): boolean {
+  return files !== undefined || ignores.length > 0;
+}
+/**
+Builds the blocks that turn off replaced rules where their owner lints, for each feature that
+holds such rules. The rules of every owner that keeps its default scope are off in one block
+over that feature's files. An owner with files or ignores of its own gets a block that is
+narrowed to them. A rule that the holding feature's overrides set stays on.
 */
 function overlapConfigs(
   options: ResolvedOptions = resolveOptions(),
 ): Linter.Config[] {
-  const replacedRuleIds = [
-    options.imports === undefined ? {} : overlaps.imports,
-    options.perfectionist === undefined ? {} : overlaps.perfectionist,
-    options.regexp === undefined ? {} : overlaps.regexp,
-    options.unicorn === undefined ? {} : overlaps.unicorn,
-    options.unusedImports === undefined ? {} : overlaps.unusedImports,
-  ].flatMap((replacedRules) => Object.keys(replacedRules));
+  const owners = [
+    {
+      name: "imports",
+      replacedRules: overlaps.imports,
+      settings: options.imports,
+    },
+    {
+      name: "perfectionist",
+      replacedRules: overlaps.perfectionist,
+      settings: options.perfectionist,
+    },
+    {
+      name: "regexp",
+      replacedRules: overlaps.regexp,
+      settings: options.regexp,
+    },
+    {
+      name: "unicorn",
+      replacedRules: overlaps.unicorn,
+      settings: options.unicorn,
+    },
+    {
+      name: "unused-imports",
+      replacedRules: overlaps.unusedImports,
+      settings: options.unusedImports,
+    },
+  ];
   const scopes = [
     {
       defaultFiles: sourceFiles,
@@ -117,24 +146,54 @@ function overlapConfigs(
   ];
 
   return scopes.flatMap(({ defaultFiles, feature, overrides, settings }) => {
-    const ruleIds = replacedRuleIds.filter(
-      (ruleId) =>
-        featureOf(ruleId) === feature &&
-        !Object.hasOwn(overrides ?? {}, ruleId),
+    if (settings === undefined) return [];
+
+    const files = settings.files ?? defaultFiles;
+    const ignores = settings.ignores ?? [];
+    const replaced = owners.flatMap(
+      ({ name, replacedRules, settings: ownerSettings }) => {
+        const ruleIds = Object.keys(replacedRules).filter(
+          (ruleId) =>
+            featureOf(ruleId) === feature &&
+            !Object.hasOwn(overrides ?? {}, ruleId),
+        );
+        if (ownerSettings === undefined || ruleIds.length === 0) return [];
+        return [{ name, ownerSettings, ruleIds }];
+      },
     );
-    if (settings === undefined || ruleIds.length === 0) return [];
+    const sharedRuleIds = replaced
+      .filter(({ ownerSettings }) => !hasOwnScope(ownerSettings))
+      .flatMap(({ ruleIds }) => ruleIds);
 
     return [
-      {
-        files: [...(settings.files ?? defaultFiles)],
-        ignores: [...(settings.ignores ?? [])],
-        name: `@cravingmaker/eslint-config/overlaps/${feature}`,
-        rules: Object.fromEntries(
-          ruleIds.map((ruleId): readonly [string, "off"] => [ruleId, "off"]),
-        ),
-      },
+      ...(sharedRuleIds.length === 0
+        ? []
+        : [
+            {
+              files: [...files],
+              ignores: [...ignores],
+              name: `@cravingmaker/eslint-config/overlaps/${feature}`,
+              rules: turnOff(sharedRuleIds),
+            },
+          ]),
+      ...replaced
+        .filter(({ ownerSettings }) => hasOwnScope(ownerSettings))
+        .map(({ name, ownerSettings, ruleIds }) => ({
+          files: narrowFiles(files, ownerSettings.files),
+          ignores: [...ignores, ...(ownerSettings.ignores ?? [])],
+          name: `@cravingmaker/eslint-config/overlaps/${feature}/${name}`,
+          rules: turnOff(ruleIds),
+        })),
     ];
   });
+}
+/**
+Rule settings that turn each of `ruleIds` off, keeping the options of earlier blocks.
+*/
+function turnOff(ruleIds: readonly string[]): Linter.RulesRecord {
+  return Object.fromEntries(
+    ruleIds.map((ruleId): readonly [string, "off"] => [ruleId, "off"]),
+  );
 }
 
 export { featureOf, overlapConfigs, overlaps };
