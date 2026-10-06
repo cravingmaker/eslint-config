@@ -1,6 +1,6 @@
 # Rewrite implementation plan
 
-Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stages 1–5 are not started.
+Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stage 1 is done. Stages 2–5 are not started.
 
 To continue the work, start with [handoff.md](./handoff.md). It explains how to pick up a stage and how to run one in a Claude Code cloud session.
 
@@ -218,7 +218,7 @@ Three commits; `npm run validate` passes with 30 test files and 191 tests.
 
 One problem surfaced and is unresolved. `functional/prefer-immutable-types` reports different results depending on which files are linted together. On the baseline, `eslint .` passes, but `eslint tests/rule-coverage.test.ts` alone reports two errors, so the pre-commit hook can reject a commit that touches only that file. The helpers in `tests/rule-overlaps.test.ts` were rewritten to avoid the affected parameter types. The rule's `parameters: ReadonlyDeep` option is decided in stage 3.
 
-### Stage 1: foundation
+### Stage 1: foundation (done)
 
 1. `scripts/typegen.ts` runs `pluginsToRulesDTS` from `eslint-typegen` over the core rules and every plugin, including the optional peers. It writes `src/typegen.d.ts`, which is ignored by git and produced by `npm run gen`. `gen` runs before `build`, `typecheck`, and `validate`. The file is not committed because Dependabot pull requests cannot regenerate it.
 2. `types.ts`: `Rules` from the generated types, plus `FeatureOptions`, `Options`, and `Context`.
@@ -227,6 +227,22 @@ One problem surfaced and is unresolved. `functional/prefer-immutable-types` repo
 5. `npm run inspect`, using `@eslint/config-inspector` as a dev dependency.
 
 Gate: snapshots unchanged; `attw` and Publint still pass with the generated types; the root import works without optional peers.
+
+Twelve commits; `npm run validate` passes with 36 test files and 254 tests. What stage 2 needs to know:
+
+- **One approved snapshot change.** Typing the rule maps exposed three disabled core rules whose options their schemas reject: `capitalized-comments`, `no-console`, and `no-restricted-globals`. ESLint does not validate a rule that is off, but a later config that enables one with only a severity keeps those options, and ESLint then rejects the configuration. The maintainer approved fixing them in stage 1, in their own commit, which changes 30 lines in 10 snapshot files. `tests/policy/rule-options.test.ts` enables every rule that is off from a later config, so a new case fails the suite.
+- **Generated types.** `src/typegen.d.ts` is ignored by git, by Prettier, and by this repository's ESLint config. `tests/typegen.test.ts` checks that every rule the configuration sets has a declaration and that the file compiles with `skipLibCheck: false`. `scripts/typegen.ts` removes one declaration that json-schema-to-typescript repeats.
+- **The published declarations grow when the options become public.** Nothing public uses the generated types yet, so `dist/index.d.mts` is unchanged. Exporting `Options` and `Rules` from the root, tried and not committed, inlines all 1,302 rule declarations: the file grows from 1.4 KB to about 670 KB, Publint and attw pass, and a consumer without optional peers type-checks both types with `skipLibCheck: false`.
+- **`Rules` is not a `Linter.RulesRecord`.** Its generated properties are optional, so a value can be `undefined`. Code that takes a rule map accepts `Rules` or `Linter.Config["rules"]`, as `buildTsConfig` now does.
+- **Option objects that hold arrays use `satisfies RuleOptionOf<"<rule>">`, not `as const`.** `as const` makes arrays readonly, which ESLint's rule entry type rejects, and perfectionist sorts the elements of `as const` arrays; `enableAllRules` builds `[ruleId, "error"]` without it for that reason. The RegExp in `unicorn/filename-case` keeps a described `@ts-expect-error`, because the generated type cannot express it.
+- **The new modules are not used yet.** `createConfig` does not import them, and the bundle does not contain them.
+  - `resolveOptions(options, detection)` resolves `"auto"` from the `Detection` that its caller passes. For identical results, detect the way 0.1.0 does: a framework block is added when its peers are installed, each React block depends only on its own plugin, and React Refresh falls back to `"generic"`. Reading the declared dependencies instead, and turning Refresh off without a known bundler, is F8 in stage 3.
+  - `createContext(options)` reads the declared dependencies as 0.1.0 does, including treating a missing or invalid manifest as empty. `detectReactRefreshVariant(dependencies)` replaces the function of the same name in `src/index.ts`, which takes a directory.
+  - `importPeer(packageName, feature)` fails on a missing peer. Calling it where 0.1.0 skips a missing peer is F1 in stage 3.
+  - `enableAllRules` returns what `getPluginRules` returns at every current call site.
+  - `typescriptFiles` in `globs.ts` repeats the glob that `src/index.ts` writes inline.
+- **Builder parameters and `functional/prefer-immutable-types`.** A parameter typed `Context`, `Options`, `FeatureOptions`, `Rules`, or a readonly record such as `Readonly<Linter.Globals>` is reported or not depending on which files are linted together. `context: Context` passed when linted alone and failed with all of `src/` or the whole repository, also with the globals as a `ReadonlyMap`. With `ignoreInferredTypes: true`, the rule skips a parameter that has a default value, because the default moves the type annotation off the parameter node. The new modules rely on that, and a builder declared as `(options: FeatureOptions = {}, context: Context = <default>)` passed in all three runs. The other way out is a repository-only `ignoreTypePattern` in `eslint.config.js`; the published options stay a stage 3 decision.
+- **`npm run inspect`** builds the package and starts the config inspector, which loads 23 config items and 1,302 rules. Use it to compare block names and order while composition moves into `factory.ts`.
 
 ### Stage 2: extraction with identical results
 
