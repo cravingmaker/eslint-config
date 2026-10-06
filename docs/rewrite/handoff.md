@@ -7,7 +7,7 @@ This document lets a new session, local or cloud, continue the rewrite of `@crav
 - **Released:** 0.1.0 is on npm. It has the pre-rewrite structure: one large `src/index.ts` plus rule maps under `src/rules/`.
 - **Done:** stage 0. The effective lint policy is snapshotted in `tests/policy/`, and the core JavaScript rules live in `src/configs/javascript/` behind an internal `javascript()` builder.
 - **Next:** stage 1 (foundation), then stages 2–5 in order. Each stage depends on the one before it.
-- **Waiting for the maintainer:** the two pending decisions in the plan. Follow the stated recommendation until they are answered.
+- **Decisions:** every design question in the plan is settled. Nothing is waiting for the maintainer.
 
 ## Working on a stage
 
@@ -24,7 +24,7 @@ Work on one stage per session and one pull request per stage.
 Stop and ask the maintainer when:
 
 - a snapshot changes during stage 1 or 2;
-- the work needs a decision the plan lists as pending, or one it does not cover;
+- the work needs a decision the plan does not cover;
 - the work needs a dependency the plan does not name.
 
 ### Snapshot rules
