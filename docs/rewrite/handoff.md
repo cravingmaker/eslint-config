@@ -55,7 +55,7 @@ Stop and ask the maintainer when:
 
 ## Continuing in a Claude Code cloud session
 
-This section is for the maintainer. It describes the setup once and then the routine per stage. The setup script below has not been run in a cloud session yet, so check the first session's startup log.
+This section is for the maintainer. It describes the setup once and then the routine per stage. The setup script below was verified in a cloud session on 6 October 2026.
 
 ### One-time setup
 
@@ -80,10 +80,9 @@ This section is for the maintainer. It describes the setup once and then the rou
    mkdir -p /opt/node24
    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.gz" \
      | tar -xz --strip-components=1 -C /opt/node24
-   ln -sf /opt/node24/bin/node /opt/node24/bin/npm /opt/node24/bin/npx /usr/local/bin/
    ```
 
-   The script runs as root before Claude Code starts, and its result is cached for later sessions. If you skip it, the session still works: `CLAUDE.md` tells Claude to check the Node.js version and install 24 itself, which costs a minute at the start of every session.
+   The script runs as root before Claude Code starts, and its result is cached for later sessions. It installs Node.js 24 next to the bundled versions and does not change the default: `node --version` still prints 22, because the bundled Node.js comes first on `PATH`. `CLAUDE.md` tells Claude to put `/opt/node24/bin` first on `PATH` in every command, and shell state does not carry over between commands, so that prefix is needed each time. If you skip the script, the session still works: Claude installs Node.js 24 itself, which costs a minute at the start of every session.
 
 ### Start a session for a stage
 
