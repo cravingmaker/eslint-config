@@ -31,6 +31,12 @@ function isModuleNotFound(error: unknown): boolean {
     error.code === "ERR_MODULE_NOT_FOUND"
   );
 }
+/**
+Whether an optional peer dependency is installed where this package can import it.
+*/
+function isPeerInstalled(packageName: string): boolean {
+  return resolveOptionalPeer(packageName) !== undefined;
+}
 function resolveOptionalPeer(packageName: string): string | undefined {
   try {
     return import.meta.resolve(packageName);
@@ -54,4 +60,4 @@ function resolvePeer(packageName: string, feature: string): string {
   }
 }
 
-export { importOptionalPeer, importPeer };
+export { importOptionalPeer, importPeer, isPeerInstalled };

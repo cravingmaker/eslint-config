@@ -25,8 +25,7 @@ type RulePlugin = {
 async function getEffectiveConfig(filePath: string): Promise<EffectiveConfig> {
   const eslint = new ESLint({
     overrideConfig: await createConfig({
-      tsconfigRootDir: process.cwd(),
-      tsTypeChecked: true,
+      typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
     }),
     overrideConfigFile: true,
   });

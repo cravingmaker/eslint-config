@@ -10,6 +10,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import {
   createContext,
   defaultContext,
+  detectFeatures,
   detectReactRefreshVariant,
 } from "../../src/context.js";
 
@@ -117,5 +118,16 @@ describe("detectReactRefreshVariant", () => {
     [["react"], "generic"],
   ])("detects the variant for %j as %s", (dependencies, variant) => {
     expect(detectReactRefreshVariant(new Set(dependencies))).toBe(variant);
+  });
+});
+
+describe("detectFeatures", () => {
+  it("detects the frameworks whose plugins are installed and the React Refresh variant", () => {
+    expect(detectFeatures(new Set(["vite"]))).toEqual({
+      express: true,
+      react: true,
+      reactRefresh: "vite",
+      svelte: true,
+    });
   });
 });

@@ -19,8 +19,7 @@ async function getRules(
   isTypeChecked: boolean,
 ): Promise<NonNullable<Linter.Config["rules"]>> {
   const config = await createConfig({
-    tsconfigRootDir: process.cwd(),
-    tsTypeChecked: isTypeChecked,
+    typescript: { tsconfigRootDir: process.cwd(), typeChecked: isTypeChecked },
   });
   return Object.fromEntries(
     config

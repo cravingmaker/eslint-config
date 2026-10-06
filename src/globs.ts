@@ -2,6 +2,8 @@ const javascriptFiles = ["**/*.{js,mjs,cjs,jsx,mjsx}"] as const;
 const typescriptFiles = ["**/*.{ts,mts,cts,tsx,mtsx}"] as const;
 // JavaScript and TypeScript sources, which share the core and code-quality rules.
 const sourceFiles = [...javascriptFiles, ...typescriptFiles] as const;
+const jsxFiles = ["**/*.{jsx,mjsx}"] as const;
+const commonjsFiles = ["**/*.cjs", "**/*.cts"] as const;
 
 // Files that can hold React components.
 const reactFiles = ["**/*.{jsx,mjsx,tsx,mtsx}"] as const;
@@ -32,6 +34,7 @@ const jsoncFiles = [
 const json5Files = ["**/*.json5"] as const;
 
 export {
+  commonjsFiles,
   expressFiles,
   htmlFiles,
   javascriptFiles,
@@ -39,6 +42,7 @@ export {
   jsoncFiles,
   jsonFiles,
   jsonIgnores,
+  jsxFiles,
   markdownFiles,
   packageJsonFiles,
   reactFiles,

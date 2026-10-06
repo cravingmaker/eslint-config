@@ -198,8 +198,8 @@ describe("published package", () => {
 					new ESLint({ overrideConfig: config, overrideConfigFile: true }).calculateConfigForFile('example.ts');
 
 				const defaultConfig = await createConfig();
-				const untyped = await createConfig({ tsTypeChecked: false });
-				const typed = await createConfig({ tsTypeChecked: true });
+				const untyped = await createConfig({ typescript: { typeChecked: false } });
+				const typed = await createConfig({ typescript: { typeChecked: true } });
 
 				if (!Array.isArray(defaultConfig) || defaultConfig.length === 0) {
 					throw new Error('createConfig did not return a non-empty flat config');
@@ -292,7 +292,7 @@ describe("published package", () => {
       `
 				import { createConfig } from '@cravingmaker/eslint-config';
 
-				const config = await createConfig({ tsTypeChecked: false });
+				const config = await createConfig({ typescript: { typeChecked: false } });
 				const pluginNames = new Set(config.flatMap((entry) => Object.keys(entry.plugins ?? {})));
 
 				for (const plugin of [
@@ -445,7 +445,7 @@ describe("published package", () => {
 				const config = await createConfig({
 					environments: ['browser'],
 					globals: { MY_GLOBAL: 'readonly' },
-					rules: { markdown: { 'markdown/no-missing-label-refs': 'off' } },
+					markdown: { overrides: { 'markdown/no-missing-label-refs': 'off' } },
 				});
 				const names = config.map((entry) => entry.name).filter(Boolean);
 

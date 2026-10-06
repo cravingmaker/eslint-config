@@ -12,15 +12,18 @@ type ConfigOptions = NonNullable<Parameters<typeof createConfig>[0]>;
 
 const rootDirectory = process.cwd();
 const baseOptions = {
+  express: true,
   projectRootDirectory: rootDirectory,
-  reactRefreshVariant: "generic",
-  tsconfigRootDir: rootDirectory,
+  react: { refresh: "generic" },
+  svelte: true,
+  typescript: { tsconfigRootDir: rootDirectory },
 } as const satisfies ConfigOptions;
 
 /*
-Every optional peer is installed in this repository, so these snapshots describe
-the configuration with all integrations active. Update them with `vitest -u`
-only after reviewing the diff: a changed line is a changed lint policy.
+The suites turn every framework on, and every optional peer is installed in this
+repository, so these snapshots describe the configuration with all integrations
+active. Update them with `vitest -u` only after reviewing the diff: a changed
+line is a changed lint policy.
 */
 const suites = [
   {
@@ -53,7 +56,10 @@ const suites = [
   {
     filePaths: ["src/example.ts", "src/example.tsx"],
     name: "type-checked",
-    options: { ...baseOptions, tsTypeChecked: true },
+    options: {
+      ...baseOptions,
+      typescript: { ...baseOptions.typescript, typeChecked: true },
+    },
   },
 ] as const satisfies ReadonlyArray<{
   readonly filePaths: readonly string[];
@@ -100,7 +106,7 @@ describe("effective rules: React Refresh variants", () => {
     async (reactRefreshVariant) => {
       const eslint = await createEslint({
         ...baseOptions,
-        reactRefreshVariant,
+        react: { refresh: reactRefreshVariant },
       });
       const description = await describeEffectiveConfig(
         eslint,

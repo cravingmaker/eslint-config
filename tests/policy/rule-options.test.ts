@@ -45,16 +45,17 @@ that enables a rule with a bare severity keeps the options configured before.
 A rule that is off must therefore still carry options that its schema accepts.
 */
 describe.each([false, true])(
-  "rule options with tsTypeChecked: %s",
-  (tsTypeChecked) => {
+  "rule options with typed linting %s",
+  (typeChecked) => {
     it.each(filePaths)(
       "stay valid when a later config enables an off rule in %s",
       async (filePath) => {
         const config = await createConfig({
+          express: true,
           projectRootDirectory: rootDirectory,
-          reactRefreshVariant: "generic",
-          tsconfigRootDir: rootDirectory,
-          tsTypeChecked,
+          react: { refresh: "generic" },
+          svelte: true,
+          typescript: { tsconfigRootDir: rootDirectory, typeChecked },
         });
         const offRuleIds = await getOffRuleIds(
           new ESLint({ overrideConfig: config, overrideConfigFile: true }),
