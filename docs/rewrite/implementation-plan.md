@@ -1,6 +1,6 @@
 # Rewrite implementation plan
 
-Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stages 1 and 2 are done. Stage 3 is in progress: the parameter immutability, file-role exceptions, CommonJS (F6), and feature toggles (F7) items are done. Stages 4 and 5 are not started. One question is open for the maintainer: what should happen to TypeScript files that the TypeScript feature leaves out (see [Feature toggles](#feature-toggles-f7-done)).
+Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stages 1 and 2 are done. Stage 3 is in progress: the parameter immutability, file-role exceptions, CommonJS (F6), feature toggles (F7), and peer loading (F1) items are done. Stages 4 and 5 are not started. One question is open for the maintainer: what should happen to TypeScript files that the TypeScript feature leaves out (see [Feature toggles](#feature-toggles-f7-done)).
 
 To continue the work, start with [handoff.md](./handoff.md). It explains how to pick up a stage and how to run one in a Claude Code cloud session.
 
@@ -281,7 +281,7 @@ Work the items in the order of the table, which the maintainer set on 6 October 
 | File-role exceptions      | `exceptions.ts`, with the initial content below. Done, for JavaScript and TypeScript files only                           |
 | CommonJS (F6)             | `.cjs` and `.cts` support is removed and the README says so. Done: neither gets rules; ESLint still parses `.cjs`         |
 | Feature toggles (F7)      | Tests for `false`, `true`, and object on every feature, including rule recovery through the overlap table. Done           |
-| Peer loading (F1)         | An enabled feature with a missing peer fails with an install message instead of being skipped                             |
+| Peer loading (F1)         | An enabled feature with a missing peer fails with an install message instead of being skipped. Done                       |
 | Detection (F8)            | `"auto"` reads the dependencies declared at the project root, not plugin presence. Refresh is off without a known bundler |
 | Hooks scope (F3)          | Hooks rules apply to `.js` and `.ts`, not only JSX and TSX                                                                |
 | Type-aware scope (F9)     | `filesTypeAware` and `ignoresTypeAware` work; typed sources and untyped scripts can be separated                          |
@@ -351,6 +351,19 @@ Two commits; `npm run validate` passes with 45 test files and 427 tests. `tests/
   Type-aware scope (F9) changes `typescript/parser` too, so the decision is best made before that item.
 
 - **For stage 5.** The README should say that limiting an owner with `files` or `ignores` brings the rules it replaces back outside its scope, and that the holding feature's `overrides` keep a replaced rule on. It should also describe the scope of `json.files`, `json.overrides`, and `json.ignores`.
+
+#### Peer loading (F1) (done)
+
+One commit; `npm run validate` passes with 45 test files and 429 tests. The `react`, `svelte`, and `express` builders load their peers with `importPeer`, so a framework feature that is on fails when a peer it needs is missing, instead of leaving out the blocks of that peer. `importOptionalPeer` is gone; `isPeerInstalled` stays for detection. With every peer installed, the configuration is unchanged block by block. What the next items need to know:
+
+- **What each feature needs.** `react` needs `@html-eslint/eslint-plugin-react` and `eslint-plugin-react-hooks`, and `eslint-plugin-react-refresh` unless `refresh` is `false`. `svelte` needs `@html-eslint/eslint-plugin-svelte` and `svelte-eslint-parser`. `express` needs `eslint-plugin-express-security`. This holds whether the feature is set or detected. `createConfig` rejects, and the ESLint CLI stops with exit code 2 before it lints anything.
+- **The message.** It names the package and the setting that turns off what needs it: `<feature>: false`, or `react: { refresh: false }` for the Refresh plugin, which `importPeer` takes as an optional third argument. When several peers of a feature are missing, it names the first in the builder's order: HTML, hooks, then Refresh for React, and plugin, then parser for Svelte. A consumer without any React plugin therefore sees one message per run until all are installed.
+- **Detection still uses plugin presence.** `detectFeatures` turns React on when any of its three plugins is installed, and Svelte only when both of its peers are. With `"auto"`, a partial React set now fails: with the HTML and hooks plugins but not the Refresh plugin, Refresh falls back to `"generic"` and needs its plugin unless `refresh` is `false`. A partial Svelte set leaves Svelte off without a message. `tests/package.smoke.test.ts` records the React case as `detected`. Detection (F8) reads the declared dependencies instead: a project that declares a framework and lacks a peer will fail, one that does not declare it gets no blocks whatever is installed, and without Next.js or Vite, Refresh is off and needs no plugin. F8 therefore changes the `detected` expectation, and `isPeerInstalled` loses its last caller.
+- **Peers of peers are not checked.** `svelte-eslint-parser` imports `svelte/compiler` when it loads. Without `svelte`, `createConfig` rejects with Node's `ERR_MODULE_NOT_FOUND` for `svelte` rather than the install message, as it did before this item. The same holds for any package that a peer imports.
+- **Tests.** `tests/package.smoke.test.ts` adds two consumers. One has no optional peers and turns each framework on. The other has the HTML plugins for React and Svelte and the hooks plugin, and checks detection, `react: true`, `react: { refresh: false }`, and `svelte: true`. `tests/factory/import-peer.test.ts` checks the message with an option, and tests `isPeerInstalled` in place of `importOptionalPeer`. Against the previous source, 3 of the 14 tests in the two files fail.
+- **Snapshot diff.** None. The suites turn every framework on in this repository, where every peer is installed, and with every peer installed the builders load the same modules and return the same blocks. A dump of every block for eight option sets, with frameworks detected, on, off, narrowed, and in each Refresh variant, and with typed linting, is byte-identical before and after.
+- **For stage 4.** The gate's cases for a feature on with missing peers and for partial peer sets exist as symlink tests. The real installs should cover them too.
+- **For stage 5.** The README should list the peers of each framework and show the error. The migration notes should say that in 0.1.0 a missing React plugin left out only its own block, while now `react` needs both plugins, and the Refresh plugin unless `refresh` is `false`.
 
 ### Stage 4: tests and package contract
 
