@@ -61,19 +61,19 @@ export default createConfig({
   environments: ["browser"],
   // Optional: Add or override individual globals
   globals: {
-    MY_GLOBAL: "readonly"
+    MY_GLOBAL: "readonly",
   },
   // Optional: Add custom ignores
   ignores: ["dist/**"],
   // Optional: Override rules
   rules: {
     markdown: {
-      "markdown/no-missing-label-refs": "off"
+      "markdown/no-missing-label-refs": "off",
     },
     ts: {
-      "@typescript-eslint/no-explicit-any": "off"
-    }
-  }
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
 });
 ```
 
