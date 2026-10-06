@@ -5,8 +5,8 @@ This document lets a new session, local or cloud, continue the rewrite of `@crav
 ## Where things stand
 
 - **Released:** 0.1.0 is on npm. It has the pre-rewrite structure: one large `src/index.ts` plus rule maps under `src/rules/`.
-- **Done:** stages 0, 1, and 2, and the parameter immutability and file-role exceptions items of stage 3. The effective lint policy is snapshotted in `tests/policy/`. `src/factory.ts` composes the config from one internal builder per feature under `src/configs/`, rule overlaps live in `src/overlaps.ts`, and `createConfig` takes the per-feature options of the plan.
-- **Next:** the rest of stage 3 (behavior changes), starting with CommonJS (F6), one item per commit in the order the plan records, then stages 4 and 5. Each stage depends on the one before it. Read the notes at the end of stage 2 and under stage 3 in the plan first.
+- **Done:** stages 0, 1, and 2, and the parameter immutability, file-role exceptions, and CommonJS (F6) items of stage 3. The effective lint policy is snapshotted in `tests/policy/`. `src/factory.ts` composes the config from one internal builder per feature under `src/configs/`, rule overlaps live in `src/overlaps.ts`, and `createConfig` takes the per-feature options of the plan.
+- **Next:** the rest of stage 3 (behavior changes), starting with feature toggles (F7), one item per commit in the order the plan records, then stages 4 and 5. Each stage depends on the one before it. Read the notes at the end of stage 2 and under stage 3 in the plan first.
 - **Decisions:** every design question in the plan is settled. Nothing is waiting for the maintainer.
 
 ## Working on a stage
@@ -52,7 +52,7 @@ Stop and ask the maintainer when:
 - **`eslint --fix` reorders literals.** Perfectionist sorts object keys and some arrays. Do not encode meaning in the order of an array literal that a fix may sort.
 - **A severity-only entry keeps earlier options.** When a later block sets a rule to only `"off"` or `"error"`, ESLint keeps the options from an earlier block, and the snapshots record them. Inside one block, an object spread replaces the whole entry instead. This is why moving a rule between blocks can change a snapshot line even when the rule stays off.
 - **Snapshots are `.txt` on purpose.** That keeps ESLint and Prettier away from them.
-- **A `files` pattern also decides which files `eslint .` lints.** ESLint lints every file that a block's `files` matches, unless the pattern is `*` or ends in `/*` or `/**`. A block for files selected by name, such as `**/*.config.*`, therefore needs an AND pattern with an extension glob, as `configs/exceptions.ts` does. Without it, `eslint .` parses the `.txt` snapshots as JavaScript and fails.
+- **A `files` pattern also decides which files `eslint .` lints.** ESLint lints every file that a block's `files` matches, unless the pattern is `*` or ends in `/*` or `/**`. A block for files selected by name, such as `**/*.config.*`, therefore needs an AND pattern with an extension glob, as `configs/exceptions.ts` does. Without it, `eslint .` parses the `.txt` snapshots as JavaScript and fails. ESLint's own default config also matches `**/*.js`, `**/*.mjs`, and `**/*.cjs`, so such a file is linted even when no block of this config matches it, with only the blocks that have no `files`. That is why `.cjs` files are still parsed after the CommonJS item, while `.cts` files are skipped.
 - **Releases.** Release Please opens or updates a release pull request when a `feat`, `fix`, or breaking commit reaches `main`. Opening that pull request publishes nothing. Merging it creates a GitHub Release, and the release triggers `npm publish`. Leave release pull requests, tags, and GitHub Releases to the maintainer. Use honest conventional types in titles; do not pick a type to steer the release.
 
 ## Continuing in a Claude Code cloud session
