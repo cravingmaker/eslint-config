@@ -342,7 +342,7 @@ describe("published package", () => {
     expect(output).toBe("ok");
   });
 
-  it("supports monorepo paths, project-root detection, and CommonJS extensions", async () => {
+  it("supports monorepo paths and project-root detection, and sets no rules for CommonJS files", async () => {
     const consumerDirectory = await createConsumer({
       dependencies: [
         "eslint",
@@ -393,28 +393,11 @@ describe("published package", () => {
 					throw new Error('Nested package.json did not receive package-specific rules');
 				}
 
-				const cjsConfig = await eslint.calculateConfigForFile('scripts/example.cjs');
-				if (cjsConfig?.languageOptions?.sourceType !== 'commonjs') {
-					throw new Error('.cjs did not use CommonJS source type');
-				}
-
-				const ctsConfig = await eslint.calculateConfigForFile('scripts/example.cts');
-				if (ctsConfig?.languageOptions?.sourceType !== 'commonjs') {
-					throw new Error('.cts did not use CommonJS source type');
-				}
-
-				const cjsResult = await eslint.lintText("module.exports = require('node:path');", {
-					filePath: 'scripts/example.cjs',
-				});
-				const ctsResult = await eslint.lintText("module.exports = require('node:path');", {
-					filePath: 'scripts/example.cts',
-				});
-				const commonJsFatalErrors = cjsResult.concat(ctsResult)
-					.flatMap((result) => result.messages)
-					.filter((message) => message.fatal);
-
-				if (commonJsFatalErrors.length !== 0) {
-					throw new Error('CommonJS extensions failed to parse');
+				for (const filePath of ['scripts/example.cjs', 'scripts/example.cts']) {
+					const commonJsConfig = await eslint.calculateConfigForFile(filePath);
+					if (Object.keys(commonJsConfig?.rules ?? {}).length !== 0) {
+						throw new Error('CommonJS file received rules: ' + filePath);
+					}
 				}
 
 				const ignored = await eslint.isPathIgnored(path.join(appRoot, 'dist', 'ignored.js'));

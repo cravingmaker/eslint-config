@@ -2,7 +2,7 @@ import type { Linter } from "eslint";
 import type { Context, FeatureOptions, Rules } from "../../types.js";
 
 import { defaultContext } from "../../context.js";
-import { commonjsFiles, jsxFiles, sourceFiles } from "../../globs.js";
+import { jsxFiles, sourceFiles } from "../../globs.js";
 import { possibleProblemRules } from "./possible-problems.js";
 import { suggestionRules } from "./suggestions.js";
 
@@ -12,8 +12,8 @@ const javascriptRules: Rules = {
   ...suggestionRules,
 };
 
-// Builds the flat config for ESLint's built-in rules on JavaScript and TypeScript files. JSX
-// parses in `.jsx` files without any React plugin, and `.cjs` and `.cts` files are CommonJS.
+// Builds the flat config for ESLint's built-in rules on JavaScript and TypeScript files, which
+// are ES modules. JSX parses in `.jsx` files without any React plugin.
 function javascript(
   { files = sourceFiles, ignores = [], overrides = {} }: FeatureOptions = {},
   { globals }: Context = defaultContext,
@@ -34,11 +34,6 @@ function javascript(
       files: [...jsxFiles],
       languageOptions: { parserOptions: { ecmaFeatures: { jsx: true } } },
       name: "@cravingmaker/eslint-config/javascript/jsx",
-    },
-    {
-      files: [...commonjsFiles],
-      languageOptions: { sourceType: "commonjs" },
-      name: "@cravingmaker/eslint-config/javascript/commonjs",
     },
   ];
 }

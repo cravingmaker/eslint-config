@@ -33,7 +33,6 @@ describe("javascript feature", () => {
     expect(configs.map((entry) => entry.name)).toEqual([
       "@cravingmaker/eslint-config/javascript/rules",
       "@cravingmaker/eslint-config/javascript/jsx",
-      "@cravingmaker/eslint-config/javascript/commonjs",
     ]);
     expect(
       configs.flatMap((entry) => Object.keys(entry.plugins ?? {})),

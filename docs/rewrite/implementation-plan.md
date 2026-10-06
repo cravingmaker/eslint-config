@@ -1,6 +1,6 @@
 # Rewrite implementation plan
 
-Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stages 1 and 2 are done. Stage 3 is in progress: the parameter immutability and file-role exceptions items are done. Stages 4 and 5 are not started.
+Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stages 1 and 2 are done. Stage 3 is in progress: the parameter immutability, file-role exceptions, and CommonJS (F6) items are done. Stages 4 and 5 are not started.
 
 To continue the work, start with [handoff.md](./handoff.md). It explains how to pick up a stage and how to run one in a Claude Code cloud session.
 
@@ -279,7 +279,7 @@ Work the items in the order of the table, which the maintainer set on 6 October 
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Parameter immutability    | Decide the `functional/prefer-immutable-types` options whose results are unstable. Done: `ReadonlyShallow`                |
 | File-role exceptions      | `exceptions.ts`, with the initial content below. Done, for JavaScript and TypeScript files only                           |
-| CommonJS (F6)             | `.cjs` and `.cts` support is removed and the README says so                                                               |
+| CommonJS (F6)             | `.cjs` and `.cts` support is removed and the README says so. Done: neither gets rules; ESLint still parses `.cjs`         |
 | Feature toggles (F7)      | Tests for `false`, `true`, and object on every feature, including rule recovery through the overlap table                 |
 | Peer loading (F1)         | An enabled feature with a missing peer fails with an install message instead of being skipped                             |
 | Detection (F8)            | `"auto"` reads the dependencies declared at the project root, not plugin presence. Refresh is off without a known bundler |
@@ -321,6 +321,19 @@ Two commits; `npm run validate` passes with 43 test files and 347 tests. `config
 - **For the CommonJS item.** The exceptions reach `.cjs` and `.cts` files only through `sourceFiles`, so removing those extensions there removes them here.
 - **For stage 5.** A consumer who suppresses these rules now gets an "Unused eslint-disable directive" warning, because the config sets `reportUnusedDisableDirectives`; with `--max-warnings 0`, the run fails. `eslint --fix` removes the comment but can leave a line with a single space. The migration notes should say so, and the README should list the exceptions and how to turn a rule back on.
 - **Not added.** `import-x/no-anonymous-default-export` reports a config file whose default export is an object literal, such as `export default { … }`. The config files in this repository export a call, so there is no evidence for that exception yet.
+
+#### CommonJS (F6) (done)
+
+One commit; `npm run validate` passes with 44 test files and 349 tests. `cjs` and `cts` are gone from `javascriptFiles` and `typescriptFiles`, and with them from `sourceFiles` and every scope built from these globs. The `javascript/commonjs` block and `commonjsFiles` are gone, and the README says that CommonJS is not supported. The config now has 46 blocks without type information and 49 with it. What the next items need to know:
+
+- **ESLint still parses `.cjs` files.** ESLint's default config, which comes before every flat config, matches `**/*.js`, `**/*.mjs`, and `**/*.cjs`, and sets `sourceType: "commonjs"` for `.cjs`. A `.cjs` file therefore stays linted, with ESLint's default parser and the plugins of the `setup` blocks, but no feature sets a rule for it. A `.cts` file matches no block, so `eslint .` skips it. This is the behavior before #40. Only a global ignore would make `eslint .` skip `.cjs` files too; the plan does not decide that, so this item does not add one.
+- **Snapshot diff.** Two of the 28 snapshot files change. `src/example.cjs` loses the built-in globals and all 789 rules; what remains comes from ESLint's default config, apart from the plugins of the `setup` blocks. `src/example.cts` has no configuration. The suite keeps both paths, so a block that matches them again shows as a snapshot diff.
+- **Tests.** `tests/configs/commonjs.test.ts` turns every feature and typed linting on. It checks that no rule applies to `.cjs`, `.cts`, and `.d.cts` files, including a config file, a test file, and a nested path, and that the ES module extensions keep `sourceType: "module"`. `tests/package.smoke.test.ts` checks the packed package. Both, and the block names in `tests/configs/javascript.test.ts`, fail against the previous source.
+- **TypeScript scopes.** `typescriptFiles` is the default of `typescript.files` and of the type-aware scope, and the scope of `imports/resolver`, `node/rules-typescript`, and the TypeScript overlap block, so none of them reaches `.cts` files now. Declaration files for CommonJS, `.d.cts`, are not linted either.
+- **For stage 5.** The README should list `.cjs` and `.cts` among the limits, and the migration notes should say:
+  - `.cjs` and `.cts` files get no rules. In 0.1.0 they got the full policy as CommonJS, although `import-x/no-commonjs` reported `require` and `module.exports` in them.
+  - `eslint .` still parses `.cjs` files, so it reports syntax errors and unused disable directives in them. A 0.1.0 suppression such as `// eslint-disable-next-line import-x/no-commonjs` becomes an "Unused eslint-disable directive" warning, and a run with `--max-warnings 0` fails. The warning comes from ESLint's default `reportUnusedDisableDirectives`; this config sets no `linterOptions`.
+  - `eslint .` skips `.cts` files. A `.cts` path passed explicitly, as lint-staged or an editor does, gets the warning "File ignored because no matching configuration was supplied."
 
 ### Stage 4: tests and package contract
 
