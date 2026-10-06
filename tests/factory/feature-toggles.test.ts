@@ -128,8 +128,14 @@ const features = [
   },
   {
     feature: "react",
-    fileNames: ["Component.tsx", "Component.jsx"],
-    files: ["app/**/*.tsx", "app/**/*.jsx"],
+    // Custom hooks also live in modules without JSX.
+    fileNames: [
+      "use-counter.ts",
+      "Component.tsx",
+      "Component.jsx",
+      "use-counter.js",
+    ],
+    files: ["app/**/*.ts", "app/**/*.tsx", "app/**/*.jsx", "app/**/*.js"],
     name: "react",
     ruleId: "react-hooks/rules-of-hooks",
   },

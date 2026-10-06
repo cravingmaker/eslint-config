@@ -13,8 +13,10 @@ type EffectiveConfig = {
     };
   };
   readonly plugins?: Readonly<Record<string, unknown>>;
-  readonly rules?: Readonly<Record<string, readonly unknown[]>>;
+  readonly rules?: Readonly<Record<string, RuleEntry>>;
 };
+// A rule's settings as ESLint resolves them: the severity as a number, then the options.
+type RuleEntry = readonly [number, ...unknown[]];
 
 async function getEffectiveConfig(
   eslint: ESLint,
@@ -24,31 +26,119 @@ async function getEffectiveConfig(
   return (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
 }
+// The settings of the eslint-plugin-react-hooks rules in `config`.
+function getHooksRules(
+  config: EffectiveConfig | undefined,
+): Readonly<Record<string, RuleEntry>> {
+  return Object.fromEntries(
+    Object.entries(config?.rules ?? {}).filter(([ruleId]) =>
+      ruleId.startsWith("react-hooks/"),
+    ),
+  );
+}
+function getPluginNames(config: EffectiveConfig | undefined): string[] {
+  return Object.keys(config?.plugins ?? {}).toSorted((left, right) =>
+    left.localeCompare(right),
+  );
+}
+// The severity of each of `ruleIds` in `config`, or `undefined` where it does not set the rule.
+function getSeverities(
+  config: EffectiveConfig | undefined,
+  ruleIds: readonly string[],
+): Array<number | undefined> {
+  const rules = new Map(Object.entries(config?.rules ?? {}));
+  return ruleIds.map((ruleId) => rules.get(ruleId)?.[0]);
+}
 
 describe("react feature", () => {
-  it("adds one block per React plugin for component files", async () => {
+  it("adds one block per React plugin, with the hooks rules in every source file", async () => {
     const configs = await react();
     const eslint = new ESLint({
       overrideConfig: configs,
       overrideConfigFile: true,
     });
-    const [component, module] = await Promise.all([
+    const [component, hooksModule, hooksScript, data] = await Promise.all([
       getEffectiveConfig(eslint, "src/Component.tsx"),
-      getEffectiveConfig(eslint, "src/module.ts"),
+      getEffectiveConfig(eslint, "src/use-counter.ts"),
+      getEffectiveConfig(eslint, "src/use-counter.js"),
+      getEffectiveConfig(eslint, "src/data.json"),
     ]);
+    const hooksRules = getHooksRules(component);
 
     expect(configs.map((config) => config.name)).toEqual([
       "@cravingmaker/eslint-config/react/html",
       "@cravingmaker/eslint-config/react/hooks",
       "@cravingmaker/eslint-config/react/refresh",
     ]);
+    expect(getPluginNames(component)).toEqual([
+      "@",
+      "@html-eslint/react",
+      "react-hooks",
+      "react-refresh",
+    ]);
+    expect(hooksRules["react-hooks/rules-of-hooks"]).toEqual([2]);
+    // Custom hooks also live in modules without JSX, which get the hooks rules and no others.
     expect(
-      Object.keys(component?.plugins ?? {}).toSorted((left, right) =>
-        left.localeCompare(right),
+      [hooksModule, hooksScript].map((config) => [
+        getPluginNames(config),
+        config?.rules,
+      ]),
+    ).toEqual([
+      [["@", "react-hooks"], hooksRules],
+      [["@", "react-hooks"], hooksRules],
+    ]);
+    expect(data).toBeUndefined();
+  });
+
+  it("applies overrides of the hooks rules wherever those apply, and other overrides to component files", async () => {
+    const eslint = new ESLint({
+      overrideConfig: await react({
+        overrides: {
+          "@html-eslint/react/no-obsolete-tags": "off",
+          "no-console": "off",
+          "react-hooks/exhaustive-deps": [
+            "error",
+            { additionalHooks: "useCustomEffect" },
+          ],
+          "react-refresh/only-export-components": [
+            "warn",
+            { allowConstantExport: true },
+          ],
+        },
+      }),
+      overrideConfigFile: true,
+    });
+    // ESLint rejects a rule that is on in a file whose configuration lacks its plugin, so the
+    // overrides of the component plugins must stay out of modules without JSX.
+    const [component, hooksModule] = await Promise.all([
+      getEffectiveConfig(eslint, "src/Component.tsx"),
+      getEffectiveConfig(eslint, "src/use-counter.ts"),
+    ]);
+    const ruleIds = [
+      "@html-eslint/react/no-obsolete-tags",
+      "no-console",
+      "react-hooks/exhaustive-deps",
+      "react-refresh/only-export-components",
+    ] as const;
+
+    expect(getSeverities(component, ruleIds)).toEqual([0, 0, 2, 1]);
+    expect(getSeverities(hooksModule, ruleIds)).toEqual([
+      undefined,
+      undefined,
+      2,
+      undefined,
+    ]);
+    expect(
+      component?.rules?.["react-refresh/only-export-components"],
+    ).toMatchObject([1, { allowConstantExport: true }]);
+    expect(
+      [component, hooksModule].map(
+        (config) => config?.rules?.["react-hooks/exhaustive-deps"],
       ),
-    ).toEqual(["@", "@html-eslint/react", "react-hooks", "react-refresh"]);
-    expect(component?.rules?.["react-hooks/rules-of-hooks"]).toEqual([2]);
-    expect(module?.rules).toBeUndefined();
+    ).toEqual([
+      [2, { additionalHooks: "useCustomEffect" }],
+      [2, { additionalHooks: "useCustomEffect" }],
+    ]);
   });
 
   it.each([

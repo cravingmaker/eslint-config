@@ -2,7 +2,7 @@ path: src/state.svelte.js
 ignored: false
 language: @/js
 processor: none
-plugins: @ @eslint-community/eslint-comments @html-eslint/svelte express-security functional import-x markdown n package-json perfectionist promise regexp security unicorn unused-imports
+plugins: @ @eslint-community/eslint-comments @html-eslint/svelte express-security functional import-x markdown n package-json perfectionist promise react-hooks regexp security unicorn unused-imports
 languageOptions:
   ecmaVersion: 2026
   globals: "AggregateError:false Array:false ArrayBuffer:false AsyncDisposableStack:false Atomics:false BigInt:false BigInt64Array:false BigUint64Array:false Boolean:false DataView:false Date:false DisposableStack:false Error:false EvalError:false FinalizationRegistry:false Float16Array:false Float32Array:false Float64Array:false Function:false Infinity:false Int16Array:false Int32Array:false Int8Array:false Intl:false Iterator:false JSON:false Map:false Math:false NaN:false Number:false Object:false Promise:false Proxy:false RangeError:false ReferenceError:false Reflect:false RegExp:false Set:false SharedArrayBuffer:false String:false SuppressedError:false Symbol:false SyntaxError:false TypeError:false URIError:false Uint16Array:false Uint32Array:false Uint8Array:false Uint8ClampedArray:false WeakMap:false WeakRef:false WeakSet:false decodeURI:false decodeURIComponent:false encodeURI:false encodeURIComponent:false escape:false eval:false globalThis:false isFinite:false isNaN:false parseFloat:false parseInt:false undefined:false unescape:false"
@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 809 (error 689, off 105, warn 15)
+rules: 825 (error 705, off 105, warn 15)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -375,6 +375,22 @@ promise/prefer-catch: error
 promise/spec-only: error
 promise/valid-params: error
 radix: error
+react-hooks/config: error
+react-hooks/error-boundaries: error
+react-hooks/exhaustive-deps: error
+react-hooks/gating: error
+react-hooks/globals: error
+react-hooks/immutability: error
+react-hooks/incompatible-library: error
+react-hooks/preserve-manual-memoization: error
+react-hooks/purity: error
+react-hooks/refs: error
+react-hooks/rules-of-hooks: error
+react-hooks/set-state-in-effect: error
+react-hooks/set-state-in-render: error
+react-hooks/static-components: error
+react-hooks/unsupported-syntax: error
+react-hooks/use-memo: error
 regexp/confusing-quantifier: error
 regexp/control-character-escape: error
 regexp/grapheme-string-literal: error
