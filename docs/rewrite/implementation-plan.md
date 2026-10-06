@@ -1,6 +1,6 @@
 # Rewrite implementation plan
 
-Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stages 1 and 2 are done. Stages 3–5 are not started.
+Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stages 1 and 2 are done. Stage 3 is in progress: the parameter immutability item is done. Stages 4 and 5 are not started.
 
 To continue the work, start with [handoff.md](./handoff.md). It explains how to pick up a stage and how to run one in a Claude Code cloud session.
 
@@ -216,7 +216,7 @@ Three commits; `npm run validate` passes with 30 test files and 191 tests.
 2. `refactor: extract core JavaScript rules into a feature builder`. `src/rules/js/*` became `src/configs/javascript/` with an internal `javascript()` builder. The snapshots did not change.
 3. `test: name the default parser in policy snapshots`.
 
-One problem surfaced and is unresolved. `functional/prefer-immutable-types` reports different results depending on which files are linted together. On the baseline, `eslint .` passes, but `eslint tests/rule-coverage.test.ts` alone reports two errors, so the pre-commit hook can reject a commit that touches only that file. The helpers in `tests/rule-overlaps.test.ts` were rewritten to avoid the affected parameter types. The rule's `parameters: ReadonlyDeep` option is decided in stage 3.
+One problem surfaced and is unresolved. `functional/prefer-immutable-types` reports different results depending on which files are linted together. On the baseline, `eslint .` passes, but `eslint tests/rule-coverage.test.ts` alone reports two errors, so the pre-commit hook can reject a commit that touches only that file. The helpers in `tests/rule-overlaps.test.ts` were rewritten to avoid the affected parameter types. The rule's `parameters: ReadonlyDeep` option is decided in stage 3. Stage 3 chose `ReadonlyShallow`; see [Parameter immutability](#parameter-immutability-done).
 
 ### Stage 1: foundation (done)
 
@@ -277,7 +277,7 @@ Work the items in the order of the table, which the maintainer set on 6 October 
 
 | Item                      | Change                                                                                                                    |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Parameter immutability    | Decide the `functional/prefer-immutable-types` options whose results are unstable                                         |
+| Parameter immutability    | Decide the `functional/prefer-immutable-types` options whose results are unstable. Done: `ReadonlyShallow`                |
 | File-role exceptions      | `exceptions.ts`, with the initial content below                                                                           |
 | CommonJS (F6)             | `.cjs` and `.cts` support is removed and the README says so                                                               |
 | Feature toggles (F7)      | Tests for `false`, `true`, and object on every feature, including rule recovery through the overlap table                 |
@@ -298,6 +298,18 @@ The matching suppressions are removed from the repository in the same commit. Fu
 Formatter test: `eslint-config-prettier` as a dev dependency; no enabled rule may be one that it turns off, apart from a short list of exceptions with reasons. `@html-eslint` layout rules are outside its coverage and are decided by hand.
 
 Gate: every open P1 finding has a fixture that fails before and passes after.
+
+#### Parameter immutability (done)
+
+One commit; `npm run validate` passes with 42 test files and 340 tests. `functional/prefer-immutable-types` now requires parameters to be `ReadonlyShallow` instead of `ReadonlyDeep`. Variables and return types stay unchecked, and `ignoreInferredTypes` stays on. One line changes in each of the two type-checked snapshots. What the next items need to know:
+
+- **Cause.** eslint-plugin-functional computes immutability with `is-immutable-type`, whose cache lasts for the whole process unless `NODE_ENV` is `test`. The cache is keyed by `checker.getRecursionIdentity`, which every instantiation of a generic type shares, and the rule looks up a parameter by its type, not by its annotation. The first `readonly T[]`, `Readonly<T>`, or `ReadonlyMap<K, V>` that a process checks can therefore decide the deep result for later ones, whatever their `T`. ESLint lints each file as soon as it has been read, so the order, and with it the result, can differ even between two runs of the same command.
+- **Evidence.** 50 fixture files with one parameter each were linted alone and together in four orders. A file's result changed with the files around it for 45 of them with `ReadonlyDeep`, for 30 with the plugin's `recommended` split (shallow for library types, deep for project types), and for 14 with `ReadonlyShallow`.
+- **What remains.** A shallow check reads only the type's own members, which every instantiation of a generic type shares. The exception is a mapped type that copies modifiers from its argument: `Partial`, `Required`, `Pick`, `Omit`, or a user-defined `{ [K in keyof T]: T[K] }`. The 14 files are all of that kind. `Partial<Readonly<T>>` can still pass or fail depending on the files linted before it; `Readonly<Partial<T>>` cannot. No parameter in this repository has such a type. No rule option closes the gap: `ignoreTypePattern` matches source text, which an alias hides.
+- **`functional/type-declaration-immutability`** uses the same cache. For a type whose name starts with `ReadonlyDeep` or `Immutable`, its deeper check can depend on the files linted before, including on parameters this rule checked shallowly. No type in this repository has such a name, and its options are not part of this item.
+- **Testing the cache.** Vitest sets `NODE_ENV=test`, so a test that lints in its own process never sees the cache. `tests/policy/parameter-immutability.test.ts` lints fixtures in a child process without `NODE_ENV`, one file after another, in both orders, and expects the same messages; with `ReadonlyDeep` it fails. One `lintFiles` call for several files does not keep their order.
+- **Builder parameters.** A parameter typed `Context`, `Options`, `FeatureOptions`, `TypeAwareScope`, `readonly Linter.Config[]`, or `Readonly<Linter.Globals>` now passes without a default value, alone and with the whole repository; `Rules` is reported in both. A parameter with a default value is still never checked, because the rule does not find its annotation. The disable comment for a `ReadonlyMap` parameter in `tests/deprecated-rules.test.ts` became unused and is removed.
+- **Not changed.** `@typescript-eslint/prefer-readonly-parameter-types`, which keeps no state between calls, stays off; making it the owner would be a policy change beyond this item. The new test file has the usual file-level suppression of `functional/no-expression-statements` and `functional/no-return-void`, which the file-role exceptions item removes with the others.
 
 ### Stage 4: tests and package contract
 

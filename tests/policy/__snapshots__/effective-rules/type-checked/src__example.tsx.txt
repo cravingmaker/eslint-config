@@ -194,7 +194,7 @@ functional/no-return-void: error
 functional/no-this-expressions: off
 functional/no-throw-statements: error
 functional/no-try-statements: off
-functional/prefer-immutable-types: error [{"enforcement":"None","ignoreInferredTypes":true,"parameters":{"enforcement":"ReadonlyDeep"}}]
+functional/prefer-immutable-types: error [{"enforcement":"None","ignoreInferredTypes":true,"parameters":{"enforcement":"ReadonlyShallow"}}]
 functional/prefer-property-signatures: error
 functional/prefer-tacit: error
 functional/readonly-type: error ["keyword"]

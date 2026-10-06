@@ -22,13 +22,15 @@ const functionalRules: Rules = {
   ],
   "functional/no-expression-statements": ["error", { ignoreVoid: true }],
   "functional/no-let": ["error", { allowInForLoopInit: true }],
+  // Shallow, because the plugin caches immutability per generic type for the whole ESLint
+  // process: a deeper check of `readonly T[]` or `Readonly<T>` reuses the `T` linted first.
   "functional/prefer-immutable-types": [
     "error",
     {
       enforcement: "None",
       ignoreInferredTypes: true,
       parameters: {
-        enforcement: "ReadonlyDeep",
+        enforcement: "ReadonlyShallow",
       },
     },
   ],
