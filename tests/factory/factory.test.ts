@@ -1,9 +1,14 @@
+/* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
+
 import type { Linter } from "eslint";
 
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import process from "node:process";
 
 import { ESLint } from "eslint";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { createConfig } from "../../src/factory.js";
 
@@ -12,7 +17,36 @@ const baseOptions = {
   projectRootDirectory: process.cwd(),
   typescript: { tsconfigRootDir: process.cwd() },
 } as const;
+const frameworks: ReadonlySet<string> = new Set(["express", "react", "svelte"]);
 
+const temporaryDirectory = await mkdtemp(
+  path.join(os.tmpdir(), "eslint-config-factory-"),
+);
+
+// A project root whose manifest declares `dependencies`.
+async function createProject(
+  name: string,
+  dependencies: readonly string[],
+): Promise<string> {
+  const directory = path.join(temporaryDirectory, name);
+  const devDependencies = Object.fromEntries(
+    dependencies.map((dependency) => [dependency, "1.0.0"]),
+  );
+  await mkdir(directory);
+  await writeFile(
+    path.join(directory, "package.json"),
+    JSON.stringify({ devDependencies }),
+    "utf8",
+  );
+  return directory;
+}
+// The block with `name` after the package prefix.
+function findBlock(
+  configs: readonly Linter.Config[],
+  name: string,
+): Linter.Config | undefined {
+  return configs.find((config) => config.name === `${prefix}${name}`);
+}
 // The feature segment of each block name, without repeats.
 async function getFeatureOrder(
   options: Parameters<typeof createConfig>[0] = {},
@@ -25,8 +59,19 @@ async function getFeatureOrder(
     (feature, index) => features.indexOf(feature) === index,
   );
 }
+// The framework features among the blocks, in order.
+async function getFrameworks(
+  options: Parameters<typeof createConfig>[0] = {},
+): Promise<readonly string[]> {
+  const order = await getFeatureOrder(options);
+  return order.filter((feature) => frameworks.has(feature));
+}
 
 describe("createConfig", () => {
+  afterAll(async () => {
+    await rm(temporaryDirectory, { force: true, recursive: true });
+  });
+
   it("composes the features in a fixed order", async () => {
     expect(
       await getFeatureOrder({
@@ -84,22 +129,59 @@ describe("createConfig", () => {
     expect(order).toContain("functional");
   });
 
-  it("turns frameworks on when their plugins are installed, unless they are off", async () => {
-    const detected = await getFeatureOrder(baseOptions);
-    const disabled = await getFeatureOrder({
-      ...baseOptions,
-      express: false,
-      react: false,
-      svelte: false,
-    });
+  it("turns frameworks on when the project declares them, unless they are off", async () => {
+    const [declared, undeclared] = await Promise.all([
+      createProject("declared", ["express", "react", "svelte"]),
+      // Every optional peer is installed in this repository.
+      createProject("undeclared", []),
+    ]);
 
-    expect(detected).toEqual(
-      expect.arrayContaining(["react", "svelte", "express"]),
-    );
-    expect(disabled).not.toEqual(
-      expect.arrayContaining(["react", "svelte", "express"]),
-    );
+    expect(
+      await getFrameworks({ ...baseOptions, projectRootDirectory: declared }),
+    ).toEqual(["react", "svelte", "express"]);
+    expect(
+      await getFrameworks({
+        ...baseOptions,
+        express: false,
+        projectRootDirectory: declared,
+        react: false,
+        svelte: false,
+      }),
+    ).toEqual([]);
+    expect(
+      await getFrameworks({ ...baseOptions, projectRootDirectory: undeclared }),
+    ).toEqual([]);
   });
+
+  it.each([
+    [false, "react"],
+    ["next", "next,react,vite"],
+    ["vite", "react,vite"],
+  ] as const)(
+    "detects React Refresh as %s in a project that declares %s",
+    async (refresh, dependencies) => {
+      const projectRootDirectory = await createProject(
+        `refresh-${dependencies}`,
+        dependencies.split(","),
+      );
+      const [detected, explicit] = await Promise.all([
+        createConfig({ ...baseOptions, projectRootDirectory }),
+        createConfig({
+          ...baseOptions,
+          projectRootDirectory,
+          react: { refresh },
+        }),
+      ]);
+
+      expect(findBlock(detected, "react/hooks")).toBeDefined();
+      expect(detected.map((config) => config.name)).toEqual(
+        explicit.map((config) => config.name),
+      );
+      expect(findBlock(detected, "react/refresh")?.rules).toEqual(
+        findBlock(explicit, "react/refresh")?.rules,
+      );
+    },
+  );
 
   it("passes feature options to the feature and appends user configs last", async () => {
     const userConfig: Linter.Config = {

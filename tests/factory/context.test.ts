@@ -115,19 +115,58 @@ describe("detectReactRefreshVariant", () => {
   it.each([
     [["next", "vite"], "next"],
     [["vite"], "vite"],
-    [["react"], "generic"],
+    [["react"], false],
+    [[], false],
   ])("detects the variant for %j as %s", (dependencies, variant) => {
     expect(detectReactRefreshVariant(new Set(dependencies))).toBe(variant);
   });
 });
 
 describe("detectFeatures", () => {
-  it("detects the frameworks whose plugins are installed and the React Refresh variant", () => {
-    expect(detectFeatures(new Set(["vite"]))).toEqual({
+  it("detects the frameworks that the project declares and the React Refresh variant", () => {
+    expect(
+      detectFeatures(new Set(["express", "react", "svelte", "vite"])),
+    ).toEqual({
       express: true,
       react: true,
       reactRefresh: "vite",
       svelte: true,
     });
+  });
+
+  it.each(["express", "react", "svelte"])(
+    "detects %s on its own",
+    (framework) => {
+      expect(detectFeatures(new Set([framework]))).toEqual({
+        express: framework === "express",
+        react: framework === "react",
+        reactRefresh: false,
+        svelte: framework === "svelte",
+      });
+    },
+  );
+
+  it("detects no framework from its plugins, installed or declared", () => {
+    const undetected = {
+      express: false,
+      react: false,
+      reactRefresh: false,
+      svelte: false,
+    };
+
+    // Every optional peer is installed in this repository.
+    expect(detectFeatures(new Set())).toEqual(undetected);
+    expect(
+      detectFeatures(
+        new Set([
+          "eslint-plugin-express-security",
+          "eslint-plugin-react-hooks",
+          "eslint-plugin-react-refresh",
+          "@html-eslint/eslint-plugin-react",
+          "@html-eslint/eslint-plugin-svelte",
+          "svelte-eslint-parser",
+        ]),
+      ),
+    ).toEqual(undetected);
   });
 });

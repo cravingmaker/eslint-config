@@ -19,21 +19,6 @@ function isModuleNotFound(error: unknown): boolean {
     error.code === "ERR_MODULE_NOT_FOUND"
   );
 }
-/**
-Whether an optional peer dependency is installed where this package can import it.
-*/
-function isPeerInstalled(packageName: string): boolean {
-  return resolveOptionalPeer(packageName) !== undefined;
-}
-function resolveOptionalPeer(packageName: string): string | undefined {
-  try {
-    return import.meta.resolve(packageName);
-  } catch (error) {
-    // eslint-disable-next-line functional/no-throw-statements -- Resolution failures other than a missing package must stay visible.
-    if (!isModuleNotFound(error)) throw error;
-    return undefined;
-  }
-}
 function resolvePeer(
   packageName: string,
   feature: string,
@@ -56,4 +41,4 @@ function resolvePeer(
   }
 }
 
-export { importPeer, isPeerInstalled };
+export { importPeer };

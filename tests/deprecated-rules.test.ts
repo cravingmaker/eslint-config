@@ -43,7 +43,9 @@ function isPluginRule(value: unknown): value is PluginRule {
 describe("deprecated rule handling", () => {
   it("does not configure deprecated plugin rules", async () => {
     const config = await createConfig({
+      express: true,
       react: { refresh: "generic" },
+      svelte: true,
       typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
     });
     const plugins = new Map(

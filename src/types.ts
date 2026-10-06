@@ -68,7 +68,8 @@ type JsonOptions = FeatureOptions & {
 };
 /**
 Options for `createConfig`. A feature defaults to `true`, except `react`, `svelte`, and
-`express`, which default to `"auto"`: on when the project uses them.
+`express`, which default to `"auto"`: on when the manifest at the project root declares the
+`react`, `svelte`, or `express` package.
 */
 type Options = {
   readonly comments?: Feature;
@@ -98,7 +99,9 @@ type Options = {
   readonly packageJson?: Feature;
   readonly perfectionist?: Feature;
   /**
-  The directory that holds the consumer's `package.json`. Defaults to `process.cwd()`.
+  The directory that holds the consumer's `package.json`, whose `dependencies`,
+  `devDependencies`, and `peerDependencies` decide the `"auto"` features. Defaults to
+  `process.cwd()`.
   */
   readonly projectRootDirectory?: string;
   readonly promise?: Feature;
@@ -115,7 +118,8 @@ Options of the `react` feature.
 */
 type ReactOptions = FeatureOptions & {
   /**
-  The React Refresh rule variant. `"auto"`, the default, detects it from the project.
+  The React Refresh rule variant. `"auto"`, the default, uses `"next"` when the project declares
+  Next.js and `"vite"` when it declares Vite, and turns the rule off without either.
   */
   readonly refresh?: ReactRefreshVariant | "auto" | false;
 };

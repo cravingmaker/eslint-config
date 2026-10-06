@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  importPeer,
-  isPeerInstalled,
-} from "../../src/utilities/import-peer.js";
+import { importPeer } from "../../src/utilities/import-peer.js";
 
 describe("importPeer", () => {
   it("imports an installed peer", async () => {
@@ -55,17 +52,5 @@ describe("importPeer", () => {
     await expect(
       importPeer("eslint-plugin-react-refresh/not-exported", "react"),
     ).rejects.toHaveProperty("code", "ERR_PACKAGE_PATH_NOT_EXPORTED");
-  });
-});
-
-describe("isPeerInstalled", () => {
-  it("is true for an installed peer", () => {
-    expect(isPeerInstalled("eslint-plugin-react-refresh")).toBe(true);
-  });
-
-  it("is false for a missing peer", () => {
-    expect(isPeerInstalled("@cravingmaker/eslint-config-missing-peer")).toBe(
-      false,
-    );
   });
 });

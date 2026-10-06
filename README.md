@@ -21,7 +21,7 @@ A highly opinionated, modern, and elegant ESLint configuration crafted by [the c
 - Node.js `>=24.15.0`
 - ESLint `>=10.4.0 <11`
 
-React, Svelte, and Express integrations are optional and activate only when their corresponding peer packages are installed. JavaScript and TypeScript files are linted as ES modules, including `.mjs` and `.mts` files. CommonJS is not supported, so the config sets no rules for `.cjs` and `.cts` files.
+React, Svelte, and Express integrations are optional. Each one turns on when the `package.json` at the project root declares `react`, `svelte`, or `express`, and then needs its corresponding peer packages installed. JavaScript and TypeScript files are linted as ES modules, including `.mjs` and `.mts` files. CommonJS is not supported, so the config sets no rules for `.cjs` and `.cts` files.
 
 ## Installation
 

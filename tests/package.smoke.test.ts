@@ -130,6 +130,25 @@ const createConsumer = async ({
   return consumerDirectory;
 };
 
+// A project root in `directory` whose manifest declares `developmentDependencies`.
+const createProjectRoot = async (
+  directory: string,
+  developmentDependencies: Readonly<Record<string, string>>,
+) => {
+  await fs.mkdir(directory, { recursive: true });
+  await fs.writeFile(
+    path.join(directory, "package.json"),
+    JSON.stringify({
+      devDependencies: developmentDependencies,
+      private: true,
+      type: "module",
+    }),
+    "utf8",
+  );
+
+  return directory;
+};
+
 const createBrokenPackage = async (
   consumerDirectory: string,
   packageName: string,
@@ -299,14 +318,19 @@ describe("published package", () => {
     expect(output).toBe("ok");
   });
 
-  it("loads optional integrations from the consumer and auto-detects Vite", async () => {
+  it("loads the optional integrations that the consumer declares and auto-detects Vite", async () => {
     const consumerDirectory = await createConsumer({
       dependencies: [
         "eslint",
         ...runtimeDependencies,
         ...optionalPeerDependencies,
       ],
-      manifestDevelopmentDependencies: { vite: "1.0.0" },
+      manifestDevelopmentDependencies: {
+        express: "1.0.0",
+        react: "1.0.0",
+        svelte: "1.0.0",
+        vite: "1.0.0",
+      },
       name: "full-consumer",
       tarball,
     });
@@ -381,7 +405,7 @@ describe("published package", () => {
     await fs.writeFile(
       path.join(appDirectory, "package.json"),
       JSON.stringify({
-        devDependencies: { vite: "1.0.0" },
+        devDependencies: { react: "1.0.0", vite: "1.0.0" },
         name: "web-app",
         private: true,
         type: "module",
@@ -409,7 +433,7 @@ describe("published package", () => {
 				const refreshRule = refreshConfig?.rules?.['react-refresh/only-export-components'];
 
 				if (!Array.isArray(refreshRule) || refreshRule[1]?.allowConstantExport !== true) {
-					throw new Error('Vite was not detected from projectRootDirectory');
+					throw new Error('React and Vite were not detected from projectRootDirectory');
 				}
 
 				const nestedPackageConfig = await eslint.calculateConfigForFile('apps/web/package.json');
@@ -477,9 +501,10 @@ describe("published package", () => {
     expect(output).toBe("ok");
   });
 
-  it("surfaces initialization failures from installed optional integrations", async () => {
+  it("surfaces initialization failures from the optional integrations that the consumer declares", async () => {
     const consumerDirectory = await createConsumer({
       dependencies: ["eslint", ...runtimeDependencies],
+      manifestDevelopmentDependencies: { express: "1.0.0" },
       name: "broken-optional-peer-consumer",
       tarball,
     });
@@ -536,6 +561,7 @@ describe("published package", () => {
         "@html-eslint/eslint-plugin-svelte",
         "eslint-plugin-react-hooks",
       ],
+      manifestDevelopmentDependencies: { react: "1.0.0", vite: "1.0.0" },
       name: "partial-peers-consumer",
       tarball,
     });
@@ -546,8 +572,8 @@ describe("published package", () => {
       runConsumer(
         consumerDirectory,
         createFrameworkScript({
-          // React is detected from its installed plugins, and React Refresh falls back to the
-          // generic variant.
+          // React is detected from the declared `react`, and React Refresh from the declared
+          // Vite.
           detected: {},
           react: { react: true },
           reactWithoutRefresh: { react: { refresh: false } },
@@ -560,6 +586,62 @@ describe("published package", () => {
       detected: refreshMessage,
       react: refreshMessage,
       reactWithoutRefresh: [
+        "@cravingmaker/eslint-config/react/html",
+        "@cravingmaker/eslint-config/react/hooks",
+      ],
+      svelte:
+        'The "svelte" feature needs "svelte-eslint-parser", which is not installed. Install it, or set `svelte: false` to turn the feature off.',
+    });
+  });
+
+  it("detects the frameworks that the project root declares, whatever peers are installed", async () => {
+    const consumerDirectory = await createConsumer({
+      dependencies: [
+        "eslint",
+        ...runtimeDependencies,
+        "@html-eslint/eslint-plugin-react",
+        "@html-eslint/eslint-plugin-svelte",
+        "eslint-plugin-react-hooks",
+      ],
+      // The working directory declares every framework, but each case reads its own project root.
+      manifestDevelopmentDependencies: {
+        express: "1.0.0",
+        react: "1.0.0",
+        svelte: "1.0.0",
+        vite: "1.0.0",
+      },
+      name: "detection-consumer",
+      tarball,
+    });
+    const createCase = async (
+      name: string,
+      developmentDependencies: Readonly<Record<string, string>>,
+    ) => ({
+      projectRootDirectory: await createProjectRoot(
+        path.join(consumerDirectory, "projects", name),
+        developmentDependencies,
+      ),
+    });
+
+    const cases = {
+      express: await createCase("express", { express: "1.0.0" }),
+      none: await createCase("none", {}),
+      react: await createCase("react", { react: "1.0.0" }),
+      svelte: await createCase("svelte", { svelte: "1.0.0" }),
+    };
+
+    const results: unknown = JSON.parse(
+      runConsumer(consumerDirectory, createFrameworkScript(cases)),
+    );
+
+    expect(results).toEqual({
+      // A declared framework needs its peers.
+      express:
+        'The "express" feature needs "eslint-plugin-express-security", which is not installed. Install it, or set `express: false` to turn the feature off.',
+      // Installed plugins turn nothing on.
+      none: [],
+      // Without Next.js or Vite, React Refresh is off, so its plugin is not needed.
+      react: [
         "@cravingmaker/eslint-config/react/html",
         "@cravingmaker/eslint-config/react/hooks",
       ],
