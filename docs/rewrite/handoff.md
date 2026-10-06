@@ -5,8 +5,8 @@ This document lets a new session, local or cloud, continue the rewrite of `@crav
 ## Where things stand
 
 - **Released:** 0.1.0 is on npm. It has the pre-rewrite structure: one large `src/index.ts` plus rule maps under `src/rules/`.
-- **Done:** stages 0, 1, and 2. The effective lint policy is snapshotted in `tests/policy/`. `src/factory.ts` composes the config from one internal builder per feature under `src/configs/`, rule overlaps live in `src/overlaps.ts`, and `createConfig` takes the per-feature options of the plan.
-- **Next:** stage 3 (behavior changes), one item per commit in the order the plan records, then stages 4 and 5. Each stage depends on the one before it. Read the notes at the end of stage 2 in the plan first.
+- **Done:** stages 0, 1, and 2, and the parameter immutability item of stage 3. The effective lint policy is snapshotted in `tests/policy/`. `src/factory.ts` composes the config from one internal builder per feature under `src/configs/`, rule overlaps live in `src/overlaps.ts`, and `createConfig` takes the per-feature options of the plan.
+- **Next:** the rest of stage 3 (behavior changes), starting with file-role exceptions, one item per commit in the order the plan records, then stages 4 and 5. Each stage depends on the one before it. Read the notes at the end of stage 2 and under stage 3 in the plan first.
 - **Decisions:** every design question in the plan is settled. Nothing is waiting for the maintainer.
 
 ## Working on a stage
@@ -48,7 +48,7 @@ Stop and ask the maintainer when:
 
 - **Build before lint and test.** `eslint.config.js` and most tests import `./dist/index.mjs`. After changing `src/`, run `npm run build` first, or you lint and test the previous build.
 - **Internal builders are tested from source.** Feature builders are not exported from the package root. Tests for them import from `src/`, as `tests/configs/javascript.test.ts` does.
-- **`functional/prefer-immutable-types` is unstable.** It reports different results depending on which files are linted together. `eslint .` can pass while linting one file alone fails, and the pre-commit hook lints only staged files. For a parameter of an ESLint type such as `readonly Linter.Config[]`, do not add a disable comment: in the runs where the rule stays silent, the comment is reported as unused. Restructure instead, for example by having the helper build its own config. Check both `npx eslint .` and `npx eslint <the files you changed>` before committing.
+- **`functional/prefer-immutable-types` shares a cache across files.** Since stage 3 it checks parameters shallowly, which gives the same result whatever files are linted together, except for a parameter whose type is a mapped type that copies modifiers, such as `Partial<Readonly<T>>`. Write `Readonly<Partial<T>>` instead, and do not add a disable comment: in the runs where the rule stays silent, the comment is reported as unused. The cache is off while `NODE_ENV` is `test`, so a Vitest test that lints in its own process cannot show such a difference; `tests/policy/parameter-immutability.test.ts` lints in a child process. Check both `npx eslint .` and `npx eslint <the files you changed>` before committing.
 - **`eslint --fix` reorders literals.** Perfectionist sorts object keys and some arrays. Do not encode meaning in the order of an array literal that a fix may sort.
 - **A severity-only entry keeps earlier options.** When a later block sets a rule to only `"off"` or `"error"`, ESLint keeps the options from an earlier block, and the snapshots record them. Inside one block, an object spread replaces the whole entry instead. This is why moving a rule between blocks can change a snapshot line even when the rule stays off.
 - **Snapshots are `.txt` on purpose.** That keeps ESLint and Prettier away from them.
