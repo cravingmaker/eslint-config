@@ -195,7 +195,7 @@ describe("published package", () => {
 					new Set(config.flatMap((entry) => Object.keys(entry.plugins ?? {})));
 
 				const getTypeScriptConfig = (config) =>
-					config.find((entry) => Object.hasOwn(entry.plugins ?? {}, '@typescript-eslint'));
+					new ESLint({ overrideConfig: config, overrideConfigFile: true }).calculateConfigForFile('example.ts');
 
 				const defaultConfig = await createConfig();
 				const untyped = await createConfig({ tsTypeChecked: false });
@@ -210,11 +210,15 @@ describe("published package", () => {
 					throw new Error('Optional plugins were loaded unexpectedly: ' + detectedOptionalPlugins.join(', '));
 				}
 
-				const defaultTsConfig = getTypeScriptConfig(defaultConfig);
-				const untypedTsConfig = getTypeScriptConfig(untyped);
-				const typedTsConfig = getTypeScriptConfig(typed);
+				const defaultTsConfig = await getTypeScriptConfig(defaultConfig);
+				const untypedTsConfig = await getTypeScriptConfig(untyped);
+				const typedTsConfig = await getTypeScriptConfig(typed);
 
-				if (!defaultTsConfig || !untypedTsConfig || !typedTsConfig) {
+				if (
+					[defaultTsConfig, untypedTsConfig, typedTsConfig].some(
+						(config) => config?.plugins?.['@typescript-eslint'] === undefined,
+					)
+				) {
 					throw new Error('TypeScript config was not created');
 				}
 
@@ -222,15 +226,15 @@ describe("published package", () => {
 					throw new Error('Default TypeScript config unexpectedly enabled projectService');
 				}
 
-				if (defaultTsConfig.rules?.['@typescript-eslint/no-unsafe-assignment'] !== 'off') {
+				if (defaultTsConfig.rules?.['@typescript-eslint/no-unsafe-assignment']?.[0] !== 0) {
 					throw new Error('Default TypeScript config unexpectedly enabled type-aware rules');
 				}
 
-				if (defaultTsConfig.rules?.['n/no-sync'] !== 'off') {
+				if (defaultTsConfig.rules?.['n/no-sync']?.[0] !== 0) {
 					throw new Error('Default TypeScript config unexpectedly enabled n/no-sync without type information');
 				}
 
-				if (typedTsConfig.rules?.['n/no-sync']?.[0] !== 'error') {
+				if (typedTsConfig.rules?.['n/no-sync']?.[0] !== 2) {
 					throw new Error('Typed TypeScript config did not enable n/no-sync');
 				}
 
@@ -260,7 +264,7 @@ describe("published package", () => {
 					throw new Error('Typed TypeScript config did not enable projectService');
 				}
 
-				if (typedTsConfig.rules?.['@typescript-eslint/no-unsafe-assignment'] !== 'error') {
+				if (typedTsConfig.rules?.['@typescript-eslint/no-unsafe-assignment']?.[0] !== 2) {
 					throw new Error('Typed TypeScript rules were not enabled');
 				}
 

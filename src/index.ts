@@ -2,11 +2,7 @@ import type { Linter } from "eslint";
 import type pluginReactHooks from "eslint-plugin-react-hooks";
 import type { reactRefresh as ReactRefreshPlugin } from "eslint-plugin-react-refresh";
 import type eslintPluginHtmlReact from "@html-eslint/eslint-plugin-react";
-import type { Rules } from "./types.js";
-import type {
-  parser as tseslintParser,
-  plugin as tseslintPlugin,
-} from "typescript-eslint";
+import type { parser as tseslintParser } from "typescript-eslint";
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -35,6 +31,7 @@ import { perfectionist, perfectionistRules } from "./configs/perfectionist.js";
 import { promise, promiseRules } from "./configs/promise.js";
 import { regexp, regexpRules } from "./configs/regexp.js";
 import { security, securityRules } from "./configs/security.js";
+import { typescript } from "./configs/typescript/index.js";
 import { unicorn, unicornRules } from "./configs/unicorn.js";
 import { unusedImports, unusedImportsRules } from "./configs/unused-imports.js";
 import { createContext } from "./context.js";
@@ -44,10 +41,6 @@ import { enforcePackageTypeEslintRules } from "./rules/json/enforce-package-type
 import { jsonEslintRules } from "./rules/json/json.js";
 import { packageJsonEslintRules } from "./rules/json/package-json.js";
 import { markdownEslintRules } from "./rules/markdown/markdown.js";
-import {
-  tsEslintRules,
-  tsEslintTypeCheckedRules,
-} from "./rules/ts/typescript-eslint.js";
 
 type CreateConfigOptions = {
   readonly environments?: readonly GlobalEnvironment[];
@@ -86,16 +79,6 @@ type RulesOptions = {
   readonly react?: Linter.RulesRecord;
   readonly svelte?: Linter.RulesRecord;
   readonly ts?: Linter.RulesRecord;
-};
-type TsConfigOptions = {
-  readonly functionalRules: Rules;
-  readonly globals: Readonly<Linter.Globals>;
-  readonly nRules: Rules;
-  readonly parser: typeof tseslintParser;
-  readonly plugin: typeof tseslintPlugin;
-  readonly ruleOverrides: Readonly<Linter.RulesRecord>;
-  readonly tsParserOptions: Readonly<Record<string, unknown>>;
-  readonly tsRules: Rules;
 };
 
 async function buildExpressConfig(
@@ -214,43 +197,6 @@ async function buildSvelteConfig(
     rules: { ...htmlSvelteEslintRules, ...ruleOverrides },
   };
 }
-// eslint-disable-next-line functional/prefer-immutable-types -- Linter.RulesRecord values are not deeply readonly; external type constraint
-function buildTsConfig({
-  functionalRules,
-  globals,
-  nRules,
-  parser,
-  plugin,
-  ruleOverrides,
-  tsParserOptions,
-  tsRules,
-}: TsConfigOptions): Linter.Config {
-  return {
-    files: ["**/*.{ts,mts,cts,tsx,mtsx}"],
-    languageOptions: {
-      globals,
-      parser,
-      parserOptions: tsParserOptions,
-    },
-    name: "@cravingmaker/eslint-config/typescript",
-    plugins: { "@typescript-eslint": plugin },
-    rules: {
-      ...javascriptRules,
-      ...tsRules,
-      ...unicornRules,
-      ...functionalRules,
-      ...promiseRules,
-      ...regexpRules,
-      ...nRules,
-      ...securityRules,
-      ...unusedImportsRules,
-      ...importsRules,
-      ...perfectionistRules,
-      ...commentsRules,
-      ...ruleOverrides,
-    },
-  };
-}
 async function detectReactRefreshVariant(
   projectRootDirectory: string,
 ): Promise<"generic" | "next" | "vite"> {
@@ -363,7 +309,6 @@ export async function createConfig({
     projectRootDirectory,
     typescript: { tsconfigRootDir, typeChecked: tsTypeChecked },
   });
-  const tsRules = tsTypeChecked ? tsEslintTypeCheckedRules : tsEslintRules;
   const functionalRules = tsTypeChecked
     ? functionalTypeCheckedRules
     : functionalUntypedRules;
@@ -371,9 +316,6 @@ export async function createConfig({
   const nRules = tsTypeChecked
     ? nodeRules
     : { ...nodeRules, "n/no-sync": "off" as const };
-  const tsParserOptions = tsTypeChecked
-    ? { projectService: true, tsconfigRootDir }
-    : {};
   const codeQualityOptions = {
     files: javascriptFiles,
     overrides: jsRuleOverrides,
@@ -383,16 +325,31 @@ export async function createConfig({
     reactRefreshVariant ??
     (await detectReactRefreshVariant(projectRootDirectory));
   const tseslint = await import("typescript-eslint");
-  const tsConfig = buildTsConfig({
-    functionalRules,
-    globals: resolvedGlobals,
-    nRules,
-    parser: tseslint.parser,
-    plugin: tseslint.plugin,
-    ruleOverrides: tsRuleOverrides,
-    tsParserOptions,
-    tsRules,
-  });
+  const [typescriptParser, typescriptRules] = await typescript(
+    { overrides: tsRuleOverrides },
+    context,
+  );
+  // TypeScript files repeat the JavaScript and code-quality rules until those features cover them.
+  const tsConfigs = [
+    typescriptParser,
+    {
+      ...typescriptRules,
+      rules: {
+        ...javascriptRules,
+        ...unicornRules,
+        ...functionalRules,
+        ...promiseRules,
+        ...regexpRules,
+        ...nRules,
+        ...securityRules,
+        ...unusedImportsRules,
+        ...importsRules,
+        ...perfectionistRules,
+        ...commentsRules,
+        ...typescriptRules.rules,
+      },
+    },
+  ];
 
   const [reactConfigs, svelteConfig, expressConfig] = await Promise.all([
     buildReactConfig(resolvedVariant, reactRuleOverrides),
@@ -400,7 +357,7 @@ export async function createConfig({
     buildExpressConfig(expressRuleOverrides),
   ]);
   const optionalConfigs = [
-    tsConfig,
+    ...tsConfigs,
     ...reactConfigs,
     ...[expressConfig, svelteConfig].filter(
       (c): c is Linter.Config => c !== undefined,

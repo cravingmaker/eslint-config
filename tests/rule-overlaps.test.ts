@@ -11,30 +11,27 @@ import { createConfig } from "../dist/index.mjs";
 async function getJavaScriptRules(
   isTypeChecked: boolean,
 ): Promise<NonNullable<Linter.Config["rules"]>> {
-  const config = await createConfig({
-    tsconfigRootDir: process.cwd(),
-    tsTypeChecked: isTypeChecked,
-  });
-  return Object.fromEntries(
-    config
-      .filter(
-        (entry) => entry.files?.includes("**/*.{js,mjs,cjs,jsx,mjsx}") === true,
-      )
-      .flatMap((entry) => Object.entries(entry.rules ?? {})),
-  );
+  return await getRules("**/*.{js,mjs,cjs,jsx,mjsx}", isTypeChecked);
 }
-async function getTypeScriptRules(
+// The rules of every block for `glob`, merged in order as written, before ESLint normalizes them.
+async function getRules(
+  glob: string,
   isTypeChecked: boolean,
 ): Promise<NonNullable<Linter.Config["rules"]>> {
   const config = await createConfig({
     tsconfigRootDir: process.cwd(),
     tsTypeChecked: isTypeChecked,
   });
-  return (
-    config.find((entry) =>
-      Object.hasOwn(entry.plugins ?? {}, "@typescript-eslint"),
-    )?.rules ?? {}
+  return Object.fromEntries(
+    config
+      .filter((entry) => entry.files?.includes(glob) === true)
+      .flatMap((entry) => Object.entries(entry.rules ?? {})),
   );
+}
+async function getTypeScriptRules(
+  isTypeChecked: boolean,
+): Promise<NonNullable<Linter.Config["rules"]>> {
+  return await getRules("**/*.{ts,mts,cts,tsx,mtsx}", isTypeChecked);
 }
 
 describe("overlapping rule policy", () => {
