@@ -36,11 +36,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "npm run clean && tsdown",
+    "build": "npm run gen && npm run clean && tsdown",
     "check:commit": "npm run lint:staged",
     "clean": "node --input-type=module --eval \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "gen": "node scripts/typegen.ts",
     "lint": "npm run build && npm run lint:built",
     "lint:built": "eslint . --max-warnings 0",
     "lint:package": "npm run build && npm run lint:package:built",
@@ -56,7 +57,7 @@
     "test:unit": "npm run build && npm run test:unit:built",
     "test:unit:built": "vitest run --exclude tests/package.smoke.test.ts",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "npm run gen && tsc --noEmit",
     "typecheck:package": "npm run build && npm run typecheck:package:built",
     "typecheck:package:built": "attw --pack . --profile esm-only",
     "validate": "npm run format:check && npm run build && npm run typecheck && npm run lint:built && npm test && npm run lint:package:built && npm run typecheck:package:built"
