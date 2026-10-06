@@ -24,7 +24,6 @@ function findPluginName(
 function isDeprecatedConfiguredRule(
   ruleId: string,
   pluginNames: readonly string[],
-  // eslint-disable-next-line functional/prefer-immutable-types -- ESLint plugin types are externally defined and not deeply readonly
   plugins: ReadonlyMap<string, Plugin>,
 ): boolean {
   const pluginName = findPluginName(ruleId, pluginNames);
