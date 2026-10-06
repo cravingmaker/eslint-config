@@ -2,6 +2,7 @@ import type { Linter } from "eslint";
 import type pluginReactHooks from "eslint-plugin-react-hooks";
 import type { reactRefresh as ReactRefreshPlugin } from "eslint-plugin-react-refresh";
 import type eslintPluginHtmlReact from "@html-eslint/eslint-plugin-react";
+import type { Rules } from "./types.js";
 import type {
   parser as tseslintParser,
   plugin as tseslintPlugin,
@@ -96,17 +97,15 @@ type RulesOptions = {
   readonly ts?: Linter.RulesRecord;
 };
 type TsConfigOptions = {
-  readonly functionalRules: Readonly<
-    Record<string, Linter.RuleEntry | undefined>
-  >;
+  readonly functionalRules: Rules;
   readonly globals: Readonly<Linter.Globals>;
-  readonly nRules: Readonly<Linter.RulesRecord>;
+  readonly nRules: Rules;
   readonly parser: typeof tseslintParser;
   readonly plugin: typeof tseslintPlugin;
   readonly resolverProject: Readonly<Record<string, unknown>>;
   readonly ruleOverrides: Readonly<Linter.RulesRecord>;
   readonly tsParserOptions: Readonly<Record<string, unknown>>;
-  readonly tsRules: Readonly<Linter.RulesRecord>;
+  readonly tsRules: Rules;
 };
 
 async function buildExpressConfig(

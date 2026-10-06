@@ -1,10 +1,10 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import eslintPluginPackageJson from "eslint-plugin-package-json";
 
 import { getPluginRules } from "../../utilities/plugin-rules.js";
 
-const packageJsonEslintRules: Linter.RulesRecord = {
+const packageJsonEslintRules: Rules = {
   ...getPluginRules("package-json", eslintPluginPackageJson.rules),
 
   "package-json/require-bugs": ["error", { ignorePrivate: true }],

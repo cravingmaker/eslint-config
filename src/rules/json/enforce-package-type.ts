@@ -1,6 +1,6 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
-const enforcePackageTypeEslintRules: Linter.RulesRecord = {
+const enforcePackageTypeEslintRules: Rules = {
   "enforce-package-type/enforce-package-type": [
     "error",
     { enforceType: "module" },

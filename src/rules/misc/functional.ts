@@ -1,4 +1,4 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import eslintPluginFunctional from "eslint-plugin-functional";
 
@@ -7,7 +7,7 @@ import {
   getPluginRules,
 } from "../../utilities/plugin-rules.js";
 
-const functionalTypeCheckedEslintRules: Linter.RulesRecord = {
+const functionalTypeCheckedEslintRules: Rules = {
   ...getPluginRules("functional", eslintPluginFunctional.rules),
 
   "functional/functional-parameters": [
@@ -84,7 +84,7 @@ const functionalTypeCheckedEslintRules: Linter.RulesRecord = {
   "functional/no-try-statements": "off", // Prefer try statements
 } as const;
 
-const functionalEslintRules = {
+const functionalEslintRules: Rules = {
   ...functionalTypeCheckedEslintRules,
   ...getPluginConfigRules(
     "functional",

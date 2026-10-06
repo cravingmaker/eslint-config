@@ -1,10 +1,10 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import eslintPluginComments from "@eslint-community/eslint-plugin-eslint-comments";
 
 import { getPluginRules } from "../../utilities/plugin-rules.js";
 
-const eslintCommentsRules: Linter.RulesRecord = {
+const eslintCommentsRules: Rules = {
   ...getPluginRules(
     "@eslint-community/eslint-comments",
     eslintPluginComments.rules,

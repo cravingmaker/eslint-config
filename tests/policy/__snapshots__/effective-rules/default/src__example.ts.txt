@@ -154,7 +154,7 @@ array-callback-return: error [{"allowImplicit":true,"allowVoid":false,"checkForE
 arrow-body-style: error ["as-needed"]
 block-scoped-var: error
 camelcase: error [{"allow":[],"ignoreDestructuring":false,"ignoreGlobals":false,"ignoreImports":false,"properties":"always"}]
-capitalized-comments: off [{"ignoreConsecutiveComments":false,"ignoreInlineComments":false}]
+capitalized-comments: off ["always",{"ignoreConsecutiveComments":false,"ignoreInlineComments":false}]
 class-methods-use-this: off [{"enforceForClassFields":true,"exceptMethods":[],"ignoreOverrideMethods":false}]
 complexity: error [{"max":20,"variant":"classic"}]
 consistent-return: off [{"treatUndefinedAsUnspecified":false}]
@@ -314,7 +314,7 @@ no-case-declarations: error
 no-class-assign: off
 no-compare-neg-zero: error
 no-cond-assign: error ["except-parens"]
-no-console: off [{"allow":[]}]
+no-console: off [{}]
 no-const-assign: off
 no-constant-binary-expression: error [{"checkRelationalComparisons":false}]
 no-constant-condition: error [{"checkLoops":"allExceptWhileTrue"}]
@@ -385,7 +385,7 @@ no-prototype-builtins: error
 no-redeclare: off [{"builtinGlobals":true}]
 no-regex-spaces: error
 no-restricted-exports: off [{}]
-no-restricted-globals: off [{}]
+no-restricted-globals: off
 no-restricted-imports: off [{}]
 no-restricted-properties: off
 no-restricted-syntax: off

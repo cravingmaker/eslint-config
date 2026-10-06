@@ -5,8 +5,8 @@ This document lets a new session, local or cloud, continue the rewrite of `@crav
 ## Where things stand
 
 - **Released:** 0.1.0 is on npm. It has the pre-rewrite structure: one large `src/index.ts` plus rule maps under `src/rules/`.
-- **Done:** stage 0. The effective lint policy is snapshotted in `tests/policy/`, and the core JavaScript rules live in `src/configs/javascript/` behind an internal `javascript()` builder.
-- **Next:** stage 1 (foundation), then stages 2–5 in order. Each stage depends on the one before it.
+- **Done:** stages 0 and 1. The effective lint policy is snapshotted in `tests/policy/`, and the core JavaScript rules live in `src/configs/javascript/` behind an internal `javascript()` builder. The rule maps are typed with generated rule types, and the option, context, and peer modules that stage 2 wires in exist but are not used yet.
+- **Next:** stage 2 (extraction with identical results), then stages 3–5 in order. Each stage depends on the one before it. Read the notes at the end of stage 1 in the plan first.
 - **Decisions:** every design question in the plan is settled. Nothing is waiting for the maintainer.
 
 ## Working on a stage

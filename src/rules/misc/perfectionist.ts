@@ -1,4 +1,4 @@
-import type { Linter } from "eslint";
+import type { RuleOptionOf, Rules } from "../../types.js";
 
 const commonOptions = {
   fallbackSort: { type: "unsorted" },
@@ -25,7 +25,7 @@ const commonTsShapeRuleOptions = {
   ],
   newlinesBetween: 1,
   newlinesInside: 0,
-} as const;
+} satisfies RuleOptionOf<"perfectionist/sort-object-types">;
 
 const commonTsCompositionRuleOptions = {
   ...commonOptions,
@@ -43,9 +43,9 @@ const commonTsCompositionRuleOptions = {
     "unknown",
     "nullish",
   ],
-} as const;
+} satisfies RuleOptionOf<"perfectionist/sort-union-types">;
 
-const perfectionistEslintRules: Linter.RulesRecord = {
+const perfectionistEslintRules: Rules = {
   "perfectionist/sort-array-includes": [
     "error",
     { ...commonCollectionRuleOptions },

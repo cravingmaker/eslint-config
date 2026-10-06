@@ -1,10 +1,10 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 
 import { getPluginRules } from "../../utilities/plugin-rules.js";
 
-const unicornEslintRules: Linter.RulesRecord = {
+const unicornEslintRules: Rules = {
   ...getPluginRules("unicorn", eslintPluginUnicorn.rules ?? {}, "js/js", [
     "consistent-arrow-return-style",
   ]),
@@ -16,6 +16,7 @@ const unicornEslintRules: Linter.RulesRecord = {
         kebabCase: true,
         pascalCase: true,
       },
+      // @ts-expect-error -- The schema accepts RegExp objects, but the generated type allows only plain objects
       ignore: [/^\d+_/v], // Migration files like 001_init.js
     },
   ],

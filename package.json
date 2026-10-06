@@ -36,11 +36,13 @@
     "dist"
   ],
   "scripts": {
-    "build": "npm run clean && tsdown",
+    "build": "npm run gen && npm run clean && tsdown",
     "check:commit": "npm run lint:staged",
     "clean": "node --input-type=module --eval \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "gen": "node scripts/typegen.ts",
+    "inspect": "npm run build && eslint-config-inspector",
     "lint": "npm run build && npm run lint:built",
     "lint:built": "eslint . --max-warnings 0",
     "lint:package": "npm run build && npm run lint:package:built",
@@ -56,7 +58,7 @@
     "test:unit": "npm run build && npm run test:unit:built",
     "test:unit:built": "vitest run --exclude tests/package.smoke.test.ts",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "npm run gen && tsc --noEmit",
     "typecheck:package": "npm run build && npm run typecheck:package:built",
     "typecheck:package:built": "attw --pack . --profile esm-only",
     "validate": "npm run format:check && npm run build && npm run typecheck && npm run lint:built && npm test && npm run lint:package:built && npm run typecheck:package:built"
@@ -107,6 +109,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
     "@cravingmaker/prettier-config": "0.3.1",
+    "@eslint/config-inspector": "3.5.0",
     "@html-eslint/eslint-plugin-react": "0.66.1",
     "@html-eslint/eslint-plugin-svelte": "0.66.1",
     "@types/eslint-plugin-security": "3.0.1",
@@ -115,6 +118,7 @@
     "eslint-plugin-express-security": "3.2.4",
     "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-react-refresh": "0.5.7",
+    "eslint-typegen": "2.3.1",
     "husky": "9.1.7",
     "lint-staged": "17.6.0",
     "prettier": "3.9.9",

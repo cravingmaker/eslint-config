@@ -1,4 +1,4 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import {
   classMethodsUseThisOptions,
@@ -14,7 +14,7 @@ import {
   preferPromiseRejectErrorsOptions,
 } from "../../options/common.js";
 
-const recommendedSuggestionRules: Linter.RulesRecord = {
+const recommendedSuggestionRules: Rules = {
   "no-case-declarations": "error",
   "no-delete-var": "error",
   "no-empty-static-block": "error",
@@ -35,7 +35,7 @@ const recommendedSuggestionRules: Linter.RulesRecord = {
   "no-empty": ["error", { allowEmptyCatch: true }],
 } as const;
 
-const suggestionRules: Linter.RulesRecord = {
+const suggestionRules: Rules = {
   ...recommendedSuggestionRules,
 
   "accessor-pairs": [
@@ -228,6 +228,7 @@ const suggestionRules: Linter.RulesRecord = {
 
   "capitalized-comments": [
     "off",
+    "always",
     {
       ignoreConsecutiveComments: false,
       ignoreInlineComments: false,
@@ -286,7 +287,7 @@ const suggestionRules: Linter.RulesRecord = {
       properties: true,
     },
   ],
-  "no-console": ["off", { allow: [] }],
+  "no-console": "off",
   "no-continue": "off",
   "no-div-regex": "off",
   "no-inline-comments": ["off", {}],
@@ -305,7 +306,7 @@ const suggestionRules: Linter.RulesRecord = {
 
   "no-plusplus": ["off", { allowForLoopAfterthoughts: false }],
   "no-restricted-exports": ["off", {}],
-  "no-restricted-globals": ["off", {}],
+  "no-restricted-globals": "off",
   "no-restricted-imports": ["off", {}],
   "no-restricted-properties": "off",
   "no-restricted-syntax": "off",

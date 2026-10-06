@@ -1,10 +1,10 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import eslintPluginJson from "@eslint/json";
 
 import { getPluginRules } from "../../utilities/plugin-rules.js";
 
-const jsonEslintRules: Linter.RulesRecord = {
+const jsonEslintRules: Rules = {
   ...getPluginRules("json", eslintPluginJson.rules),
 
   "json/sort-keys": [

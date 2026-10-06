@@ -1,4 +1,4 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import {
   classMethodsUseThisOptions,
@@ -18,7 +18,7 @@ import {
   preferPromiseRejectErrorsOptions,
 } from "../../options/common.js";
 
-const tsEslintConflictedEslintRecommendedRules: Linter.RulesRecord = {
+const tsEslintConflictedEslintRecommendedRules: Rules = {
   "constructor-super": "off", // ts(2335) & ts(2377)
   "getter-return": "off", // ts(2378)
   "no-class-assign": "off", // ts(2629)
@@ -39,7 +39,7 @@ const tsEslintConflictedEslintRecommendedRules: Linter.RulesRecord = {
   "no-with": "off", // ts(1101) & ts(2410)
 } as const;
 
-const tsEslintRecommendedRules: Linter.RulesRecord = {
+const tsEslintRecommendedRules: Rules = {
   "@typescript-eslint/no-duplicate-enum-values": "error",
   "@typescript-eslint/no-explicit-any": [
     "error",
@@ -120,7 +120,7 @@ const tsEslintRecommendedRules: Linter.RulesRecord = {
   "@typescript-eslint/no-unused-vars": ["off", { ...noUnusedVarsOptions }], // Covered by `eslint-plugin-unused-imports/no-unused-vars`
 } as const;
 
-const tsEslintRecommendedTypeCheckedOnlyRules: Linter.RulesRecord = {
+const tsEslintRecommendedTypeCheckedOnlyRules: Rules = {
   "@typescript-eslint/await-thenable": "error",
   "@typescript-eslint/no-array-delete": "error",
   "@typescript-eslint/no-base-to-string": [
@@ -231,7 +231,7 @@ const tsEslintRecommendedTypeCheckedOnlyRules: Linter.RulesRecord = {
   ],
 } as const;
 
-const tsEslintStylisticRules: Linter.RulesRecord = {
+const tsEslintStylisticRules: Rules = {
   "@typescript-eslint/ban-tslint-comment": "error",
   "@typescript-eslint/class-literal-property-style": ["error", "fields"],
   "@typescript-eslint/consistent-generic-constructors": [
@@ -271,7 +271,7 @@ const tsEslintStylisticRules: Linter.RulesRecord = {
   "@typescript-eslint/adjacent-overload-signatures": "off", // Use ESLint's perfectionist/sort-object-types and perfectionist/sort-interfaces rule instead
 } as const;
 
-const tsEslintStylisticTypeCheckedOnlyRules: Linter.RulesRecord = {
+const tsEslintStylisticTypeCheckedOnlyRules: Rules = {
   "@typescript-eslint/non-nullable-type-assertion-style": "error",
   "@typescript-eslint/prefer-find": "error",
   "@typescript-eslint/prefer-includes": "error",
@@ -325,7 +325,7 @@ const tsEslintStylisticTypeCheckedOnlyRules: Linter.RulesRecord = {
   ],
 } as const;
 
-const tsEslintStrictOnlyRules: Linter.RulesRecord = {
+const tsEslintStrictOnlyRules: Rules = {
   "@typescript-eslint/no-dynamic-delete": "error",
   "@typescript-eslint/no-extraneous-class": [
     "error",
@@ -363,7 +363,7 @@ const tsEslintStrictOnlyRules: Linter.RulesRecord = {
   ],
 } as const;
 
-const tsEslintStrictTypeCheckedOnlyRules: Linter.RulesRecord = {
+const tsEslintStrictTypeCheckedOnlyRules: Rules = {
   "@typescript-eslint/no-deprecated": ["warn", { allow: [] }],
   "@typescript-eslint/no-generated-empty-object-type": "error",
 
@@ -414,7 +414,7 @@ const tsEslintStrictTypeCheckedOnlyRules: Linter.RulesRecord = {
   "@typescript-eslint/return-await": ["error", "always"],
 } as const;
 
-const tsEslintOtherRules: Linter.RulesRecord = {
+const tsEslintOtherRules: Rules = {
   "@typescript-eslint/consistent-type-imports": [
     "error",
     {
@@ -627,7 +627,7 @@ const tsEslintOtherRules: Linter.RulesRecord = {
   "@typescript-eslint/no-redeclare": "off", // Not recommended to enable this in new TypeScript projects
 } as const;
 
-const tsEslintOtherTypeCheckedOnlyRules: Linter.RulesRecord = {
+const tsEslintOtherTypeCheckedOnlyRules: Rules = {
   "@typescript-eslint/no-unnecessary-qualifier": "error",
   "@typescript-eslint/no-unsafe-type-assertion": "error",
   "@typescript-eslint/prefer-readonly": ["error", { onlyInlineLambdas: false }],
@@ -701,7 +701,7 @@ const tsEslintOtherTypeCheckedOnlyRules: Linter.RulesRecord = {
   ], // It's recommended to use tsconfig's noImplicitReturns option rather than this rule
 } as const;
 
-const tsEslintDisableTypeCheckedRules: Linter.RulesRecord = {
+const tsEslintDisableTypeCheckedRules: Rules = {
   "@typescript-eslint/await-thenable": "off",
   "@typescript-eslint/consistent-return": "off",
   "@typescript-eslint/consistent-type-exports": "off",
@@ -766,7 +766,7 @@ const tsEslintDisableTypeCheckedRules: Linter.RulesRecord = {
   "@typescript-eslint/use-unknown-in-catch-callback-variable": "off",
 } as const;
 
-const tsEslintRules: Linter.RulesRecord = {
+const tsEslintRules: Rules = {
   ...tsEslintConflictedEslintRecommendedRules,
   ...tsEslintRecommendedRules,
   ...tsEslintStrictOnlyRules,
@@ -775,7 +775,7 @@ const tsEslintRules: Linter.RulesRecord = {
   ...tsEslintDisableTypeCheckedRules,
 } as const;
 
-const tsEslintTypeCheckedRules: Linter.RulesRecord = {
+const tsEslintTypeCheckedRules: Rules = {
   ...tsEslintConflictedEslintRecommendedRules,
   ...tsEslintRecommendedRules,
   ...tsEslintRecommendedTypeCheckedOnlyRules,

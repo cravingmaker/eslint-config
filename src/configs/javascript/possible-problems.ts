@@ -1,4 +1,4 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import {
   // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
@@ -6,7 +6,7 @@ import {
   noUseBeforeDefineOptions,
 } from "../../options/common.js";
 
-const recommendedPossibleProblemRules: Linter.RulesRecord = {
+const recommendedPossibleProblemRules: Rules = {
   "constructor-super": "error",
   "for-direction": "error",
 
@@ -91,7 +91,7 @@ const recommendedPossibleProblemRules: Linter.RulesRecord = {
   "no-useless-backreference": "off", // Covered by `eslint-plugin-regexp/no-useless-backreference`
 } as const;
 
-const possibleProblemRules: Linter.RulesRecord = {
+const possibleProblemRules: Rules = {
   ...recommendedPossibleProblemRules,
 
   "no-await-in-loop": "error",

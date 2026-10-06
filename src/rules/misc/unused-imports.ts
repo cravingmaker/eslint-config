@@ -1,4 +1,4 @@
-import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import unusedImportsPlugin from "eslint-plugin-unused-imports";
 
@@ -6,7 +6,7 @@ import unusedImportsPlugin from "eslint-plugin-unused-imports";
 import { noUnusedVarsOptions } from "../../options/common.js";
 import { getPluginRules } from "../../utilities/plugin-rules.js";
 
-const unusedImportsEslintRules: Linter.RulesRecord = {
+const unusedImportsEslintRules: Rules = {
   ...getPluginRules("unused-imports", unusedImportsPlugin.rules ?? {}),
 
   "unused-imports/no-unused-vars": ["error", { ...noUnusedVarsOptions }],

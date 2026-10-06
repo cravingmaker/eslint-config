@@ -52,6 +52,10 @@ For faster feedback, run `npm run test:unit` for unit tests or
 `npm run test:package` for package consumer tests. Both commands build the
 package first; their `:built` variants reuse an existing build.
 
+To browse the configuration that `eslint.config.js` resolves, run
+`npm run inspect`. It builds the package and opens
+`@eslint/config-inspector` at <http://localhost:7777>.
+
 The pre-commit hook runs `npm run check:commit`, which invokes
 `npm run lint:staged` to build the package and apply Prettier and ESLint
 fixes to staged files. The pre-push hook runs the full test suite through

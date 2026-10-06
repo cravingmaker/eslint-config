@@ -1,4 +1,4 @@
-import type { Linter } from "eslint";
+import type { RuleOptionOf, Rules } from "../../types.js";
 
 import eslintPluginHtml from "@html-eslint/eslint-plugin";
 
@@ -7,9 +7,9 @@ import { getPluginRules } from "../../utilities/plugin-rules.js";
 const newLineOptions = {
   inline: ["$inline"],
   skip: ["pre", "code", "textarea"],
-} as const;
+} satisfies RuleOptionOf<"@html-eslint/element-newline">;
 
-const htmlEslintRules: Linter.RulesRecord = {
+const htmlEslintRules: Rules = {
   ...getPluginRules("@html-eslint", eslintPluginHtml.rules),
 
   "@html-eslint/attrs-newline": ["error", { ...newLineOptions }],

@@ -1,4 +1,5 @@
 import type { Linter } from "eslint";
+import type { Rules } from "../../types.js";
 
 import { javascriptFiles } from "../../globs.js";
 import { possibleProblemRules } from "./possible-problems.js";
@@ -16,7 +17,7 @@ type JavaScriptOptions = {
 };
 
 // Policy for every non-deprecated ESLint core rule, shared by JavaScript and TypeScript files.
-const javascriptRules: Linter.RulesRecord = {
+const javascriptRules: Rules = {
   ...possibleProblemRules,
   ...suggestionRules,
 };
