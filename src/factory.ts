@@ -25,12 +25,14 @@ import { unicorn } from "./configs/unicorn.js";
 import { unusedImports } from "./configs/unused-imports.js";
 import { createContext, detectFeatures } from "./context.js";
 import { resolveOptions } from "./options.js";
+import { overlapConfigs } from "./overlaps.js";
 
 /**
 Builds the ESLint flat config. Every feature is on unless it is `false`, except `react`,
 `svelte`, and `express`, which are on when the project uses them. The blocks come in a fixed
-order: global ignores, JavaScript and the code-quality plugins, TypeScript, frameworks, and
-file formats, followed by `userConfigs` in the order given.
+order: global ignores, JavaScript and the code-quality plugins, TypeScript, frameworks, file
+formats, and the rules that other features replace, followed by `userConfigs` in the order
+given.
 */
 async function createConfig(
   options: Options = {},
@@ -87,6 +89,8 @@ async function createConfig(
       ? []
       : packageJson(resolved.packageJson)),
     ...(resolved.markdown === undefined ? [] : markdown(resolved.markdown)),
+
+    ...overlapConfigs(resolved),
 
     ...userConfigs,
   ]);

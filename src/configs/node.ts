@@ -33,11 +33,12 @@ const nodeRules: Rules = {
 
   "n/no-restricted-import": "off", // Project specific
 
-  "n/file-extension-in-import": "off", // Covered by `import-x/extensions` rule
-  "n/no-extraneous-import": "off", // Covered by `import-x/no-extraneous-dependencies` rule
-  "n/no-missing-import": "off", // Covered by `import-x/no-unresolved` rule
-  "n/no-process-exit": "off", // Covered by `unicorn/no-process-exit` rule
-  "n/prefer-node-protocol": "off", // Covered by `unicorn/prefer-node-protocol` rule
+  // Off while their replacements are on, see src/overlaps.ts
+  "n/file-extension-in-import": "error",
+  "n/no-extraneous-import": "error",
+  "n/no-missing-import": "error",
+  "n/no-process-exit": "error",
+  "n/prefer-node-protocol": "error",
 
   "n/exports-style": "off", // Irrelevant for ESM-only project
   "n/global-require": "off", // Irrelevant for ESM-only project

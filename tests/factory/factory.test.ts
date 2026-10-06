@@ -58,6 +58,7 @@ describe("createConfig", () => {
       "json",
       "package-json",
       "markdown",
+      "overlaps",
     ]);
   });
 

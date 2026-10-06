@@ -51,7 +51,7 @@ const replacementRules: Rules = {
   ],
 
   "no-unused-vars": "off",
-  "@typescript-eslint/no-unused-vars": ["off", { ...noUnusedVarsOptions }], // Covered by `eslint-plugin-unused-imports/no-unused-vars`
+  "@typescript-eslint/no-unused-vars": ["error", { ...noUnusedVarsOptions }], // Off while unused-imports is on, see src/overlaps.ts
 
   "no-empty-function": "off",
   "@typescript-eslint/no-empty-function": [

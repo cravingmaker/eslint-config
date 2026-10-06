@@ -84,11 +84,13 @@ const recommendedPossibleProblemRules: Rules = {
     },
   ],
 
-  "no-empty-character-class": "off", // Covered by `eslint-plugin-regexp/no-empty-character-class`
-  "no-invalid-regexp": "off", // Covered by `eslint-plugin-regexp/no-invalid-regexp`
   "no-unexpected-multiline": "off", // Covered by `prettier`
-  "no-unused-vars": ["off", { ...noUnusedVarsOptions }], // Covered by `eslint-plugin-unused-imports`
-  "no-useless-backreference": "off", // Covered by `eslint-plugin-regexp/no-useless-backreference`
+
+  // Off while their replacements are on, see src/overlaps.ts
+  "no-empty-character-class": "error",
+  "no-invalid-regexp": "error",
+  "no-unused-vars": ["error", { ...noUnusedVarsOptions }],
+  "no-useless-backreference": "error",
 } as const;
 
 const possibleProblemRules: Rules = {
@@ -109,7 +111,7 @@ const possibleProblemRules: Rules = {
   "no-use-before-define": ["error", { ...noUseBeforeDefineOptions }],
 
   "no-duplicate-imports": [
-    "off", // Covered by `import-x/no-duplicates`
+    "error", // Off while import-x is on, see src/overlaps.ts
     {
       allowSeparateTypeImports: false,
       includeExports: false,

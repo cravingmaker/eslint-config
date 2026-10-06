@@ -138,7 +138,7 @@ const stylisticRules: Rules = {
   ],
   "@typescript-eslint/consistent-type-definitions": ["error", "type"],
 
-  "@typescript-eslint/adjacent-overload-signatures": "off", // Use ESLint's perfectionist/sort-object-types and perfectionist/sort-interfaces rule instead
+  "@typescript-eslint/adjacent-overload-signatures": "error", // Off while perfectionist is on, see src/overlaps.ts
 } as const;
 
 // The other typescript-eslint rules that work without type information.
@@ -171,7 +171,7 @@ const otherRules: Rules = {
   ],
 
   "@typescript-eslint/member-ordering": [
-    "off", // Use perfectionist's sort-classes rule instead
+    "error", // Off while perfectionist is on, see src/overlaps.ts
     {
       default: {
         memberTypes: [

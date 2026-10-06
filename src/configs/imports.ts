@@ -127,8 +127,9 @@ const importsRules: Rules = {
   "import-x/dynamic-import-chunkname": "off", // Project specific, only target Webpack
   "import-x/no-webpack-loader-syntax": "off", // Project specific, only target Webpack
 
-  "import-x/first": "off", // Covered by `perfectionist/sort-imports` rule
-  "import-x/order": "off", // Covered by `perfectionist/sort-imports` rule
+  // Off while perfectionist is on, see src/overlaps.ts
+  "import-x/first": "error",
+  "import-x/order": "error",
 } as const;
 
 // Builds the flat config for eslint-plugin-import-x. TypeScript files resolve imports through
