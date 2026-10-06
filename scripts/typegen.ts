@@ -55,9 +55,27 @@ const plugins: Record<string, ESLint.Plugin> = {
   "unused-imports": pluginUnusedImports,
 };
 
+/**
+Drops repeated copies of a top-level declaration. json-schema-to-typescript can emit one
+definition twice, as it does for `unicorn/name-replacements`, and a repeated interface fails
+to compile when declaration files are type-checked.
+*/
+function removeRepeatedDeclarations(source: string): string {
+  const parts = source.split(/^(?=(?:interface|type) |\/\/ -{5} )/mu);
+  return parts
+    .filter(
+      (part, index) =>
+        !/^(?:interface|type) /u.test(part) || parts.indexOf(part) === index,
+    )
+    .join("");
+}
+
 const declarations = await pluginsToRulesDTS(plugins, {
   includeAugmentation: false,
 });
 
 // eslint-disable-next-line security/detect-non-literal-fs-filename -- The output path is fixed relative to this script.
-await writeFile(new URL("../src/typegen.d.ts", import.meta.url), declarations);
+await writeFile(
+  new URL("../src/typegen.d.ts", import.meta.url),
+  removeRepeatedDeclarations(declarations),
+);
