@@ -1,9 +1,10 @@
-const javascriptFiles = ["**/*.{js,mjs,cjs,jsx,mjsx}"] as const;
-const typescriptFiles = ["**/*.{ts,mts,cts,tsx,mtsx}"] as const;
+// ES modules. CommonJS is not supported, so `.cjs` and `.cts` files are left out and get no
+// rules. ESLint's default config still matches `.cjs` files and parses them as CommonJS.
+const javascriptFiles = ["**/*.{js,mjs,jsx,mjsx}"] as const;
+const typescriptFiles = ["**/*.{ts,mts,tsx,mtsx}"] as const;
 // JavaScript and TypeScript sources, which share the core and code-quality rules.
 const sourceFiles = [...javascriptFiles, ...typescriptFiles] as const;
 const jsxFiles = ["**/*.{jsx,mjsx}"] as const;
-const commonjsFiles = ["**/*.cjs", "**/*.cts"] as const;
 
 // Files that can hold React components.
 const reactFiles = ["**/*.{jsx,mjsx,tsx,mtsx}"] as const;
@@ -40,7 +41,6 @@ const testFiles = ["**/*.{test,spec}.*"] as const;
 const configFiles = ["**/*.config.*"] as const;
 
 export {
-  commonjsFiles,
   configFiles,
   expressFiles,
   htmlFiles,
