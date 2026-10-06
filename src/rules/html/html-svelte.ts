@@ -1,11 +1,11 @@
-import type { Linter } from 'eslint';
+import type { Linter } from "eslint";
 
-import eslintPluginHtmlSvelte from '@html-eslint/eslint-plugin-svelte';
+import eslintPluginHtmlSvelte from "@html-eslint/eslint-plugin-svelte";
 
-import { getPluginRules } from '../../utilities/plugin-rules.js';
+import { getPluginRules } from "../../utilities/plugin-rules.js";
 
 const htmlSvelteEslintRules: Linter.RulesRecord = {
-	...getPluginRules('@html-eslint/svelte', eslintPluginHtmlSvelte.rules ?? {}),
+  ...getPluginRules("@html-eslint/svelte", eslintPluginHtmlSvelte.rules ?? {}),
 } as const;
 
 export { htmlSvelteEslintRules };

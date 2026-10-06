@@ -1,15 +1,15 @@
-import type { Linter } from 'eslint';
+import type { Linter } from "eslint";
 
-import unusedImportsPlugin from 'eslint-plugin-unused-imports';
+import unusedImportsPlugin from "eslint-plugin-unused-imports";
 
 // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
-import { noUnusedVarsOptions } from '../../options/common.js';
-import { getPluginRules } from '../../utilities/plugin-rules.js';
+import { noUnusedVarsOptions } from "../../options/common.js";
+import { getPluginRules } from "../../utilities/plugin-rules.js";
 
 const unusedImportsEslintRules: Linter.RulesRecord = {
-	...getPluginRules('unused-imports', unusedImportsPlugin.rules ?? {}),
+  ...getPluginRules("unused-imports", unusedImportsPlugin.rules ?? {}),
 
-	'unused-imports/no-unused-vars': ['error', { ...noUnusedVarsOptions }],
+  "unused-imports/no-unused-vars": ["error", { ...noUnusedVarsOptions }],
 };
 
 export { unusedImportsEslintRules };
