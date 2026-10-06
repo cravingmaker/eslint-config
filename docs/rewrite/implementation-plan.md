@@ -1,6 +1,6 @@
 # Rewrite implementation plan
 
-Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stages 1 and 2 are done. Stage 3 is in progress: the parameter immutability item is done. Stages 4 and 5 are not started.
+Status: agreed on 6 October 2026. Stage 0 is done; it landed in the pull request that added this document. Stages 1 and 2 are done. Stage 3 is in progress: the parameter immutability and file-role exceptions items are done. Stages 4 and 5 are not started.
 
 To continue the work, start with [handoff.md](./handoff.md). It explains how to pick up a stage and how to run one in a Claude Code cloud session.
 
@@ -278,7 +278,7 @@ Work the items in the order of the table, which the maintainer set on 6 October 
 | Item                      | Change                                                                                                                    |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Parameter immutability    | Decide the `functional/prefer-immutable-types` options whose results are unstable. Done: `ReadonlyShallow`                |
-| File-role exceptions      | `exceptions.ts`, with the initial content below                                                                           |
+| File-role exceptions      | `exceptions.ts`, with the initial content below. Done, for JavaScript and TypeScript files only                           |
 | CommonJS (F6)             | `.cjs` and `.cts` support is removed and the README says so                                                               |
 | Feature toggles (F7)      | Tests for `false`, `true`, and object on every feature, including rule recovery through the overlap table                 |
 | Peer loading (F1)         | An enabled feature with a missing peer fails with an install message instead of being skipped                             |
@@ -310,6 +310,17 @@ One commit; `npm run validate` passes with 42 test files and 340 tests. `functio
 - **Testing the cache.** Vitest sets `NODE_ENV=test`, so a test that lints in its own process never sees the cache. `tests/policy/parameter-immutability.test.ts` lints fixtures in a child process without `NODE_ENV`, one file after another, in both orders, and expects the same messages; with `ReadonlyDeep` it fails. One `lintFiles` call for several files does not keep their order.
 - **Builder parameters.** A parameter typed `Context`, `Options`, `FeatureOptions`, `TypeAwareScope`, `readonly Linter.Config[]`, or `Readonly<Linter.Globals>` now passes without a default value, alone and with the whole repository; `Rules` is reported in both. A parameter with a default value is still never checked, because the rule does not find its annotation. The disable comment for a `ReadonlyMap` parameter in `tests/deprecated-rules.test.ts` became unused and is removed.
 - **Not changed.** `@typescript-eslint/prefer-readonly-parameter-types`, which keeps no state between calls, stays off; making it the owner would be a policy change beyond this item. The new test file has the usual file-level suppression of `functional/no-expression-statements` and `functional/no-return-void`, which the file-role exceptions item removes with the others.
+
+#### File-role exceptions (done)
+
+Two commits; `npm run validate` passes with 43 test files and 347 tests. `configs/exceptions.ts` turns off `functional/no-expression-statements` and `functional/no-return-void` in test files and `import-x/no-default-export` in config files. Its blocks, `exceptions/config-files` and `exceptions/test-files`, come after the overlaps. The suppressions they replace are gone: the file-level comment in all 42 test files, 83 rule names in all, and the next-line comment in the 3 config files. Three of the test-file comments keep their other rules. What the next items need to know:
+
+- **Patterns are combined with `sourceFiles`.** ESLint lints every file that a `files` pattern matches, unless the pattern is `*`, starts with `!`, or ends in `/*` or `/**`; an AND array counts when any of its patterns does. On their own, `**/*.{test,spec}.*` and `**/*.config.*` made `eslint .` parse two `.txt` snapshots as JavaScript and fail. In a consumer, they would also reach files such as `example.test.ts.snap` and `vite.config.yaml`. `exceptions()` therefore combines each role's patterns with `sourceFiles` into AND patterns, and `tests/configs/exceptions.test.ts` checks that such files stay unlinted. A later block that selects files by name rather than by extension needs the same.
+- **Scope.** A role's rules apply only while the feature that holds them is on, and a role with none of them has no block. The config now has 47 blocks without type information and 50 with it. Unlike an overlap, an exception does not follow the feature's `files`, `ignores`, or `overrides`: `"off"` changes nothing where the feature does not set the rule, and an override still applies outside the role's files. A user config, which comes last, turns a rule back on in those files.
+- **Typed linting.** Both functional rules need type information, so without it, the default, they are already off, and only the config-file exception changes results. The snapshots record `eslint.config.js` in the default suite and `src/example.test.ts` in the type-checked suite. Both were added from unchanged source in a commit before the change, so the change's snapshot diff is the 5 lines it changes.
+- **For the CommonJS item.** The exceptions reach `.cjs` and `.cts` files only through `sourceFiles`, so removing those extensions there removes them here.
+- **For stage 5.** A consumer who suppresses these rules now gets an "Unused eslint-disable directive" warning, because the config sets `reportUnusedDisableDirectives`; with `--max-warnings 0`, the run fails. `eslint --fix` removes the comment but can leave a line with a single space. The migration notes should say so, and the README should list the exceptions and how to turn a rule back on.
+- **Not added.** `import-x/no-anonymous-default-export` reports a config file whose default export is an object literal, such as `export default { … }`. The config files in this repository export a call, so there is no evidence for that exception yet.
 
 ### Stage 4: tests and package contract
 
