@@ -1,0 +1,114 @@
+path: package.json
+ignored: false
+language: @/js
+processor: none
+plugins: @ @eslint-community/eslint-comments enforce-package-type functional import-x markdown n package-json perfectionist promise regexp security unicorn unused-imports
+languageOptions:
+  ecmaVersion: 2026
+  parser: "[Parser jsonc-eslint-parser]"
+  parserOptions: {}
+  sourceType: "module"
+linterOptions:
+  reportUnusedDisableDirectives: 1
+settings: null
+rules: 99 (error 79, off 20, warn 0)
+
+enforce-package-type/enforce-package-type: error [{"enforceType":"module"}]
+package-json/bin-name-casing: error
+package-json/exports-subpaths-style: error [{"prefer":"explicit"}]
+package-json/no-empty-fields: error [{"ignoreProperties":["files"]}]
+package-json/no-local-dependencies: error [{"ignorePrivate":true}]
+package-json/no-redundant-files: error
+package-json/no-redundant-publishConfig: error
+package-json/order-properties: error [{"order":"sort-package-json"}]
+package-json/prefer-rolling-workspace-spec: error [{}]
+package-json/repository-shorthand: error [{"form":"object"}]
+package-json/require-attribution: error [{"ignorePrivate":true,"preferContributorsOnly":false}]
+package-json/require-author: error
+package-json/require-bin: off
+package-json/require-browser: off
+package-json/require-bugs: error [{"ignorePrivate":true}]
+package-json/require-bundleDependencies: off
+package-json/require-config: off
+package-json/require-contributors: off
+package-json/require-cpu: off
+package-json/require-dependencies: off
+package-json/require-description: error
+package-json/require-devDependencies: error
+package-json/require-devEngines: error
+package-json/require-directories: off
+package-json/require-engines: error
+package-json/require-exports: error [{"ignorePrivate":true}]
+package-json/require-files: error [{"ignorePrivate":true}]
+package-json/require-funding: off
+package-json/require-gypfile: off
+package-json/require-homepage: error [{"ignorePrivate":true}]
+package-json/require-keywords: error [{"ignorePrivate":true}]
+package-json/require-libc: off
+package-json/require-license: error [{"ignorePrivate":true}]
+package-json/require-main: off
+package-json/require-man: off
+package-json/require-module: off
+package-json/require-name: error
+package-json/require-optionalDependencies: off
+package-json/require-os: off
+package-json/require-packageManager: off
+package-json/require-peerDependencies: off
+package-json/require-peerDependenciesMeta: error
+package-json/require-private: error
+package-json/require-publishConfig: off
+package-json/require-repository: error [{"ignorePrivate":true}]
+package-json/require-scripts: error
+package-json/require-sideEffects: error [{"ignorePrivate":true}]
+package-json/require-type: error
+package-json/require-types: error [{"ignorePrivate":true}]
+package-json/require-version: error
+package-json/restrict-dependency-ranges: error [{"forDependencyTypes":["dependencies","devDependencies"],"rangeType":"pin"}]
+package-json/restrict-dist-tags: error [{"allowed":["latest","dev","next","alpha","beta","canary","rc"]}]
+package-json/restrict-private-properties: error [{"blockedProperties":["files","publishConfig"]}]
+package-json/restrict-top-level-properties: off [{"ban":[]}]
+package-json/scripts-name-casing: error [{}]
+package-json/sort-collections: error [["config","dependencies","devDependencies","exports","optionalDependencies","overrides","peerDependencies","peerDependenciesMeta","scripts"]]
+package-json/specify-peers-locally: error
+package-json/unique-dependencies: error
+package-json/valid-author: error
+package-json/valid-bin: error
+package-json/valid-browser: error
+package-json/valid-bugs: error
+package-json/valid-bundleDependencies: error
+package-json/valid-config: error
+package-json/valid-contributors: error
+package-json/valid-cpu: error
+package-json/valid-dependencies: error
+package-json/valid-description: error
+package-json/valid-devDependencies: error
+package-json/valid-devEngines: error
+package-json/valid-directories: error
+package-json/valid-engines: error
+package-json/valid-exports: error
+package-json/valid-files: error
+package-json/valid-funding: error
+package-json/valid-gypfile: error
+package-json/valid-homepage: error
+package-json/valid-keywords: error
+package-json/valid-libc: error
+package-json/valid-license: error
+package-json/valid-main: error
+package-json/valid-man: error
+package-json/valid-module: error
+package-json/valid-name: error
+package-json/valid-optionalDependencies: error
+package-json/valid-os: error
+package-json/valid-packageManager: error
+package-json/valid-peerDependencies: error
+package-json/valid-peerDependenciesMeta: error
+package-json/valid-peerDependenciesMeta-relationship: error
+package-json/valid-private: error
+package-json/valid-publishConfig: error
+package-json/valid-repository: error
+package-json/valid-repository-directory: error
+package-json/valid-scripts: error
+package-json/valid-sideEffects: error
+package-json/valid-type: error
+package-json/valid-version: error
+package-json/valid-workspaces: error

@@ -1,0 +1,17 @@
+path: data.jsonc
+ignored: false
+language: json/jsonc
+processor: none
+plugins: @ @eslint-community/eslint-comments functional import-x json markdown n package-json perfectionist promise regexp security unicorn unused-imports
+languageOptions:
+linterOptions:
+  reportUnusedDisableDirectives: 1
+settings: null
+rules: 6 (error 6, off 0, warn 0)
+
+json/no-duplicate-keys: error
+json/no-empty-keys: error
+json/no-unnormalized-keys: error [{"form":"NFC"}]
+json/no-unsafe-values: error
+json/sort-keys: error ["asc",{"allowLineSeparatedGroups":true,"caseSensitive":false,"minKeys":2,"natural":true}]
+json/top-level-interop: error

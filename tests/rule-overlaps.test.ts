@@ -8,18 +8,28 @@ import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../dist/index.mjs";
 
-function getJavaScriptRules(
-  config: readonly Linter.Config[],
-): NonNullable<Linter.Config["rules"]> {
-  return (
-    config.find(
-      (entry) => entry.files?.includes("**/*.{js,mjs,cjs,jsx,mjsx}") === true,
-    )?.rules ?? {}
+async function getJavaScriptRules(
+  isTypeChecked: boolean,
+): Promise<NonNullable<Linter.Config["rules"]>> {
+  const config = await createConfig({
+    tsconfigRootDir: process.cwd(),
+    tsTypeChecked: isTypeChecked,
+  });
+  return Object.fromEntries(
+    config
+      .filter(
+        (entry) => entry.files?.includes("**/*.{js,mjs,cjs,jsx,mjsx}") === true,
+      )
+      .flatMap((entry) => Object.entries(entry.rules ?? {})),
   );
 }
-function getTypeScriptRules(
-  config: readonly Linter.Config[],
-): NonNullable<Linter.Config["rules"]> {
+async function getTypeScriptRules(
+  isTypeChecked: boolean,
+): Promise<NonNullable<Linter.Config["rules"]>> {
+  const config = await createConfig({
+    tsconfigRootDir: process.cwd(),
+    tsTypeChecked: isTypeChecked,
+  });
   return (
     config.find((entry) =>
       Object.hasOwn(entry.plugins ?? {}, "@typescript-eslint"),
@@ -29,11 +39,7 @@ function getTypeScriptRules(
 
 describe("overlapping rule policy", () => {
   it("uses the intended rule authority for JavaScript overlaps", async () => {
-    const config = await createConfig({
-      tsconfigRootDir: process.cwd(),
-      tsTypeChecked: false,
-    });
-    const rules = getJavaScriptRules(config);
+    const rules = await getJavaScriptRules(false);
 
     expect(rules["arrow-body-style"]).toEqual(["error", "as-needed"]);
     expect(rules["unicorn/consistent-arrow-return-style"]).toBeUndefined();
@@ -101,11 +107,7 @@ describe("overlapping rule policy", () => {
   });
 
   it("prefers TypeScript-aware extension rules in TypeScript files", async () => {
-    const config = await createConfig({
-      tsconfigRootDir: process.cwd(),
-      tsTypeChecked: true,
-    });
-    const rules = getTypeScriptRules(config);
+    const rules = await getTypeScriptRules(true);
 
     expect(rules["no-unused-private-class-members"]).toBe("off");
     expect(rules["@typescript-eslint/no-unused-private-class-members"]).toBe(

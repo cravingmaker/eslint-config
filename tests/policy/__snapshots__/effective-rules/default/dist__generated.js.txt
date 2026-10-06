@@ -1,0 +1,3 @@
+path: dist/generated.js
+ignored: true
+config: none

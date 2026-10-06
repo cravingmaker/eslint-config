@@ -32,9 +32,9 @@ import pluginHtml from "@html-eslint/eslint-plugin";
 import htmlParser from "@html-eslint/parser";
 import * as jsoncParser from "jsonc-eslint-parser";
 
+import { javascript, javascriptRules } from "./configs/javascript/index.js";
+import { javascriptFiles } from "./globs.js";
 import { htmlEslintRules } from "./rules/html/html.js";
-import { possibleProblemRules } from "./rules/js/possible-problems.js";
-import { suggestionRules } from "./rules/js/suggestions.js";
 import { enforcePackageTypeEslintRules } from "./rules/json/enforce-package-type.js";
 import { jsonEslintRules } from "./rules/json/json.js";
 import { packageJsonEslintRules } from "./rules/json/package-json.js";
@@ -248,8 +248,7 @@ function buildTsConfig({
     name: "@cravingmaker/eslint-config/typescript",
     plugins: { "@typescript-eslint": plugin },
     rules: {
-      ...possibleProblemRules,
-      ...suggestionRules,
+      ...javascriptRules,
       ...tsRules,
       ...unicornEslintRules,
       ...functionalRules,
@@ -452,17 +451,11 @@ export async function createConfig({
       },
     },
 
+    ...javascript({ globals: resolvedGlobals, overrides: jsRuleOverrides }),
     {
-      files: ["**/*.{js,mjs,cjs,jsx,mjsx}"],
-      languageOptions: {
-        ecmaVersion: "latest",
-        globals: resolvedGlobals,
-        sourceType: "module",
-      },
-      name: "@cravingmaker/eslint-config/javascript",
+      files: [...javascriptFiles],
+      name: "@cravingmaker/eslint-config/javascript/plugin-rules",
       rules: {
-        ...possibleProblemRules,
-        ...suggestionRules,
         ...unicornEslintRules,
         ...functionalEslintRules,
         ...promiseEslintRules,
