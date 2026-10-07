@@ -306,7 +306,7 @@ describe("a consumer without optional peers", () => {
     ).toEqual(withoutMessages(fixturesWithoutPeers));
   }, 120_000);
 
-  it("fails with an install message for a framework that is on or that the project declares", async () => {
+  it("fails with an install message for a framework that is on or that the project declares, and needs no peer for one that is off", async () => {
     const declaresReact = await createProjectRoot(withoutPeers, "react", [
       "react",
     ]);
@@ -314,6 +314,7 @@ describe("a consumer without optional peers", () => {
     expect(
       await runFrameworkCases(withoutPeers, {
         declared: { projectRootDirectory: declaresReact },
+        declaredOff: { projectRootDirectory: declaresReact, react: false },
         express: { express: true },
         react: { react: true },
         svelte: { svelte: true },
@@ -322,6 +323,7 @@ describe("a consumer without optional peers", () => {
     ).toEqual({
       declared:
         'The "react" feature needs "@html-eslint/eslint-plugin-react", which is not installed. Install it, or set `react: false` to turn the feature off.',
+      declaredOff: [],
       express:
         'The "express" feature needs "eslint-plugin-express-security", which is not installed. Install it, or set `express: false` to turn the feature off.',
       react:
