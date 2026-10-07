@@ -1,0 +1,5 @@
+{
+  "colors": ["red", "green", "blue"],
+  "name": "Fixture data",
+  "sizes": { "large": 24, "medium": 16, "small": 12 }
+}

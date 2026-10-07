@@ -1,0 +1,6 @@
+// JSON5 allows comments, unquoted keys, and trailing commas.
+{
+  colors: ["red", "green", "blue"],
+  name: "Fixture data",
+  sizes: { large: 24, medium: 16, small: 12 },
+}

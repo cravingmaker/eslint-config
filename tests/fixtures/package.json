@@ -1,0 +1,37 @@
+{
+  "name": "@cravingmaker/eslint-config-fixtures",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Valid files of each type that @cravingmaker/eslint-config lints",
+  "author": "cravingmaker (https://github.com/cravingmaker)",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "10.11.0",
+    "react": "19.3.0",
+    "svelte": "5.55.9"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0 <20",
+    "svelte": ">=5.0.0 <6"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24.15.0"
+    }
+  }
+}
