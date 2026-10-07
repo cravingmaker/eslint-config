@@ -30,6 +30,9 @@ The type-aware-scope suite limits typed linting to `src/` without
 `src/legacy/`, and leaves generated files out of the TypeScript feature. It
 records a file outside `filesTypeAware`, one in `ignoresTypeAware`, and one in
 `typescript.ignores`.
+
+The type-checked suite also records a Svelte component, which typed linting
+leaves out of the type-aware scope.
 */
 const suites = [
   {
@@ -91,7 +94,12 @@ const suites = [
     options: baseOptions,
   },
   {
-    filePaths: ["src/example.ts", "src/example.tsx", "src/example.test.ts"],
+    filePaths: [
+      "src/example.ts",
+      "src/example.tsx",
+      "src/example.test.ts",
+      "src/Component.svelte",
+    ],
     name: "type-checked",
     options: {
       ...baseOptions,
