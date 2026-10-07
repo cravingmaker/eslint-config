@@ -25,6 +25,11 @@ line is a changed lint policy.
 
 The narrowed-owners suite limits each feature that replaces rules of other
 features to `src/`, and records files outside it.
+
+The type-aware-scope suite limits typed linting to `src/` without
+`src/legacy/`, and leaves generated files out of the TypeScript feature. It
+records a file outside `filesTypeAware`, one in `ignoresTypeAware`, and one in
+`typescript.ignores`.
 */
 const suites = [
   {
@@ -37,6 +42,24 @@ const suites = [
       regexp: { files: ["src/**"] },
       unicorn: { files: ["src/**"] },
       unusedImports: { files: ["src/**"] },
+    },
+  },
+  {
+    filePaths: [
+      "scripts/example.ts",
+      "src/legacy/example.ts",
+      "src/example.generated.ts",
+    ],
+    name: "type-aware-scope",
+    options: {
+      ...baseOptions,
+      typescript: {
+        ...baseOptions.typescript,
+        filesTypeAware: ["src/**"],
+        ignores: ["**/*.generated.ts"],
+        ignoresTypeAware: ["src/legacy/**"],
+        typeChecked: true,
+      },
     },
   },
   {

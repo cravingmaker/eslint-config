@@ -1,0 +1,958 @@
+path: scripts/example.ts
+ignored: false
+language: @/js
+processor: none
+plugins: @ @eslint-community/eslint-comments @typescript-eslint express-security functional import-x markdown n package-json perfectionist promise react-hooks regexp security unicorn unused-imports
+languageOptions:
+  ecmaVersion: 2026
+  globals: "AggregateError:false Array:false ArrayBuffer:false AsyncDisposableStack:false Atomics:false BigInt:false BigInt64Array:false BigUint64Array:false Boolean:false DataView:false Date:false DisposableStack:false Error:false EvalError:false FinalizationRegistry:false Float16Array:false Float32Array:false Float64Array:false Function:false Infinity:false Int16Array:false Int32Array:false Int8Array:false Intl:false Iterator:false JSON:false Map:false Math:false NaN:false Number:false Object:false Promise:false Proxy:false RangeError:false ReferenceError:false Reflect:false RegExp:false Set:false SharedArrayBuffer:false String:false SuppressedError:false Symbol:false SyntaxError:false TypeError:false URIError:false Uint16Array:false Uint32Array:false Uint8Array:false Uint8ClampedArray:false WeakMap:false WeakRef:false WeakSet:false decodeURI:false decodeURIComponent:false encodeURI:false encodeURIComponent:false escape:false eval:false globalThis:false isFinite:false isNaN:false parseFloat:false parseInt:false undefined:false unescape:false"
+  parser: "[Parser typescript-eslint/parser]"
+  parserOptions: {"projectService":true,"tsconfigRootDir":"<root>"}
+  sourceType: "module"
+linterOptions:
+  reportUnusedDisableDirectives: 1
+settings:
+  import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
+rules: 941 (error 718, off 208, warn 15)
+
+@eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
+@eslint-community/eslint-comments/no-aggregating-enable: error
+@eslint-community/eslint-comments/no-duplicate-disable: error
+@eslint-community/eslint-comments/no-restricted-disable: off
+@eslint-community/eslint-comments/no-unlimited-disable: error
+@eslint-community/eslint-comments/no-unused-enable: error
+@eslint-community/eslint-comments/no-use: error [{"allow":["eslint-disable","eslint-enable","eslint-disable-next-line"]}]
+@eslint-community/eslint-comments/require-description: error
+@typescript-eslint/adjacent-overload-signatures: off
+@typescript-eslint/array-type: error [{"default":"array-simple"}]
+@typescript-eslint/await-thenable: off
+@typescript-eslint/ban-ts-comment: error [{"minimumDescriptionLength":10,"ts-check":false,"ts-expect-error":"allow-with-description","ts-ignore":true,"ts-nocheck":true}]
+@typescript-eslint/ban-tslint-comment: error
+@typescript-eslint/class-literal-property-style: error ["fields"]
+@typescript-eslint/class-methods-use-this: error [{"enforceForClassFields":true,"exceptMethods":[],"ignoreClassesThatImplementAnInterface":"public-fields","ignoreOverrideMethods":true}]
+@typescript-eslint/consistent-generic-constructors: error ["constructor"]
+@typescript-eslint/consistent-indexed-object-style: error ["record"]
+@typescript-eslint/consistent-return: off [{"treatUndefinedAsUnspecified":false}]
+@typescript-eslint/consistent-type-assertions: error [{"arrayLiteralTypeAssertions":"allow-as-parameter","assertionStyle":"as","objectLiteralTypeAssertions":"allow-as-parameter"}]
+@typescript-eslint/consistent-type-definitions: error ["type"]
+@typescript-eslint/consistent-type-exports: off
+@typescript-eslint/consistent-type-imports: error [{"disallowTypeAnnotations":true,"fixStyle":"separate-type-imports","prefer":"type-imports"}]
+@typescript-eslint/default-param-last: error
+@typescript-eslint/dot-notation: off [{"allowIndexSignaturePropertyAccess":false,"allowKeywords":true,"allowPattern":"","allowPrivateClassPropertyAccess":false,"allowProtectedClassPropertyAccess":false}]
+@typescript-eslint/explicit-function-return-type: off [{"allowConciseArrowFunctionExpressionsStartingWithVoid":false,"allowDirectConstAssertionInArrowFunctions":true,"allowExpressions":false,"allowFunctionsWithoutTypeParameters":false,"allowHigherOrderFunctions":true,"allowIIFEs":false,"allowTypedFunctionExpressions":true,"allowedNames":[]}]
+@typescript-eslint/explicit-member-accessibility: error [{"accessibility":"no-public","overrides":{"constructors":"off","parameterProperties":"off"}}]
+@typescript-eslint/explicit-module-boundary-types: off [{"allowArgumentsExplicitlyTypedAsAny":false,"allowDirectConstAssertionInArrowFunctions":true,"allowHigherOrderFunctions":true,"allowOverloadFunctions":false,"allowTypedFunctionExpressions":true,"allowedNames":[]}]
+@typescript-eslint/init-declarations: off
+@typescript-eslint/max-params: error [{"countVoidThis":false,"max":4}]
+@typescript-eslint/member-ordering: off [{"default":{"memberTypes":["public-static-field","protected-static-field","private-static-field","#private-static-field","static-initialization","public-decorated-field","protected-decorated-field","private-decorated-field","public-instance-field","protected-instance-field","private-instance-field","#private-instance-field","public-abstract-field","protected-abstract-field","signature","call-signature","public-constructor","protected-constructor","private-constructor","public-static-accessor","protected-static-accessor","private-static-accessor","#private-static-accessor","public-static-get","protected-static-get","private-static-get","#private-static-get","public-static-set","protected-static-set","private-static-set","#private-static-set","public-static-method","protected-static-method","private-static-method","#private-static-method","public-decorated-accessor","protected-decorated-accessor","private-decorated-accessor","public-instance-accessor","protected-instance-accessor","private-instance-accessor","#private-instance-accessor","public-abstract-accessor","protected-abstract-accessor","public-decorated-get","protected-decorated-get","private-decorated-get","public-instance-get","protected-instance-get","private-instance-get","#private-instance-get","public-abstract-get","protected-abstract-get","public-decorated-set","protected-decorated-set","private-decorated-set","public-instance-set","protected-instance-set","private-instance-set","#private-instance-set","public-abstract-set","protected-abstract-set","public-decorated-method","protected-decorated-method","private-decorated-method","public-instance-method","protected-instance-method","private-instance-method","#private-instance-method","public-abstract-method","protected-abstract-method"],"order":"alphabetically-case-insensitive"}}]
+@typescript-eslint/method-signature-style: error ["property"]
+@typescript-eslint/naming-convention: off
+@typescript-eslint/no-array-constructor: error
+@typescript-eslint/no-array-delete: off
+@typescript-eslint/no-base-to-string: off
+@typescript-eslint/no-confusing-non-null-assertion: error
+@typescript-eslint/no-confusing-void-expression: off
+@typescript-eslint/no-deprecated: off
+@typescript-eslint/no-dupe-class-members: off
+@typescript-eslint/no-duplicate-enum-values: error
+@typescript-eslint/no-duplicate-type-constituents: off
+@typescript-eslint/no-dynamic-delete: error
+@typescript-eslint/no-empty-function: error [{"allow":[]}]
+@typescript-eslint/no-empty-object-type: error [{"allowInterfaces":"with-single-extends","allowObjectTypes":"never","allowWithName":""}]
+@typescript-eslint/no-explicit-any: error [{"fixToUnknown":false,"ignoreRestArgs":false}]
+@typescript-eslint/no-extra-non-null-assertion: error
+@typescript-eslint/no-extraneous-class: error [{"allowConstructorOnly":false,"allowEmpty":false,"allowStaticOnly":false,"allowWithDecorator":true}]
+@typescript-eslint/no-floating-promises: off
+@typescript-eslint/no-for-in-array: off
+@typescript-eslint/no-generated-empty-object-type: off
+@typescript-eslint/no-implied-eval: off
+@typescript-eslint/no-import-type-side-effects: error
+@typescript-eslint/no-inferrable-types: error [{"ignoreParameters":false,"ignoreProperties":false}]
+@typescript-eslint/no-invalid-this: off [{"capIsConstructor":true}]
+@typescript-eslint/no-invalid-void-type: error [{"allowAsThisParameter":false,"allowInGenericTypeArguments":true}]
+@typescript-eslint/no-magic-numbers: off [{"detectObjects":false,"enforceConst":false,"ignore":[],"ignoreArrayIndexes":false,"ignoreEnums":false,"ignoreNumericLiteralTypes":false,"ignoreReadonlyClassProperties":false,"ignoreTypeIndexes":false}]
+@typescript-eslint/no-meaningless-void-operator: off
+@typescript-eslint/no-misused-new: error
+@typescript-eslint/no-misused-promises: off
+@typescript-eslint/no-misused-spread: off
+@typescript-eslint/no-mixed-enums: off
+@typescript-eslint/no-namespace: error [{"allowDeclarations":false,"allowDefinitionFiles":true}]
+@typescript-eslint/no-non-null-asserted-nullish-coalescing: error
+@typescript-eslint/no-non-null-asserted-optional-chain: error
+@typescript-eslint/no-non-null-assertion: error
+@typescript-eslint/no-redeclare: off
+@typescript-eslint/no-redundant-type-constituents: off
+@typescript-eslint/no-require-imports: error [{"allow":[],"allowAsImport":false}]
+@typescript-eslint/no-restricted-types: off
+@typescript-eslint/no-shadow: error [{"allow":[],"builtinGlobals":false,"hoist":"functions-and-types","ignoreFunctionTypeParameterNameValueShadow":true,"ignoreOnInitialization":false,"ignoreTypeValueShadow":true}]
+@typescript-eslint/no-this-alias: error [{"allowDestructuring":true,"allowedNames":[]}]
+@typescript-eslint/no-unnecessary-boolean-literal-compare: off
+@typescript-eslint/no-unnecessary-condition: off
+@typescript-eslint/no-unnecessary-parameter-property-assignment: error
+@typescript-eslint/no-unnecessary-qualifier: off
+@typescript-eslint/no-unnecessary-template-expression: off
+@typescript-eslint/no-unnecessary-type-arguments: off
+@typescript-eslint/no-unnecessary-type-assertion: off
+@typescript-eslint/no-unnecessary-type-constraint: error
+@typescript-eslint/no-unnecessary-type-conversion: off
+@typescript-eslint/no-unnecessary-type-parameters: off
+@typescript-eslint/no-unsafe-argument: off
+@typescript-eslint/no-unsafe-assignment: off
+@typescript-eslint/no-unsafe-call: off
+@typescript-eslint/no-unsafe-declaration-merging: error
+@typescript-eslint/no-unsafe-enum-comparison: off
+@typescript-eslint/no-unsafe-function-type: error
+@typescript-eslint/no-unsafe-member-access: off
+@typescript-eslint/no-unsafe-return: off
+@typescript-eslint/no-unsafe-type-assertion: off
+@typescript-eslint/no-unsafe-unary-minus: off
+@typescript-eslint/no-unused-expressions: error [{"allowShortCircuit":true,"allowTaggedTemplates":true,"allowTernary":true,"enforceForJSX":true,"ignoreDirectives":false}]
+@typescript-eslint/no-unused-private-class-members: error
+@typescript-eslint/no-unused-vars: off [{"args":"after-used","argsIgnorePattern":"^_","caughtErrors":"all","caughtErrorsIgnorePattern":"^_","destructuredArrayIgnorePattern":"^_","ignoreClassWithStaticInitBlock":false,"ignoreRestSiblings":true,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"vars":"all","varsIgnorePattern":"^_"}]
+@typescript-eslint/no-use-before-define: error [{"allowNamedExports":false,"classes":true,"enums":true,"functions":false,"ignoreTypeReferences":true,"typedefs":true,"variables":true}]
+@typescript-eslint/no-useless-constructor: error
+@typescript-eslint/no-useless-default-assignment: off
+@typescript-eslint/no-useless-empty-export: error
+@typescript-eslint/no-wrapper-object-types: error
+@typescript-eslint/non-nullable-type-assertion-style: off
+@typescript-eslint/only-throw-error: off
+@typescript-eslint/parameter-properties: off
+@typescript-eslint/prefer-as-const: error
+@typescript-eslint/prefer-destructuring: off
+@typescript-eslint/prefer-enum-initializers: error
+@typescript-eslint/prefer-find: off
+@typescript-eslint/prefer-for-of: error
+@typescript-eslint/prefer-function-type: error
+@typescript-eslint/prefer-includes: off
+@typescript-eslint/prefer-literal-enum-member: error [{"allowBitwiseExpressions":true}]
+@typescript-eslint/prefer-namespace-keyword: error
+@typescript-eslint/prefer-nullish-coalescing: off
+@typescript-eslint/prefer-optional-chain: off
+@typescript-eslint/prefer-promise-reject-errors: off
+@typescript-eslint/prefer-readonly: off
+@typescript-eslint/prefer-readonly-parameter-types: off
+@typescript-eslint/prefer-reduce-type-parameter: off
+@typescript-eslint/prefer-regexp-exec: off
+@typescript-eslint/prefer-return-this-type: off
+@typescript-eslint/prefer-string-starts-ends-with: off
+@typescript-eslint/promise-function-async: off
+@typescript-eslint/related-getter-setter-pairs: off
+@typescript-eslint/require-array-sort-compare: off
+@typescript-eslint/require-await: off
+@typescript-eslint/restrict-plus-operands: off
+@typescript-eslint/restrict-template-expressions: off
+@typescript-eslint/return-await: off
+@typescript-eslint/strict-boolean-expressions: off
+@typescript-eslint/strict-void-return: off
+@typescript-eslint/switch-exhaustiveness-check: off
+@typescript-eslint/triple-slash-reference: error [{"lib":"never","path":"never","types":"never"}]
+@typescript-eslint/unbound-method: off
+@typescript-eslint/unified-signatures: error [{"ignoreDifferentlyNamedParameters":false,"ignoreOverloadsWithDifferentJSDoc":false}]
+@typescript-eslint/use-unknown-in-catch-callback-variable: off
+accessor-pairs: error [{"enforceForClassMembers":true,"enforceForTSTypes":false,"getWithoutSet":false,"setWithoutGet":true}]
+array-callback-return: error [{"allowImplicit":true,"allowVoid":false,"checkForEach":false}]
+arrow-body-style: error ["as-needed"]
+block-scoped-var: error
+camelcase: error [{"allow":[],"ignoreDestructuring":false,"ignoreGlobals":false,"ignoreImports":false,"properties":"always"}]
+capitalized-comments: off ["always",{"ignoreConsecutiveComments":false,"ignoreInlineComments":false}]
+class-methods-use-this: off [{"enforceForClassFields":true,"exceptMethods":[],"ignoreOverrideMethods":false}]
+complexity: error [{"max":20,"variant":"classic"}]
+consistent-return: off [{"treatUndefinedAsUnspecified":false}]
+consistent-this: off ["that"]
+constructor-super: off
+curly: off ["all"]
+default-case: error [{}]
+default-case-last: error
+default-param-last: off
+dot-notation: error [{"allowKeywords":true,"allowPattern":""}]
+eqeqeq: error ["always"]
+express-security/no-cors-credentials-wildcard: error
+express-security/no-exposed-debug-endpoints: off
+express-security/no-express-unsafe-regex-route: error
+express-security/no-graphql-introspection-production: error
+express-security/no-insecure-cookie-options: error
+express-security/no-permissive-cors: error
+express-security/require-csrf-protection: error
+express-security/require-express-body-parser-limits: error
+express-security/require-helmet: error
+express-security/require-rate-limiting: error
+for-direction: error
+func-name-matching: error ["always",{"considerPropertyDescriptor":true,"includeCommonJSModuleExports":false}]
+func-names: error ["never",{"generators":"never"}]
+func-style: off ["expression",{"allowArrowFunctions":false,"allowTypeAnnotation":false,"overrides":{}}]
+functional/functional-parameters: off
+functional/immutable-data: off
+functional/no-class-inheritance: error
+functional/no-classes: error
+functional/no-conditional-statements: off
+functional/no-expression-statements: off
+functional/no-let: error [{"allowInForLoopInit":true}]
+functional/no-loop-statements: error
+functional/no-mixed-types: off
+functional/no-promise-reject: error
+functional/no-return-void: off
+functional/no-this-expressions: off
+functional/no-throw-statements: off
+functional/no-try-statements: off
+functional/prefer-immutable-types: off
+functional/prefer-property-signatures: off
+functional/prefer-tacit: off
+functional/readonly-type: off
+functional/type-declaration-immutability: off
+getter-return: off [{"allowImplicit":true}]
+grouped-accessor-pairs: error ["getBeforeSet",{"enforceForTSTypes":false}]
+guard-for-in: off
+id-denylist: off
+id-length: off [{"exceptionPatterns":[],"exceptions":[],"max":"[Number Infinity]","min":2,"properties":"always"}]
+id-match: off ["^.+$",{"classFields":false,"ignoreDestructuring":false,"onlyDeclarations":false,"properties":false}]
+import-x/consistent-type-specifier-style: error
+import-x/default: error
+import-x/dynamic-import-chunkname: off
+import-x/export: error
+import-x/exports-last: error
+import-x/extensions: error ["ignorePackages",{"js":"always","jsx":"always","mjs":"always","mts":"never","ts":"never","tsx":"never"}]
+import-x/first: off
+import-x/group-exports: error
+import-x/max-dependencies: off
+import-x/named: error
+import-x/namespace: error
+import-x/newline-after-import: error [{"considerComments":true,"exactCount":true}]
+import-x/no-absolute-path: error
+import-x/no-amd: error
+import-x/no-anonymous-default-export: error
+import-x/no-commonjs: error [{"allowConditionalRequire":false,"allowPrimitiveModules":false,"allowRequire":false}]
+import-x/no-cycle: off
+import-x/no-default-export: error
+import-x/no-deprecated: error
+import-x/no-duplicates: error
+import-x/no-dynamic-require: error
+import-x/no-empty-named-blocks: error
+import-x/no-extraneous-dependencies: error
+import-x/no-import-module-exports: error
+import-x/no-internal-modules: off
+import-x/no-mutable-exports: error
+import-x/no-named-as-default: error
+import-x/no-named-as-default-member: error
+import-x/no-named-default: error
+import-x/no-named-export: off
+import-x/no-namespace: error [{"ignore":["node:assert","node:assert/strict","node:async_hooks","node:buffer","node:child_process","node:cluster","node:console","node:constants","node:crypto","node:dgram","node:diagnostics_channel","node:dns","node:dns/promises","node:domain","node:events","node:fs","node:fs/promises","node:http","node:http2","node:https","node:inspector","node:inspector/promises","node:module","node:net","node:os","node:path","node:path/posix","node:path/win32","node:perf_hooks","node:process","node:querystring","node:readline","node:readline/promises","node:repl","node:sea","node:sqlite","node:stream","node:stream/consumers","node:stream/promises","node:stream/web","node:string_decoder","node:sys","node:test","node:test/reporters","node:timers","node:timers/promises","node:tls","node:trace_events","node:tty","node:url","node:util","node:util/types","node:v8","node:vm","node:wasi","node:worker_threads","node:zlib","react","react-dom","jsonc-eslint-parser"]}]
+import-x/no-nodejs-modules: off
+import-x/no-relative-packages: error
+import-x/no-relative-parent-imports: off
+import-x/no-rename-default: error
+import-x/no-restricted-paths: off
+import-x/no-self-import: error
+import-x/no-unassigned-import: error
+import-x/no-unresolved: error
+import-x/no-unused-modules: off
+import-x/no-useless-path-segments: error
+import-x/no-webpack-loader-syntax: off
+import-x/order: off
+import-x/prefer-default-export: off
+import-x/prefer-namespace-import: off
+import-x/unambiguous: error
+init-declarations: off ["always"]
+logical-assignment-operators: error ["always",{"enforceForIfStatements":false}]
+max-classes-per-file: off [{"ignoreExpressions":false,"max":1}]
+max-depth: error [{"max":4}]
+max-lines: error [{"max":1500,"skipBlankLines":true,"skipComments":true}]
+max-lines-per-function: off [{"IIFEs":false,"max":50,"skipBlankLines":true,"skipComments":true}]
+max-nested-callbacks: error [4]
+max-params: off [{"max":4}]
+max-statements: off [10]
+n/callback-return: error
+n/exports-style: off
+n/file-extension-in-import: off
+n/global-require: off
+n/handle-callback-err: error
+n/hashbang: error [{"executableMap":{".js":"node",".mjs":"node"},"ignoreUnpublished":true}]
+n/no-callback-literal: error
+n/no-deprecated-api: error [{"ignoreIndirectDependencies":true}]
+n/no-exports-assign: off
+n/no-extraneous-import: off
+n/no-extraneous-require: off
+n/no-missing-import: off
+n/no-missing-require: off
+n/no-mixed-requires: off
+n/no-new-require: off
+n/no-path-concat: error
+n/no-process-env: warn [{"allowedVariables":["NODE_ENV"]}]
+n/no-process-exit: off
+n/no-restricted-import: off
+n/no-restricted-require: off
+n/no-sync: off [{"allowAtRootLevel":true}]
+n/no-top-level-await: off
+n/no-unpublished-bin: error
+n/no-unpublished-import: error
+n/no-unpublished-require: off
+n/no-unsupported-features/es-builtins: error
+n/no-unsupported-features/es-syntax: error
+n/no-unsupported-features/node-builtins: error
+n/prefer-global/buffer: error ["never"]
+n/prefer-global/console: error
+n/prefer-global/crypto: error ["never"]
+n/prefer-global/process: error ["never"]
+n/prefer-global/text-decoder: error
+n/prefer-global/text-encoder: error
+n/prefer-global/timers: error
+n/prefer-global/url: error
+n/prefer-global/url-search-params: error
+n/prefer-import/assert-strict: error
+n/prefer-node-protocol: off
+n/prefer-process-get-builtin-module: error
+n/prefer-promises/dns: error
+n/prefer-promises/fs: error
+n/process-exit-as-throw: error
+new-cap: off [{"capIsNew":true,"capIsNewExceptions":[],"newIsCap":true,"newIsCapExceptions":[],"properties":true}]
+no-alert: error
+no-array-constructor: off
+no-async-promise-executor: error
+no-await-in-loop: error
+no-bitwise: error [{"allow":[],"int32Hint":false}]
+no-caller: error
+no-case-declarations: error
+no-class-assign: off
+no-compare-neg-zero: error
+no-cond-assign: error ["except-parens"]
+no-console: off [{}]
+no-const-assign: off
+no-constant-binary-expression: error [{"checkRelationalComparisons":false}]
+no-constant-condition: error [{"checkLoops":"allExceptWhileTrue"}]
+no-constructor-return: error
+no-continue: off
+no-control-regex: error
+no-debugger: error
+no-delete-var: error
+no-div-regex: off
+no-dupe-args: off
+no-dupe-class-members: off
+no-dupe-else-if: error
+no-dupe-keys: off
+no-duplicate-case: error
+no-duplicate-imports: off [{"allowSeparateTypeImports":false,"includeExports":false}]
+no-else-return: error [{"allowElseIf":false}]
+no-empty: error [{"allowEmptyCatch":true}]
+no-empty-character-class: off
+no-empty-function: off [{"allow":[]}]
+no-empty-pattern: error [{"allowObjectPatternsAsParameters":false}]
+no-empty-static-block: error
+no-eq-null: error
+no-eval: error [{"allowIndirect":false}]
+no-ex-assign: error
+no-extend-native: error [{"exceptions":[]}]
+no-extra-bind: error
+no-extra-boolean-cast: error [{}]
+no-extra-label: error
+no-fallthrough: error [{"allowEmptyCase":false,"reportUnusedFallthroughComment":false}]
+no-func-assign: off
+no-global-assign: error [{"exceptions":[]}]
+no-implicit-coercion: error [{"allow":[],"boolean":true,"disallowTemplateShorthand":false,"number":true,"string":true}]
+no-implicit-globals: error [{"lexicalBindings":false}]
+no-implied-eval: error
+no-import-assign: off
+no-inline-comments: off [{}]
+no-inner-declarations: error ["functions",{"blockScopedFunctions":"allow"}]
+no-invalid-regexp: off [{}]
+no-invalid-this: off [{"capIsConstructor":true}]
+no-irregular-whitespace: error [{"skipComments":false,"skipJSXText":false,"skipRegExps":false,"skipStrings":true,"skipTemplates":false}]
+no-iterator: error
+no-label-var: error
+no-labels: error [{"allowLoop":false,"allowSwitch":false}]
+no-lone-blocks: error
+no-lonely-if: error
+no-loop-func: error
+no-loss-of-precision: error
+no-magic-numbers: off [{"detectObjects":false,"enforceConst":false,"ignore":[],"ignoreArrayIndexes":false,"ignoreClassFieldInitialValues":false,"ignoreDefaultValues":false,"ignoreEnums":false,"ignoreNumericLiteralTypes":false,"ignoreReadonlyClassProperties":false,"ignoreTypeIndexes":false}]
+no-misleading-character-class: error [{"allowEscape":false}]
+no-multi-assign: error [{"ignoreNonDeclaration":false}]
+no-multi-str: error
+no-negated-condition: off
+no-nested-ternary: off
+no-new: error
+no-new-func: error
+no-new-native-nonconstructor: off
+no-new-wrappers: error
+no-nonoctal-decimal-escape: error
+no-obj-calls: off
+no-object-constructor: error
+no-octal: error
+no-octal-escape: error
+no-param-reassign: error [{"props":false}]
+no-plusplus: off [{"allowForLoopAfterthoughts":false}]
+no-promise-executor-return: error [{"allowVoid":false}]
+no-proto: error
+no-prototype-builtins: error
+no-redeclare: off [{"builtinGlobals":true}]
+no-regex-spaces: error
+no-restricted-exports: off [{}]
+no-restricted-globals: off
+no-restricted-imports: off [{}]
+no-restricted-properties: off
+no-restricted-syntax: off
+no-return-assign: error ["always"]
+no-script-url: error
+no-self-assign: error [{"props":true}]
+no-self-compare: error
+no-sequences: error [{"allowInParentheses":false}]
+no-setter-return: off
+no-shadow: off [{"allow":[],"builtinGlobals":false,"hoist":"functions","ignoreFunctionTypeParameterNameValueShadow":true,"ignoreOnInitialization":false,"ignoreTypeValueShadow":true}]
+no-shadow-restricted-names: error [{"reportGlobalThis":true}]
+no-sparse-arrays: error
+no-template-curly-in-string: error
+no-ternary: off
+no-this-before-super: off
+no-throw-literal: error
+no-unassigned-vars: error
+no-undef: off [{"typeof":true}]
+no-undef-init: error
+no-undefined: off
+no-underscore-dangle: off [{"allow":[],"allowAfterSuper":false,"allowAfterThis":false,"allowAfterThisConstructor":false,"allowFunctionParams":true,"allowInArrayDestructuring":true,"allowInObjectDestructuring":true,"enforceInClassFields":false,"enforceInMethodNames":false}]
+no-unexpected-multiline: off
+no-unmodified-loop-condition: error [{"checkConditionalExpressions":false}]
+no-unneeded-ternary: error [{"defaultAssignment":true}]
+no-unreachable: off
+no-unreachable-loop: error [{"ignore":[]}]
+no-unsafe-finally: error
+no-unsafe-negation: off [{"enforceForOrderingRelations":true}]
+no-unsafe-optional-chaining: error [{"disallowArithmeticOperators":true}]
+no-unused-expressions: off [{"allowShortCircuit":true,"allowTaggedTemplates":true,"allowTernary":true,"enforceForJSX":true,"ignoreDirectives":false}]
+no-unused-labels: error
+no-unused-private-class-members: off
+no-unused-vars: off [{"args":"after-used","argsIgnorePattern":"^_","caughtErrors":"all","caughtErrorsIgnorePattern":"^_","destructuredArrayIgnorePattern":"^_","ignoreClassWithStaticInitBlock":false,"ignoreRestSiblings":true,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"vars":"all","varsIgnorePattern":"^_"}]
+no-use-before-define: off [{"allowNamedExports":false,"classes":true,"enums":true,"functions":true,"ignoreTypeReferences":true,"typedefs":true,"variables":true}]
+no-useless-assignment: off
+no-useless-backreference: off
+no-useless-call: error
+no-useless-catch: error
+no-useless-computed-key: error [{"enforceForClassMembers":true}]
+no-useless-concat: error
+no-useless-constructor: off
+no-useless-escape: error [{"allowRegexCharacters":[]}]
+no-useless-rename: error [{"ignoreDestructuring":false,"ignoreExport":false,"ignoreImport":false}]
+no-useless-return: error
+no-var: error
+no-void: error [{"allowAsStatement":false}]
+no-warning-comments: off [{"location":"start","terms":["todo","fixme","xxx"]}]
+no-with: off
+object-shorthand: error ["always",{"avoidExplicitReturnArrows":true,"avoidQuotes":false,"ignoreConstructors":false}]
+one-var: error ["never"]
+operator-assignment: error ["always"]
+perfectionist/sort-array-includes: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","partitionByNewLine":true,"specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-arrays: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","partitionByNewLine":true,"specialCharacters":"trim","type":"natural","useConfigurationIf":{"matchesAstSelector":"TSAsExpression > ArrayExpression"}}]
+perfectionist/sort-classes: error [{"customGroups":[{"groupName":"hash-private-static-property","modifiers":["private","static"],"selector":"property"},{"groupName":"hash-private-property","modifiers":["private"],"selector":"property"},{"groupName":"hash-private-static-accessor","modifiers":["private","static"],"selector":"accessor-property"},{"groupName":"hash-private-accessor","modifiers":["private"],"selector":"accessor-property"},{"groupName":"hash-private-static-get-method","modifiers":["private","static"],"selector":"get-method"},{"groupName":"hash-private-get-method","modifiers":["private"],"selector":"get-method"},{"groupName":"hash-private-static-set-method","modifiers":["private","static"],"selector":"set-method"},{"groupName":"hash-private-set-method","modifiers":["private"],"selector":"set-method"},{"groupName":"hash-private-static-method","modifiers":["private","static"],"selector":"method"},{"groupName":"hash-private-method","modifiers":["private"],"selector":"method"}],"groups":["public-static-property","protected-static-property","private-static-property","hash-private-static-property","static-block","public-decorated-property","protected-decorated-property","private-decorated-property","public-property","protected-property","private-property","hash-private-property","public-abstract-property","protected-abstract-property","index-signature","public-constructor","protected-constructor","private-constructor","public-static-accessor-property","protected-static-accessor-property","private-static-accessor-property","hash-private-static-accessor","public-static-get-method","protected-static-get-method","private-static-get-method","hash-private-static-get-method","public-static-set-method","protected-static-set-method","private-static-set-method","hash-private-static-set-method","public-static-method","protected-static-method","private-static-method","hash-private-static-method","public-decorated-accessor-property","protected-decorated-accessor-property","private-decorated-accessor-property","public-accessor-property","protected-accessor-property","private-accessor-property","hash-private-accessor","public-abstract-accessor-property","protected-abstract-accessor-property","public-decorated-get-method","protected-decorated-get-method","private-decorated-get-method","public-get-method","protected-get-method","private-get-method","hash-private-get-method","public-abstract-get-method","protected-abstract-get-method","public-decorated-set-method","protected-decorated-set-method","private-decorated-set-method","public-set-method","protected-set-method","private-set-method","hash-private-set-method","public-abstract-set-method","protected-abstract-set-method","public-decorated-method","protected-decorated-method","private-decorated-method","public-method","protected-method","private-method","hash-private-method","public-abstract-method","protected-abstract-method","unknown"],"ignoreCase":true,"order":"asc","type":"alphabetical"}]
+perfectionist/sort-decorators: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-enums: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","partitionByNewLine":true,"specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-export-attributes: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-exports: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-heritage-clauses: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-import-attributes: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-imports: error [{"customGroups":[{"anyOf":[{"elementNamePattern":"^node:"}],"groupName":"node"},{"anyOf":[{"elementNamePattern":"^bun:"}],"groupName":"bun"}],"fallbackSort":{"type":"unsorted"},"groups":[["type-builtin","type-external","type-internal","type-parent","type-sibling","type-index"],"type","node","bun","builtin","external","internal",["parent","sibling","index"],["side-effect","side-effect-style"],"style","unknown"],"ignoreCase":true,"internalPattern":["^~/.*","^@/.*"],"locales":"en-US","newlinesBetween":1,"order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-interfaces: error [{"fallbackSort":{"type":"unsorted"},"groups":["index-signature",["required-property","required-method"],["optional-property","optional-method"],"unknown"],"ignoreCase":true,"locales":"en-US","newlinesBetween":1,"newlinesInside":0,"order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-intersection-types: error [{"fallbackSort":{"type":"unsorted"},"groups":["keyword","named","literal","operator","import","object","function","tuple",["intersection","union"],"conditional","unknown","nullish"],"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-jsx-props: error [{"customGroups":[{"elementNamePattern":"^on[A-Z]","groupName":"callback"}],"fallbackSort":{"type":"unsorted"},"groups":["multiline-prop","prop","shorthand-prop","callback"],"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-maps: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","partitionByNewLine":true,"specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-modules: error [{"fallbackSort":{"type":"unsorted"},"groups":[["interface","type","declare-interface","declare-type"],["enum","declare-enum"],["class","declare-class"],["function","async-function","declare-function"],"unknown",["export-interface","export-type","export-enum","export-declare-enum","export-class","export-default-class","export-default-decorated-class","export-declare-class","export-function","export-default-function","export-async-function","export-default-async-function","export-declare-function"]],"ignoreCase":true,"locales":"en-US","newlinesBetween":1,"order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-named-exports: error [{"fallbackSort":{"type":"unsorted"},"groups":["type-export","value-export","unknown"],"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-named-imports: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-object-types: error [{"fallbackSort":{"type":"unsorted"},"groups":["index-signature",["required-property","required-method"],["optional-property","optional-method"],"unknown"],"ignoreCase":true,"locales":"en-US","newlinesBetween":1,"newlinesInside":0,"order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-objects: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","partitionByNewLine":true,"specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-sets: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","partitionByNewLine":true,"specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-switch-case: error [{"fallbackSort":{"type":"unsorted"},"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-union-types: error [{"fallbackSort":{"type":"unsorted"},"groups":["keyword","named","literal","operator","import","object","function","tuple",["intersection","union"],"conditional","unknown","nullish"],"ignoreCase":true,"locales":"en-US","order":"asc","specialCharacters":"trim","type":"natural"}]
+perfectionist/sort-variable-declarations: off
+prefer-arrow-callback: error [{"allowNamedFunctions":false,"allowUnboundThis":true}]
+prefer-const: error [{"destructuring":"all","ignoreReadBeforeAssign":false}]
+prefer-destructuring: error [{"AssignmentExpression":{"array":false,"object":false},"VariableDeclarator":{"array":false,"object":true}},{"enforceForRenamedProperties":false}]
+prefer-exponentiation-operator: error
+prefer-named-capture-group: off
+prefer-numeric-literals: error
+prefer-object-has-own: error
+prefer-object-spread: error
+prefer-promise-reject-errors: error [{"allowEmptyReject":false}]
+prefer-regex-literals: error [{"disallowRedundantWrapping":true}]
+prefer-rest-params: error
+prefer-spread: error
+prefer-template: error
+preserve-caught-error: error [{"errorClassNames":[],"requireCatchParameter":false}]
+promise/always-return: error
+promise/avoid-new: error
+promise/catch-or-return: error [{"allowFinally":true,"terminationMethod":"catch"}]
+promise/no-callback-in-promise: error
+promise/no-multiple-resolved: error
+promise/no-native: off
+promise/no-nesting: error
+promise/no-new-statics: error
+promise/no-promise-in-callback: error
+promise/no-return-in-finally: error
+promise/no-return-wrap: error
+promise/param-names: error
+promise/prefer-await-to-callbacks: error
+promise/prefer-await-to-then: error
+promise/prefer-catch: error
+promise/spec-only: error
+promise/valid-params: error
+radix: error
+react-hooks/config: error
+react-hooks/error-boundaries: error
+react-hooks/exhaustive-deps: error
+react-hooks/gating: error
+react-hooks/globals: error
+react-hooks/immutability: error
+react-hooks/incompatible-library: error
+react-hooks/preserve-manual-memoization: error
+react-hooks/purity: error
+react-hooks/refs: error
+react-hooks/rules-of-hooks: error
+react-hooks/set-state-in-effect: error
+react-hooks/set-state-in-render: error
+react-hooks/static-components: error
+react-hooks/unsupported-syntax: error
+react-hooks/use-memo: error
+regexp/confusing-quantifier: error
+regexp/control-character-escape: error
+regexp/grapheme-string-literal: error
+regexp/hexadecimal-escape: error ["never"]
+regexp/letter-case: error
+regexp/match-any: error
+regexp/negation: error
+regexp/no-contradiction-with-assertion: error
+regexp/no-control-character: error
+regexp/no-dupe-characters-character-class: error
+regexp/no-dupe-disjunctions: error
+regexp/no-empty-alternative: error
+regexp/no-empty-capturing-group: error
+regexp/no-empty-character-class: error
+regexp/no-empty-group: error
+regexp/no-empty-lookarounds-assertion: error
+regexp/no-empty-string-literal: error
+regexp/no-escape-backspace: error
+regexp/no-extra-lookaround-assertions: error
+regexp/no-invalid-regexp: error
+regexp/no-invisible-character: error
+regexp/no-lazy-ends: error
+regexp/no-legacy-features: error
+regexp/no-misleading-capturing-group: error
+regexp/no-misleading-unicode-character: error
+regexp/no-missing-g-flag: error
+regexp/no-non-standard-flag: error
+regexp/no-obscure-range: error
+regexp/no-octal: error
+regexp/no-optional-assertion: error
+regexp/no-potentially-useless-backreference: error
+regexp/no-standalone-backslash: error
+regexp/no-super-linear-backtracking: error
+regexp/no-super-linear-move: error
+regexp/no-trivially-nested-assertion: error
+regexp/no-trivially-nested-quantifier: error
+regexp/no-unused-capturing-group: error
+regexp/no-useless-assertions: error
+regexp/no-useless-backreference: error
+regexp/no-useless-character-class: error
+regexp/no-useless-dollar-replacements: error
+regexp/no-useless-escape: error
+regexp/no-useless-flag: error
+regexp/no-useless-lazy: error
+regexp/no-useless-non-capturing-group: error
+regexp/no-useless-quantifier: error
+regexp/no-useless-range: error
+regexp/no-useless-set-operand: error
+regexp/no-useless-string-literal: error
+regexp/no-useless-two-nums-quantifier: error
+regexp/no-zero-quantifier: error
+regexp/optimal-lookaround-quantifier: error
+regexp/optimal-quantifier-concatenation: error
+regexp/prefer-character-class: error [{"minAlternatives":2}]
+regexp/prefer-d: error
+regexp/prefer-escape-replacement-dollar-char: off
+regexp/prefer-lookaround: error
+regexp/prefer-named-backreference: error
+regexp/prefer-named-capture-group: error
+regexp/prefer-named-replacement: error
+regexp/prefer-plus-quantifier: error
+regexp/prefer-predefined-assertion: error
+regexp/prefer-quantifier: error
+regexp/prefer-question-quantifier: error
+regexp/prefer-range: error
+regexp/prefer-regexp-exec: error
+regexp/prefer-regexp-test: error
+regexp/prefer-result-array-groups: error
+regexp/prefer-set-operation: error
+regexp/prefer-star-quantifier: error
+regexp/prefer-unicode-codepoint-escapes: error
+regexp/prefer-w: error
+regexp/require-unicode-regexp: off
+regexp/require-unicode-sets-regexp: off
+regexp/simplify-set-operations: error
+regexp/sort-alternatives: error
+regexp/sort-character-class-elements: error
+regexp/sort-flags: error
+regexp/strict: error
+regexp/unicode-escape: error
+regexp/unicode-property: error [{"generalCategory":"never","key":"long","property":"long"}]
+regexp/use-ignore-case: error
+require-atomic-updates: off [{"allowProperties":false}]
+require-await: error
+require-unicode-regexp: off [{}]
+require-yield: error
+security/detect-bidi-characters: warn
+security/detect-buffer-noassert: warn
+security/detect-child-process: warn
+security/detect-disable-mustache-escape: warn
+security/detect-eval-with-expression: warn
+security/detect-new-buffer: warn
+security/detect-no-csrf-before-method-override: warn
+security/detect-non-literal-fs-filename: warn
+security/detect-non-literal-regexp: warn
+security/detect-non-literal-require: warn
+security/detect-object-injection: warn
+security/detect-possible-timing-attacks: warn
+security/detect-pseudoRandomBytes: warn
+security/detect-unsafe-regex: warn
+sort-imports: off [{"allowSeparatedGroups":false,"ignoreCase":false,"ignoreDeclarationSort":false,"ignoreMemberSort":false,"memberSyntaxSortOrder":["none","all","multiple","single"]}]
+sort-keys: off ["asc",{"allowLineSeparatedGroups":false,"caseSensitive":true,"ignoreComputedKeys":false,"minKeys":2,"natural":false}]
+sort-vars: off [{"ignoreCase":false}]
+strict: off ["safe"]
+symbol-description: error
+unicode-bom: error ["never"]
+unicorn/better-dom-traversing: error
+unicorn/catch-error-name: error [{"ignore":[],"name":"error"}]
+unicorn/class-reference-in-static-methods: error [{"preferSuper":true,"preferThis":true}]
+unicorn/comment-content: off [{"checkUniformCase":true,"extendDefaultReplacements":true,"replacements":{}}]
+unicorn/consistent-assert: error
+unicorn/consistent-boolean-name: error [{"checkArguments":"always","checkFields":"never","checkFunctions":"always","checkMethods":"never","checkVariables":"always","ignore":[],"wrappers":{}}]
+unicorn/consistent-class-member-order: error [{"order":["static-field","static-block","static-method","private-field","public-field","constructor","private-method","public-method"]}]
+unicorn/consistent-compound-words: error [{}]
+unicorn/consistent-conditional-object-spread: error ["logical"]
+unicorn/consistent-date-clone: error
+unicorn/consistent-destructuring: off
+unicorn/consistent-empty-array-spread: error
+unicorn/consistent-existence-index-check: error
+unicorn/consistent-export-decorator-position: error ["above"]
+unicorn/consistent-function-scoping: error [{"checkArrowFunctions":true}]
+unicorn/consistent-function-style: error [{"callbacks":"ignore","default":"ignore","namedExports":"ignore","namedFunctions":"ignore","objectProperties":"ignore","reassignedVariables":"ignore","typedVariables":"ignore"}]
+unicorn/consistent-json-file-read: off ["string"]
+unicorn/consistent-optional-chaining: error
+unicorn/consistent-template-literal-escape: error
+unicorn/consistent-tuple-labels: error
+unicorn/custom-error-definition: error
+unicorn/default-export-style: error [{"classes":"inline","functions":"inline"}]
+unicorn/dom-node-dataset: error [{"preferAttributes":false}]
+unicorn/empty-brace-spaces: error
+unicorn/error-message: error
+unicorn/escape-case: error ["uppercase"]
+unicorn/expiring-todo-comments: error [{"allowWarningComments":true,"checkDates":false,"checkDatesOnPullRequests":false,"ignore":[],"terms":["todo","fixme","xxx"]}]
+unicorn/explicit-length-check: error [{"non-zero":"greater-than"}]
+unicorn/explicit-timer-delay: error ["always"]
+unicorn/filename-case: error [{"cases":{"kebabCase":true,"pascalCase":true},"ignore":["[RegExp /^\\d+_/v]"]}]
+unicorn/id-match: error ["^.+$",{"checkNamedSpecifiers":true,"classFields":false,"ignoreDestructuring":false,"onlyDeclarations":false,"properties":false}]
+unicorn/import-style: error [{}]
+unicorn/isolated-functions: error [{"comments":["@isolated"],"functions":["makeSynchronous","workerize"],"overrideGlobals":{},"selectors":[]}]
+unicorn/iteration-fallback-style: error ["guard"]
+unicorn/logical-assignment-operators: error ["always"]
+unicorn/max-nested-calls: error [{"max":3}]
+unicorn/name-replacements: error [{"allowList":{"i18n":true,"i18nKey":true,"tsconfigRootDir":true},"ignore":["\\.spec$","\\.test$","\\.e2e$"],"replacements":{"ctx":false,"e":{"error":true,"event":false},"fn":{"function":false},"ref":false,"req":false,"res":false}}]
+unicorn/new-for-builtins: error
+unicorn/no-abusive-eslint-disable: error
+unicorn/no-accessor-recursion: error
+unicorn/no-accidental-bitwise-operator: error
+unicorn/no-anonymous-default-export: error
+unicorn/no-array-callback-reference: error [{"ignore":[]}]
+unicorn/no-array-concat-in-loop: error
+unicorn/no-array-fill-with-reference-type: error
+unicorn/no-array-from-fill: error
+unicorn/no-array-front-mutation: error
+unicorn/no-array-method-this-argument: error
+unicorn/no-array-reduce: error [{"allowSimpleOperations":true}]
+unicorn/no-array-reverse: error [{"allowExpressionStatement":true}]
+unicorn/no-array-sort: error [{"allowExpressionStatement":true}]
+unicorn/no-array-sort-for-min-max: error
+unicorn/no-array-splice: error
+unicorn/no-asterisk-prefix-in-documentation-comments: error
+unicorn/no-async-promise-finally: error
+unicorn/no-await-expression-member: error
+unicorn/no-await-in-promise-methods: error
+unicorn/no-barrel-files: error
+unicorn/no-blob-to-file: error
+unicorn/no-boolean-sort-comparator: error
+unicorn/no-break-in-nested-loop: error
+unicorn/no-canvas-to-image: error
+unicorn/no-chained-comparison: error
+unicorn/no-collection-bracket-access: error
+unicorn/no-computed-property-existence-check: error
+unicorn/no-confusing-array-splice: error
+unicorn/no-confusing-array-with: error
+unicorn/no-console-spaces: error
+unicorn/no-constant-zero-expression: error
+unicorn/no-declarations-before-early-exit: error
+unicorn/no-document-cookie: error
+unicorn/no-double-comparison: error
+unicorn/no-duplicate-if-branches: error
+unicorn/no-duplicate-logical-operands: error
+unicorn/no-duplicate-loops: error
+unicorn/no-duplicate-set-values: error
+unicorn/no-empty-file: error [{"allowComments":false}]
+unicorn/no-error-property-assignment: error
+unicorn/no-exports-in-scripts: error
+unicorn/no-for-each: error
+unicorn/no-for-loop: error
+unicorn/no-global-object-property-assignment: error
+unicorn/no-immediate-mutation: error
+unicorn/no-impossible-length-comparison: error
+unicorn/no-incorrect-query-selector: error
+unicorn/no-incorrect-template-string-interpolation: error
+unicorn/no-instanceof-builtins: error [{"exclude":[],"include":[],"strategy":"loose","useErrorIsError":false}]
+unicorn/no-invalid-argument-count: error [{}]
+unicorn/no-invalid-character-comparison: error
+unicorn/no-invalid-fetch-options: error
+unicorn/no-invalid-file-input-accept: error
+unicorn/no-invalid-remove-event-listener: error
+unicorn/no-invalid-well-known-symbol-methods: error
+unicorn/no-keyword-prefix: off [{}]
+unicorn/no-late-current-target-access: error
+unicorn/no-late-event-control: error
+unicorn/no-lonely-if: error
+unicorn/no-loop-iterable-mutation: error
+unicorn/no-magic-array-flat-depth: error
+unicorn/no-manually-wrapped-comments: error
+unicorn/no-mismatched-map-key: error
+unicorn/no-misrefactored-assignment: error
+unicorn/no-missing-local-resource: error
+unicorn/no-multiple-promise-resolver-calls: error
+unicorn/no-named-default: error
+unicorn/no-negated-array-predicate: error
+unicorn/no-negated-comparison: error [{"checkLogicalExpressions":false}]
+unicorn/no-negated-condition: error
+unicorn/no-negation-in-equality-check: error
+unicorn/no-nested-ternary: error
+unicorn/no-new-array: error
+unicorn/no-new-buffer: error
+unicorn/no-non-function-verb-prefix: error [{"ignore":[],"verbs":["get","set","unset","delete","add","remove","destroy","create"]}]
+unicorn/no-nonstandard-builtin-properties: error
+unicorn/no-null: error [{"checkArguments":true,"checkStrictEquality":false}]
+unicorn/no-object-as-default-parameter: error
+unicorn/no-object-methods-with-collections: error
+unicorn/no-optional-chaining-on-undeclared-variable: error
+unicorn/no-process-exit: error
+unicorn/no-redundant-comparison: error
+unicorn/no-return-array-push: error
+unicorn/no-selector-as-dom-name: error
+unicorn/no-shorthand-property-overrides: error
+unicorn/no-single-promise-in-promise-methods: error
+unicorn/no-static-only-class: error
+unicorn/no-subtraction-comparison: error
+unicorn/no-thenable: error
+unicorn/no-this-assignment: error
+unicorn/no-this-outside-of-class: error
+unicorn/no-top-level-assignment-in-function: error
+unicorn/no-top-level-side-effects: error
+unicorn/no-transition-all: error
+unicorn/no-typeof-undefined: error [{"checkGlobalVariables":false}]
+unicorn/no-uncalled-method: error
+unicorn/no-undeclared-class-members: error
+unicorn/no-unnecessary-array-flat-depth: error
+unicorn/no-unnecessary-array-flat-map: error
+unicorn/no-unnecessary-array-splice-count: error
+unicorn/no-unnecessary-await: error
+unicorn/no-unnecessary-boolean-comparison: error
+unicorn/no-unnecessary-fetch-options: error
+unicorn/no-unnecessary-global-this: error
+unicorn/no-unnecessary-nested-ternary: error
+unicorn/no-unnecessary-polyfills: error [{}]
+unicorn/no-unnecessary-slice-end: error
+unicorn/no-unnecessary-splice: error
+unicorn/no-unnecessary-string-trim: error
+unicorn/no-unreadable-array-destructuring: error [{"maximumIgnoredElements":1}]
+unicorn/no-unreadable-for-of-expression: error
+unicorn/no-unreadable-iife: error
+unicorn/no-unreadable-new-expression: error
+unicorn/no-unreadable-object-destructuring: error
+unicorn/no-unsafe-buffer-conversion: error
+unicorn/no-unsafe-dom-html: error
+unicorn/no-unsafe-promise-all-settled-values: error
+unicorn/no-unsafe-property-key: error
+unicorn/no-unsafe-sqlite-interpolation: error
+unicorn/no-unsafe-string-replacement: error
+unicorn/no-unused-array-method-return: error
+unicorn/no-unused-properties: off
+unicorn/no-useless-boolean-cast: error
+unicorn/no-useless-coercion: error
+unicorn/no-useless-collection-argument: error
+unicorn/no-useless-compound-assignment: error
+unicorn/no-useless-concat: error
+unicorn/no-useless-continue: error
+unicorn/no-useless-delete-check: error
+unicorn/no-useless-else: error
+unicorn/no-useless-error-capture-stack-trace: error
+unicorn/no-useless-fallback-in-spread: error
+unicorn/no-useless-iterator-to-array: error
+unicorn/no-useless-length-check: error
+unicorn/no-useless-logical-operand: error
+unicorn/no-useless-override: error
+unicorn/no-useless-promise-resolve-reject: error
+unicorn/no-useless-re-export: error
+unicorn/no-useless-recursion: error
+unicorn/no-useless-spread: error
+unicorn/no-useless-switch-case: error
+unicorn/no-useless-template-literals: error
+unicorn/no-useless-undefined: error [{"checkArguments":true,"checkArrowFunctionBody":true}]
+unicorn/no-xor-as-exponentiation: error
+unicorn/no-zero-fractions: error
+unicorn/number-literal-case: error [{"hexadecimalValue":"uppercase"}]
+unicorn/numeric-separators-style: error [{"binary":{"groupLength":4,"minimumDigits":0},"hexadecimal":{"groupLength":2,"minimumDigits":0},"number":{"fractionGroupLength":"[Number Infinity]","groupLength":3,"minimumDigits":5},"octal":{"groupLength":4,"minimumDigits":0},"onlyIfContainsSeparator":false}]
+unicorn/operator-assignment: error ["always"]
+unicorn/prefer-abort-signal-any: error
+unicorn/prefer-abort-signal-timeout: error
+unicorn/prefer-add-event-listener: error [{"excludedPackages":["koa","sax"]}]
+unicorn/prefer-add-event-listener-options: error
+unicorn/prefer-aggregate-error: error
+unicorn/prefer-array-find: error [{"checkFromLast":true}]
+unicorn/prefer-array-flat: error [{"functions":[]}]
+unicorn/prefer-array-flat-map: error
+unicorn/prefer-array-from-async: error
+unicorn/prefer-array-from-map: error
+unicorn/prefer-array-from-range: error
+unicorn/prefer-array-index-of: error
+unicorn/prefer-array-iterable-methods: error
+unicorn/prefer-array-last-methods: error
+unicorn/prefer-array-slice: error
+unicorn/prefer-array-some: error
+unicorn/prefer-at: error [{"checkAllIndexAccess":false,"getLastElementFunctions":[]}]
+unicorn/prefer-await: error
+unicorn/prefer-bigint-literals: error
+unicorn/prefer-blob-reading-methods: error
+unicorn/prefer-block-statement-over-iife: error
+unicorn/prefer-boolean-return: error
+unicorn/prefer-class-fields: error
+unicorn/prefer-classlist-toggle: error
+unicorn/prefer-code-point: error
+unicorn/prefer-continue: error [{"maximumStatements":1}]
+unicorn/prefer-date-now: error
+unicorn/prefer-default-parameters: error
+unicorn/prefer-direct-iteration: error
+unicorn/prefer-dispose: error
+unicorn/prefer-dom-node-append: error
+unicorn/prefer-dom-node-html-methods: error [{"checkGetHTML":true,"checkSetHTML":false}]
+unicorn/prefer-dom-node-remove: error
+unicorn/prefer-dom-node-replace-children: error
+unicorn/prefer-dom-node-text-content: error
+unicorn/prefer-early-return: error [{"maximumStatements":1}]
+unicorn/prefer-else-if: error
+unicorn/prefer-error-is-error: error
+unicorn/prefer-event-target: error
+unicorn/prefer-export-from: error [{"checkUsedVariables":true}]
+unicorn/prefer-flat-math-min-max: error
+unicorn/prefer-get-or-insert-computed: error
+unicorn/prefer-global-number-constants: error
+unicorn/prefer-global-this: error
+unicorn/prefer-group-by: error
+unicorn/prefer-has-check: error
+unicorn/prefer-hoisting-branch-code: error
+unicorn/prefer-https: error [{"ignore":[]}]
+unicorn/prefer-identifier-import-export-specifiers: error
+unicorn/prefer-import-meta-properties: error
+unicorn/prefer-includes: error
+unicorn/prefer-includes-over-repeated-comparisons: error [{"minimumComparisons":3}]
+unicorn/prefer-iterable-in-constructor: error
+unicorn/prefer-iterator-concat: error
+unicorn/prefer-iterator-helpers: error
+unicorn/prefer-iterator-to-array: error
+unicorn/prefer-iterator-to-array-at-end: error
+unicorn/prefer-keyboard-event-key: error
+unicorn/prefer-location-assign: error
+unicorn/prefer-logical-operator-over-ternary: error
+unicorn/prefer-map-from-entries: error
+unicorn/prefer-math-abs: error
+unicorn/prefer-math-constants: error
+unicorn/prefer-math-min-max: error
+unicorn/prefer-math-trunc: error
+unicorn/prefer-minimal-ternary: error [{"checkComputedMemberAccess":false,"checkVaryingBase":false}]
+unicorn/prefer-modern-dom-apis: error
+unicorn/prefer-modern-math-apis: error
+unicorn/prefer-module: error
+unicorn/prefer-native-coercion-functions: error
+unicorn/prefer-negative-index: error
+unicorn/prefer-node-protocol: error
+unicorn/prefer-number-coercion: error
+unicorn/prefer-number-is-safe-integer: error
+unicorn/prefer-number-properties: error [{"checkInfinity":false,"checkNaN":false}]
+unicorn/prefer-object-define-properties: error
+unicorn/prefer-object-destructuring-defaults: error
+unicorn/prefer-object-from-entries: error [{"functions":[]}]
+unicorn/prefer-object-iterable-methods: error
+unicorn/prefer-observer-apis: error
+unicorn/prefer-optional-catch-binding: error
+unicorn/prefer-path2d: error
+unicorn/prefer-private-class-fields: error
+unicorn/prefer-promise-try: error
+unicorn/prefer-promise-with-resolvers: error
+unicorn/prefer-prototype-methods: error
+unicorn/prefer-query-selector: error [{"allowWithVariables":false}]
+unicorn/prefer-queue-microtask: error [{"checkSetImmediate":false,"checkSetTimeout":false}]
+unicorn/prefer-reflect-apply: error
+unicorn/prefer-regexp-escape: error
+unicorn/prefer-regexp-test: error
+unicorn/prefer-response-static-json: error
+unicorn/prefer-scoped-selector: error
+unicorn/prefer-set-has: error [{"minimumItems":0}]
+unicorn/prefer-set-methods: error
+unicorn/prefer-set-size: error
+unicorn/prefer-short-arrow-method: error ["always"]
+unicorn/prefer-simple-condition-first: error
+unicorn/prefer-simple-sort-comparator: error
+unicorn/prefer-simplified-conditions: error
+unicorn/prefer-single-array-predicate: error
+unicorn/prefer-single-call: error [{"ignore":[]}]
+unicorn/prefer-single-object-destructuring: error
+unicorn/prefer-single-replace: error
+unicorn/prefer-smaller-scope: error
+unicorn/prefer-split-limit: error
+unicorn/prefer-spread: error
+unicorn/prefer-string-match-all: error
+unicorn/prefer-string-pad-start-end: error
+unicorn/prefer-string-raw: error
+unicorn/prefer-string-repeat: error [{"minimumRepetitions":3}]
+unicorn/prefer-string-replace-all: error
+unicorn/prefer-string-slice: error
+unicorn/prefer-string-starts-ends-with: error
+unicorn/prefer-string-trim-start-end: error
+unicorn/prefer-structured-clone: error [{"functions":[]}]
+unicorn/prefer-switch: error [{"emptyDefaultCase":"no-default-comment","minimumCases":3}]
+unicorn/prefer-temporal: error [{"checkDateNow":false,"checkMethods":false,"checkReferences":false}]
+unicorn/prefer-ternary: error ["always"]
+unicorn/prefer-then-catch: error
+unicorn/prefer-toggle-attribute: error
+unicorn/prefer-top-level-await: error
+unicorn/prefer-type-error: error
+unicorn/prefer-type-literal-last: error
+unicorn/prefer-uint8array-base64: error
+unicorn/prefer-unary-minus: error
+unicorn/prefer-unicode-code-point-escapes: error
+unicorn/prefer-url-can-parse: error
+unicorn/prefer-url-href: error
+unicorn/prefer-url-search-parameters: error
+unicorn/prefer-while-loop-condition: error
+unicorn/relative-url-style: error ["never"]
+unicorn/require-array-join-separator: error
+unicorn/require-array-sort-compare: error
+unicorn/require-css-escape: error [{"checkAllSelectors":false}]
+unicorn/require-frontmatter-fields: error [{"fields":[]}]
+unicorn/require-module-attributes: error
+unicorn/require-module-specifiers: error
+unicorn/require-number-to-fixed-digits-argument: error
+unicorn/require-passive-events: error
+unicorn/require-post-message-target-origin: off
+unicorn/require-proxy-trap-boolean-return: error
+unicorn/single-line-block-comment-style: error ["multiline",{"ignore":[]}]
+unicorn/string-content: error [{"patterns":{"->":"→","<-":"←","\\.\\.\\.":"…"},"selectors":[]}]
+unicorn/switch-case-braces: error ["always"]
+unicorn/switch-case-break-position: error
+unicorn/template-indent: error [{"comments":["HTML","indent"],"functions":["dedent","stripIndent"],"selectors":[],"tags":["outdent","dedent","gql","sql","html","styled"]}]
+unicorn/text-encoding-identifier-case: error [{"withDash":false}]
+unicorn/throw-new-error: error
+unicorn/try-complexity: off [{"max":1}]
+unused-imports/no-unused-imports: error
+unused-imports/no-unused-vars: error [{"args":"after-used","argsIgnorePattern":"^_","caughtErrors":"all","caughtErrorsIgnorePattern":"^_","destructuredArrayIgnorePattern":"^_","ignoreClassWithStaticInitBlock":false,"ignoreRestSiblings":true,"ignoreUsingDeclarations":false,"reportUsedIgnorePattern":false,"vars":"all","varsIgnorePattern":"^_"}]
+use-isnan: error [{"enforceForIndexOf":false,"enforceForSwitchCase":true}]
+valid-typeof: error [{"requireStringLiterals":false}]
+vars-on-top: off
+yoda: error ["never",{"exceptRange":false,"onlyEquality":false}]
