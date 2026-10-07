@@ -14,7 +14,7 @@ import { createConfig } from "../../dist/index.mjs";
 const fixturesDirectory = fileURLToPath(
   new URL("../fixtures", import.meta.url),
 );
-// The fixtures that Prettier formats. It formats Svelte components only with prettier-plugin-svelte.
+// Every fixture.
 const fixturePaths = [
   "data.json",
   "data.json5",
@@ -28,24 +28,34 @@ const fixturePaths = [
   "react/use-toggle.ts",
   "README.md",
   "settle.mts",
+  "svelte/Counter.svelte",
   "svelte/theme.svelte.ts",
+  "svelte/Toggle.svelte",
   "svelte/visits.svelte.js",
   "temperature.ts",
   "tsconfig.json",
 ] as const;
-// Prettier's defaults, this repository's configuration, and two layouts that other projects choose.
+/*
+Prettier's defaults, this repository's configuration, and two layouts that other projects choose.
+Prettier formats Svelte components only with prettier-plugin-svelte, which this repository's
+configuration loads when it is installed, and the others load explicitly.
+*/
 const prettierConfigs = new Map<string, PrettierOptions>([
-  ["defaults", {}],
+  ["defaults", { plugins: ["prettier-plugin-svelte"] }],
   [
     "single quotes without semicolons",
     {
       arrowParens: "avoid",
+      plugins: ["prettier-plugin-svelte"],
       semi: false,
       singleQuote: true,
       trailingComma: "none",
     },
   ],
-  ["tabs and 120 columns", { printWidth: 120, useTabs: true }],
+  [
+    "tabs and 120 columns",
+    { plugins: ["prettier-plugin-svelte"], printWidth: 120, useTabs: true },
+  ],
   ["the configuration of this repository", repositoryPrettierConfig],
 ]);
 /*
@@ -83,6 +93,20 @@ const unfixedFiles = new Map([
   [
     "unfixed.md",
     "#Title\n\nSome ** strong ** text, and a bare link: https://example.com\n\n* one\n* two\n",
+  ],
+  [
+    "unfixed.svelte",
+    [
+      '<script lang="ts">',
+      "  import { writable, derived } from 'svelte/store'",
+      "  var count = writable(0)",
+      "  const doubled = derived(count, ($count) => $count * 2)",
+      "  let label = 'Count: ' + 1",
+      "</script>",
+      "",
+      '<p class="b  a">{label} {$doubled}</p>',
+      "",
+    ].join("\n"),
   ],
   [
     "unfixed.ts",
