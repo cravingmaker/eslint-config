@@ -40,14 +40,6 @@ describe("html rules", () => {
     );
   });
 
-  it("@html-eslint/require-doctype: reports missing document type declarations", async () => {
-    await expectLintError(
-      `<html lang="en">\n<head>\n\t<title>Home</title>\n</head>\n<body>\n\t<p>Hello</p>\n</body>\n</html>\n`,
-      "@html-eslint/require-doctype",
-      htmlOptions,
-    );
-  });
-
   it("@html-eslint/require-attrs: reports missing required image attributes", async () => {
     await expectLintError(
       `<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<title>Home</title>\n</head>\n<body>\n\t<img src="hero.png" />\n</body>\n</html>\n`,

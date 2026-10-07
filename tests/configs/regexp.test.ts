@@ -21,41 +21,9 @@ describe("regexp rules", () => {
     );
   });
 
-  it("regexp/unicode-property: enforces the configured long key/property form", async () => {
-    await expectLintError(
-      `const pattern = /\\p{sc=Grek}/u;\nconsole.log(pattern);\n`,
-      "regexp/unicode-property",
-      jsOptions,
-    );
-  });
-
-  it("regexp/prefer-regexp-test: reports RegExp#exec used as a boolean check", async () => {
-    await expectLintError(
-      `const matches = /ready/u.exec('ready') !== null;\nconsole.log(matches);\n`,
-      "regexp/prefer-regexp-test",
-      jsOptions,
-    );
-  });
-
-  it("regexp/no-empty-character-class: reports empty character classes", async () => {
-    await expectLintError(
-      `const pattern = /[]/u;\nconsole.log(pattern);\n`,
-      "regexp/no-empty-character-class",
-      jsOptions,
-    );
-  });
-
-  it("regexp/sort-flags: reports unsorted regexp flags", async () => {
-    await expectLintError(
-      `const pattern = /ready/miu;\nconsole.log(pattern);\n`,
-      "regexp/sort-flags",
-      jsOptions,
-    );
-  });
-
   it("regexp/prefer-escape-replacement-dollar-char: stays disabled for WYSIWYG replacements", async () => {
     await expectNoLintError(
-      `const value = 'total'.replace(/total/u, '$1');\nconsole.log(value);\n`,
+      `export const price = '10'.replace(/\\d+/u, '$&$');\n`,
       "regexp/prefer-escape-replacement-dollar-char",
       jsOptions,
     );

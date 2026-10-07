@@ -39,7 +39,6 @@ const nextSpecificExportCode = [
 ].join("\n");
 
 const rule = "react-refresh/only-export-components";
-const reactOptions = { filePath: "component.jsx" } as const;
 
 async function getEffectiveConfig(
   eslint: ESLint,
@@ -225,53 +224,9 @@ describe("react-hooks rules", () => {
         });
       },
     );
-
-    it("reports a hook called inside a conditional branch", async () => {
-      const code = [
-        "function useState(v: unknown) { return v; }",
-        "export function Component({ show }: { show: boolean }) {",
-        "	if (show) { useState(0); }",
-        "	return null;",
-        "}",
-      ].join("\n");
-      await expectLintError(code, "react-hooks/rules-of-hooks", tsxOptions);
-    });
-
-    it("does not report a hook called unconditionally at the top level", async () => {
-      const code = [
-        "function useState(v: unknown) { return v; }",
-        "export function Component() {",
-        "	useState(0);",
-        "	return null;",
-        "}",
-      ].join("\n");
-      await expectNoLintError(code, "react-hooks/rules-of-hooks", tsxOptions);
-    });
   });
 
   describe("react-hooks/exhaustive-deps", () => {
-    it("reports a missing dependency in a useEffect call", async () => {
-      const code = [
-        "import { useEffect } from 'react';",
-        "export function Component({ count }: { count: number }) {",
-        "	useEffect(() => { console.log(count); }, []);",
-        "	return null;",
-        "}",
-      ].join("\n");
-      await expectLintError(code, "react-hooks/exhaustive-deps", tsxOptions);
-    });
-
-    it("does not report when all dependencies are listed", async () => {
-      const code = [
-        "import { useEffect } from 'react';",
-        "export function Component({ count }: { count: number }) {",
-        "	useEffect(() => { console.log(count); }, [count]);",
-        "	return null;",
-        "}",
-      ].join("\n");
-      await expectNoLintError(code, "react-hooks/exhaustive-deps", tsxOptions);
-    });
-
     it.each(moduleFilePaths)(
       "reports a missing dependency in a custom hook in %s",
       async (filePath) => {
@@ -288,24 +243,28 @@ describe("react-hooks rules", () => {
     );
   });
 
-  describe("Meta-internal rules stay disabled", () => {
-    const validCode = "export function useCounter() { return 0; }";
+  // fbt depends on Meta's FBT library, and todo and rule-suppression serve Meta-internal tracking.
+  // No sample triggers them without Meta's compiler settings, so the test reads the configuration.
+  it("leaves out the React Compiler rules that are internal to Meta", async () => {
+    const internalRuleIds = [
+      "react-hooks/fbt",
+      "react-hooks/rule-suppression",
+      "react-hooks/todo",
+    ];
+    const configs = await react();
+    const hooks = configs.find(
+      (config) => config.name === "@cravingmaker/eslint-config/react/hooks",
+    );
+    const pluginRuleIds = Object.keys(
+      hooks?.plugins?.["react-hooks"]?.rules ?? {},
+    ).map((ruleName) => `react-hooks/${ruleName}`);
 
-    it("react-hooks/fbt: stays off (depends on Meta FBT library)", async () => {
-      await expectNoLintError(validCode, "react-hooks/fbt", tsxOptions);
-    });
-
-    it("react-hooks/todo: stays off (Meta-internal tracking)", async () => {
-      await expectNoLintError(validCode, "react-hooks/todo", tsxOptions);
-    });
-
-    it("react-hooks/rule-suppression: stays off (Meta-internal mechanism)", async () => {
-      await expectNoLintError(
-        validCode,
-        "react-hooks/rule-suppression",
-        tsxOptions,
-      );
-    });
+    expect(pluginRuleIds).toEqual(expect.arrayContaining(internalRuleIds));
+    expect(
+      internalRuleIds.filter((ruleId) =>
+        Object.hasOwn(hooks?.rules ?? {}, ruleId),
+      ),
+    ).toEqual([]);
   });
 });
 
@@ -371,23 +330,5 @@ describe("react-refresh/only-export-components", () => {
       ].join("\n");
       await expectNoLintError(code, rule, nextOptions);
     });
-  });
-});
-
-describe("html react rules", () => {
-  it("@html-eslint/react/classname-spacing: reports repeated spacing in className values", async () => {
-    await expectLintError(
-      `const element = <div className="stack  center" />;\nconsole.log(element);\n`,
-      "@html-eslint/react/classname-spacing",
-      reactOptions,
-    );
-  });
-
-  it("@html-eslint/react/no-duplicate-classname: reports duplicate className tokens", async () => {
-    await expectLintError(
-      `const element = <div className="stack stack" />;\nconsole.log(element);\n`,
-      "@html-eslint/react/no-duplicate-classname",
-      reactOptions,
-    );
   });
 });

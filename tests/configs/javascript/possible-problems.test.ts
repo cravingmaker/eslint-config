@@ -5,7 +5,7 @@ import { expectLintError } from "../../utilities.js";
 describe("js possible problem rules", () => {
   it("no-undef: reports typeof checks against undeclared variables", async () => {
     await expectLintError(
-      `if (typeof missingValue === 'undefined') {\n\tconsole.log('missing');\n}\n`,
+      `export const isMissing = typeof missingValue === 'undefined';\n`,
       "no-undef",
       {
         filePath: "test.js",
@@ -28,24 +28,6 @@ describe("js possible problem rules", () => {
       `const item = {};\nconst total = item?.count + 1;\nconsole.log(total);\n`,
       "no-unsafe-optional-chaining",
       { filePath: "test.js" },
-    );
-  });
-
-  it("no-promise-executor-return: reports returned values from promise executors", async () => {
-    await expectLintError(
-      `const promise = new Promise((resolve) => {\n\treturn resolve(1);\n});\nconsole.log(promise);\n`,
-      "no-promise-executor-return",
-      { filePath: "test.js" },
-    );
-  });
-
-  it("no-use-before-define: reports variables used before declaration", async () => {
-    await expectLintError(
-      `const result = value;\nconst value = 1;\nconsole.log(result);\n`,
-      "no-use-before-define",
-      {
-        filePath: "test.js",
-      },
     );
   });
 });

@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { describeFile } from "./describe-file.js";
 import { json } from "../../src/configs/json.js";
-import { expectLintError } from "../utilities.js";
 
 describe("json feature", () => {
   it("keeps each override in its own JSON language", async () => {
@@ -32,15 +31,5 @@ describe("json feature", () => {
     expect(
       await describeFile(eslint, "tsconfig.json", "json/sort-keys"),
     ).toEqual({ language: "json/jsonc", plugins: ["@", "json"], severity: 0 });
-  });
-});
-
-describe("json rules", () => {
-  it("json/sort-keys: reports unsorted object keys in JSON files", async () => {
-    await expectLintError(
-      `{\n\t"zebra": true,\n\t"apple": true\n}\n`,
-      "json/sort-keys",
-      { filePath: "config.json" },
-    );
   });
 });

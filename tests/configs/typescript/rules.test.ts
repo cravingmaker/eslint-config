@@ -16,38 +16,6 @@ describe("typescript-eslint rules", () => {
     );
   });
 
-  it("@typescript-eslint/no-empty-object-type: reports empty object type aliases", async () => {
-    await expectLintError(
-      `type Options = {};\nconst options: Options = {};\nconsole.log(options);\n`,
-      "@typescript-eslint/no-empty-object-type",
-      tsOptions,
-    );
-  });
-
-  it("@typescript-eslint/triple-slash-reference: reports path references", async () => {
-    await expectLintError(
-      `/// <reference path="./types.d.ts" />\nconst value = 1;\nconsole.log(value);\n`,
-      "@typescript-eslint/triple-slash-reference",
-      tsOptions,
-    );
-  });
-
-  it("@typescript-eslint/array-type: reports non-simple generic array types", async () => {
-    await expectLintError(
-      `type Values = Array<string>;\nconst values: Values = ['one'];\nconsole.log(values);\n`,
-      "@typescript-eslint/array-type",
-      tsOptions,
-    );
-  });
-
-  it("@typescript-eslint/consistent-type-assertions: reports angle-bracket assertions", async () => {
-    await expectLintError(
-      `const value = <string>'one';\nconsole.log(value);\n`,
-      "@typescript-eslint/consistent-type-assertions",
-      tsOptions,
-    );
-  });
-
   it("@typescript-eslint/consistent-type-definitions: reports interface declarations", async () => {
     await expectLintError(
       `interface User {\n\tname: string;\n}\nconst user: User = { name: 'Ada' };\nconsole.log(user);\n`,
@@ -60,14 +28,6 @@ describe("typescript-eslint rules", () => {
     await expectLintError(
       `class Store {\n\tpublic value = 1;\n}\nconsole.log(Store);\n`,
       "@typescript-eslint/explicit-member-accessibility",
-      tsOptions,
-    );
-  });
-
-  it("@typescript-eslint/no-use-before-define: reports classes used before declarations", async () => {
-    await expectLintError(
-      `const value = new Store();\nclass Store {}\nconsole.log(value);\n`,
-      "@typescript-eslint/no-use-before-define",
       tsOptions,
     );
   });

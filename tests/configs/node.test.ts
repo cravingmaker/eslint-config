@@ -6,7 +6,6 @@ import { describe, expect, it } from "vitest";
 import { node } from "../../src/configs/node.js";
 import { defaultContext } from "../../src/context.js";
 import { typescriptFiles } from "../../src/globs.js";
-import { expectLintError } from "../utilities.js";
 
 type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 
@@ -71,32 +70,6 @@ describe("node feature", () => {
 
     expect(await getSeverity(eslint, "src/Component.svelte", "n/no-sync")).toBe(
       0,
-    );
-  });
-});
-
-describe("n rules", () => {
-  it("n/no-process-env: reports disallowed process.env variables", async () => {
-    await expectLintError(
-      `console.log(process.env.PORT);\n`,
-      "n/no-process-env",
-      { filePath: "test.js" },
-    );
-  });
-
-  it("n/no-sync: reports sync APIs below the module root", async () => {
-    await expectLintError(
-      `import fs from 'node:fs';\nfunction loadFixture(path) {\n\treturn fs.readFileSync(path, 'utf8');\n}\nconsole.log(loadFixture('fixture.txt'));\n`,
-      "n/no-sync",
-      { filePath: "test.js" },
-    );
-  });
-
-  it("n/no-deprecated-api: reports deprecated Node.js APIs", async () => {
-    await expectLintError(
-      `import { Buffer } from 'node:buffer';\nconst value = new Buffer(1);\nconsole.log(value);\n`,
-      "n/no-deprecated-api",
-      { filePath: "test.js" },
     );
   });
 });

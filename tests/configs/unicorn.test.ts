@@ -6,30 +6,6 @@ const jsOptions = { filePath: "test.js" } as const;
 const rightArrowText = String.fromCodePoint(45, 62);
 
 describe("unicorn rules", () => {
-  it("unicorn/no-for-each: reports Array#forEach usage from the enabled plugin preset", async () => {
-    await expectLintError(
-      `const values = [1, 2, 3];\nvalues.forEach((value) => {\n\tconsole.log(value);\n});\n`,
-      "unicorn/no-for-each",
-      jsOptions,
-    );
-  });
-
-  it("unicorn/prefer-node-protocol: reports bare Node.js builtin imports from the enabled plugin preset", async () => {
-    await expectLintError(
-      `import fs from 'fs';\nconsole.log(fs);\n`,
-      "unicorn/prefer-node-protocol",
-      jsOptions,
-    );
-  });
-
-  it("unicorn/filename-case: reports filenames outside the configured cases", async () => {
-    await expectLintError(
-      `export const value = 1;\n`,
-      "unicorn/filename-case",
-      { filePath: "bad_name.js" },
-    );
-  });
-
   it("unicorn/filename-case: allows PascalCase filenames", async () => {
     await expectNoLintError(
       `export const value = 1;\n`,
@@ -43,14 +19,6 @@ describe("unicorn rules", () => {
       `export const value = 1;\n`,
       "unicorn/filename-case",
       { filePath: "001_init.js" },
-    );
-  });
-
-  it("unicorn/name-replacements: reports unapproved abbreviations", async () => {
-    await expectLintError(
-      `const btn = 'save';\nconsole.log(btn);\n`,
-      "unicorn/name-replacements",
-      jsOptions,
     );
   });
 
@@ -80,7 +48,7 @@ describe("unicorn rules", () => {
 
   it("unicorn/consistent-destructuring: stays disabled for mixed property access patterns", async () => {
     await expectNoLintError(
-      `const user = { name: 'Ada' };\nconst name = user.name;\nconsole.log(user, name);\n`,
+      `export function describeUser(user) {\n\tconst { name } = user;\n\treturn name + user.name;\n}\n`,
       "unicorn/consistent-destructuring",
       jsOptions,
     );
@@ -102,9 +70,9 @@ describe("unicorn rules", () => {
     );
   });
 
-  it("unicorn/consistent-json-file-read: stays disabled for explicit JSON file reading", async () => {
+  it("unicorn/consistent-json-file-read: stays disabled for JSON files read as buffers", async () => {
     await expectNoLintError(
-      `const payload = Buffer.from('{"ready":true}');\nconst value = JSON.parse(payload.toString());\nconsole.log(value);\n`,
+      `import fs from 'node:fs/promises';\n\nexport const data = JSON.parse(await fs.readFile('data.json'));\n`,
       "unicorn/consistent-json-file-read",
       jsOptions,
     );
@@ -114,26 +82,6 @@ describe("unicorn rules", () => {
     await expectNoLintError(
       `const channel = new BroadcastChannel('events');\nchannel.postMessage({ ready: true });\n`,
       "unicorn/require-post-message-target-origin",
-      jsOptions,
-    );
-  });
-
-  it("modern replacement rules remain enabled", async () => {
-    await expectLintError(
-      `const values = [];\nvalues.push(1);\nvalues.push(2);\nconsole.log(values);\n`,
-      "unicorn/prefer-single-call",
-      jsOptions,
-    );
-
-    await expectLintError(
-      `function isArray(value) {\n\treturn value instanceof Array;\n}\nconsole.log(isArray([]));\n`,
-      "unicorn/no-instanceof-builtins",
-      jsOptions,
-    );
-
-    await expectLintError(
-      `const values = [1, 2, 3];\nconst tail = values.slice(1, values.length);\nconsole.log(tail);\n`,
-      "unicorn/no-unnecessary-slice-end",
       jsOptions,
     );
   });

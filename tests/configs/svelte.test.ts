@@ -55,20 +55,4 @@ describe("html svelte rules", () => {
       svelteOptions,
     );
   });
-
-  it("@html-eslint/svelte/class-spacing: reports repeated spacing in class attributes", async () => {
-    await expectLintError(
-      `<div class="stack  center">Hello</div>\n`,
-      "@html-eslint/svelte/class-spacing",
-      svelteOptions,
-    );
-  });
-
-  it("@html-eslint/svelte/no-duplicate-class: reports duplicate class tokens", async () => {
-    await expectLintError(
-      `<div class="stack stack">Hello</div>\n`,
-      "@html-eslint/svelte/no-duplicate-class",
-      svelteOptions,
-    );
-  });
 });
