@@ -13,21 +13,27 @@ function buildContext(
   options: Options = {},
   dependencies: ReadonlySet<string> = new Set(),
 ): Context {
-  const { globals, projectRootDirectory, typeAware, typescript } =
-    resolveOptions(options);
+  const {
+    globals,
+    projectRootDirectory,
+    svelteComponents,
+    typeAware,
+    typescript,
+  } = resolveOptions(options, detectFeatures(dependencies));
 
   return {
     dependencies,
     globals,
     projectRootDirectory,
+    svelteComponents,
     tsconfigRootDir: typescript?.tsconfigRootDir ?? projectRootDirectory,
     typeAware,
   };
 }
 /**
 Builds the context that every feature builder receives: the project root, the package names
-that its manifest declares, the resolved globals, the tsconfig directory, and the type-aware
-scope.
+that its manifest declares, the resolved globals, the Svelte components, the tsconfig directory,
+and the type-aware scope.
 */
 async function createContext(options: Options = {}): Promise<Context> {
   const { projectRootDirectory } = resolveOptions(options);

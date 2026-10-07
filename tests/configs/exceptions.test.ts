@@ -25,6 +25,12 @@ const testFileRules = [
   "functional/no-return-void",
 ] as const;
 const configFileRules = ["import-x/no-default-export"] as const;
+const svelteComponentRules = [
+  "functional/no-let",
+  "import-x/no-mutable-exports",
+  "import-x/unambiguous",
+  "unicorn/no-top-level-assignment-in-function",
+] as const;
 
 async function createEslint(
   options: Options,
@@ -122,16 +128,69 @@ describe("file-role exceptions", () => {
     expect(ignored).toEqual([true, true, true]);
   });
 
+  it("turn off the rules that Svelte components break by design", async () => {
+    const eslint = await createEslint({ ...baseOptions, svelte: true });
+    const expected = {
+      "src/Component.svelte": [0, 0, 0, 0],
+      "src/example.ts": [2, 2, 2, 2],
+      // The top level of a rune module is shared by every module that imports it.
+      "src/state.svelte.ts": [2, 2, 2, 2],
+    };
+
+    expect(
+      await getSeveritiesByPath(
+        eslint,
+        Object.keys(expected),
+        svelteComponentRules,
+      ),
+    ).toEqual(expected);
+  });
+
   it("apply only while the feature that holds their rules is on", async () => {
     const [withoutFunctional, withoutImports] = await Promise.all([
-      createConfig({ ...baseOptions, functional: false }),
-      createConfig({ ...baseOptions, imports: false }),
+      createConfig({ ...baseOptions, functional: false, svelte: false }),
+      createConfig({ ...baseOptions, imports: false, svelte: false }),
     ]);
 
     expect(getExceptionNames(withoutFunctional)).toEqual([
       `${prefix}config-files`,
     ]);
     expect(getExceptionNames(withoutImports)).toEqual([`${prefix}test-files`]);
+  });
+
+  it("apply to Svelte components only while the Svelte feature is on", async () => {
+    const configs = await Promise.all([
+      createConfig({ ...baseOptions, svelte: true }),
+      createConfig({ ...baseOptions, functional: false, svelte: true }),
+      createConfig({ ...baseOptions, imports: false, svelte: true }),
+      createConfig({ ...baseOptions, svelte: true, unicorn: false }),
+      createConfig({ ...baseOptions, svelte: false }),
+    ]);
+
+    expect(
+      configs.map(
+        (config) =>
+          config.find(({ name }) => name === `${prefix}svelte-components`)
+            ?.rules,
+      ),
+    ).toEqual([
+      Object.fromEntries(svelteComponentRules.map((ruleId) => [ruleId, "off"])),
+      {
+        "import-x/no-mutable-exports": "off",
+        "import-x/unambiguous": "off",
+        "unicorn/no-top-level-assignment-in-function": "off",
+      },
+      {
+        "functional/no-let": "off",
+        "unicorn/no-top-level-assignment-in-function": "off",
+      },
+      {
+        "functional/no-let": "off",
+        "import-x/no-mutable-exports": "off",
+        "import-x/unambiguous": "off",
+      },
+      undefined,
+    ]);
   });
 
   it("come before user configs, which can turn a rule back on", async () => {

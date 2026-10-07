@@ -1,9 +1,10 @@
 import type { Linter } from "eslint";
-import type { FeatureOptions, Rules } from "../types.js";
+import type { Context, FeatureOptions, Rules } from "../types.js";
 
 import pluginPromise from "eslint-plugin-promise";
 
-import { sourceFiles } from "../globs.js";
+import { defaultContext } from "../context.js";
+import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 
 // Policy for eslint-plugin-promise.
@@ -23,11 +24,10 @@ const promiseRules: Rules = {
 } as const;
 
 // Builds the flat config for eslint-plugin-promise.
-function promise({
-  files = sourceFiles,
-  ignores = [],
-  overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+function promise(
+  { files, ignores = [], overrides = {} }: FeatureOptions = {},
+  { svelteComponents }: Context = defaultContext,
+): Linter.Config[] {
   return [
     {
       name: "@cravingmaker/eslint-config/promise/setup",
@@ -37,7 +37,9 @@ function promise({
       },
     },
     {
-      files: [...files],
+      files: [
+        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
+      ],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/promise/rules",
       rules: { ...promiseRules, ...overrides },

@@ -1,9 +1,10 @@
 import type { Linter } from "eslint";
-import type { FeatureOptions, Rules } from "../types.js";
+import type { Context, FeatureOptions, Rules } from "../types.js";
 
 import pluginUnicorn from "eslint-plugin-unicorn";
 
-import { sourceFiles } from "../globs.js";
+import { defaultContext } from "../context.js";
+import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 
 // Policy for eslint-plugin-unicorn.
@@ -95,18 +96,19 @@ const unicornRules: Rules = {
 } as const;
 
 // Builds the flat config for eslint-plugin-unicorn.
-function unicorn({
-  files = sourceFiles,
-  ignores = [],
-  overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+function unicorn(
+  { files, ignores = [], overrides = {} }: FeatureOptions = {},
+  { svelteComponents }: Context = defaultContext,
+): Linter.Config[] {
   return [
     {
       name: "@cravingmaker/eslint-config/unicorn/setup",
       plugins: { unicorn: pluginUnicorn },
     },
     {
-      files: [...files],
+      files: [
+        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
+      ],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/unicorn/rules",
       rules: { ...unicornRules, ...overrides },

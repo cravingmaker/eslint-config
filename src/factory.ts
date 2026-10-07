@@ -61,24 +61,32 @@ async function createConfig(
     ...ignores(resolved.ignores),
 
     ...javascript(resolved.javascript, context),
-    ...(resolved.comments === undefined ? [] : comments(resolved.comments)),
+    ...(resolved.comments === undefined
+      ? []
+      : comments(resolved.comments, context)),
     ...(resolved.node === undefined ? [] : node(resolved.node, context)),
-    ...(resolved.security === undefined ? [] : security(resolved.security)),
+    ...(resolved.security === undefined
+      ? []
+      : security(resolved.security, context)),
     ...(resolved.imports === undefined
       ? []
       : imports(resolved.imports, context)),
     ...(resolved.unusedImports === undefined
       ? []
-      : unusedImports(resolved.unusedImports)),
-    ...(resolved.promise === undefined ? [] : promise(resolved.promise)),
-    ...(resolved.regexp === undefined ? [] : regexp(resolved.regexp)),
-    ...(resolved.unicorn === undefined ? [] : unicorn(resolved.unicorn)),
+      : unusedImports(resolved.unusedImports, context)),
+    ...(resolved.promise === undefined
+      ? []
+      : promise(resolved.promise, context)),
+    ...(resolved.regexp === undefined ? [] : regexp(resolved.regexp, context)),
+    ...(resolved.unicorn === undefined
+      ? []
+      : unicorn(resolved.unicorn, context)),
     ...(resolved.functional === undefined
       ? []
       : functional(resolved.functional, context)),
     ...(resolved.perfectionist === undefined
       ? []
-      : perfectionist(resolved.perfectionist)),
+      : perfectionist(resolved.perfectionist, context)),
 
     ...typescriptConfigs,
 

@@ -1,9 +1,10 @@
 import type { Linter } from "eslint";
-import type { FeatureOptions, Rules } from "../types.js";
+import type { Context, FeatureOptions, Rules } from "../types.js";
 
 import pluginComments from "@eslint-community/eslint-plugin-eslint-comments";
 
-import { sourceFiles } from "../globs.js";
+import { defaultContext } from "../context.js";
+import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 
 // Policy for ESLint directive comments, from @eslint-community/eslint-plugin-eslint-comments.
@@ -23,18 +24,19 @@ const commentsRules: Rules = {
 } as const;
 
 // Builds the flat config for ESLint directive comments.
-function comments({
-  files = sourceFiles,
-  ignores = [],
-  overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+function comments(
+  { files, ignores = [], overrides = {} }: FeatureOptions = {},
+  { svelteComponents }: Context = defaultContext,
+): Linter.Config[] {
   return [
     {
       name: "@cravingmaker/eslint-config/comments/setup",
       plugins: { "@eslint-community/eslint-comments": pluginComments },
     },
     {
-      files: [...files],
+      files: [
+        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
+      ],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/comments/rules",
       rules: { ...commentsRules, ...overrides },

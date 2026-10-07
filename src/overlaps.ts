@@ -2,7 +2,7 @@ import type { Linter } from "eslint";
 import type { ResolvedOptions } from "./options.js";
 import type { FeatureOptions } from "./types.js";
 
-import { sourceFiles, typescriptFiles } from "./globs.js";
+import { sourceFiles, typescriptFiles, withSvelteComponents } from "./globs.js";
 import { resolveOptions } from "./options.js";
 import { narrowFiles } from "./utilities/type-aware.js";
 
@@ -114,27 +114,32 @@ function overlapConfigs(
       settings: options.unusedImports,
     },
   ];
+  // The default files of the features that hold replaced rules, Svelte components included.
+  const sources = withSvelteComponents(sourceFiles, options.svelteComponents);
   const scopes = [
     {
-      defaultFiles: sourceFiles,
+      defaultFiles: sources,
       feature: "javascript",
       overrides: options.javascript.overrides,
       settings: options.javascript,
     },
     {
-      defaultFiles: sourceFiles,
+      defaultFiles: sources,
       feature: "node",
       overrides: options.node?.overrides,
       settings: options.node,
     },
     {
-      defaultFiles: sourceFiles,
+      defaultFiles: sources,
       feature: "imports",
       overrides: options.imports?.overrides,
       settings: options.imports,
     },
     {
-      defaultFiles: typescriptFiles,
+      defaultFiles: withSvelteComponents(
+        typescriptFiles,
+        options.svelteComponents,
+      ),
       feature: "typescript",
       overrides: {
         ...options.typescript?.overrides,

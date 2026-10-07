@@ -1,3 +1,5 @@
+import type { Linter } from "eslint";
+
 // ES modules. CommonJS is not supported, so `.cjs` and `.cts` files are left out and get no
 // rules. ESLint's default config still matches `.cjs` files and parses them as CommonJS.
 const javascriptFiles = ["**/*.{js,mjs,jsx,mjsx}"] as const;
@@ -12,6 +14,8 @@ const reactFiles = ["**/*.{jsx,mjsx,tsx,mtsx}"] as const;
 const svelteFiles = [
   "**/*.{svelte,svelte.js,svelte.mjs,svelte.ts,svelte.mts}",
 ] as const;
+// Svelte components. Rune modules are JavaScript and TypeScript sources by their extension.
+const svelteComponentFiles = ["**/*.svelte"] as const;
 // ES module sources, where Express apps live.
 const expressFiles = ["**/*.{js,mjs,ts,mts}"] as const;
 
@@ -40,6 +44,23 @@ const testFiles = ["**/*.{test,spec}.*"] as const;
 // Config files of tools such as ESLint, Vite, and Vitest.
 const configFiles = ["**/*.config.*"] as const;
 
+/**
+The default files of a feature that lints JavaScript or TypeScript sources: `patterns`, and the
+Svelte components whose scripts it also lints. Each nested array is a set of patterns that a file
+must all match.
+*/
+function withSvelteComponents(
+  patterns: readonly string[],
+  svelteComponents: ReadonlyArray<string | readonly string[]>,
+): NonNullable<Linter.Config["files"]> {
+  return [
+    ...patterns,
+    ...svelteComponents.map((entry) =>
+      typeof entry === "string" ? entry : [...entry],
+    ),
+  ];
+}
+
 export {
   configFiles,
   expressFiles,
@@ -54,7 +75,9 @@ export {
   packageJsonFiles,
   reactFiles,
   sourceFiles,
+  svelteComponentFiles,
   svelteFiles,
   testFiles,
   typescriptFiles,
+  withSvelteComponents,
 };

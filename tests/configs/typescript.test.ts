@@ -94,6 +94,25 @@ describe("typescript feature", () => {
     ).toEqual([{ projectService: true, tsconfigRootDir: "/project" }, {}, {}]);
   });
 
+  it("lints the Svelte components of the context without type information", async () => {
+    const eslint = new ESLint({
+      overrideConfig: await typescript(
+        {},
+        { ...typedContext, svelteComponents: ["**/*.svelte"] },
+      ),
+      overrideConfigFile: true,
+    });
+    const component = await getEffectiveConfig(eslint, "src/Component.svelte");
+
+    expect(component?.languageOptions?.parserOptions).toEqual({});
+    expect(component?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(
+      2,
+    );
+    expect(
+      component?.rules?.["@typescript-eslint/no-floating-promises"],
+    ).toEqual([0]);
+  });
+
   it("keeps files, ignores, and overrides local to the feature", async () => {
     const eslint = new ESLint({
       overrideConfig: await typescript({

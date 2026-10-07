@@ -156,6 +156,44 @@ describe("resolveOptions", () => {
     });
   });
 
+  it("resolves the Svelte components that the Svelte feature parses", () => {
+    expect(resolveOptions().svelteComponents).toEqual([]);
+    expect(resolveOptions({}, allDetected).svelteComponents).toEqual([
+      "**/*.svelte",
+    ]);
+    expect(resolveOptions({ svelte: true }).svelteComponents).toEqual([
+      "**/*.svelte",
+    ]);
+    expect(
+      resolveOptions({ svelte: false }, allDetected).svelteComponents,
+    ).toEqual([]);
+  });
+
+  it("keeps the Svelte components within the files and ignores of the Svelte feature", () => {
+    expect(
+      resolveOptions({
+        svelte: {
+          files: ["app/**/*.svelte", "app/**/*.svelte.ts"],
+          ignores: ["**/generated/**", "app/legacy/**"],
+        },
+      }).svelteComponents,
+    ).toEqual([
+      ["**/*.svelte", "app/**/*.svelte", "!**/generated/**", "!app/legacy/**"],
+      [
+        "**/*.svelte",
+        "app/**/*.svelte.ts",
+        "!**/generated/**",
+        "!app/legacy/**",
+      ],
+    ]);
+    // A negated pattern cannot unignore a file, so such an ignore is left out.
+    expect(
+      resolveOptions({
+        svelte: { ignores: ["**/generated/**", "!**/generated/Kept.svelte"] },
+      }).svelteComponents,
+    ).toEqual([["**/*.svelte", "!**/generated/**"]]);
+  });
+
   it("has no TypeScript options or type-aware scope when TypeScript is off", () => {
     const resolved = resolveOptions({ typescript: false });
 

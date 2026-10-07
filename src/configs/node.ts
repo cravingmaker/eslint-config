@@ -4,7 +4,11 @@ import type { Context, FeatureOptions, Rules } from "../types.js";
 import pluginNode from "eslint-plugin-n";
 
 import { defaultContext } from "../context.js";
-import { sourceFiles, typescriptFiles } from "../globs.js";
+import {
+  sourceFiles,
+  typescriptFiles,
+  withSvelteComponents,
+} from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 import { narrowFiles, typeAwareConfig } from "../utilities/type-aware.js";
 
@@ -54,11 +58,11 @@ const nodeRules: Rules = {
 // The rules that need type information in TypeScript files.
 const typeAwareRules: Rules = { "n/no-sync": nodeRules["n/no-sync"] };
 
-// Builds the flat config for eslint-plugin-n. In TypeScript files, `n/no-sync` is off unless
-// they are in the type-aware scope.
+// Builds the flat config for eslint-plugin-n. In TypeScript files and Svelte components,
+// `n/no-sync` is off unless they are in the type-aware scope.
 function node(
   options: FeatureOptions = {},
-  { typeAware }: Context = defaultContext,
+  { svelteComponents, typeAware }: Context = defaultContext,
 ): Linter.Config[] {
   const { files, ignores = [], overrides = {} } = options;
 
@@ -68,13 +72,18 @@ function node(
       plugins: { n: pluginNode },
     },
     {
-      files: [...(files ?? sourceFiles)],
+      files: [
+        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
+      ],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/node/rules",
       rules: { ...nodeRules, ...overrides },
     },
     {
-      files: narrowFiles(typescriptFiles, files),
+      files: narrowFiles(
+        withSvelteComponents(typescriptFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/node/rules-typescript",
       rules: { "n/no-sync": "off", ...overrides },

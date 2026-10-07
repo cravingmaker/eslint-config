@@ -1,9 +1,10 @@
 import type { Linter } from "eslint";
-import type { FeatureOptions, Rules } from "../types.js";
+import type { Context, FeatureOptions, Rules } from "../types.js";
 
 import pluginUnusedImports from "eslint-plugin-unused-imports";
 
-import { sourceFiles } from "../globs.js";
+import { defaultContext } from "../context.js";
+import { sourceFiles, withSvelteComponents } from "../globs.js";
 import {
   // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
   noUnusedVarsOptions,
@@ -18,18 +19,19 @@ const unusedImportsRules: Rules = {
 };
 
 // Builds the flat config for eslint-plugin-unused-imports.
-function unusedImports({
-  files = sourceFiles,
-  ignores = [],
-  overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+function unusedImports(
+  { files, ignores = [], overrides = {} }: FeatureOptions = {},
+  { svelteComponents }: Context = defaultContext,
+): Linter.Config[] {
   return [
     {
       name: "@cravingmaker/eslint-config/unused-imports/setup",
       plugins: { "unused-imports": pluginUnusedImports },
     },
     {
-      files: [...files],
+      files: [
+        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
+      ],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/unused-imports/rules",
       rules: { ...unusedImportsRules, ...overrides },
