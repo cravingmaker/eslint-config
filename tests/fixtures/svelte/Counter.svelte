@@ -11,6 +11,10 @@
   }
 </script>
 
-<button class={preferences.theme} type="button" onclick={increment}>
+<button
+  class={preferences.theme}
+  type="button"
+  onclick={increment}
+>
   Clicked {count} times
 </button>

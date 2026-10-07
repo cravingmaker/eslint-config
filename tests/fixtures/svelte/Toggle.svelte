@@ -8,5 +8,8 @@
   }
 </script>
 
-<button type="button" onclick={toggle}>{isOpen ? "Close" : "Open"}</button>
+<button
+  type="button"
+  onclick={toggle}>{isOpen ? "Close" : "Open"}</button
+>
 <p>Visits: {$visits}</p>
