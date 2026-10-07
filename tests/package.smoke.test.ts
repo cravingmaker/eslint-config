@@ -337,7 +337,7 @@ describe("published package", () => {
 
     const output = runConsumer(
       consumerDirectory,
-      `
+      String.raw`
 				import { createConfig } from '@cravingmaker/eslint-config';
 
 				const config = await createConfig({ typescript: { typeChecked: false } });
@@ -381,6 +381,15 @@ describe("published package", () => {
 
 				if (refreshRule[1]?.allowConstantExport !== true) {
 					throw new Error('Vite React Refresh variant was not auto-detected');
+				}
+
+				// Custom hooks also live in modules without JSX.
+				const conditionalHook = 'function useValue(value) { return value; }\nexport function useToggle(isOn) {\n\tif (isOn) { useValue(true); }\n}\n';
+				for (const filePath of ['use-toggle.js', 'use-toggle.ts']) {
+					const [result] = await eslint.lintText(conditionalHook, { filePath });
+					if (!result.messages.some((message) => message.ruleId === 'react-hooks/rules-of-hooks')) {
+						throw new Error('A conditional hook was not reported in ' + filePath);
+					}
 				}
 
 				process.stdout.write('ok');

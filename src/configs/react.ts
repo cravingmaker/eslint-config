@@ -9,7 +9,7 @@ import type {
   Rules,
 } from "../types.js";
 
-import { reactFiles } from "../globs.js";
+import { reactFiles, sourceFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 import { importPeer } from "../utilities/import-peer.js";
 
@@ -101,11 +101,12 @@ const refreshOptions = {
   RuleOptionOf<"react-refresh/only-export-components">
 >;
 
-// Builds the flat config for React components: one block for the @html-eslint React rules, one
-// for the hooks rules, and one for React Refresh unless `refresh` is `false`. A missing plugin
-// fails with a message that names it.
+// Builds the flat config for React: one block for the @html-eslint React rules and one for React
+// Refresh, unless `refresh` is `false`, in files that can hold components, and one for the hooks
+// rules in every JavaScript and TypeScript source, where custom hooks also live. `files` replaces
+// both scopes. A missing plugin fails with a message that names it.
 async function react({
-  files = reactFiles,
+  files,
   ignores = [],
   overrides = {},
   refresh = "generic",
@@ -127,7 +128,14 @@ async function react({
           "refresh",
         ),
   ]);
-  const scope = { files: [...files], ignores: [...ignores] };
+  const scope = { files: [...(files ?? reactFiles)], ignores: [...ignores] };
+  // The hooks block takes only the overrides of hooks rules: ESLint rejects a rule that is on in a
+  // file whose configuration lacks its plugin, and the other overrides keep to component files.
+  const hooksOverrides = Object.fromEntries(
+    Object.entries(overrides).filter(([ruleId]) =>
+      ruleId.startsWith("react-hooks/"),
+    ),
+  );
 
   return [
     {
@@ -141,7 +149,8 @@ async function react({
       },
     },
     {
-      ...scope,
+      files: [...(files ?? sourceFiles)],
+      ignores: [...ignores],
       name: "@cravingmaker/eslint-config/react/hooks",
       plugins: {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint-plugin-react-hooks configs.flat shape is not assignable to Linter.Plugin without assertion
@@ -149,7 +158,7 @@ async function react({
           Linter.Config["plugins"]
         >[string],
       },
-      rules: { ...hooksRules, ...overrides },
+      rules: { ...hooksRules, ...hooksOverrides },
     },
     ...(refreshModule === undefined || refresh === false
       ? []

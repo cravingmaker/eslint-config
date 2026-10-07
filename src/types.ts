@@ -114,7 +114,10 @@ type Options = {
   readonly unusedImports?: Feature;
 };
 /**
-Options of the `react` feature.
+Options of the `react` feature. By default, the hooks rules apply to every JavaScript and
+TypeScript file, where custom hooks also live, and the other React rules to JSX and TSX files.
+`files` replaces both defaults. Overrides of hooks rules apply wherever the hooks rules do, and
+other overrides where the other React rules do.
 */
 type ReactOptions = FeatureOptions & {
   /**
