@@ -6,8 +6,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
+type CommandResult = {
+  readonly exitCode: number;
+  readonly stderr: string;
+  readonly stdout: string;
+};
 type Manifest = {
   readonly devDependencies: Readonly<Record<string, string>>;
+  readonly peerDependencies: Readonly<Record<string, string>>;
 };
 
 // eslint-disable-next-line @typescript-eslint/strict-void-return -- promisify takes the callback form of execFile, which also returns its child process.
@@ -101,5 +107,40 @@ async function getOutput(
       : String(error);
   }
 }
+/*
+Runs a command and returns its exit code and what it prints. A command that cannot start, or
+that a signal stops, has no exit code, which reads as `NaN`.
+*/
+async function runCommand(
+  command: string,
+  commandArguments: readonly string[],
+  directory: string,
+): Promise<CommandResult> {
+  try {
+    const { stderr, stdout } = await execute(command, [...commandArguments], {
+      cwd: directory,
+      maxBuffer: 16 * 1024 * 1024,
+    });
+    return { exitCode: 0, stderr, stdout };
+  } catch (error) {
+    // The error of a command that ran holds its exit code and output as own properties.
+    const failure: Readonly<Record<string, unknown>> =
+      typeof error === "object" && error !== null ? { ...error } : {};
+    return {
+      exitCode: typeof failure.code === "number" ? failure.code : NaN,
+      stderr:
+        typeof failure.stderr === "string" ? failure.stderr : String(error),
+      stdout: typeof failure.stdout === "string" ? failure.stdout : "",
+    };
+  }
+}
 
-export { createConsumer, createTarball, execute, getOutput };
+export {
+  createConsumer,
+  createTarball,
+  execute,
+  fixturesDirectory,
+  getOutput,
+  manifest,
+  runCommand,
+};
