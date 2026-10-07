@@ -32,9 +32,10 @@ Use a conventional pull request title, such as `fix: ...`, `test: ...`, or
 `docs: ...`. Describe the problem and resulting behavior, including
 before/after examples when lint diagnostics or fixes change.
 
-Add relevant regression tests for behavior changes. Rule tests live in
-`tests/rules/`. For configuration or plugin changes, exercise packed
-consumers in `tests/package.smoke.test.ts` as well.
+Add relevant regression tests for behavior changes. The tests for a
+feature live in `tests/configs/`, in the file named after its module in
+`src/configs/`. For configuration or plugin changes, exercise packed
+consumers in `tests/package/` as well.
 
 ## Validation
 
@@ -45,8 +46,9 @@ npm run validate
 ```
 
 This runs formatting checks, a build, typechecking, linting, tests, and
-package integrity checks. Package smoke tests exercise the tarball in
-temporary consumer projects.
+package integrity checks. Package tests exercise the tarball in temporary
+consumer projects. Some install it from the npm registry, so the tests need
+network access.
 
 For faster feedback, run `npm run test:unit` for unit tests or
 `npm run test:package` for package consumer tests. Both commands build the

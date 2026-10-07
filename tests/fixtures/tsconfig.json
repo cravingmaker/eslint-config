@@ -1,0 +1,13 @@
+{
+  // The TypeScript fixtures, including the rune modules. React ships no types, so the React
+  // fixtures are left out.
+  "compilerOptions": {
+    "module": "nodenext",
+    "noEmit": true,
+    "strict": true,
+    "target": "es2024",
+    "types": ["svelte"]
+  },
+  "exclude": ["react"],
+  "include": ["**/*.ts", "**/*.mts"]
+}

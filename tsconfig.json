@@ -12,6 +12,7 @@
     "target": "ESNext",
     "types": ["node"]
   },
+  "exclude": ["tests/fixtures"],
   "include": [
     "scripts/**/*",
     "src/**/*",

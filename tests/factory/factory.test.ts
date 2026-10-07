@@ -10,6 +10,7 @@ import process from "node:process";
 import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
 
+import { describeEffectiveConfig } from "../policy/effective-config.js";
 import { createConfig } from "../../src/factory.js";
 
 const prefix = "@cravingmaker/eslint-config/";
@@ -182,6 +183,79 @@ describe("createConfig", () => {
       );
     },
   );
+
+  it("lets an explicit value beat detection either way", async () => {
+    const [declared, undeclared] = await Promise.all([
+      createProject("explicit-declared", ["express", "react", "svelte"]),
+      createProject("explicit-undeclared", []),
+    ]);
+
+    expect(
+      await getFrameworks({
+        ...baseOptions,
+        express: true,
+        projectRootDirectory: undeclared,
+        react: {},
+        svelte: true,
+      }),
+    ).toEqual(["react", "svelte", "express"]);
+    expect(
+      await getFrameworks({
+        ...baseOptions,
+        express: false,
+        projectRootDirectory: declared,
+        react: false,
+        svelte: false,
+      }),
+    ).toEqual([]);
+  });
+
+  it("returns the same configuration from every call, whatever the order of the options", async () => {
+    const options = {
+      ...baseOptions,
+      express: true,
+      react: { refresh: "vite" },
+      svelte: true,
+      typescript: { ...baseOptions.typescript, typeChecked: true },
+    } as const;
+    const reversed = Object.fromEntries(Object.entries(options).toReversed());
+    const filePaths = [
+      "README.md",
+      "data.json",
+      "index.html",
+      "package.json",
+      "src/Component.svelte",
+      "src/example.js",
+      "src/example.ts",
+      "src/example.tsx",
+    ];
+    // The block names, and the configuration that ESLint resolves for each of `filePaths`.
+    const describeOutput = async (
+      configs: readonly Linter.Config[],
+    ): Promise<readonly unknown[]> => {
+      const eslint = new ESLint({
+        overrideConfig: [...configs],
+        overrideConfigFile: true,
+      });
+      return [
+        configs.map((config) => config.name),
+        ...(await Promise.all(
+          filePaths.map(
+            async (filePath) =>
+              await describeEffectiveConfig(eslint, filePath, process.cwd()),
+          ),
+        )),
+      ];
+    };
+    const [first, second, fromReversed] = await Promise.all(
+      [options, options, reversed].map(
+        async (value) => await describeOutput(await createConfig(value)),
+      ),
+    );
+
+    expect(second).toEqual(first);
+    expect(fromReversed).toEqual(first);
+  });
 
   it("passes feature options to the feature and appends user configs last", async () => {
     const userConfig: Linter.Config = {
