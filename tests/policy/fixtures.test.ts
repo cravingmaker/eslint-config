@@ -52,7 +52,7 @@ Lints every fixture with every feature and framework on, and returns the message
 React Refresh uses its strictest variant, which allows nothing but components to be exported next
 to them. The React fixtures are left out of typed linting. React ships no type declarations, so
 every value from React would be an error type, which the type-aware rules report; and with them,
-typed linting reports the components themselves, which the plan records under stage 4.
+typed linting reports the components themselves, one of the known issues in the README.
 */
 async function lintFixtures(
   isTypeChecked: boolean,
