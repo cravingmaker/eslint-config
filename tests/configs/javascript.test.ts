@@ -3,6 +3,7 @@ import { builtinRules } from "eslint/use-at-your-own-risk";
 import { describe, expect, it } from "vitest";
 
 import { javascript } from "../../src/configs/javascript/index.js";
+import { defaultContext } from "../../src/context.js";
 
 type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 
@@ -37,6 +38,28 @@ describe("javascript feature", () => {
     expect(
       configs.flatMap((entry) => Object.keys(entry.plugins ?? {})),
     ).toEqual([]);
+  });
+
+  it("lints the Svelte components of the context unless its files are set", async () => {
+    const svelteContext = {
+      ...defaultContext,
+      svelteComponents: ["**/*.svelte"],
+    };
+    const [byDefault, withFiles] = await Promise.all(
+      [
+        javascript({}, svelteContext),
+        javascript({ files: ["**/*.js"] }, svelteContext),
+      ].map(
+        async (configs) =>
+          await getRules(
+            new ESLint({ overrideConfig: configs, overrideConfigFile: true }),
+            "src/Component.svelte",
+          ),
+      ),
+    );
+
+    expect(byDefault).toHaveProperty(["eqeqeq", 0], 2);
+    expect(withFiles).toBeUndefined();
   });
 
   it("keeps files, ignores, and overrides local to the feature", async () => {

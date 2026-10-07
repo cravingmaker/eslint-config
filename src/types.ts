@@ -19,6 +19,12 @@ type Context = {
   */
   readonly projectRootDirectory: string;
   /**
+  Svelte components whose scripts the JavaScript, code-quality, and TypeScript features lint: the
+  components that the Svelte feature parses, or none while it is off. Each nested array is a set of
+  patterns that a file must all match.
+  */
+  readonly svelteComponents: ReadonlyArray<string | readonly string[]>;
+  /**
   The directory that holds `tsconfig.json`: `typescript.tsconfigRootDir`, or the project root.
   */
   readonly tsconfigRootDir: string;
@@ -109,6 +115,10 @@ type Options = {
   readonly react?: Feature<ReactOptions> | "auto";
   readonly regexp?: Feature;
   readonly security?: Feature;
+  /**
+  Svelte components and rune modules. While it is on, the features for JavaScript and TypeScript
+  sources also lint the scripts of the components that it parses, without type information.
+  */
   readonly svelte?: Feature | "auto";
   readonly typescript?: Feature<TypeScriptOptions>;
   readonly unicorn?: Feature;

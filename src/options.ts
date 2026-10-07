@@ -15,7 +15,7 @@ import process from "node:process";
 
 import globalVariables from "globals";
 
-import { typescriptFiles } from "./globs.js";
+import { svelteComponentFiles, typescriptFiles } from "./globs.js";
 import { narrowFiles } from "./utilities/type-aware.js";
 
 /**
@@ -53,6 +53,10 @@ type ResolvedOptions = {
   readonly regexp: FeatureOptions | undefined;
   readonly security: FeatureOptions | undefined;
   readonly svelte: FeatureOptions | undefined;
+  /**
+  The Svelte components whose scripts the features for JavaScript and TypeScript sources lint.
+  */
+  readonly svelteComponents: ReadonlyArray<string | readonly string[]>;
   readonly typeAware: TypeAwareScope | undefined;
   readonly typescript: ResolvedTypeScriptOptions | undefined;
   readonly unicorn: FeatureOptions | undefined;
@@ -112,6 +116,7 @@ function resolveOptions(
   detection: Detection = undetected,
 ): ResolvedOptions {
   const projectRootDirectory = options.projectRootDirectory ?? process.cwd();
+  const svelte = resolveDetectedFeature(detection.svelte, options.svelte);
 
   return {
     comments: resolveFeature(options.comments),
@@ -132,7 +137,8 @@ function resolveOptions(
     react: resolveReact(detection, options.react),
     regexp: resolveFeature(options.regexp),
     security: resolveFeature(options.security),
-    svelte: resolveDetectedFeature(detection.svelte, options.svelte),
+    svelte,
+    svelteComponents: resolveSvelteComponents(svelte),
     typeAware: resolveTypeAwareScope(options.typescript),
     typescript: resolveTypeScript(projectRootDirectory, options.typescript),
     unicorn: resolveFeature(options.unicorn),
@@ -151,6 +157,29 @@ function resolveReact(
     ...react,
     refresh: refresh === "auto" ? detection.reactRefresh : refresh,
   };
+}
+/**
+Resolves the Svelte components whose scripts the features for JavaScript and TypeScript sources
+lint: the components among the Svelte feature's files, without its ignores, because only
+svelte-eslint-parser reads them. None while the Svelte feature is off.
+*/
+function resolveSvelteComponents(
+  svelte: FeatureOptions | undefined,
+): ReadonlyArray<string | readonly string[]> {
+  if (svelte === undefined) return [];
+
+  const { files, ignores = [] } = svelte;
+  // A file matches a negated pattern when it does not match the pattern. An ignore that starts
+  // with `!` unignores files, which an AND pattern cannot express, so it is left out, and the
+  // files that it unignores keep only the Svelte rules.
+  const excluded = ignores
+    .filter((pattern) => !pattern.startsWith("!"))
+    .map((pattern) => `!${pattern}`);
+  return narrowFiles(svelteComponentFiles, files).map((entry) =>
+    excluded.length === 0
+      ? entry
+      : [...(typeof entry === "string" ? [entry] : entry), ...excluded],
+  );
 }
 /**
 Resolves the files that the parser reads with type information and that get type-aware rules:

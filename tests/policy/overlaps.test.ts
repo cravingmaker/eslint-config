@@ -1,3 +1,4 @@
+import type { Linter } from "eslint";
 import type { Options } from "../../src/types.js";
 
 import process from "node:process";
@@ -8,7 +9,9 @@ import { describe, expect, it } from "vitest";
 import { createConfig } from "../../dist/index.mjs";
 import { featureOf, overlaps } from "../../src/overlaps.js";
 
-type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
+type RuleEntries = Readonly<Record<string, RuleEntry>>;
+// A rule's settings as ESLint resolves them: the severity as a number, then the options.
+type RuleEntry = readonly [Linter.Severity, ...unknown[]];
 
 const baseOptions = {
   projectRootDirectory: process.cwd(),
@@ -52,7 +55,7 @@ const cases = Object.entries(overlaps).flatMap(([owner, replacedRules]) =>
 async function getRules(
   options: Options,
   filePath: string,
-): Promise<ReadonlyMap<string, readonly unknown[]>> {
+): Promise<ReadonlyMap<string, RuleEntry>> {
   const eslint = new ESLint({
     overrideConfig: await createConfig(options),
     overrideConfigFile: true,
@@ -61,6 +64,15 @@ async function getRules(
   const config = (await eslint.calculateConfigForFile(filePath)) as
     { readonly rules?: RuleEntries } | undefined;
   return new Map(Object.entries(config?.rules ?? {}));
+}
+// The severity of each of `ruleIds` that ESLint resolves for `filePath` with `options`.
+async function getSeverities(
+  options: Options,
+  filePath: string,
+  ruleIds: readonly string[],
+): Promise<ReadonlyArray<Linter.Severity | undefined>> {
+  const rules = await getRules(options, filePath);
+  return ruleIds.map((ruleId) => rules.get(ruleId)?.[0]);
 }
 
 describe("overlap table", () => {
@@ -109,6 +121,28 @@ describe("overlap table", () => {
           (ruleId) => outside.has(ruleId) || ignored.has(ruleId),
         ),
       ).toEqual([]);
+    },
+  );
+
+  // The scripts of Svelte components get the rules of TypeScript sources, so core rules that
+  // typescript-eslint replaces stay off there whether the owner is on or off.
+  it.each(cases)(
+    "$owner replaces $replaced in Svelte components as in TypeScript sources",
+    async ({ owner, ownerRules, replaced }) => {
+      const ownerOn = { ...baseOptions, svelte: true };
+      const ownerOff = { ...optionsWithoutOwner.get(owner), svelte: true };
+      const ruleIds = [replaced, ...ownerRules];
+      const [componentOn, sourceOn, componentOff, sourceOff] =
+        await Promise.all([
+          getSeverities(ownerOn, "src/Component.svelte", ruleIds),
+          getSeverities(ownerOn, "src/example.ts", ruleIds),
+          getSeverities(ownerOff, "src/Component.svelte", ruleIds),
+          getSeverities(ownerOff, "src/example.ts", ruleIds),
+        ]);
+
+      expect(componentOn[0]).toBe(0);
+      expect(componentOn).toEqual(sourceOn);
+      expect(componentOff).toEqual(sourceOff);
     },
   );
 

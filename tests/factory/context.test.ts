@@ -98,6 +98,27 @@ describe("createContext", () => {
     expect(withoutTypeScript.tsconfigRootDir).toBe(projectRootDirectory);
   });
 
+  it("carries the Svelte components while the Svelte feature is on", async () => {
+    const declared = await createProject(
+      "svelte",
+      JSON.stringify({ devDependencies: { svelte: "5.0.0" } }),
+    );
+    const undeclared = await createProject("without-svelte", "{}");
+    const contexts = await Promise.all([
+      createContext({ projectRootDirectory: declared }),
+      createContext({ projectRootDirectory: declared, svelte: false }),
+      createContext({ projectRootDirectory: undeclared }),
+      createContext({ projectRootDirectory: undeclared, svelte: true }),
+    ]);
+
+    expect(contexts.map(({ svelteComponents }) => svelteComponents)).toEqual([
+      ["**/*.svelte"],
+      [],
+      [],
+      ["**/*.svelte"],
+    ]);
+  });
+
   it("uses the working directory as the default project root", async () => {
     const context = await createContext();
 
@@ -111,7 +132,12 @@ describe("defaultContext", () => {
   it("describes createConfig without options in a project without dependencies", async () => {
     const context = await createContext();
 
-    expect(defaultContext).toEqual({ ...context, dependencies: new Set() });
+    // This repository's manifest declares Svelte, which a project without dependencies does not.
+    expect(defaultContext).toEqual({
+      ...context,
+      dependencies: new Set(),
+      svelteComponents: [],
+    });
   });
 });
 

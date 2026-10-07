@@ -11,7 +11,8 @@ languageOptions:
   sourceType: "module"
 linterOptions:
   reportUnusedDisableDirectives: 1
-settings: null
+settings:
+  import-x/parsers: {"espree":[".js",".mjs",".cjs"]}
 rules: 825 (error 703, off 107, warn 15)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]

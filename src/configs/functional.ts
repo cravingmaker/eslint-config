@@ -4,7 +4,7 @@ import type { Context, FeatureOptions, Rules } from "../types.js";
 import pluginFunctional from "eslint-plugin-functional";
 
 import { defaultContext } from "../context.js";
-import { sourceFiles } from "../globs.js";
+import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { disableConfigRules, enableAllRules } from "../utilities/all-rules.js";
 import { typeAwareConfig } from "../utilities/type-aware.js";
 
@@ -105,9 +105,9 @@ const typeAwareRules: Rules = Object.fromEntries(
 // are off, and turned on again for the type-aware scope when typed linting is on.
 function functional(
   options: FeatureOptions = {},
-  { typeAware }: Context = defaultContext,
+  { svelteComponents, typeAware }: Context = defaultContext,
 ): Linter.Config[] {
-  const { files = sourceFiles, ignores = [], overrides = {} } = options;
+  const { files, ignores = [], overrides = {} } = options;
 
   return [
     {
@@ -115,7 +115,9 @@ function functional(
       plugins: { functional: pluginFunctional },
     },
     {
-      files: [...files],
+      files: [
+        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
+      ],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/functional/rules",
       rules: { ...functionalRules, ...typeAwareRulesOff, ...overrides },

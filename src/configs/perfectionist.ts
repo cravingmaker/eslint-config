@@ -1,9 +1,10 @@
 import type { Linter } from "eslint";
-import type { FeatureOptions, RuleOptionOf, Rules } from "../types.js";
+import type { Context, FeatureOptions, RuleOptionOf, Rules } from "../types.js";
 
 import pluginPerfectionist from "eslint-plugin-perfectionist";
 
-import { sourceFiles } from "../globs.js";
+import { defaultContext } from "../context.js";
+import { sourceFiles, withSvelteComponents } from "../globs.js";
 
 const commonOptions = {
   fallbackSort: { type: "unsorted" },
@@ -394,18 +395,19 @@ const perfectionistRules: Rules = {
 } as const;
 
 // Builds the flat config for eslint-plugin-perfectionist.
-function perfectionist({
-  files = sourceFiles,
-  ignores = [],
-  overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+function perfectionist(
+  { files, ignores = [], overrides = {} }: FeatureOptions = {},
+  { svelteComponents }: Context = defaultContext,
+): Linter.Config[] {
   return [
     {
       name: "@cravingmaker/eslint-config/perfectionist/setup",
       plugins: { perfectionist: pluginPerfectionist },
     },
     {
-      files: [...files],
+      files: [
+        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
+      ],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/perfectionist/rules",
       rules: { ...perfectionistRules, ...overrides },

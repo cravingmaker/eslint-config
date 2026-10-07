@@ -1,9 +1,10 @@
 import type { Linter } from "eslint";
-import type { FeatureOptions, Rules } from "../types.js";
+import type { Context, FeatureOptions, Rules } from "../types.js";
 
 import pluginRegexp from "eslint-plugin-regexp";
 
-import { sourceFiles } from "../globs.js";
+import { defaultContext } from "../context.js";
+import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 
 // Policy for eslint-plugin-regexp.
@@ -27,18 +28,19 @@ const regexpRules: Rules = {
 } as const;
 
 // Builds the flat config for eslint-plugin-regexp.
-function regexp({
-  files = sourceFiles,
-  ignores = [],
-  overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+function regexp(
+  { files, ignores = [], overrides = {} }: FeatureOptions = {},
+  { svelteComponents }: Context = defaultContext,
+): Linter.Config[] {
   return [
     {
       name: "@cravingmaker/eslint-config/regexp/setup",
       plugins: { regexp: pluginRegexp },
     },
     {
-      files: [...files],
+      files: [
+        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
+      ],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/regexp/rules",
       rules: { ...regexpRules, ...overrides },

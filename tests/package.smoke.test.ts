@@ -444,6 +444,27 @@ describe("published package", () => {
 					}
 				}
 
+				// The script of a component gets the rules of JavaScript and TypeScript sources.
+				const [componentResult] = await eslint.lintText(
+					'<script lang="ts">\n\tconst value: any = 1;\n\tdebugger;\n</script>\n\n<p>{value}</p>\n',
+					{ filePath: 'component.svelte' },
+				);
+				const componentRuleIds = componentResult.messages.map((message) => message.ruleId);
+				for (const ruleId of ['no-debugger', '@typescript-eslint/no-explicit-any']) {
+					if (!componentRuleIds.includes(ruleId)) {
+						throw new Error('The script of a component was not linted with ' + ruleId);
+					}
+				}
+
+				// import-x reads a module that a rune module imports as JavaScript.
+				const [runeModuleResult] = await eslint.lintText(
+					"import { writable } from 'svelte/store';\n\nexport const visits = writable(0);\n",
+					{ filePath: 'visits.svelte.js' },
+				);
+				if (runeModuleResult.messages.length !== 0) {
+					throw new Error('A rune module that imports from Svelte was reported: ' + JSON.stringify(runeModuleResult.messages));
+				}
+
 				process.stdout.write('ok');
 			`,
     );

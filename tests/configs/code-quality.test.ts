@@ -23,6 +23,10 @@ const typedContext: Context = {
   ...defaultContext,
   typeAware: { files: typescriptFiles, ignores: ["**/*.d.ts"] },
 };
+const svelteContext: Context = {
+  ...defaultContext,
+  svelteComponents: [["**/*.svelte", "!**/generated/**"]],
+};
 
 // Each builder, its block name segment, the plugin it registers, and one of its rules.
 const features = [
@@ -144,6 +148,27 @@ describe.each(features)("$name feature", ({ build, name, plugin, rule }) => {
     ]);
   });
 
+  it("turns its rules on for the Svelte components of the context by default", async () => {
+    const [byDefault, withFiles] = [
+      build({}, svelteContext),
+      build({ files: ["app/**/*.js"] }, svelteContext),
+    ].map(
+      (configs) =>
+        new ESLint({ overrideConfig: configs, overrideConfigFile: true }),
+    );
+    const severities = await Promise.all([
+      getSeverity(byDefault, "src/Component.svelte", rule),
+      getSeverity(byDefault, "src/generated/Component.svelte", rule),
+      getSeverity(withFiles, "src/Component.svelte", rule),
+    ]);
+
+    expect(severities).toEqual([
+      expect.toBeOneOf([1, 2]),
+      undefined,
+      undefined,
+    ]);
+  });
+
   it("keeps files, ignores, and overrides local to the feature", async () => {
     const eslint = new ESLint({
       overrideConfig: build({
@@ -232,6 +257,20 @@ describe("node feature", () => {
 
     expect(severities).toEqual([2, 0, 2, 0]);
   });
+
+  it("turns n/no-sync off in Svelte components, which have no type information", async () => {
+    const eslint = new ESLint({
+      overrideConfig: node(
+        {},
+        { ...typedContext, svelteComponents: svelteContext.svelteComponents },
+      ),
+      overrideConfigFile: true,
+    });
+
+    expect(await getSeverity(eslint, "src/Component.svelte", "n/no-sync")).toBe(
+      0,
+    );
+  });
 });
 
 describe("imports feature", () => {
@@ -250,5 +289,18 @@ describe("imports feature", () => {
       expect.objectContaining({ name: "eslint-plugin-import-x:node" }),
     ]);
     expect(javascriptSettings?.["import-x/resolver-next"]).toBeUndefined();
+  });
+
+  it("resolves imports in Svelte components through the TypeScript resolver", async () => {
+    const eslint = new ESLint({
+      overrideConfig: imports({}, svelteContext),
+      overrideConfigFile: true,
+    });
+    const settings = await getSettings(eslint, "src/Component.svelte");
+
+    expect(settings?.["import-x/resolver-next"]).toEqual([
+      expect.objectContaining({ name: "eslint-import-resolver-typescript" }),
+      expect.objectContaining({ name: "eslint-plugin-import-x:node" }),
+    ]);
   });
 });

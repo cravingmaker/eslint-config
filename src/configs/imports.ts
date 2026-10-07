@@ -5,7 +5,11 @@ import { createTypeScriptImportResolver } from "eslint-import-resolver-typescrip
 import pluginImportX, { createNodeResolver } from "eslint-plugin-import-x";
 
 import { defaultContext } from "../context.js";
-import { sourceFiles, typescriptFiles } from "../globs.js";
+import {
+  sourceFiles,
+  typescriptFiles,
+  withSvelteComponents,
+} from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 import { narrowFiles } from "../utilities/type-aware.js";
 
@@ -133,11 +137,12 @@ const importsRules: Rules = {
   "import-x/order": "error",
 } as const;
 
-// Builds the flat config for eslint-plugin-import-x. TypeScript files within the feature's files
-// resolve imports through the TypeScript resolver first, with the project's tsconfig.
+// Builds the flat config for eslint-plugin-import-x. TypeScript files and Svelte components
+// within the feature's files resolve imports through the TypeScript resolver first, with the
+// project's tsconfig.
 function imports(
   options: FeatureOptions = {},
-  { tsconfigRootDir }: Context = defaultContext,
+  { svelteComponents, tsconfigRootDir }: Context = defaultContext,
 ): Linter.Config[] {
   const { files, ignores = [], overrides = {} } = options;
   const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
@@ -148,13 +153,18 @@ function imports(
       plugins: { "import-x": pluginImportX },
     },
     {
-      files: [...(files ?? sourceFiles)],
+      files: [
+        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
+      ],
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/imports/rules",
       rules: { ...importsRules, ...overrides },
     },
     {
-      files: narrowFiles(typescriptFiles, files),
+      files: narrowFiles(
+        withSvelteComponents(typescriptFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/imports/resolver",
       settings: {

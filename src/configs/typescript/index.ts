@@ -2,7 +2,7 @@ import type { Linter } from "eslint";
 import type { Context, TypeScriptOptions } from "../../types.js";
 
 import { defaultContext } from "../../context.js";
-import { typescriptFiles } from "../../globs.js";
+import { typescriptFiles, withSvelteComponents } from "../../globs.js";
 import { typescriptParser } from "./parser.js";
 import {
   compilerCheckedRules,
@@ -15,17 +15,19 @@ import { disableConfigRules } from "../../utilities/all-rules.js";
 import { typeAwareConfig } from "../../utilities/type-aware.js";
 
 /**
-Builds the flat config for TypeScript files: the typescript-eslint parser, the core rules that
-the compiler checks or that extension rules replace, and the typescript-eslint rules. The rules
-that need type information are off. With typed linting on, the parser reads type information in
-the type-aware scope, and those rules are on there in a separate block.
+Builds the flat config for TypeScript files and Svelte components, whose scripts
+svelte-eslint-parser hands to the typescript-eslint parser whatever their language: the parser,
+the core rules that the compiler checks or that extension rules replace, and the typescript-eslint
+rules. The rules that need type information are off. With typed linting on, the parser reads type
+information in the type-aware scope, which leaves out Svelte components, and those rules are on
+there in a separate block.
 */
 async function typescript(
   options: TypeScriptOptions = {},
   context: Context = defaultContext,
 ): Promise<Linter.Config[]> {
   const {
-    files = typescriptFiles,
+    files = withSvelteComponents(typescriptFiles, context.svelteComponents),
     ignores = [],
     overrides = {},
     overridesTypeAware = {},
