@@ -73,12 +73,23 @@ const unicornRules: Rules = {
       },
     },
   ],
+  "unicorn/template-indent": [
+    "error",
+    {
+      // The defaults without `gql`, `html`, and `/* HTML */`: Prettier formats those templates
+      comments: ["indent"],
+      tags: ["outdent", "dedent", "sql", "styled"],
+    },
+  ],
 
   "unicorn/comment-content": "off", // Avoid enforcing terminology and brand-name wording in comments
   "unicorn/consistent-destructuring": "off", // Prefer freedom with variable accessing patterns
   "unicorn/consistent-json-file-read": "off", // Prefer explicit JSON file reading behavior
+  "unicorn/empty-brace-spaces": "off", // Covered by `prettier`
   "unicorn/no-keyword-prefix": "off", // Prefer freedom with keywords / names
+  "unicorn/no-nested-ternary": "off", // Prettier removes the parentheses that this rule requires; core `no-nested-ternary` applies instead
   "unicorn/no-unused-properties": "off", // Prefer freedom with properties
+  "unicorn/number-literal-case": "off", // Covered by `prettier`
   "unicorn/require-post-message-target-origin": "off", // It can't distinguish between window.postMessage() and other calls like Worker#postMessage(), MessagePort#postMessage(), Client#postMessage(), and BroadcastChannel#postMessage()
   "unicorn/try-complexity": "off", // Core complexity rules already provide a less restrictive complexity policy
 } as const;

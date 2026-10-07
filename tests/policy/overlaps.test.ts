@@ -130,7 +130,7 @@ describe("overlap table", () => {
 
     expect(rules.get("sort-keys")?.[0]).toBe(1);
     expect(rules.get("n/prefer-node-protocol")?.[0]).toBe(1);
-    expect(rules.get("no-nested-ternary")?.[0]).toBe(0);
+    expect(rules.get("no-negated-condition")?.[0]).toBe(0);
   });
 });
 

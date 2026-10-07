@@ -1,12 +1,12 @@
 import { describe, it } from "vitest";
 
-import { expectLintError } from "../../utilities.js";
+import { expectLintError, expectNoLintError } from "../../utilities.js";
 
 const htmlOptions = { filePath: "index.html" } as const;
 
 describe("html rules", () => {
-  it("@html-eslint/no-extra-spacing-tags: reports extra spacing between attributes", async () => {
-    await expectLintError(
+  it("@html-eslint/no-extra-spacing-tags: leaves spacing between attributes to Prettier", async () => {
+    await expectNoLintError(
       `<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<title>Home</title>\n</head>\n<body>\n\t<div id="app"  class="root">Hello</div>\n</body>\n</html>\n`,
       "@html-eslint/no-extra-spacing-tags",
       htmlOptions,

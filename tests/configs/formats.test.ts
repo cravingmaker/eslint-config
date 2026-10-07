@@ -36,7 +36,8 @@ async function describeFile(
 
 describe("html feature", () => {
   it("parses and lints HTML files with a plugin registered for them only", async () => {
-    const configs = html({ overrides: { "@html-eslint/indent": "off" } });
+    // A layout rule that Prettier covers, turned back on.
+    const configs = html({ overrides: { "@html-eslint/indent": "warn" } });
     const eslint = new ESLint({
       overrideConfig: configs,
       overrideConfigFile: true,
@@ -51,7 +52,7 @@ describe("html feature", () => {
         describeFile(eslint, "src/example.js", "@html-eslint/indent"),
       ]),
     ).toEqual([
-      { language: "@/js", plugins: ["@", "@html-eslint"], severity: 0 },
+      { language: "@/js", plugins: ["@", "@html-eslint"], severity: 1 },
       { language: "@/js", plugins: ["@"], severity: undefined },
     ]);
   });

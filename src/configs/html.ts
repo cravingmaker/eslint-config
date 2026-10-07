@@ -1,5 +1,5 @@
 import type { Linter } from "eslint";
-import type { FeatureOptions, RuleOptionOf, Rules } from "../types.js";
+import type { FeatureOptions, Rules } from "../types.js";
 
 import pluginHtml from "@html-eslint/eslint-plugin";
 import htmlParser from "@html-eslint/parser";
@@ -7,35 +7,13 @@ import htmlParser from "@html-eslint/parser";
 import { htmlFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 
-const newLineOptions = {
-  inline: ["$inline"],
-  skip: ["pre", "code", "textarea"],
-} satisfies RuleOptionOf<"@html-eslint/element-newline">;
-
 // Policy for @html-eslint/eslint-plugin.
 const htmlRules: Rules = {
   ...enableAllRules("@html-eslint", pluginHtml.rules),
 
-  "@html-eslint/attrs-newline": ["error", { ...newLineOptions }],
-  "@html-eslint/element-newline": ["error", { ...newLineOptions }],
   "@html-eslint/id-naming-convention": ["error", "kebab-case"],
-  "@html-eslint/indent": ["error", 2],
   "@html-eslint/max-element-depth": ["error", { max: 6 }],
-  "@html-eslint/no-extra-spacing-tags": [
-    "error",
-    {
-      disallowInAssignment: true,
-      disallowMissing: true,
-      disallowTabs: true,
-      enforceBeforeSelfClose: true,
-    },
-  ],
-  "@html-eslint/no-extra-spacing-text": [
-    "error",
-    { skip: ["pre", "code", "textarea"] },
-  ],
   "@html-eslint/no-inline-styles": "warn",
-  "@html-eslint/no-multiple-empty-lines": ["error", { max: 1 }],
   "@html-eslint/no-restricted-attr-values": [
     "error",
     {
@@ -63,11 +41,6 @@ const htmlRules: Rules = {
       message: "Use semantic alternatives or CSS instead.",
       tagPatterns: ["^(b|i|s|u)$"],
     },
-  ],
-  "@html-eslint/quotes": [
-    "error",
-    "double",
-    { enforceTemplatedAttrValue: true },
   ],
   "@html-eslint/require-attrs": [
     "error",
@@ -171,6 +144,17 @@ const htmlRules: Rules = {
       ],
     },
   ],
+
+  // Layout: whitespace, line breaks, indentation, and attribute quotes
+  "@html-eslint/attrs-newline": "off", // Covered by `prettier`
+  "@html-eslint/class-spacing": "off", // Covered by `prettier`
+  "@html-eslint/element-newline": "off", // Covered by `prettier`
+  "@html-eslint/indent": "off", // Covered by `prettier`
+  "@html-eslint/no-extra-spacing-tags": "off", // Covered by `prettier`
+  "@html-eslint/no-extra-spacing-text": "off", // Covered by `prettier`
+  "@html-eslint/no-multiple-empty-lines": "off", // Covered by `prettier`
+  "@html-eslint/no-trailing-spaces": "off", // Covered by `prettier`
+  "@html-eslint/quotes": "off", // Covered by `prettier`
 } as const;
 
 // Builds the flat config for HTML files.
