@@ -13,7 +13,7 @@ linterOptions:
   reportUnusedDisableDirectives: 1
 settings:
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 942 (error 719, off 207, warn 16)
+rules: 942 (error 717, off 209, warn 16)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -367,7 +367,7 @@ no-misleading-character-class: error [{"allowEscape":false}]
 no-multi-assign: error [{"ignoreNonDeclaration":false}]
 no-multi-str: error
 no-negated-condition: off
-no-nested-ternary: off
+no-nested-ternary: error
 no-new: error
 no-new-func: error
 no-new-native-nonconstructor: off
@@ -638,7 +638,7 @@ unicorn/consistent-tuple-labels: error
 unicorn/custom-error-definition: error
 unicorn/default-export-style: error [{"classes":"inline","functions":"inline"}]
 unicorn/dom-node-dataset: error [{"preferAttributes":false}]
-unicorn/empty-brace-spaces: error
+unicorn/empty-brace-spaces: off
 unicorn/error-message: error
 unicorn/escape-case: error ["uppercase"]
 unicorn/expiring-todo-comments: error [{"allowWarningComments":true,"checkDates":false,"checkDatesOnPullRequests":false,"ignore":[],"terms":["todo","fixme","xxx"]}]
@@ -724,7 +724,7 @@ unicorn/no-negated-array-predicate: error
 unicorn/no-negated-comparison: error [{"checkLogicalExpressions":false}]
 unicorn/no-negated-condition: error
 unicorn/no-negation-in-equality-check: error
-unicorn/no-nested-ternary: error
+unicorn/no-nested-ternary: off
 unicorn/no-new-array: error
 unicorn/no-new-buffer: error
 unicorn/no-non-function-verb-prefix: error [{"ignore":[],"verbs":["get","set","unset","delete","add","remove","destroy","create"]}]
@@ -798,7 +798,7 @@ unicorn/no-useless-template-literals: error
 unicorn/no-useless-undefined: error [{"checkArguments":true,"checkArrowFunctionBody":true}]
 unicorn/no-xor-as-exponentiation: error
 unicorn/no-zero-fractions: error
-unicorn/number-literal-case: error [{"hexadecimalValue":"uppercase"}]
+unicorn/number-literal-case: off [{"hexadecimalValue":"uppercase"}]
 unicorn/numeric-separators-style: error [{"binary":{"groupLength":4,"minimumDigits":0},"hexadecimal":{"groupLength":2,"minimumDigits":0},"number":{"fractionGroupLength":"[Number Infinity]","groupLength":3,"minimumDigits":5},"octal":{"groupLength":4,"minimumDigits":0},"onlyIfContainsSeparator":false}]
 unicorn/operator-assignment: error ["always"]
 unicorn/prefer-abort-signal-any: error
@@ -947,7 +947,7 @@ unicorn/single-line-block-comment-style: error ["multiline",{"ignore":[]}]
 unicorn/string-content: error [{"patterns":{"->":"→","<-":"←","\\.\\.\\.":"…"},"selectors":[]}]
 unicorn/switch-case-braces: error ["always"]
 unicorn/switch-case-break-position: error
-unicorn/template-indent: error [{"comments":["HTML","indent"],"functions":["dedent","stripIndent"],"selectors":[],"tags":["outdent","dedent","gql","sql","html","styled"]}]
+unicorn/template-indent: error [{"comments":["indent"],"functions":["dedent","stripIndent"],"selectors":[],"tags":["outdent","dedent","sql","styled"]}]
 unicorn/text-encoding-identifier-case: error [{"withDash":false}]
 unicorn/throw-new-error: error
 unicorn/try-complexity: off [{"max":1}]

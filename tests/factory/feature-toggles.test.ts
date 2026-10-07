@@ -74,7 +74,7 @@ const features = [
     fileNames: ["index.html"],
     files: ["app/**/*.html"],
     name: "html",
-    ruleId: "@html-eslint/class-spacing",
+    ruleId: "@html-eslint/no-duplicate-id",
   },
   {
     feature: "imports",

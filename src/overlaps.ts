@@ -50,7 +50,6 @@ const overlaps: Readonly<
     "n/no-process-exit": ["unicorn/no-process-exit"],
     "n/prefer-node-protocol": ["unicorn/prefer-node-protocol"],
     "no-negated-condition": ["unicorn/no-negated-condition"],
-    "no-nested-ternary": ["unicorn/no-nested-ternary"],
     "no-warning-comments": ["unicorn/expiring-todo-comments"],
   },
   unusedImports: {

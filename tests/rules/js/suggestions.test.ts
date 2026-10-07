@@ -69,6 +69,15 @@ describe("js suggestion rules", () => {
     );
   });
 
+  it("no-nested-ternary: reports a chained ternary as Prettier prints it, in place of unicorn/no-nested-ternary", async () => {
+    const code = `const pick = (first, second) => (first ? 1 : second ? 2 : 3);\nconsole.log(pick(true, false));\n`;
+
+    await expectLintError(code, "no-nested-ternary", { filePath: "test.js" });
+    await expectNoLintError(code, "unicorn/no-nested-ternary", {
+      filePath: "test.js",
+    });
+  });
+
   it("prefer-destructuring: reports object property variable declarations", async () => {
     await expectLintError(
       `const item = { name: 'test' };\nconst name = item.name;\nconsole.log(name);\n`,
