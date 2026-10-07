@@ -17,8 +17,8 @@ import { typeAwareConfig } from "../../utilities/type-aware.js";
 /**
 Builds the flat config for TypeScript files: the typescript-eslint parser, the core rules that
 the compiler checks or that extension rules replace, and the typescript-eslint rules. The rules
-that need type information are off, and on in a separate block for the type-aware scope when
-typed linting is on.
+that need type information are off. With typed linting on, the parser reads type information in
+the type-aware scope, and those rules are on there in a separate block.
 */
 async function typescript(
   options: TypeScriptOptions = {},
@@ -30,8 +30,8 @@ async function typescript(
     overrides = {},
     overridesTypeAware = {},
   } = options;
-  const [parserConfig, { configs, plugin }] = await Promise.all([
-    typescriptParser({ files, ignores }, context),
+  const [parserConfigs, { configs, plugin }] = await Promise.all([
+    typescriptParser(options, context),
     import("typescript-eslint"),
   ]);
   // Off as in typescript-eslint's `disableTypeChecked` config. The plugin's type omits its rules.
@@ -42,7 +42,7 @@ async function typescript(
   );
 
   return [
-    parserConfig,
+    ...parserConfigs,
     {
       files: [...files],
       ignores: [...ignores],

@@ -120,12 +120,40 @@ describe("resolveOptions", () => {
     expect(
       resolveOptions({
         typescript: {
-          filesTypeAware: ["src/**/*.ts"],
+          filesTypeAware: ["src/**"],
           ignoresTypeAware: ["src/**/*.test.ts"],
           typeChecked: true,
         },
       }).typeAware,
-    ).toEqual({ files: ["src/**/*.ts"], ignores: ["src/**/*.test.ts"] });
+    ).toEqual({
+      files: [["src/**", ...typescriptFiles]],
+      ignores: ["src/**/*.test.ts"],
+    });
+  });
+
+  it("keeps the type-aware scope within the files and ignores of the TypeScript feature", () => {
+    const typescript = {
+      files: ["app/**/*.ts"],
+      ignores: ["**/*.generated.ts"],
+      typeChecked: true,
+    } as const;
+
+    expect(resolveOptions({ typescript }).typeAware).toEqual({
+      files: ["app/**/*.ts"],
+      ignores: ["**/*.generated.ts"],
+    });
+    expect(
+      resolveOptions({
+        typescript: {
+          ...typescript,
+          filesTypeAware: ["app/server/**"],
+          ignoresTypeAware: ["app/server/legacy/**"],
+        },
+      }).typeAware,
+    ).toEqual({
+      files: [["app/server/**", "app/**/*.ts"]],
+      ignores: ["**/*.generated.ts", "app/server/legacy/**"],
+    });
   });
 
   it("has no TypeScript options or type-aware scope when TypeScript is off", () => {

@@ -13,6 +13,7 @@ import {
   detectFeatures,
   detectReactRefreshVariant,
 } from "../../src/context.js";
+import { typescriptFiles } from "../../src/globs.js";
 
 const temporaryDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-context-"),
@@ -74,7 +75,10 @@ describe("createContext", () => {
     expect(context.projectRootDirectory).toBe(projectRootDirectory);
     expect(context.globals.process).toBe(false);
     expect(context.tsconfigRootDir).toBe(projectRootDirectory);
-    expect(context.typeAware).toEqual({ files: ["src/**/*.ts"], ignores: [] });
+    expect(context.typeAware).toEqual({
+      files: [["src/**/*.ts", ...typescriptFiles]],
+      ignores: [],
+    });
   });
 
   it("uses the tsconfig directory of the TypeScript options when it is set", async () => {

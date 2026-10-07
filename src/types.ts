@@ -23,7 +23,8 @@ type Context = {
   */
   readonly tsconfigRootDir: string;
   /**
-  Files that receive type-aware rules, or `undefined` when typed linting is off.
+  Files that the parser reads with type information and that receive type-aware rules, or
+  `undefined` when typed linting is off.
   */
   readonly typeAware: TypeAwareScope | undefined;
 };
@@ -149,10 +150,12 @@ schemas; any other rule ID is accepted, for plugins added in user configs.
 */
 type Rules = Record<string, Linter.RuleEntry | undefined> & RuleOptions;
 /**
-Files that receive type-aware rules.
+Files that the parser reads with type information and that receive type-aware rules, within the
+files that the TypeScript feature parses. Each nested array is a set of patterns that a file must
+all match.
 */
 type TypeAwareScope = {
-  readonly files: readonly string[];
+  readonly files: ReadonlyArray<string | readonly string[]>;
   readonly ignores: readonly string[];
 };
 /**
@@ -160,11 +163,14 @@ Options of the `typescript` feature.
 */
 type TypeScriptOptions = FeatureOptions & {
   /**
-  File patterns for type-aware rules, instead of every TypeScript file.
+  File patterns to lint with type information and type-aware rules, instead of every file of the
+  feature. They match only TypeScript files that the feature lints, so a directory such as
+  `src/**` is enough. Other TypeScript files are linted without type information.
   */
   readonly filesTypeAware?: readonly string[];
   /**
-  File patterns to exclude from type-aware rules.
+  File patterns to lint without type information and type-aware rules, such as scripts that no
+  tsconfig includes.
   */
   readonly ignoresTypeAware?: readonly string[];
   /**

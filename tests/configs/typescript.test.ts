@@ -72,6 +72,28 @@ describe("typescript feature", () => {
     expect(config?.rules?.["require-await"]).toEqual([0]);
   });
 
+  it("reads type information only in the type-aware scope", async () => {
+    const eslint = new ESLint({
+      overrideConfig: await typescript(
+        {},
+        {
+          ...typedContext,
+          typeAware: { files: ["src/**/*.ts"], ignores: ["src/legacy/**"] },
+        },
+      ),
+      overrideConfigFile: true,
+    });
+    const configs = await Promise.all(
+      ["src/example.ts", "src/legacy/example.ts", "scripts/example.ts"].map(
+        async (filePath) => await getEffectiveConfig(eslint, filePath),
+      ),
+    );
+
+    expect(
+      configs.map((config) => config?.languageOptions?.parserOptions),
+    ).toEqual([{ projectService: true, tsconfigRootDir: "/project" }, {}, {}]);
+  });
+
   it("keeps files, ignores, and overrides local to the feature", async () => {
     const eslint = new ESLint({
       overrideConfig: await typescript({
@@ -113,6 +135,7 @@ describe("typescript feature", () => {
 
     expect(configs.map((config) => config.name)).toEqual([
       "@cravingmaker/eslint-config/typescript/parser",
+      "@cravingmaker/eslint-config/typescript/parser-type-aware",
       "@cravingmaker/eslint-config/typescript/rules",
       "@cravingmaker/eslint-config/typescript/rules-type-aware",
     ]);
