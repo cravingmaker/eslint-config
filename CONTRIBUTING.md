@@ -46,8 +46,9 @@ npm run validate
 ```
 
 This runs formatting checks, a build, typechecking, linting, tests, and
-package integrity checks. Package smoke tests exercise the tarball in
-temporary consumer projects.
+package integrity checks. Package tests exercise the tarball in temporary
+consumer projects. Some install it from the npm registry, so the tests need
+network access.
 
 For faster feedback, run `npm run test:unit` for unit tests or
 `npm run test:package` for package consumer tests. Both commands build the

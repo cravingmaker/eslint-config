@@ -23,7 +23,7 @@ Valid files of each type that the configuration lints. `tests/policy/fixtures.te
 | Package manifest               | `package.json`            |
 | Markdown                       | `README.md`               |
 
-React ships no type declarations, so the files in `react/` are linted without type information, and `tsconfig.json` leaves them out.
+The files in `react/` are linted without type information, and `tsconfig.json` leaves them out. React ships no type declarations, and with them, typed linting reports the components themselves, which the rewrite plan records under stage 4.
 
 To cover a new file type, add one valid file of that type here and list it in the test:
 

@@ -50,8 +50,9 @@ function compareText(left: string, right: string): number {
 /*
 Lints every fixture with every feature and framework on, and returns the messages of each by path.
 React Refresh uses its strictest variant, which allows nothing but components to be exported next
-to them. React ships no type declarations, so the React fixtures are left out of typed linting:
-without them, every value from React is an error type, which the type-aware rules report.
+to them. The React fixtures are left out of typed linting. React ships no type declarations, so
+every value from React would be an error type, which the type-aware rules report; and with them,
+typed linting reports the components themselves, which the plan records under stage 4.
 */
 async function lintFixtures(
   isTypeChecked: boolean,
