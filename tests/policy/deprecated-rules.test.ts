@@ -4,7 +4,7 @@ import process from "node:process";
 
 import { describe, expect, it } from "vitest";
 
-import { createConfig } from "../dist/index.mjs";
+import { createConfig } from "../../dist/index.mjs";
 
 type Plugin = NonNullable<Linter.Config["plugins"]>[string];
 type PluginRule = {

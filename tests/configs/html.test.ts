@@ -1,8 +1,35 @@
-import { describe, it } from "vitest";
+import { ESLint } from "eslint";
+import { describe, expect, it } from "vitest";
 
-import { expectLintError, expectNoLintError } from "../../utilities.js";
+import { describeFile } from "./describe-file.js";
+import { html } from "../../src/configs/html.js";
+import { expectLintError, expectNoLintError } from "../utilities.js";
 
 const htmlOptions = { filePath: "index.html" } as const;
+
+describe("html feature", () => {
+  it("parses and lints HTML files with a plugin registered for them only", async () => {
+    // A layout rule that Prettier covers, turned back on.
+    const configs = html({ overrides: { "@html-eslint/indent": "warn" } });
+    const eslint = new ESLint({
+      overrideConfig: configs,
+      overrideConfigFile: true,
+    });
+
+    expect(configs.map((config) => config.name)).toEqual([
+      "@cravingmaker/eslint-config/html/rules",
+    ]);
+    expect(
+      await Promise.all([
+        describeFile(eslint, "index.html", "@html-eslint/indent"),
+        describeFile(eslint, "src/example.js", "@html-eslint/indent"),
+      ]),
+    ).toEqual([
+      { language: "@/js", plugins: ["@", "@html-eslint"], severity: 1 },
+      { language: "@/js", plugins: ["@"], severity: undefined },
+    ]);
+  });
+});
 
 describe("html rules", () => {
   it("@html-eslint/no-extra-spacing-tags: leaves spacing between attributes to Prettier", async () => {

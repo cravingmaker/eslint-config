@@ -15,7 +15,7 @@ type ConsumerOptions = {
   readonly manifestDevelopmentDependencies?: Readonly<Record<string, string>>;
 };
 
-const projectDirectory = path.resolve(__dirname, "..");
+const projectDirectory = path.resolve(__dirname, "../..");
 
 const runtimeDependencies: readonly string[] = [
   "@eslint-community/eslint-plugin-eslint-comments",

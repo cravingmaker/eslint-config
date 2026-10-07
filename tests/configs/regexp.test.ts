@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
 
-import { expectLintError, expectNoLintError } from "../../utilities.js";
+import { expectLintError, expectNoLintError } from "../utilities.js";
 
 const jsOptions = { filePath: "test.js" } as const;
 

@@ -4,7 +4,7 @@ import { ESLint } from "eslint";
 import { builtinRules } from "eslint/use-at-your-own-risk";
 import { describe, expect, it } from "vitest";
 
-import { createConfig } from "../dist/index.mjs";
+import { createConfig } from "../../dist/index.mjs";
 
 type EffectiveConfig = {
   readonly plugins?: Readonly<Record<string, RulePlugin | undefined>>;

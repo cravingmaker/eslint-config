@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
 
-import { expectLintError } from "../../utilities.js";
+import { expectLintError } from "../utilities.js";
 
 describe("security rules", () => {
   it("security/detect-child-process: reports child process execution", async () => {

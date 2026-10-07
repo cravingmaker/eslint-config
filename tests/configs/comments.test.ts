@@ -1,6 +1,6 @@
 import { describe, it } from "vitest";
 
-import { expectLintError } from "../../utilities.js";
+import { expectLintError } from "../utilities.js";
 
 describe("eslint-comments rules", () => {
   it("@eslint-community/eslint-comments/no-use: reports disallowed directive kinds", async () => {

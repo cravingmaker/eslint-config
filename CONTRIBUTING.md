@@ -32,9 +32,10 @@ Use a conventional pull request title, such as `fix: ...`, `test: ...`, or
 `docs: ...`. Describe the problem and resulting behavior, including
 before/after examples when lint diagnostics or fixes change.
 
-Add relevant regression tests for behavior changes. Rule tests live in
-`tests/rules/`. For configuration or plugin changes, exercise packed
-consumers in `tests/package.smoke.test.ts` as well.
+Add relevant regression tests for behavior changes. The tests for a
+feature live in `tests/configs/`, in the file named after its module in
+`src/configs/`. For configuration or plugin changes, exercise packed
+consumers in `tests/package/` as well.
 
 ## Validation
 

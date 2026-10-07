@@ -82,10 +82,10 @@ const readJson = async <T>(url: URL): Promise<T> =>
   JSON.parse(await readFile(url, "utf8")) as T;
 
 const packageManifest = await readJson<PackageManifest>(
-  new URL("../package.json", import.meta.url),
+  new URL("../../package.json", import.meta.url),
 );
 const packageLock = await readJson<PackageLock>(
-  new URL("../package-lock.json", import.meta.url),
+  new URL("../../package-lock.json", import.meta.url),
 );
 const packageLockRoot = packageLock.packages[""];
 

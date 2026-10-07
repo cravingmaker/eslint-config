@@ -2,8 +2,8 @@ import { ESLint } from "eslint";
 import { builtinRules } from "eslint/use-at-your-own-risk";
 import { describe, expect, it } from "vitest";
 
-import { javascript } from "../../src/configs/javascript/index.js";
-import { defaultContext } from "../../src/context.js";
+import { javascript } from "../../../src/configs/javascript/index.js";
+import { defaultContext } from "../../../src/context.js";
 
 type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 
