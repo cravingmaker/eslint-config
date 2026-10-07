@@ -16,6 +16,7 @@ import process from "node:process";
 import globalVariables from "globals";
 
 import { typescriptFiles } from "./globs.js";
+import { narrowFiles } from "./utilities/type-aware.js";
 
 /**
 What the project uses, for the options whose default is `"auto"`.
@@ -151,15 +152,27 @@ function resolveReact(
     refresh: refresh === "auto" ? detection.reactRefresh : refresh,
   };
 }
+/**
+Resolves the files that the parser reads with type information and that get type-aware rules:
+`filesTypeAware` without `ignoresTypeAware`, within the files that the TypeScript feature
+parses, because type information needs its parser.
+*/
 function resolveTypeAwareScope(
   value: Feature<TypeScriptOptions> = true,
 ): TypeAwareScope | undefined {
   const typescript = resolveFeature(value);
   if (typescript?.typeChecked !== true) return undefined;
 
+  const {
+    files = typescriptFiles,
+    filesTypeAware,
+    ignores = [],
+    ignoresTypeAware = [],
+  } = typescript;
   return {
-    files: typescript.filesTypeAware ?? typescriptFiles,
-    ignores: typescript.ignoresTypeAware ?? [],
+    files:
+      filesTypeAware === undefined ? files : narrowFiles(filesTypeAware, files),
+    ignores: [...ignores, ...ignoresTypeAware],
   };
 }
 function resolveTypeScript(

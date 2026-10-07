@@ -13,7 +13,7 @@ linterOptions:
   reportUnusedDisableDirectives: 1
 settings:
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 815 (error 707, off 93, warn 15)
+rules: 815 (error 694, off 106, warn 15)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -54,25 +54,25 @@ for-direction: error
 func-name-matching: error ["always",{"considerPropertyDescriptor":true,"includeCommonJSModuleExports":false}]
 func-names: error ["never",{"generators":"never"}]
 func-style: off ["expression",{"allowArrowFunctions":false,"allowTypeAnnotation":false,"overrides":{}}]
-functional/functional-parameters: error [{"enforceParameterCount":{"ignoreLambdaExpression":true}}]
-functional/immutable-data: error
+functional/functional-parameters: off
+functional/immutable-data: off
 functional/no-class-inheritance: error
 functional/no-classes: error
-functional/no-conditional-statements: error [{"allowReturningBranches":true}]
-functional/no-expression-statements: error [{"ignoreVoid":true}]
+functional/no-conditional-statements: off
+functional/no-expression-statements: off
 functional/no-let: error [{"allowInForLoopInit":true}]
 functional/no-loop-statements: error
-functional/no-mixed-types: error
+functional/no-mixed-types: off
 functional/no-promise-reject: error
-functional/no-return-void: error
+functional/no-return-void: off
 functional/no-this-expressions: off
-functional/no-throw-statements: error
+functional/no-throw-statements: off
 functional/no-try-statements: off
-functional/prefer-immutable-types: error [{"enforcement":"None","ignoreInferredTypes":true,"parameters":{"enforcement":"ReadonlyShallow"}}]
-functional/prefer-property-signatures: error
-functional/prefer-tacit: error
-functional/readonly-type: error ["keyword"]
-functional/type-declaration-immutability: error [{"rules":[{"comparator":"AtLeast","identifiers":"I?Immutable.+","immutability":"Immutable"},{"comparator":"AtLeast","identifiers":"I?ReadonlyDeep.+","immutability":"ReadonlyDeep"},{"comparator":"AtLeast","fixer":[{"pattern":"^(Array|Map|Set)<(.+)>$","replace":"Readonly$1<$2>"},{"pattern":"^(.+)$","replace":"Readonly<$1>"}],"identifiers":"I?Readonly.+","immutability":"ReadonlyShallow"},{"comparator":"AtMost","fixer":[{"pattern":"^Readonly(Array|Map|Set)<(.+)>$","replace":"$1<$2>"},{"pattern":"^Readonly<(.+)>$","replace":"$1"}],"identifiers":"I?Mutable.+","immutability":"Mutable"}]}]
+functional/prefer-immutable-types: off
+functional/prefer-property-signatures: off
+functional/prefer-tacit: off
+functional/readonly-type: off
+functional/type-declaration-immutability: off
 getter-return: error [{"allowImplicit":true}]
 grouped-accessor-pairs: error ["getBeforeSet",{"enforceForTSTypes":false}]
 guard-for-in: off
@@ -154,7 +154,7 @@ n/no-process-env: warn [{"allowedVariables":["NODE_ENV"]}]
 n/no-process-exit: off
 n/no-restricted-import: off
 n/no-restricted-require: off
-n/no-sync: error [{"allowAtRootLevel":true,"ignores":[]}]
+n/no-sync: off [{"allowAtRootLevel":true}]
 n/no-top-level-await: off
 n/no-unpublished-bin: error
 n/no-unpublished-import: error

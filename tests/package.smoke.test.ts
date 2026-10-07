@@ -318,6 +318,58 @@ describe("published package", () => {
     expect(output).toBe("ok");
   });
 
+  it("reads type information only in the type-aware scope", async () => {
+    const consumerDirectory = await createConsumer({
+      dependencies: ["eslint", ...runtimeDependencies],
+      name: "type-aware-scope-consumer",
+      tarball,
+    });
+
+    const output = runConsumer(
+      consumerDirectory,
+      `
+				import { ESLint } from 'eslint';
+				import { createConfig } from '@cravingmaker/eslint-config';
+
+				const eslint = new ESLint({
+					overrideConfig: await createConfig({
+						typescript: {
+							filesTypeAware: ['src/**'],
+							ignoresTypeAware: ['src/legacy/**'],
+							typeChecked: true,
+						},
+					}),
+					overrideConfigFile: true,
+				});
+				const [source, legacySource, script, javascriptSource] = await Promise.all(
+					['src/index.ts', 'src/legacy/index.ts', 'scripts/build.ts', 'src/util.js'].map(
+						(filePath) => eslint.calculateConfigForFile(filePath),
+					),
+				);
+
+				if (source?.languageOptions?.parserOptions?.projectService !== true) {
+					throw new Error('A source in filesTypeAware was parsed without type information');
+				}
+
+				if (
+					[legacySource, script].some(
+						(config) => config?.languageOptions?.parserOptions?.projectService !== undefined,
+					)
+				) {
+					throw new Error('A file outside the type-aware scope was parsed with type information');
+				}
+
+				if (javascriptSource?.rules?.['@typescript-eslint/await-thenable'] !== undefined) {
+					throw new Error('A type-aware rule reached a JavaScript file in filesTypeAware');
+				}
+
+				process.stdout.write('ok');
+			`,
+    );
+
+    expect(output).toBe("ok");
+  });
+
   it("loads the optional integrations that the consumer declares and auto-detects Vite", async () => {
     const consumerDirectory = await createConsumer({
       dependencies: [
