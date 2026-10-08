@@ -1,7 +1,6 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- The consumer is created in a temporary directory. */
 
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import os from "node:os";
+import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -12,6 +11,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import {
   createConsumer,
   createTarball,
+  createTemporaryDirectory,
   fixturesDirectory,
   getOutput,
   manifest,
@@ -84,8 +84,8 @@ const reactTsconfig = JSON.stringify({
   include: ["*.ts", "*.tsx"],
 });
 
-const temporaryDirectory = await mkdtemp(
-  path.join(os.tmpdir(), "eslint-config-readme-"),
+const temporaryDirectory = await createTemporaryDirectory(
+  "eslint-config-readme-",
 );
 
 afterAll(async () => {

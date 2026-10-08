@@ -14,7 +14,7 @@ A step is in one of three states:
 
 ## Checklist
 
-- [ ] **Step 1.** Use real paths for the temporary directories of the install tests. Not blocked.
+- [x] **Step 1.** Use real paths for the temporary directories of the install tests. Not blocked. [#77](https://github.com/cravingmaker/eslint-config/pull/77)
 
 - [ ] **Step 2.** Keep the type-aware scope whole under every option. Not blocked.
 
