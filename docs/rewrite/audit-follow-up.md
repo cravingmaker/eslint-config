@@ -20,7 +20,7 @@ A step is in one of three states:
 
 - [x] **Step 3.** Apply overrides of type-aware rules only where type information is read. Blocked by step 2. [#79](https://github.com/cravingmaker/eslint-config/pull/79)
 
-- [ ] **Step 4.** Keep an overlap exemption inside the files that its override reaches. Blocked by step 2.
+- [x] **Step 4.** Keep an overlap exemption inside the files that its override reaches. Blocked by step 2. [#80](https://github.com/cravingmaker/eslint-config/pull/80)
 
 - [ ] **Step 5.** Separate the files of the JSON and JSONC blocks. Not blocked.
 
