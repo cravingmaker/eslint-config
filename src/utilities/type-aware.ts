@@ -1,6 +1,17 @@
 import type { Linter } from "eslint";
 import type { FeatureOptions, Rules, TypeAwareScope } from "../types.js";
 
+// The severities that turn a rule on. Apart from them, ESLint takes only `"off"` and `0`.
+const severitiesOn: ReadonlySet<unknown> = new Set([1, 2, "error", "warn"]);
+
+/**
+Whether the settings of a rule turn it on, with one of `severitiesOn` alone or first in an array.
+*/
+function isOn(entry: Readonly<Linter.RuleEntry> | undefined): boolean {
+  // `Array.isArray` narrows a readonly tuple to `any[]`.
+  const severity: unknown = Array.isArray(entry) ? entry[0] : entry;
+  return severitiesOn.has(severity);
+}
 /**
 Limits `scope` to the files that also match one of `files`, or keeps it when `files` is not
 set. Each nested array is a set of patterns that a file must all match.
@@ -40,6 +51,22 @@ function negateIgnores(ignores: readonly string[]): readonly string[] {
   return ignores
     .filter((pattern) => !pattern.startsWith("!"))
     .map((pattern) => `!${pattern}`);
+}
+/**
+The overrides of a feature for a block that reaches files without type information. A rule that
+needs it, one of `typeAwareRuleIds`, stops ESLint in such a file while it is on, so an override
+that turns it on is left out, and one that turns it off stays. So do settings that ESLint rejects,
+which it then reports as for any other rule. The feature's type-aware block takes every override.
+*/
+function overridesWithoutTypeInformation(
+  overrides: Readonly<Rules>,
+  typeAwareRuleIds: readonly string[],
+): Rules {
+  return Object.fromEntries(
+    Object.entries(overrides).filter(
+      ([ruleId, entry]) => !(typeAwareRuleIds.includes(ruleId) && isOn(entry)),
+    ),
+  );
 }
 /**
 Builds a feature's block for the rules that need type information, over the files of
@@ -93,4 +120,10 @@ function withoutIgnores(
   );
 }
 
-export { narrowFiles, narrowTypeAwareScope, typeAwareConfig, withoutIgnores };
+export {
+  narrowFiles,
+  narrowTypeAwareScope,
+  overridesWithoutTypeInformation,
+  typeAwareConfig,
+  withoutIgnores,
+};

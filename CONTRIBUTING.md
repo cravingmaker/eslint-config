@@ -160,7 +160,12 @@ consumers in `tests/package/` as well.
   such as `!scripts/**` brings back files that the patterns before it
   left out, also those of another list that it is appended to.
   `withoutIgnores` turns each list of ignores into `files` patterns on
-  its own; use it for every list that limits such a block.
+  its own; use it for every list that limits such a block. A feature's
+  `overrides` can turn such a rule on as well, so a block that reaches
+  files without type information takes them through
+  `overridesWithoutTypeInformation`, which leaves out the override of
+  such a rule when it turns the rule on. The feature's type-aware block
+  takes every override.
 - **TypeScript files outside the TypeScript feature do not parse.** The
   JavaScript and code-quality blocks match `.ts` files through
   `sourceFiles`, but only `typescript/parser` reads TypeScript. With

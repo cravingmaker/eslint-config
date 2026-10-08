@@ -30,31 +30,41 @@ type Plugin = {
     >
   >;
 };
-// Options that decide where the parser reads type information, and the files where it then does.
+/*
+Options that decide where the parser reads type information, the files where it then does, and,
+for options that override a rule that needs type information, the settings of that rule there.
+*/
 type Shape = readonly [
   description: string,
   options: ConfigOptions,
   typed: readonly string[],
+  overridden?: Readonly<Record<string, readonly unknown[]>>,
 ];
 
-const plainModule = "export const example = 1;\n";
+/*
+A module with what the rules of `functional` and `node` ask for type information about, which
+they do only when they find it: an expression statement, a constant without a type annotation, a
+parameter, and a call of a synchronous method in a function. It has no type syntax.
+*/
+const plainModule =
+  'import { readFileSync } from "node:fs";\n\nexport const values = [1];\nvalues.push(2);\n\nexport function read(file) {\n  return readFileSync(file, "utf8");\n}\n';
 const jsxModule = "export function Example() {\n  return <p>example</p>;\n}\n";
+// Without a call of a synchronous method: `n/no-sync` is on in a JavaScript rune module, which
+// typescript-eslint parses without type information, so such a call stops ESLint there.
 const runeModule = "export const state = $state({ count: 0 });\n";
 /*
 One file of each kind of source, a script, and two generated files that an option can tell apart.
 The tsconfig of the project includes `src/` only, so the project service cannot find the script.
-The script has what the rules of `functional` and `node` ask for type information about, which
-they do only when they find it: an expression statement, and a call of a synchronous method in a
-function. Only the component and the declaration file have type syntax, and the TSX file has no
-JSX, so espree parses a TypeScript file that an option leaves out of the TypeScript feature. The
+The script of the component has a parameter and a call of a synchronous method in a function as
+well. Only the component and the declaration file have type syntax, and the TSX file has no JSX,
+so espree parses a TypeScript file that an option leaves out of the TypeScript feature. The
 TypeScript files have different names, because a tsconfig includes only one of `example.ts`,
 `example.tsx`, and `example.d.ts`.
 */
 const sources = {
-  "scripts/build.ts":
-    'import { readFileSync } from "node:fs";\n\nexport const values = [1];\nvalues.push(2);\n\nexport function read(file) {\n  return readFileSync(file, "utf8");\n}\n',
+  "scripts/build.ts": plainModule,
   "src/Component.svelte":
-    '<script lang="ts">\n  const count: number = 1;\n</script>\n\n<p>{count}</p>\n',
+    '<script lang="ts">\n  import { readFileSync } from "node:fs";\n\n  function read(file: string): string {\n    return readFileSync(file, "utf8");\n  }\n</script>\n\n<p>{read("example.txt")}</p>\n',
   "src/example.js": plainModule,
   "src/example.jsx": jsxModule,
   "src/example.mjs": plainModule,
@@ -93,10 +103,39 @@ const withComponents = {
   typeChecked: true,
 } as const;
 /*
+Overrides that turn on a rule that needs type information, each in the feature that holds the
+rule and with options that the policy does not have. A feature's base block reaches files without
+type information, where such a rule stops ESLint, so the override applies in the type-aware scope
+only. `functional/prefer-readonly-type` is deprecated, so the policy does not set it, and it asks
+for type information only with `checkImplicit`.
+*/
+const deepParameters = {
+  enforcement: "None",
+  ignoreInferredTypes: true,
+  parameters: { enforcement: "ReadonlyDeep" },
+} as const;
+const functionalOverride = {
+  overrides: { "functional/prefer-immutable-types": ["error", deepParameters] },
+} satisfies ConfigOptions["functional"];
+const deprecatedOverride = {
+  overrides: {
+    "functional/prefer-readonly-type": ["error", { checkImplicit: true }],
+  },
+} satisfies ConfigOptions["functional"];
+const nodeOverride = {
+  overrides: { "n/no-sync": ["error", { allowAtRootLevel: false }] },
+} satisfies ConfigOptions["node"];
+const typescriptOverride = {
+  overrides: {
+    "@typescript-eslint/no-floating-promises": ["error", { ignoreVoid: false }],
+  },
+} satisfies ConfigOptions["typescript"];
+/*
 ESLint reads an ignore list in order, so a negated pattern brings back files that the patterns
 before it left out. It does so within its own list, as in `ignoresTypeAware` below, and must not
 across two lists: joined lists used to bring a file back into a type-aware block. Every shape
-leaves the script out of typed linting, and the last one is a control without a negated pattern.
+leaves the script out of typed linting. The ninth is a control without a negated pattern, and the
+shapes after it have one override each, with typed linting on and with typed linting off.
 */
 const shapes: readonly Shape[] = [
   [
@@ -180,6 +219,46 @@ const shapes: readonly Shape[] = [
       },
     },
     writtenSources,
+  ],
+  [
+    "an override in functional",
+    { functional: functionalOverride, typescript: withoutScripts },
+    typedSources,
+    { "functional/prefer-immutable-types": [2, deepParameters] },
+  ],
+  [
+    "an override in functional and typed linting off",
+    { functional: functionalOverride },
+    [],
+  ],
+  [
+    "an override of a deprecated rule in functional",
+    { functional: deprecatedOverride, typescript: withoutScripts },
+    typedSources,
+    { "functional/prefer-readonly-type": [2, { checkImplicit: true }] },
+  ],
+  [
+    "an override of a deprecated rule in functional and typed linting off",
+    { functional: deprecatedOverride },
+    [],
+  ],
+  [
+    "an override in node",
+    { node: nodeOverride, typescript: withoutScripts },
+    typedSources,
+    { "n/no-sync": [2, { allowAtRootLevel: false }] },
+  ],
+  ["an override in node and typed linting off", { node: nodeOverride }, []],
+  [
+    "an override in typescript",
+    { typescript: { ...withoutScripts, ...typescriptOverride } },
+    typedSources,
+    { "@typescript-eslint/no-floating-promises": [2, { ignoreVoid: false }] },
+  ],
+  [
+    "an override in typescript and typed linting off",
+    { typescript: typescriptOverride },
+    [],
   ],
 ];
 /*
@@ -292,9 +371,19 @@ function requiresTypeInformation(
   );
 }
 
-describe.each(shapes)(
+// Vitest takes rows of one length, so a shape without an override gets no settings.
+const rows = shapes.map(
+  ([description, options, typed, overridden = {}]): Required<Shape> => [
+    description,
+    options,
+    typed,
+    overridden,
+  ],
+);
+
+describe.each(rows)(
   "rules that need type information, with %s",
-  (_description, options, typed) => {
+  (_description, options, typed, overridden) => {
     const eslint = createEslint(options);
 
     // A rule that needs type information throws in a file without it, which stops ESLint for
@@ -332,6 +421,16 @@ describe.each(shapes)(
           projectService: false,
           typeAwareRules: [],
         });
+      },
+    );
+
+    // ESLint adds the defaults of a rule's options, so the settings may have more than these.
+    it.each(Object.keys(overridden).length === 0 ? [] : typed)(
+      "have the settings of the override in %s",
+      async (filePath) => {
+        const config = await getEffectiveConfig(await eslint, filePath);
+
+        expect(config?.rules).toMatchObject(overridden);
       },
     );
   },

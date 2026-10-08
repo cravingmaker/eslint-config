@@ -59,7 +59,9 @@ const nodeRules: Rules = {
 const typeAwareRules: Rules = { "n/no-sync": nodeRules["n/no-sync"] };
 
 // Builds the flat config for eslint-plugin-n. In TypeScript files and Svelte components,
-// `n/no-sync` is off unless they are in the type-aware scope.
+// `n/no-sync` is off unless they are in the type-aware scope, also when an override turns it on.
+// The rules block applies the overrides to every file of the feature, so the block that turns
+// the rule off takes none.
 function node(
   options: FeatureOptions = {},
   { svelteComponents, typeAware }: Context = defaultContext,
@@ -86,7 +88,7 @@ function node(
       ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/node/rules-typescript",
-      rules: { "n/no-sync": "off", ...overrides },
+      rules: { "n/no-sync": "off" },
     },
     ...(typeAware === undefined
       ? []
