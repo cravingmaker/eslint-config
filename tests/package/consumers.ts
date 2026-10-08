@@ -1,7 +1,15 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- The consumers are created in a temporary directory. */
 
 import { execFile } from "node:child_process";
-import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
+import {
+  cp,
+  mkdir,
+  mkdtemp,
+  readFile,
+  realpath,
+  writeFile,
+} from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
@@ -84,6 +92,15 @@ async function createTarball(destination: string): Promise<string> {
   return path.join(destination, filename);
 }
 /*
+A new directory in the system's temporary directory, with a name that starts with `prefix`, as its
+real path. The temporary directory can be a symbolic link, as it is on macOS, and a child process
+reports its working directory, and the files that it resolves from it, by their real paths.
+*/
+async function createTemporaryDirectory(prefix: string): Promise<string> {
+  const directory = await mkdtemp(path.join(os.tmpdir(), prefix));
+  return await realpath(directory);
+}
+/*
 Runs a command and returns what it prints, also when it exits with an error, as ESLint does when
 it reports a problem and TypeScript does when it finds one.
 */
@@ -138,6 +155,7 @@ async function runCommand(
 export {
   createConsumer,
   createTarball,
+  createTemporaryDirectory,
   execute,
   fixturesDirectory,
   getOutput,

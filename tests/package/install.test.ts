@@ -1,7 +1,6 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- The consumers are created in a temporary directory. */
 
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
-import os from "node:os";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 
@@ -10,6 +9,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import {
   createConsumer,
   createTarball,
+  createTemporaryDirectory,
   execute,
   getOutput,
 } from "./consumers.js";
@@ -49,8 +49,8 @@ const defaultConfig = `import { createConfig } from "@cravingmaker/eslint-config
 export default createConfig();
 `;
 
-const temporaryDirectory = await mkdtemp(
-  path.join(os.tmpdir(), "eslint-config-install-"),
+const temporaryDirectory = await createTemporaryDirectory(
+  "eslint-config-install-",
 );
 
 afterAll(async () => {
