@@ -116,7 +116,7 @@ describe("resolveOptions", () => {
   it("scopes type-aware rules to TypeScript files when type checking is on", () => {
     expect(
       resolveOptions({ typescript: { typeChecked: true } }).typeAware,
-    ).toEqual({ files: typescriptFiles, ignores: [] });
+    ).toEqual([[...typescriptFiles, "!**/*.svelte"]]);
     expect(
       resolveOptions({
         typescript: {
@@ -125,10 +125,9 @@ describe("resolveOptions", () => {
           typeChecked: true,
         },
       }).typeAware,
-    ).toEqual({
-      files: [["src/**", ...typescriptFiles]],
-      ignores: ["src/**/*.test.ts"],
-    });
+    ).toEqual([
+      [...typescriptFiles, "!**/*.svelte", "src/**", "!src/**/*.test.ts"],
+    ]);
   });
 
   it("keeps the type-aware scope within the files and ignores of the TypeScript feature", () => {
@@ -138,10 +137,9 @@ describe("resolveOptions", () => {
       typeChecked: true,
     } as const;
 
-    expect(resolveOptions({ typescript }).typeAware).toEqual({
-      files: ["app/**/*.ts"],
-      ignores: ["**/*.generated.ts"],
-    });
+    expect(resolveOptions({ typescript }).typeAware).toEqual([
+      ["app/**/*.ts", "!**/*.svelte", "!**/*.generated.ts"],
+    ]);
     expect(
       resolveOptions({
         typescript: {
@@ -150,10 +148,70 @@ describe("resolveOptions", () => {
           ignoresTypeAware: ["app/server/legacy/**"],
         },
       }).typeAware,
-    ).toEqual({
-      files: [["app/server/**", "app/**/*.ts"]],
-      ignores: ["**/*.generated.ts", "app/server/legacy/**"],
-    });
+    ).toEqual([
+      [
+        "app/**/*.ts",
+        "!**/*.svelte",
+        "!**/*.generated.ts",
+        "app/server/**",
+        "!app/server/legacy/**",
+      ],
+    ]);
+  });
+
+  it("leaves Svelte components out of the type-aware scope, whatever the files of the TypeScript feature name", () => {
+    expect(
+      resolveOptions({
+        svelte: true,
+        typescript: { files: ["src/**/*.{ts,svelte}"], typeChecked: true },
+      }).typeAware,
+    ).toEqual([["src/**/*.{ts,svelte}", "!**/*.svelte"]]);
+  });
+
+  it("applies each list of ignores to the type-aware scope on its own", () => {
+    // A negated pattern brings back only what its own list left out. The one of `ignores` does
+    // not bring back the file that `ignoresTypeAware` leaves out.
+    expect(
+      resolveOptions({
+        typescript: {
+          ignores: ["**/generated/**", "!**/generated/keep.ts"],
+          ignoresTypeAware: ["**/generated/keep.ts"],
+          typeChecked: true,
+        },
+      }).typeAware,
+    ).toEqual([
+      [
+        ...typescriptFiles,
+        "!**/*.svelte",
+        "!**/generated/**",
+        "!**/generated/keep.ts",
+      ],
+      [
+        ...typescriptFiles,
+        "!**/*.svelte",
+        "**/generated/keep.ts",
+        "!**/generated/keep.ts",
+      ],
+    ]);
+    // Nor does the one of `ignoresTypeAware` bring back a file that `ignores` leaves out, which
+    // the parser of the feature does not read.
+    expect(
+      resolveOptions({
+        typescript: {
+          ignores: ["**/generated/**"],
+          ignoresTypeAware: ["!**/generated/keep.ts"],
+          typeChecked: true,
+        },
+      }).typeAware,
+    ).toEqual([
+      [...typescriptFiles, "!**/*.svelte", "!**/generated/**"],
+      [
+        ...typescriptFiles,
+        "!**/*.svelte",
+        "!**/generated/**",
+        "**/generated/keep.ts",
+      ],
+    ]);
   });
 
   it("resolves the Svelte components that the Svelte feature parses", () => {

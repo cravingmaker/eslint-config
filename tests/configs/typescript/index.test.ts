@@ -16,7 +16,7 @@ type EffectiveConfig = {
 const typedContext: Context = {
   ...defaultContext,
   tsconfigRootDir: "/project",
-  typeAware: { files: ["**/*.ts"], ignores: [] },
+  typeAware: ["**/*.ts"],
 };
 
 async function getEffectiveConfig(
@@ -78,7 +78,7 @@ describe("typescript feature", () => {
         {},
         {
           ...typedContext,
-          typeAware: { files: ["src/**/*.ts"], ignores: ["src/legacy/**"] },
+          typeAware: [["src/**/*.ts", "!src/legacy/**"]],
         },
       ),
       overrideConfigFile: true,
@@ -141,7 +141,7 @@ describe("typescript feature", () => {
         overrides: { "@typescript-eslint/no-floating-promises": "warn" },
         overridesTypeAware: { "@typescript-eslint/await-thenable": "warn" },
       },
-      { ...typedContext, typeAware: { files: ["src/**"], ignores: [] } },
+      { ...typedContext, typeAware: ["src/**"] },
     );
     const eslint = new ESLint({
       overrideConfig: configs,

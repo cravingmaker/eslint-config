@@ -16,7 +16,7 @@ A step is in one of three states:
 
 - [x] **Step 1.** Use real paths for the temporary directories of the install tests. Not blocked. [#77](https://github.com/cravingmaker/eslint-config/pull/77)
 
-- [ ] **Step 2.** Keep the type-aware scope whole under every option. Not blocked.
+- [x] **Step 2.** Keep the type-aware scope whole under every option. Not blocked. [#78](https://github.com/cravingmaker/eslint-config/pull/78)
 
 - [ ] **Step 3.** Apply overrides of type-aware rules only where type information is read. Blocked by step 2.
 

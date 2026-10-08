@@ -11,7 +11,7 @@ type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 
 const typedContext: Context = {
   ...defaultContext,
-  typeAware: { files: typescriptFiles, ignores: ["**/*.d.ts"] },
+  typeAware: [[...typescriptFiles, "!**/*.d.ts"]],
 };
 const svelteContext: Context = {
   ...defaultContext,
@@ -71,5 +71,20 @@ describe("node feature", () => {
     expect(await getSeverity(eslint, "src/Component.svelte", "n/no-sync")).toBe(
       0,
     );
+  });
+
+  it("keeps the type-aware block within the type-aware scope, whatever its ignores bring back", async () => {
+    // The feature lints `src/` only, declaration files included, which the scope leaves out.
+    const eslint = new ESLint({
+      overrideConfig: node({ ignores: ["**/*", "!src/**"] }, typedContext),
+      overrideConfigFile: true,
+    });
+    const severities = await Promise.all([
+      getSeverity(eslint, "src/example.ts", "n/no-sync"),
+      getSeverity(eslint, "src/example.d.ts", "n/no-sync"),
+      getSeverity(eslint, "lib/example.ts", "n/no-sync"),
+    ]);
+
+    expect(severities).toEqual([2, 0, undefined]);
   });
 });

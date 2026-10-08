@@ -161,13 +161,11 @@ schemas; any other rule ID is accepted, for plugins added in user configs.
 type Rules = Record<string, Linter.RuleEntry | undefined> & RuleOptions;
 /**
 Files that the parser reads with type information and that receive type-aware rules, within the
-files that the TypeScript feature parses. Each nested array is a set of patterns that a file must
-all match.
+files that the TypeScript feature parses and without Svelte components. Each nested array is a
+set of patterns that a file must all match. The scope has no ignore list: ESLint reads one in
+order, so the ignores of a block that takes the scope could bring back a file that it leaves out.
 */
-type TypeAwareScope = {
-  readonly files: ReadonlyArray<string | readonly string[]>;
-  readonly ignores: readonly string[];
-};
+type TypeAwareScope = ReadonlyArray<string | readonly string[]>;
 /**
 Options of the `typescript` feature.
 */
