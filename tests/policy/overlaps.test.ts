@@ -1,10 +1,15 @@
-import type { Linter } from "eslint";
-import type { Options } from "../../src/types.js";
+/* eslint-disable security/detect-non-literal-fs-filename -- The project is written to a temporary directory. */
 
+import type { Linter } from "eslint";
+import type { Options, Rules, TypeScriptOptions } from "../../src/types.js";
+
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import process from "node:process";
 
 import { ESLint } from "eslint";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
 import { featureOf, overlaps } from "../../src/overlaps.js";
@@ -13,6 +18,7 @@ type RuleEntries = Readonly<Record<string, RuleEntry>>;
 // A rule's settings as ESLint resolves them: the severity as a number, then the options.
 type RuleEntry = readonly [Linter.Severity, ...unknown[]];
 
+const prefix = "@cravingmaker/eslint-config/";
 const baseOptions = {
   projectRootDirectory: process.cwd(),
   typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
@@ -50,7 +56,133 @@ const cases = Object.entries(overlaps).flatMap(([owner, replacedRules]) =>
     replaced,
   })),
 );
+// The replaced rules that the TypeScript feature holds. `typescript.overridesTypeAware` can set
+// them as well, and apply in the type-aware scope only.
+const typescriptCases = cases.filter(
+  ({ replaced }) => featureOf(replaced) === "typescript",
+);
+// Typed linting that leaves the scripts out, as a project does whose tsconfig does not include
+// them.
+const withoutScripts = {
+  ignoresTypeAware: ["scripts/**"],
+  typeChecked: true,
+} as const satisfies TypeScriptOptions;
+/*
+A sample for each of those rules, which the rule and a rule of its owner both report: a variable
+that nothing uses, a method before a field, and overloads with another member between them.
+*/
+const samples = [
+  {
+    code: "const unused = 1;\nexport {};\n",
+    fileName: "unused.ts",
+    ownerRule: "unused-imports/no-unused-vars",
+    replaced: "@typescript-eslint/no-unused-vars",
+  },
+  {
+    code: "export class Counter {\n  increment(): number {\n    return this.count + 1;\n  }\n\n  count = 0;\n}\n",
+    fileName: "members.ts",
+    ownerRule: "perfectionist/sort-classes",
+    replaced: "@typescript-eslint/member-ordering",
+  },
+  {
+    code: "export type Reader = {\n  read(name: string): string;\n  close(): void;\n  read(id: number): string;\n};\n",
+    fileName: "overloads.ts",
+    ownerRule: "perfectionist/sort-object-types",
+    replaced: "@typescript-eslint/adjacent-overload-signatures",
+  },
+] as const;
+/*
+What `overridesTypeAware` sets such a rule to, while its owner lints only `src/` and typed linting
+leaves out the `legacy` folders, and the severity that the rule then has in four files: one that
+both cover, one that only typed linting covers, one that only the owner lints, and one that
+neither does.
+*/
+const narrowedSeverities = [
+  { entry: "error", severities: [2, 2, 0, 2] },
+  { entry: "off", severities: [0, 0, 0, 2] },
+] as const;
+const narrowedCases = typescriptCases.flatMap((testCase) =>
+  narrowedSeverities.map((expected) => ({ ...testCase, ...expected })),
+);
 
+/*
+A project whose tsconfig includes `src/` only. Each sample is in `src/` and in `scripts/`, which
+typed linting leaves out with `withoutScripts`.
+*/
+const projectDirectory = await mkdtemp(
+  path.join(os.tmpdir(), "eslint-config-overlaps-"),
+);
+await Promise.all(
+  [
+    ["package.json", JSON.stringify({ name: "fixture", type: "module" })],
+    [
+      "tsconfig.json",
+      JSON.stringify({
+        compilerOptions: {
+          module: "nodenext",
+          noEmit: true,
+          strict: true,
+          target: "es2024",
+        },
+        include: ["src"],
+      }),
+    ],
+    ...samples.flatMap(({ code, fileName }) => [
+      [`scripts/${fileName}`, code],
+      [`src/${fileName}`, code],
+    ]),
+  ].map(async ([fileName = "", content = ""]) => {
+    const filePath = path.join(projectDirectory, fileName);
+    await mkdir(path.dirname(filePath), { recursive: true });
+    await writeFile(filePath, content, "utf8");
+  }),
+);
+
+afterAll(async () => {
+  await rm(projectDirectory, { force: true, recursive: true });
+});
+
+/*
+The rules among `ruleIds` that report each of `filePaths` in the project, in the order of
+`filePaths`, with `typescript` as the options of the TypeScript feature. The manifest of the
+project declares no framework.
+*/
+async function getReported(
+  typescript: TypeScriptOptions,
+  filePaths: readonly string[],
+  ruleIds: readonly string[],
+): Promise<ReadonlyArray<readonly string[]>> {
+  const eslint = new ESLint({
+    cwd: projectDirectory,
+    overrideConfig: await createConfig({
+      projectRootDirectory: projectDirectory,
+      typescript: { ...typescript, tsconfigRootDir: projectDirectory },
+    }),
+    overrideConfigFile: true,
+  });
+  const results = await eslint.lintFiles([...filePaths]);
+  const messagesByPath = new Map(
+    results.map(({ filePath, messages }) => [
+      path.relative(projectDirectory, filePath).replaceAll(path.sep, "/"),
+      messages,
+    ]),
+  );
+
+  // A file that does not parse has one message without a rule, so no rule reports it.
+  expect(
+    results
+      .flatMap(({ messages }) => messages)
+      .filter(({ fatal }) => fatal === true)
+      .map(({ message }) => message),
+  ).toEqual([]);
+  return filePaths.map((filePath) =>
+    ruleIds.filter((ruleId) =>
+      (messagesByPath.get(filePath) ?? []).some(
+        (message) => message.ruleId === ruleId,
+      ),
+    ),
+  );
+}
 // The rules that ESLint resolves for `filePath` with `options`.
 async function getRules(
   options: Options,
@@ -73,6 +205,29 @@ async function getSeverities(
 ): Promise<ReadonlyArray<Linter.Severity | undefined>> {
   const rules = await getRules(options, filePath);
   return ruleIds.map((ruleId) => rules.get(ruleId)?.[0]);
+}
+// The severity of `ruleId` that ESLint resolves for each of `filePaths` with `options`.
+async function getSeverityByFile(
+  options: Options,
+  filePaths: readonly string[],
+  ruleId: string,
+): Promise<ReadonlyArray<Linter.Severity | undefined>> {
+  const severities = await Promise.all(
+    filePaths.map(
+      async (filePath) => await getSeverities(options, filePath, [ruleId]),
+    ),
+  );
+  return severities.map(([severity]) => severity);
+}
+// `options` with `typescript` added to the typed linting of `baseOptions`.
+function withTypeScript(
+  options: Options,
+  typescript: TypeScriptOptions,
+): Options {
+  return {
+    ...options,
+    typescript: { ...baseOptions.typescript, ...typescript },
+  };
 }
 
 describe("overlap table", () => {
@@ -165,6 +320,219 @@ describe("overlap table", () => {
     expect(rules.get("sort-keys")?.[0]).toBe(1);
     expect(rules.get("n/prefer-node-protocol")?.[0]).toBe(1);
     expect(rules.get("no-negated-condition")?.[0]).toBe(0);
+  });
+});
+
+/*
+`typescript.overrides` apply in every file of the feature, so a replaced rule that they set is
+the user's everywhere. `typescript.overridesTypeAware` apply in the type-aware scope only, so a
+rule that only they set is still replaced outside that scope, and in every file while typed
+linting is off.
+*/
+describe("replaced rules in typescript.overridesTypeAware", () => {
+  it("have a sample each", () => {
+    expect(new Set(samples.map(({ replaced }) => replaced))).toEqual(
+      new Set(typescriptCases.map(({ replaced }) => replaced)),
+    );
+  });
+
+  describe.each(samples)(
+    "the sample of $replaced",
+    ({ fileName, ownerRule, replaced }) => {
+      /*
+      The rules that report the sample with `overridesTypeAware`: with typed linting off, and with
+      it on, in the file that it covers and in the one that it leaves out.
+      */
+      const describeReports = async (
+        overridesTypeAware: Readonly<Rules>,
+      ): Promise<Readonly<Record<string, readonly string[]>>> => {
+        const ruleIds = [replaced, ownerRule];
+        const [[untyped], [inside, outside]] = await Promise.all([
+          getReported({ overridesTypeAware }, [`src/${fileName}`], ruleIds),
+          getReported(
+            { ...withoutScripts, overridesTypeAware },
+            [`src/${fileName}`, `scripts/${fileName}`],
+            ruleIds,
+          ),
+        ]);
+        return { inside, outside, untyped };
+      };
+
+      it("is reported by the rule of the owner only, without an override", async () => {
+        expect(await describeReports({})).toEqual({
+          inside: [ownerRule],
+          outside: [ownerRule],
+          untyped: [ownerRule],
+        });
+      });
+
+      it('is reported by the rule of the owner only with "off", whether typed linting covers the file or not', async () => {
+        expect(await describeReports({ [replaced]: "off" })).toEqual({
+          inside: [ownerRule],
+          outside: [ownerRule],
+          untyped: [ownerRule],
+        });
+      });
+
+      it('is reported by both rules with "error", but only where typed linting covers the file', async () => {
+        expect(await describeReports({ [replaced]: "error" })).toEqual({
+          inside: [replaced, ownerRule],
+          outside: [ownerRule],
+          untyped: [ownerRule],
+        });
+      });
+    },
+  );
+
+  it.each(typescriptCases)(
+    "$owner still replaces $replaced in Svelte components, which typed linting leaves out",
+    async ({ replaced }) => {
+      const options = withTypeScript(
+        { ...baseOptions, svelte: true },
+        { overridesTypeAware: { [replaced]: "error" } },
+      );
+
+      expect(
+        await getSeverityByFile(
+          options,
+          ["src/example.ts", "src/Component.svelte"],
+          replaced,
+        ),
+      ).toEqual([2, 0]);
+    },
+  );
+
+  it.each(typescriptCases)(
+    "turning $owner off brings $replaced back where overridesTypeAware does not apply",
+    async ({ owner, replaced }) => {
+      const options = withTypeScript(optionsWithoutOwner.get(owner) ?? {}, {
+        ...withoutScripts,
+        overridesTypeAware: { [replaced]: "off" },
+      });
+
+      expect(
+        await getSeverityByFile(
+          options,
+          ["src/example.ts", "scripts/example.ts"],
+          replaced,
+        ),
+      ).toEqual([0, 2]);
+    },
+  );
+
+  it.each(narrowedCases)(
+    "$owner replaces $replaced, set to $entry, in its own files outside the type-aware scope",
+    async ({ entry, owner, replaced, severities }) => {
+      const options = withTypeScript(
+        optionsWithNarrowedOwner.get(owner) ?? {},
+        {
+          ignoresTypeAware: ["**/legacy/**"],
+          overridesTypeAware: { [replaced]: entry },
+        },
+      );
+
+      expect(
+        await getSeverityByFile(
+          options,
+          [
+            "src/example.ts",
+            "scripts/example.ts",
+            "src/legacy/example.ts",
+            "scripts/legacy/example.ts",
+          ],
+          replaced,
+        ),
+      ).toEqual(severities);
+    },
+  );
+
+  it.each(typescriptCases)(
+    "leave $replaced to typescript.overrides outside the type-aware scope",
+    async ({ replaced }) => {
+      const typescript = {
+        overrides: { [replaced]: "warn" },
+        overridesTypeAware: { [replaced]: "off" },
+      } satisfies TypeScriptOptions;
+      const [typed, untyped] = await Promise.all([
+        getSeverityByFile(
+          withTypeScript(baseOptions, { ...withoutScripts, ...typescript }),
+          ["src/example.ts", "scripts/example.ts"],
+          replaced,
+        ),
+        getSeverityByFile(
+          { projectRootDirectory: process.cwd(), typescript },
+          ["src/example.ts"],
+          replaced,
+        ),
+      ]);
+
+      expect({ typed, untyped }).toEqual({ typed: [0, 1], untyped: [1] });
+    },
+  );
+
+  it("apply with their options in the type-aware scope", async () => {
+    const ruleId = "@typescript-eslint/no-unused-vars";
+    const options = withTypeScript(baseOptions, {
+      ...withoutScripts,
+      overridesTypeAware: { [ruleId]: ["warn", { args: "none" }] },
+    });
+    const [inside, outside] = await Promise.all([
+      getRules(options, "src/example.ts"),
+      getRules(options, "scripts/example.ts"),
+    ]);
+
+    // ESLint adds the defaults of a rule's options, so the settings may have more than these.
+    expect(inside.get(ruleId)).toMatchObject([1, { args: "none" }]);
+    expect(outside.get(ruleId)?.[0]).toBe(0);
+  });
+
+  it("do not bring back a replaced rule of another feature", async () => {
+    const options = withTypeScript(baseOptions, {
+      overridesTypeAware: { "sort-keys": "error" },
+    });
+
+    expect(
+      await getSeverities(options, "src/example.ts", ["sort-keys"]),
+    ).toEqual([0]);
+  });
+
+  it("are set again in one block over the type-aware scope, and only with typed linting", async () => {
+    const overridesTypeAware = {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "error",
+    } satisfies Rules;
+    const [typed, untyped] = await Promise.all([
+      createConfig(withTypeScript(baseOptions, { overridesTypeAware })),
+      createConfig({
+        projectRootDirectory: process.cwd(),
+        typescript: { overridesTypeAware },
+      }),
+    ]);
+    // The blocks of `configs` that turn off or set again the replaced rules of typescript-eslint.
+    const getBlocks = (
+      configs: readonly Linter.Config[],
+    ): readonly Linter.Config[] =>
+      configs.filter(
+        ({ name = "" }) =>
+          name === `${prefix}overlaps/typescript` ||
+          name.startsWith(`${prefix}overlaps/typescript/`),
+      );
+    const typeAwareRules = typed.find(
+      ({ name }) => name === `${prefix}typescript/rules-type-aware`,
+    );
+
+    // A type-aware block has no `ignores`, which could bring back a file outside the scope.
+    expect(getBlocks(typed)).toStrictEqual([
+      expect.objectContaining({ name: `${prefix}overlaps/typescript` }),
+      {
+        files: typeAwareRules?.files,
+        name: `${prefix}overlaps/typescript/overrides-type-aware`,
+        rules: { "@typescript-eslint/no-unused-vars": "error" },
+      },
+    ]);
+    expect(getBlocks(untyped).map(({ name }) => name)).toEqual([
+      `${prefix}overlaps/typescript`,
+    ]);
   });
 });
 

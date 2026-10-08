@@ -341,7 +341,7 @@ Some plugins check what another plugin's rule also checks. For each such pair, o
 
 - Turning the owner off turns the rules it replaces back on.
 - Limiting the owner with `files` or `ignores` turns them back on outside the owner's files.
-- Setting a replaced rule in the overrides of the feature that holds it keeps it on, as `node: { overrides: { "n/no-process-exit": "error" } }` does. For `typescript`, that includes `overridesTypeAware`.
+- Setting a replaced rule in the overrides of the feature that holds it keeps it on, as `node: { overrides: { "n/no-process-exit": "error" } }` does. For `typescript`, that includes `overridesTypeAware` in the files that [typed linting](#typed-linting) covers. Outside them, a rule that only `overridesTypeAware` sets is still replaced.
 
 ## File-role exceptions
 

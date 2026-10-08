@@ -4,7 +4,7 @@ import type { FeatureOptions } from "./types.js";
 
 import { sourceFiles, typescriptFiles, withSvelteComponents } from "./globs.js";
 import { resolveOptions } from "./options.js";
-import { narrowFiles } from "./utilities/type-aware.js";
+import { narrowFiles, narrowTypeAwareScope } from "./utilities/type-aware.js";
 
 /**
 A feature whose rules replace rules of other features.
@@ -83,6 +83,8 @@ Builds the blocks that turn off replaced rules where their owner lints, for each
 holds such rules. The rules of every owner that keeps its default scope are off in one block
 over that feature's files. An owner with files or ignores of its own gets a block that is
 narrowed to them. A rule that the holding feature's overrides set stays on.
+`typescript.overridesTypeAware` apply in the type-aware scope only, so a rule that only they set
+is turned off with the others, and a last block sets it again over that scope.
 */
 function overlapConfigs(
   options: ResolvedOptions = resolveOptions(),
@@ -141,55 +143,70 @@ function overlapConfigs(
         options.svelteComponents,
       ),
       feature: "typescript",
-      overrides: {
-        ...options.typescript?.overrides,
-        ...options.typescript?.overridesTypeAware,
-      },
+      overrides: options.typescript?.overrides,
+      overridesTypeAware: options.typescript?.overridesTypeAware,
       settings: options.typescript,
     },
   ];
 
-  return scopes.flatMap(({ defaultFiles, feature, overrides, settings }) => {
-    if (settings === undefined) return [];
+  return scopes.flatMap(
+    ({ defaultFiles, feature, overrides, overridesTypeAware, settings }) => {
+      if (settings === undefined) return [];
 
-    const files = settings.files ?? defaultFiles;
-    const ignores = settings.ignores ?? [];
-    const replaced = owners.flatMap(
-      ({ name, replacedRules, settings: ownerSettings }) => {
-        const ruleIds = Object.keys(replacedRules).filter(
-          (ruleId) =>
-            featureOf(ruleId) === feature &&
-            !Object.hasOwn(overrides ?? {}, ruleId),
-        );
-        if (ownerSettings === undefined || ruleIds.length === 0) return [];
-        return [{ name, ownerSettings, ruleIds }];
-      },
-    );
-    const sharedRuleIds = replaced
-      .filter(({ ownerSettings }) => !hasOwnScope(ownerSettings))
-      .flatMap(({ ruleIds }) => ruleIds);
+      const files = settings.files ?? defaultFiles;
+      const ignores = settings.ignores ?? [];
+      const replaced = owners.flatMap(
+        ({ name, replacedRules, settings: ownerSettings }) => {
+          const ruleIds = Object.keys(replacedRules).filter(
+            (ruleId) =>
+              featureOf(ruleId) === feature &&
+              !Object.hasOwn(overrides ?? {}, ruleId),
+          );
+          if (ownerSettings === undefined || ruleIds.length === 0) return [];
+          return [{ name, ownerSettings, ruleIds }];
+        },
+      );
+      const sharedRuleIds = replaced
+        .filter(({ ownerSettings }) => !hasOwnScope(ownerSettings))
+        .flatMap(({ ruleIds }) => ruleIds);
+      // The settings of `overridesTypeAware` for the rules that the blocks below turn off.
+      const typeAwareEntries = Object.entries(overridesTypeAware ?? {}).filter(
+        ([ruleId]) => replaced.some(({ ruleIds }) => ruleIds.includes(ruleId)),
+      );
 
-    return [
-      ...(sharedRuleIds.length === 0
-        ? []
-        : [
-            {
-              files: [...files],
-              ignores: [...ignores],
-              name: `@cravingmaker/eslint-config/overlaps/${feature}`,
-              rules: turnOff(sharedRuleIds),
-            },
-          ]),
-      ...replaced
-        .filter(({ ownerSettings }) => hasOwnScope(ownerSettings))
-        .map(({ name, ownerSettings, ruleIds }) => ({
-          files: narrowFiles(files, ownerSettings.files),
-          ignores: [...ignores, ...(ownerSettings.ignores ?? [])],
-          name: `@cravingmaker/eslint-config/overlaps/${feature}/${name}`,
-          rules: turnOff(ruleIds),
-        })),
-    ];
-  });
+      return [
+        ...(sharedRuleIds.length === 0
+          ? []
+          : [
+              {
+                files: [...files],
+                ignores: [...ignores],
+                name: `@cravingmaker/eslint-config/overlaps/${feature}`,
+                rules: turnOff(sharedRuleIds),
+              },
+            ]),
+        ...replaced
+          .filter(({ ownerSettings }) => hasOwnScope(ownerSettings))
+          .map(({ name, ownerSettings, ruleIds }) => ({
+            files: narrowFiles(files, ownerSettings.files),
+            ignores: [...ignores, ...(ownerSettings.ignores ?? [])],
+            name: `@cravingmaker/eslint-config/overlaps/${feature}/${name}`,
+            rules: turnOff(ruleIds),
+          })),
+        ...(options.typeAware === undefined || typeAwareEntries.length === 0
+          ? []
+          : [
+              {
+                // The scope stays within the feature's files and ignores, so they are not
+                // applied again.
+                files: narrowTypeAwareScope(options.typeAware),
+                name: `@cravingmaker/eslint-config/overlaps/${feature}/overrides-type-aware`,
+                rules: Object.fromEntries(typeAwareEntries),
+              },
+            ]),
+      ];
+    },
+  );
 }
 /**
 Rule settings that turn each of `ruleIds` off, keeping the options of earlier blocks.
