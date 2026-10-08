@@ -37,7 +37,8 @@ async function typescriptParser(
       ? []
       : [
           {
-            ...narrowTypeAwareScope(typeAware, options),
+            // The scope stays within the feature's files and ignores, so they are not applied again.
+            files: narrowTypeAwareScope(typeAware),
             languageOptions: {
               parserOptions: { projectService: true, tsconfigRootDir },
             },

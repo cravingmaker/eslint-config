@@ -21,17 +21,25 @@ function narrowFiles(
   );
 }
 /**
-The files of a feature's type-aware blocks: the type-aware scope, narrowed to the feature's own
-files when they are set, without the feature's ignores.
+The files of a feature's type-aware block: the type-aware scope, within the feature's own files
+when they are set, and without the files that its ignores leave out. The block takes them as its
+`files` and has no `ignores`, which could bring back a file that the scope leaves out.
 */
 function narrowTypeAwareScope(
   typeAware: TypeAwareScope,
   { files, ignores = [] }: FeatureOptions = {},
-): Pick<Linter.Config, "files" | "ignores"> {
-  return {
-    files: narrowFiles(typeAware.files, files),
-    ignores: [...typeAware.ignores, ...ignores],
-  };
+): NonNullable<Linter.Config["files"]> {
+  return withoutIgnores(narrowFiles(typeAware, files), ignores);
+}
+/**
+The patterns of `ignores` that leave files out, each negated: a file matches all of them when
+none of those patterns leaves it out. The negated patterns of the list, which bring files back,
+are not among them.
+*/
+function negateIgnores(ignores: readonly string[]): readonly string[] {
+  return ignores
+    .filter((pattern) => !pattern.startsWith("!"))
+    .map((pattern) => `!${pattern}`);
 }
 /**
 Builds a feature's block for the rules that need type information, over the files of
@@ -44,10 +52,45 @@ function typeAwareConfig(
   rules: Rules = {},
 ): Linter.Config {
   return {
-    ...narrowTypeAwareScope(typeAware, options),
+    files: narrowTypeAwareScope(typeAware, options),
     name: `@cravingmaker/eslint-config/${feature}/rules-type-aware`,
     rules,
   };
 }
+/**
+Limits `scope` to the files that the ignore list `ignores` leaves in, as patterns for `files`
+alone. ESLint reads an ignore list in order, and a negated pattern brings back files that the
+patterns before it left out, so two lists that are joined into one do not leave out what each of
+them does on its own. A file is left in when no pattern leaves it out, or when a negated pattern
+brings it back and no later pattern leaves it out again. Each case becomes a set of patterns that
+a file must all match.
+*/
+function withoutIgnores(
+  scope: ReadonlyArray<string | readonly string[]>,
+  ignores: readonly string[],
+): NonNullable<Linter.Config["files"]> {
+  if (ignores.length === 0) return narrowFiles(scope, undefined);
 
-export { narrowFiles, narrowTypeAwareScope, typeAwareConfig };
+  const leftIn = [
+    negateIgnores(ignores),
+    ...ignores.flatMap((pattern, index) =>
+      pattern.startsWith("!")
+        ? [
+            [
+              // ESLint reads any number of leading `!` as one.
+              pattern.replace(/^!+/v, ""),
+              ...negateIgnores(ignores.slice(index + 1)),
+            ],
+          ]
+        : [],
+    ),
+  ];
+  return scope.flatMap((entry) =>
+    leftIn.map((patterns) => [
+      ...(typeof entry === "string" ? [entry] : entry),
+      ...patterns,
+    ]),
+  );
+}
+
+export { narrowFiles, narrowTypeAwareScope, typeAwareConfig, withoutIgnores };

@@ -12,7 +12,7 @@ type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 
 const typedContext: Context = {
   ...defaultContext,
-  typeAware: { files: typescriptFiles, ignores: ["**/*.d.ts"] },
+  typeAware: [[...typescriptFiles, "!**/*.d.ts"]],
 };
 const tsOptions = {
   filePath: "tests/utilities.ts",
@@ -85,6 +85,24 @@ describe("functional feature", () => {
     expect(inside?.["functional/prefer-immutable-types"]).toEqual([1]);
     expect(inside?.["functional/readonly-type"]?.[0]).toBe(2);
     expect(outside?.["functional/readonly-type"]).toBeUndefined();
+  });
+
+  it("keeps the type-aware block within the type-aware scope, whatever its ignores bring back", async () => {
+    // The feature lints `src/` only, declaration files included, which the scope leaves out.
+    const eslint = new ESLint({
+      overrideConfig: functional(
+        { ignores: ["**/*", "!src/**"] },
+        typedContext,
+      ),
+      overrideConfigFile: true,
+    });
+    const severities = await Promise.all([
+      getSeverity(eslint, "src/example.ts", "functional/readonly-type"),
+      getSeverity(eslint, "src/example.d.ts", "functional/readonly-type"),
+      getSeverity(eslint, "lib/example.ts", "functional/readonly-type"),
+    ]);
+
+    expect(severities).toEqual([2, 0, undefined]);
   });
 });
 

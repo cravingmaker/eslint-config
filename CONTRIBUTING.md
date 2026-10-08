@@ -150,11 +150,17 @@ consumers in `tests/package/` as well.
 - **Type information follows the type-aware scope.** Only
   `typescript/parser-type-aware` sets `projectService`, over
   `context.typeAware`, which stays within the files that
-  `typescript/parser` parses. A rule that needs type information crashes
-  the whole run in a file without it, with "You have used a rule which
-  requires type information", so a feature's type-aware block takes its
-  files from `narrowTypeAwareScope`, through `typeAwareConfig`, and never
-  from its own `files` alone.
+  `typescript/parser` parses and leaves out Svelte components. A rule
+  that needs type information crashes the whole run in a file without
+  it, with "You have used a rule which requires type information", so a
+  feature's type-aware block takes its files from `narrowTypeAwareScope`,
+  through `typeAwareConfig`, and never from its own `files` alone. The
+  scope is a list of `files` patterns, and a type-aware block has no
+  `ignores`: ESLint reads an ignore list in order, so a negated pattern
+  such as `!scripts/**` brings back files that the patterns before it
+  left out, also those of another list that it is appended to.
+  `withoutIgnores` turns each list of ignores into `files` patterns on
+  its own; use it for every list that limits such a block.
 - **TypeScript files outside the TypeScript feature do not parse.** The
   JavaScript and code-quality blocks match `.ts` files through
   `sourceFiles`, but only `typescript/parser` reads TypeScript. With

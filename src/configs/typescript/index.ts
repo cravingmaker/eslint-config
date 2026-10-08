@@ -60,12 +60,18 @@ async function typescript(
     ...(context.typeAware === undefined
       ? []
       : [
-          typeAwareConfig("typescript", context.typeAware, options, {
-            ...typeAwareReplacementRules,
-            ...typescriptTypeAwareRules,
-            ...overrides,
-            ...overridesTypeAware,
-          }),
+          // The scope stays within the feature's files and ignores, so they are not applied again.
+          typeAwareConfig(
+            "typescript",
+            context.typeAware,
+            {},
+            {
+              ...typeAwareReplacementRules,
+              ...typescriptTypeAwareRules,
+              ...overrides,
+              ...overridesTypeAware,
+            },
+          ),
         ]),
   ];
 }
