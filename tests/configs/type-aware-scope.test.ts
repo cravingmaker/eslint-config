@@ -1,6 +1,7 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
 
-import type { TypeScriptOptions } from "../../src/types.js";
+import type { Linter } from "eslint";
+import type { Rules, TypeScriptOptions } from "../../src/types.js";
 
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -10,7 +11,10 @@ import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { createConfig } from "../../src/factory.js";
-import { withoutIgnores } from "../../src/utilities/type-aware.js";
+import {
+  overridesWithoutTypeInformation,
+  withoutIgnores,
+} from "../../src/utilities/type-aware.js";
 
 type EffectiveConfig = {
   readonly languageOptions?: {
@@ -118,6 +122,23 @@ const typed: TypeInformation = {
   projectService: true,
   typeAwareRules: typeAwareRuleIds,
 };
+// `example/typed` stands for a rule that needs type information. The settings below turn a rule
+// off, or on, with the severity alone or first in an array.
+const exampleTypeAwareRuleIds = ["example/typed"];
+const turnedOff: ReadonlyArray<{ readonly entry: Linter.RuleEntry }> = [
+  { entry: "off" },
+  { entry: 0 },
+  { entry: ["off"] },
+  { entry: [0, { option: true }] },
+];
+const turnedOn: ReadonlyArray<{ readonly entry: Linter.RuleEntry }> = [
+  { entry: "warn" },
+  { entry: 1 },
+  { entry: "error" },
+  { entry: 2 },
+  { entry: ["warn"] },
+  { entry: [2, { option: true }] },
+];
 const untyped: TypeInformation = { projectService: false, typeAwareRules: [] };
 
 const projectDirectory = await mkdtemp(
@@ -262,6 +283,54 @@ describe("withoutIgnores", () => {
       ["src/**", "**/*.ts", "!**/generated/**"],
       ["src/**", "**/*.ts", "**/generated/keep.ts"],
     ]);
+  });
+});
+
+describe("overridesWithoutTypeInformation", () => {
+  it.each(turnedOff)(
+    "keeps the override $entry of a rule that needs type information, which turns it off",
+    ({ entry }) => {
+      const overrides = { "example/typed": entry };
+
+      expect(
+        overridesWithoutTypeInformation(overrides, exampleTypeAwareRuleIds),
+      ).toEqual(overrides);
+    },
+  );
+
+  it.each(turnedOn)(
+    "leaves out the override $entry of a rule that needs type information, which turns it on",
+    ({ entry }) => {
+      expect(
+        overridesWithoutTypeInformation(
+          { "example/typed": entry },
+          exampleTypeAwareRuleIds,
+        ),
+      ).toEqual({});
+    },
+  );
+
+  it("keeps settings that ESLint rejects, so that ESLint reports them", () => {
+    const overrides = { "example/typed": undefined };
+
+    // `toEqual` takes a property that is `undefined` for a missing one.
+    expect(
+      overridesWithoutTypeInformation(overrides, exampleTypeAwareRuleIds),
+    ).toStrictEqual(overrides);
+  });
+
+  it("keeps the overrides of the rules that need no type information", () => {
+    const plain: Rules = {
+      "example/other": "off",
+      "example/plain": ["error", { option: true }],
+    };
+
+    expect(
+      overridesWithoutTypeInformation(
+        { ...plain, "example/typed": "error" },
+        exampleTypeAwareRuleIds,
+      ),
+    ).toEqual(plain);
   });
 });
 

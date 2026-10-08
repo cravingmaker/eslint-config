@@ -87,4 +87,62 @@ describe("node feature", () => {
 
     expect(severities).toEqual([2, 0, undefined]);
   });
+
+  it("applies an override that turns n/no-sync on only where the rule needs no type information or has it", async () => {
+    const eslint = new ESLint({
+      overrideConfig: node(
+        { overrides: { "n/no-sync": ["error", { allowAtRootLevel: false }] } },
+        { ...typedContext, svelteComponents: svelteContext.svelteComponents },
+      ),
+      overrideConfigFile: true,
+    });
+    const [script, typed, declaration, component] = await Promise.all([
+      getRules(eslint, "src/example.js"),
+      getRules(eslint, "src/example.ts"),
+      getRules(eslint, "src/example.d.ts"),
+      getRules(eslint, "src/Component.svelte"),
+    ]);
+    // ESLint adds the default of `ignores` while the rule is on.
+    const overridden = [2, { allowAtRootLevel: false, ignores: [] }];
+
+    expect(script?.["n/no-sync"]).toEqual(overridden);
+    expect(typed?.["n/no-sync"]).toEqual(overridden);
+    expect(declaration?.["n/no-sync"]?.[0]).toBe(0);
+    expect(component?.["n/no-sync"]?.[0]).toBe(0);
+  });
+
+  it("does not apply such an override in TypeScript files and Svelte components without typed linting", async () => {
+    const eslint = new ESLint({
+      overrideConfig: node(
+        { overrides: { "n/no-sync": ["error", { allowAtRootLevel: false }] } },
+        svelteContext,
+      ),
+      overrideConfigFile: true,
+    });
+    const severities = await Promise.all([
+      getSeverity(eslint, "src/example.js", "n/no-sync"),
+      getSeverity(eslint, "src/example.ts", "n/no-sync"),
+      getSeverity(eslint, "src/Component.svelte", "n/no-sync"),
+    ]);
+
+    expect(severities).toEqual([2, 0, 0]);
+  });
+
+  it("applies an override that turns n/no-sync off in every file", async () => {
+    const eslint = new ESLint({
+      overrideConfig: node({ overrides: { "n/no-sync": "off" } }, typedContext),
+      overrideConfigFile: true,
+    });
+    const rules = await Promise.all([
+      getRules(eslint, "src/example.js"),
+      getRules(eslint, "src/example.ts"),
+      getRules(eslint, "src/example.d.ts"),
+    ]);
+
+    expect(rules.map((entries) => entries?.["n/no-sync"])).toEqual([
+      [0],
+      [0],
+      [0],
+    ]);
+  });
 });

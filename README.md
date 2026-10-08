@@ -112,10 +112,11 @@ export default createConfig({
 });
 ```
 
-Two things to keep in mind:
+Three things to keep in mind:
 
 - **Give each `files` pattern an extension,** such as `src/**/*.ts`. A pattern without one, such as `src/**`, also matches the JSON and Markdown files there, and ESLint stops with an error such as `The following rules do not support the language "json/json"`. `ignores` patterns need no extension.
 - **Override a rule in the feature that holds it:** a core rule in `javascript`, and a plugin's rule in the feature of that plugin, listed in [Features](#features). The blocks of each feature come after those of the features before it, so `javascript: { overrides: { "unicorn/no-null": "off" } }` changes nothing, while `unicorn: { overrides: { "unicorn/no-null": "off" } }` turns the rule off. To change a rule in some files only, use a [user config](#user-configs).
+- **An override of a rule that needs type information applies only where typed linting does.** Such a rule stops ESLint in a file without type information, so an override that turns it on, also one that only changes its options, applies in the files that [typed linting](#typed-linting) covers. In the other files of the feature the rule stays off, and so it does in every file while `typeChecked` is `false`. An override that turns such a rule off applies in every file. These rules are the ones of typescript-eslint and eslint-plugin-functional that need type information, and `n/no-sync`. `n/no-sync` needs it only in TypeScript files and Svelte components, so in JavaScript files an override of it applies as any other does.
 
 The options of every rule of the bundled plugins are typed and checked against their schemas. Any other rule ID is accepted, for plugins that a user config adds.
 
@@ -258,7 +259,7 @@ TypeScript files are parsed by typescript-eslint. By default, the parser reads n
 | `typeChecked`        | `false`                  | Lint with type information.                                                                                                                                                                    |
 | `filesTypeAware`     | The files of the feature | Files that the parser reads with type information and that get the rules that need it. They match only the TypeScript files that the feature lints, so a directory such as `src/**` is enough. |
 | `ignoresTypeAware`   | `[]`                     | Files to lint without type information, such as scripts that no tsconfig includes.                                                                                                             |
-| `overridesTypeAware` | `{}`                     | Rule settings applied after the rules that need type information.                                                                                                                              |
+| `overridesTypeAware` | `{}`                     | Rule settings for the files that typed linting covers, applied after the rules that need type information and after `overrides`.                                                               |
 | `tsconfigRootDir`    | `projectRootDirectory`   | The directory that holds the root `tsconfig.json`, for typescript-eslint and the TypeScript import resolver.                                                                                   |
 
 `files`, `ignores`, and `overrides` work as for every feature.
@@ -452,7 +453,7 @@ This version changes the options of 0.1.0 and several defaults. A lint run that 
 | `plugins`                                                    | A [user config](#user-configs) that registers the plugin                                                   |
 | `environments`, `globals`, `ignores`, `projectRootDirectory` | Unchanged                                                                                                  |
 
-In 0.1.0, `rules.js` applied to every rule in JavaScript files, and `rules.ts` to every rule in TypeScript files. Now each feature's `overrides` apply to its own rules in its own files: `javascript.overrides` to the core rules in JavaScript and TypeScript files, `unicorn.overrides` to the unicorn rules, and so on. An override that should apply to one language only needs a user config with `files`.
+In 0.1.0, `rules.js` applied to every rule in JavaScript files, and `rules.ts` to every rule in TypeScript files. Now each feature's `overrides` apply to its own rules in its own files: `javascript.overrides` to the core rules in JavaScript and TypeScript files, `unicorn.overrides` to the unicorn rules, and so on. An override that should apply to one language only needs a user config with `files`. An override of a rule that needs type information, which `rules.ts` could hold, applies only in the files that typed linting covers; see [Feature values](#feature-values).
 
 A config for 0.1.0:
 
