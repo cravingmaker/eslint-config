@@ -148,7 +148,7 @@ A source is a JavaScript or TypeScript file: `**/*.{js,mjs,jsx,mjsx,ts,mts,tsx,m
 
 The `json` feature lints three languages:
 
-- JSON: `**/*.json`, apart from `package.json` and `package-lock.json`.
+- JSON: `**/*.json`, apart from `package.json`, `package-lock.json`, and the JSONC files below.
 - JSONC: `**/*.jsonc`, `**/tsconfig*.json`, `**/.vscode/*.json`, and `**/.devcontainer/*.json`.
 - JSON5: `**/*.json5`.
 
