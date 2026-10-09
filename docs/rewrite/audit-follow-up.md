@@ -24,7 +24,7 @@ A step is in one of three states:
 
 - [x] **Step 5.** Separate the files of the JSON and JSONC blocks. Not blocked. [#81](https://github.com/cravingmaker/eslint-config/pull/81)
 
-- [ ] **Step 6.** Reject options that `createConfig` does not know. Not blocked.
+- [x] **Step 6.** Reject options that `createConfig` does not know. Not blocked. [#82](https://github.com/cravingmaker/eslint-config/pull/82)
 
 - [ ] **Step 7.** Resolve the root directories to absolute paths. Not blocked.
 
