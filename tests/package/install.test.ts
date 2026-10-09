@@ -12,6 +12,7 @@ import {
   createTemporaryDirectory,
   execute,
   getOutput,
+  runCommand,
 } from "./consumers.js";
 
 type LintResult = {
@@ -247,6 +248,41 @@ describe("a consumer without optional peers", () => {
       undeclared: [],
     });
   });
+
+  it("stops ESLint before it lints, with a message that names what replaces the options of 0.1.0", async () => {
+    await writeFile(
+      path.join(withoutPeers, "eslint.config.js"),
+      `import { createConfig } from "@cravingmaker/eslint-config";
+
+export default createConfig({
+  reactRefreshVariant: "vite",
+  rules: { js: { "no-console": "error" } },
+  tsTypeChecked: true,
+});
+`,
+    );
+    const { exitCode, stderr, stdout } = await runCommand(
+      process.execPath,
+      [
+        path.join(withoutPeers, "node_modules", "eslint", "bin", "eslint.js"),
+        "fixtures/format-date.js",
+      ],
+      withoutPeers,
+    );
+
+    // ESLint exits with 2 when it cannot load the config, and with 0 or 1 once it has linted.
+    expect(exitCode, stderr).toBe(2);
+    expect(stdout).toBe("");
+    expect(stderr).toContain(
+      [
+        "Error: createConfig() does not know these options:",
+        "- `reactRefreshVariant`: an option of 0.1.0, now `react.refresh`.",
+        "- `rules`: an option of 0.1.0, now the `overrides` of each feature: `javascript.overrides` for core rules, and the `overrides` of a plugin's feature for the plugin's rules.",
+        "- `tsTypeChecked`: an option of 0.1.0, now `typescript.typeChecked`.",
+        'See "Migrating from 0.1.0" in the README.',
+      ].join("\n"),
+    );
+  }, 120_000);
 
   it("compiles a TypeScript example of the options, and rejects invalid ones", async () => {
     await writeFile(

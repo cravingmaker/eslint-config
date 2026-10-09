@@ -27,24 +27,28 @@ import { unusedImports } from "./configs/unused-imports.js";
 import { createContext, detectFeatures } from "./context.js";
 import { resolveOptions } from "./options.js";
 import { overlapConfigs } from "./overlaps.js";
+import { rejectUnknownOptions } from "./unknown-options.js";
 
 /**
 Builds the ESLint flat config. Every feature is on unless it is `false`, except `react`,
 `svelte`, and `express`, which are on when the project declares them. Their plugins are optional
 peer dependencies: when one of these features is on and a peer it needs is not installed, the
-returned promise rejects with a message that names the package. The blocks come in a fixed
-order: global ignores, JavaScript and the code-quality plugins, TypeScript, frameworks, file
-formats, the rules that other features replace, and the rules that test and config files turn
-off, followed by `userConfigs` in the order given.
+returned promise rejects with a message that names the package. It also rejects, before
+anything else, when `options` or the options object of a feature has a key that is not an
+option, with a message that lists every such key. The blocks come in a fixed order: global
+ignores, JavaScript and the code-quality plugins, TypeScript, frameworks, file formats, the
+rules that other features replace, and the rules that test and config files turn off, followed
+by `userConfigs` in the order given.
 */
 async function createConfig(
   options: Options = {},
   // eslint-disable-next-line functional/functional-parameters, functional/prefer-immutable-types -- The public signature takes user configs as rest arguments of ESLint's mutable config type.
   ...userConfigs: Linter.Config[]
 ): Promise<Linter.Config[]> {
-  const context = await createContext(options);
+  const knownOptions = rejectUnknownOptions(options);
+  const context = await createContext(knownOptions);
   const resolved = resolveOptions(
-    options,
+    knownOptions,
     detectFeatures(context.dependencies),
   );
   const [typescriptConfigs, reactConfigs, svelteConfigs, expressConfigs] =
