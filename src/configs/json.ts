@@ -22,7 +22,11 @@ const jsonRules: Rules = {
 } as const;
 
 // Builds the flat config for JSON, JSONC, and JSON5 files. `files` and `overrides` apply to
-// JSON files; JSONC and JSON5 files have their own overrides.
+// JSON files; JSONC and JSON5 files have their own overrides. The JSON block leaves out the
+// files of the JSONC block, some of which its own patterns match: the JSONC block sets most
+// rules with a severity alone, which keeps the options that an earlier block gave them. The
+// patterns that the JSON block leaves out by itself come after `ignores`: ESLint reads an ignore
+// list in order, so a negated pattern brings back only what the patterns before it left out.
 function json({
   files = jsonFiles,
   ignores = [],
@@ -33,7 +37,7 @@ function json({
   return [
     {
       files: [...files],
-      ignores: [...jsonIgnores, ...ignores],
+      ignores: [...ignores, ...jsonIgnores, ...jsoncFiles],
       language: "json/json",
       name: "@cravingmaker/eslint-config/json/rules",
       plugins: { json: pluginJson },
