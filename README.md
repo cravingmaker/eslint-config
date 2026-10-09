@@ -72,7 +72,7 @@ export default createConfig({
 
 ## Options
 
-`createConfig(options, ...userConfigs)` takes one options object, whose properties are all optional, and any number of [user configs](#user-configs).
+`createConfig(options, ...userConfigs)` takes one options object, whose properties are all optional, and any number of [user configs](#user-configs). An option that it does not know is an error, at the top level and in the object of a feature: `createConfig()` rejects with a message that names every such option and the valid ones, and ESLint exits with code 2 before it lints anything.
 
 | Option                                                                                                                    | Default         | Description                                                                                                                                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -452,6 +452,8 @@ This version changes the options of 0.1.0 and several defaults. A lint run that 
 | `rules.packageJson`, `rules.markdown`                        | `packageJson.overrides`, `markdown.overrides`                                                              |
 | `plugins`                                                    | A [user config](#user-configs) that registers the plugin                                                   |
 | `environments`, `globals`, `ignores`, `projectRootDirectory` | Unchanged                                                                                                  |
+
+`createConfig()` rejects a config that still has `tsTypeChecked`, `tsconfigRootDir`, `reactRefreshVariant`, `rules`, or `plugins`, with a message that names what replaces each of them.
 
 In 0.1.0, `rules.js` applied to every rule in JavaScript files, and `rules.ts` to every rule in TypeScript files. Now each feature's `overrides` apply to its own rules in its own files: `javascript.overrides` to the core rules in JavaScript and TypeScript files, `unicorn.overrides` to the unicorn rules, and so on. An override that should apply to one language only needs a user config with `files`. An override of a rule that needs type information, which `rules.ts` could hold, applies only in the files that typed linting covers; see [Feature values](#feature-values).
 
