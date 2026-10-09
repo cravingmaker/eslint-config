@@ -22,7 +22,7 @@ A step is in one of three states:
 
 - [x] **Step 4.** Keep an overlap exemption inside the files that its override reaches. Blocked by step 2. [#80](https://github.com/cravingmaker/eslint-config/pull/80)
 
-- [ ] **Step 5.** Separate the files of the JSON and JSONC blocks. Not blocked.
+- [x] **Step 5.** Separate the files of the JSON and JSONC blocks. Not blocked. [#81](https://github.com/cravingmaker/eslint-config/pull/81)
 
 - [ ] **Step 6.** Reject options that `createConfig` does not know. Not blocked.
 
