@@ -306,8 +306,15 @@ const suggestionRules: Rules = {
 
   "no-plusplus": ["off", { allowForLoopAfterthoughts: false }],
   "no-restricted-exports": ["off", {}],
-  "no-restricted-globals": "off",
-  "no-restricted-imports": ["off", {}],
+  "no-restricted-globals": [
+    "error",
+    { message: "Use Uint8Array instead.", name: "Buffer" },
+  ],
+  "no-restricted-imports": [
+    "error",
+    { message: "Use Uint8Array instead.", name: "buffer" },
+    { message: "Use Uint8Array instead.", name: "node:buffer" },
+  ],
   "no-restricted-properties": "off",
   "no-restricted-syntax": "off",
   "no-ternary": "off",

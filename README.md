@@ -60,6 +60,8 @@ npx eslint .
 
 Every feature is on by default, apart from React, Svelte, and Express, which turn on when the `package.json` of the project declares them (see [Automatic detection](#automatic-detection)).
 
+For binary data, use `Uint8Array`. The defaults report the `Buffer` global, imports from `buffer` and `node:buffer`, and TypeScript `Buffer` types with "Use Uint8Array instead." Type annotations offer an editor suggestion to use `Uint8Array`.
+
 Only the built-in globals of ECMAScript are defined. In JavaScript files, `no-undef` therefore reports names such as `console`, `window`, and `process` until `environments` names the runtime. TypeScript files are not affected, because the compiler checks names there.
 
 ```js

@@ -13,7 +13,7 @@ linterOptions:
   reportUnusedDisableDirectives: 1
 settings:
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 941 (error 716, off 210, warn 15)
+rules: 941 (error 718, off 208, warn 15)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -83,7 +83,7 @@ rules: 941 (error 716, off 210, warn 15)
 @typescript-eslint/no-redeclare: off
 @typescript-eslint/no-redundant-type-constituents: off
 @typescript-eslint/no-require-imports: error [{"allow":[],"allowAsImport":false}]
-@typescript-eslint/no-restricted-types: off
+@typescript-eslint/no-restricted-types: error [{"types":{"Buffer":{"message":"Use Uint8Array instead.","suggest":["Uint8Array"]}}}]
 @typescript-eslint/no-shadow: error [{"allow":[],"builtinGlobals":false,"hoist":"functions-and-types","ignoreFunctionTypeParameterNameValueShadow":true,"ignoreOnInitialization":false,"ignoreTypeValueShadow":true}]
 @typescript-eslint/no-this-alias: error [{"allowDestructuring":true,"allowedNames":[]}]
 @typescript-eslint/no-unnecessary-boolean-literal-compare: off
@@ -288,7 +288,7 @@ n/no-unpublished-require: off
 n/no-unsupported-features/es-builtins: error
 n/no-unsupported-features/es-syntax: error
 n/no-unsupported-features/node-builtins: error
-n/prefer-global/buffer: error ["never"]
+n/prefer-global/buffer: off
 n/prefer-global/console: error
 n/prefer-global/crypto: error ["never"]
 n/prefer-global/process: error ["never"]
@@ -385,8 +385,8 @@ no-prototype-builtins: error
 no-redeclare: off [{"builtinGlobals":true}]
 no-regex-spaces: error
 no-restricted-exports: off [{}]
-no-restricted-globals: off
-no-restricted-imports: off [{}]
+no-restricted-globals: error [{"message":"Use Uint8Array instead.","name":"Buffer"}]
+no-restricted-imports: error [{"message":"Use Uint8Array instead.","name":"buffer"},{"message":"Use Uint8Array instead.","name":"node:buffer"}]
 no-restricted-properties: off
 no-restricted-syntax: off
 no-return-assign: error ["always"]

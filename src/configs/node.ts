@@ -16,7 +16,7 @@ import { narrowFiles, typeAwareConfig } from "../utilities/type-aware.js";
 const nodeRules: Rules = {
   ...enableAllRules("n", pluginNode.rules ?? {}),
 
-  "n/prefer-global/buffer": ["error", "never"],
+  "n/prefer-global/buffer": "off", // Buffer globals and imports are restricted in favor of Uint8Array
   "n/prefer-global/crypto": ["error", "never"],
   "n/prefer-global/process": ["error", "never"],
 
