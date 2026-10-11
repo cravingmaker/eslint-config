@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 326 (error 246, off 65, warn 15)
+rules: 326 (error 247, off 64, warn 15)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -115,7 +115,7 @@ n/no-unpublished-require: off
 n/no-unsupported-features/es-builtins: error
 n/no-unsupported-features/es-syntax: error
 n/no-unsupported-features/node-builtins: error
-n/prefer-global/buffer: error ["never"]
+n/prefer-global/buffer: off
 n/prefer-global/console: error
 n/prefer-global/crypto: error ["never"]
 n/prefer-global/process: error ["never"]
@@ -212,8 +212,8 @@ no-prototype-builtins: error
 no-redeclare: error [{"builtinGlobals":true}]
 no-regex-spaces: error
 no-restricted-exports: off [{}]
-no-restricted-globals: off
-no-restricted-imports: off [{}]
+no-restricted-globals: error [{"message":"Use Uint8Array instead.","name":"Buffer"}]
+no-restricted-imports: error [{"message":"Use Uint8Array instead.","name":"buffer"},{"message":"Use Uint8Array instead.","name":"node:buffer"}]
 no-restricted-properties: off
 no-restricted-syntax: off
 no-return-assign: error ["always"]

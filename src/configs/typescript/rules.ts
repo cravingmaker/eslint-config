@@ -293,7 +293,18 @@ const otherRules: Rules = {
       allowTypedFunctionExpressions: true,
     },
   ],
-  "@typescript-eslint/no-restricted-types": "off",
+  "@typescript-eslint/no-restricted-types": [
+    "error",
+    {
+      types: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention -- The key must match the restricted TypeScript type name
+        Buffer: {
+          message: "Use Uint8Array instead.",
+          suggest: ["Uint8Array"],
+        },
+      },
+    },
+  ],
   "@typescript-eslint/parameter-properties": "off",
 
   // 'init-declarations': 'off', //Uncomment this if @typescript-eslint/init-declarations is enabled

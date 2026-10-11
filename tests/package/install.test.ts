@@ -215,6 +215,45 @@ describe("the packed package", () => {
 });
 
 describe("a consumer without optional peers", () => {
+  it("reports Buffer globals, imports, and types from the installed package", async () => {
+    const output = await run(
+      withoutPeers,
+      String.raw`
+        import { ESLint } from "eslint";
+        import { createConfig } from "@cravingmaker/eslint-config";
+
+        const eslint = new ESLint({
+          overrideConfig: await createConfig({ environments: ["node"] }),
+          overrideConfigFile: true,
+        });
+        const cases = [
+          ["buffer-global.js", "export const bytes = Buffer.from('data');\n"],
+          ["buffer-import.js", "import { Buffer } from 'buffer';\nexport const bytes = Buffer.from('data');\n"],
+          ["buffer-import.ts", "import { Buffer } from 'node:buffer';\nexport const bytes = Buffer.from('data');\n"],
+          ["buffer-type.ts", "export type Bytes = Buffer;\n"],
+          ["uint8array.ts", "export const bytes = new Uint8Array([1, 2]);\n"],
+        ];
+        const rules = [];
+        for (const [filePath, code] of cases) {
+          const results = await eslint.lintText(code, { filePath });
+          if (await eslint.isPathIgnored(filePath) || results.some((result) => result.fatalErrorCount !== 0)) {
+            throw new Error(filePath + " was ignored or failed to parse");
+          }
+          rules.push(results.flatMap((result) => result.messages).map((message) => message.ruleId));
+        }
+        process.stdout.write(JSON.stringify(rules));
+      `,
+    );
+
+    expect(JSON.parse(output)).toEqual([
+      expect.arrayContaining(["no-restricted-globals"]),
+      expect.arrayContaining(["no-restricted-imports"]),
+      expect.arrayContaining(["no-restricted-imports"]),
+      expect.arrayContaining(["@typescript-eslint/no-restricted-types"]),
+      [],
+    ]);
+  });
+
   it("lints the fixtures that need no peer, the JSX component among them, without messages", async () => {
     expect(
       await lint(withoutPeers, defaultConfig, fixturesWithoutPeers),
