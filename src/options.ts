@@ -11,6 +11,7 @@ import type {
   TypeScriptOptions,
 } from "./types.js";
 
+import path from "node:path";
 import process from "node:process";
 
 import globalVariables from "globals";
@@ -110,12 +111,16 @@ function resolveGlobals(
 /**
 Applies the defaults to the options of `createConfig`. Every feature is on unless it is
 `false`, except `react`, `svelte`, and `express`, whose `"auto"` default follows `detection`.
+The project root becomes an absolute path: a relative one is resolved from the working
+directory, which is also its default.
 */
 function resolveOptions(
   options: Options = {},
   detection: Detection = undetected,
 ): ResolvedOptions {
-  const projectRootDirectory = options.projectRootDirectory ?? process.cwd();
+  const projectRootDirectory = path.resolve(
+    options.projectRootDirectory ?? process.cwd(),
+  );
   const svelte = resolveDetectedFeature(detection.svelte, options.svelte);
 
   return {
@@ -207,6 +212,11 @@ function resolveTypeAwareScope(
   );
   return withoutIgnores(narrowFiles(parsed, filesTypeAware), ignoresTypeAware);
 }
+/**
+Applies the defaults to the options of the TypeScript feature. typescript-eslint takes an
+absolute `tsconfigRootDir` only, so the tsconfig directory becomes an absolute path: a relative
+one is resolved from the working directory, as the project root is, and not from that root.
+*/
 function resolveTypeScript(
   projectRootDirectory: string,
   value: Feature<TypeScriptOptions> = true,
@@ -216,7 +226,9 @@ function resolveTypeScript(
 
   return {
     ...typescript,
-    tsconfigRootDir: typescript.tsconfigRootDir ?? projectRootDirectory,
+    tsconfigRootDir: path.resolve(
+      typescript.tsconfigRootDir ?? projectRootDirectory,
+    ),
     typeChecked: typescript.typeChecked ?? false,
   };
 }
