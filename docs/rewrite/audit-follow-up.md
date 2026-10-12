@@ -32,7 +32,7 @@ A step is in one of three states:
 
 - [x] **Step 9.** Make the rules that come back for an owner fit together. Blocked by decision D1. [#90](https://github.com/cravingmaker/eslint-config/pull/90)
 
-- [ ] **Step 10.** Settle what a feature's `files` means. Blocked by decision D2, and by steps 2 to 4.
+- [x] **Step 10.** Settle what a feature's `files` means. Blocked by decision D2, and by steps 2 to 4. [#91](https://github.com/cravingmaker/eslint-config/pull/91)
 
 - [ ] **Step 11.** Document the TypeScript range and two limits. Not blocked.
 
@@ -42,10 +42,10 @@ A step is in one of three states:
 
 The maintainer fills in the last column. Each option is described in the step that the decision blocks.
 
-| ID  | Question                                                                     | Recommended                                                            | Decision                                                                                     |
-| --- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| D1  | Which replaced rules come back when their owner is off or leaves a file out? | Option A of step 9: checks come back, sorting and style rules stay off | Option A: only the same checks come back, and `n/no-missing-import` in JavaScript files only |
-| D2  | Does a feature's `files` replace its default files or narrow them?           | Option A of step 10: narrow                                            | Open                                                                                         |
+| ID  | Question                                                                     | Recommended                                                            | Decision                                                                                                           |
+| --- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| D1  | Which replaced rules come back when their owner is off or leaves a file out? | Option A of step 9: checks come back, sorting and style rules stay off | Option A: only the same checks come back, and `n/no-missing-import` in JavaScript files only                       |
+| D2  | Does a feature's `files` replace its default files or narrow them?           | Option A of step 10: narrow                                            | Option A: `files` narrows, in every block of a feature: all three JSON languages and both parts of `react` as well |
 
 ## Rules for every step
 
