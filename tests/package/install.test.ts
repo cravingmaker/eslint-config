@@ -55,6 +55,15 @@ const defaultConfig = `import { createConfig } from "@cravingmaker/eslint-config
 
 export default createConfig();
 `;
+// A config that turns on the rule of React Refresh through the overrides of the React feature.
+const refreshOverrideConfig = `import { createConfig } from "@cravingmaker/eslint-config";
+
+export default createConfig({
+  react: {
+    overrides: { "react-refresh/only-export-components": "error" },
+  },
+});
+`;
 /*
 Configs with typed linting and a root directory that is a relative path, each by the option that
 has it. ESLint runs in the consumer, so `.` is the consumer and `fixtures` is the directory of
@@ -465,6 +474,16 @@ describe("a consumer with a partial peer set", () => {
     expect(await lint(withPartialPeers, defaultConfig, filePaths)).toEqual(
       withoutMessages(filePaths),
     );
+  }, 120_000);
+
+  // Without React Refresh, no block registers its plugin, which this consumer has not installed.
+  // ESLint stops when a rule is on in a file whose configuration lacks its plugin.
+  it("lints the React fixtures with an override of the React Refresh rule, which applies nowhere without React Refresh", async () => {
+    const filePaths = ["fixtures/react/Greeting.jsx", ...reactFixtures];
+
+    expect(
+      await lint(withPartialPeers, refreshOverrideConfig, filePaths),
+    ).toEqual(withoutMessages(filePaths));
   }, 120_000);
 
   it("fails with an install message for a missing peer, and with Node's message for a missing peer of a peer", async () => {

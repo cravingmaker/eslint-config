@@ -142,11 +142,14 @@ consumers in `tests/package/` as well.
 - **A rule that is on needs its plugin in every file it reaches.** ESLint
   rejects the configuration of a file where a rule is on but no block
   registers its plugin, with `Could not find plugin`; a rule that is only
-  `"off"` passes. A block that reaches more files than the blocks that
-  register its feature's other plugins must not spread all of the
-  feature's `overrides`, which is why `react/hooks` takes only the
-  `react-hooks/*` overrides. `calculateConfigForFile` shows the error, so
-  a test of the resolved configuration catches it.
+  `"off"` passes. A feature whose plugins are registered in different
+  blocks must therefore not spread all of its `overrides` into each of
+  them. A block can reach more files than the blocks of the other
+  plugins, as `react/hooks` does, and a block can be missing, as
+  `react/refresh` is while React Refresh is off. Each block of the React
+  feature takes only the overrides of its own plugin's rules, and
+  `react/html` also those of any other rule. `calculateConfigForFile`
+  shows the error, so a test of the resolved configuration catches it.
 - **Type information follows the type-aware scope.** Only
   `typescript/parser-type-aware` sets `projectService`, over
   `context.typeAware`, which stays within the files that

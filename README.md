@@ -201,7 +201,7 @@ The `react` feature has three parts:
 - **Hooks.** The Rules of Hooks, `exhaustive-deps`, and the React Compiler rules of eslint-plugin-react-hooks, in every source, because custom hooks live in `.js` and `.ts` files too. The compiler rules analyze functions named like a component, with a capital letter, or like a hook, with `use` and a capital letter or digit.
 - **React Refresh.** `react-refresh/only-export-components`, as a warning, in JSX and TSX files.
 
-`react.files` replaces the files of all three parts. Overrides of `react-hooks/*` rules apply wherever the hooks rules do, and other overrides where the other two parts do.
+`react.files` replaces the files of all three parts. Overrides of `react-hooks/*` rules apply wherever the hooks rules do, and other overrides where the other two parts do. While React Refresh is off, an override of a `react-refresh/*` rule applies nowhere, because its plugin is not loaded.
 
 `react.refresh` selects the React Refresh variant, which decides what a file may export next to its components:
 
