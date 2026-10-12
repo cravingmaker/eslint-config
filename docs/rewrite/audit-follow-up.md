@@ -30,7 +30,7 @@ A step is in one of three states:
 
 - [x] **Step 8.** Give each React override to the block that has its plugin. Not blocked. [#89](https://github.com/cravingmaker/eslint-config/pull/89)
 
-- [ ] **Step 9.** Make the rules that come back for an owner fit together. Blocked by decision D1.
+- [x] **Step 9.** Make the rules that come back for an owner fit together. Blocked by decision D1. [#90](https://github.com/cravingmaker/eslint-config/pull/90)
 
 - [ ] **Step 10.** Settle what a feature's `files` means. Blocked by decision D2, and by steps 2 to 4.
 
@@ -42,10 +42,10 @@ A step is in one of three states:
 
 The maintainer fills in the last column. Each option is described in the step that the decision blocks.
 
-| ID  | Question                                                                     | Recommended                                                            | Decision |
-| --- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------- |
-| D1  | Which replaced rules come back when their owner is off or leaves a file out? | Option A of step 9: checks come back, sorting and style rules stay off | Open     |
-| D2  | Does a feature's `files` replace its default files or narrow them?           | Option A of step 10: narrow                                            | Open     |
+| ID  | Question                                                                     | Recommended                                                            | Decision                                                                                     |
+| --- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| D1  | Which replaced rules come back when their owner is off or leaves a file out? | Option A of step 9: checks come back, sorting and style rules stay off | Option A: only the same checks come back, and `n/no-missing-import` in JavaScript files only |
+| D2  | Does a feature's `files` replace its default files or narrow them?           | Option A of step 10: narrow                                            | Open                                                                                         |
 
 ## Rules for every step
 
