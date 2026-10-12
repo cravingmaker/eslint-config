@@ -101,10 +101,19 @@ const refreshOptions = {
   RuleOptionOf<"react-refresh/only-export-components">
 >;
 
+// The overrides of the rules of one plugin, which are the ones that its block takes.
+function overridesOf(overrides: Readonly<Rules>, pluginName: string): Rules {
+  return Object.fromEntries(
+    Object.entries(overrides).filter(([ruleId]) =>
+      ruleId.startsWith(`${pluginName}/`),
+    ),
+  );
+}
 // Builds the flat config for React: one block for the @html-eslint React rules and one for React
 // Refresh, unless `refresh` is `false`, in files that can hold components, and one for the hooks
 // rules in every JavaScript and TypeScript source, where custom hooks also live. `files` replaces
-// both scopes. A missing plugin fails with a message that names it.
+// both scopes. Each block takes the overrides of its own plugin's rules, and the first one also
+// those of any other rule. A missing plugin fails with a message that names it.
 async function react({
   files,
   ignores = [],
@@ -129,11 +138,18 @@ async function react({
         ),
   ]);
   const scope = { files: [...(files ?? reactFiles)], ignores: [...ignores] };
-  // The hooks block takes only the overrides of hooks rules: ESLint rejects a rule that is on in a
-  // file whose configuration lacks its plugin, and the other overrides keep to component files.
-  const hooksOverrides = Object.fromEntries(
-    Object.entries(overrides).filter(([ruleId]) =>
-      ruleId.startsWith("react-hooks/"),
+  // ESLint rejects a rule that is on in a file whose configuration lacks its plugin, so the
+  // overrides of a plugin's rules go only to the block that registers it. The hooks block reaches
+  // modules without JSX, which have no other React plugin, and the React Refresh block is missing
+  // while React Refresh is off, so an override of its rule then applies nowhere. The overrides of
+  // any other rule keep to component files, in the first block.
+  const hooksOverrides = overridesOf(overrides, "react-hooks");
+  const refreshOverrides = overridesOf(overrides, "react-refresh");
+  const otherOverrides = Object.fromEntries(
+    Object.entries(overrides).filter(
+      ([ruleId]) =>
+        !Object.hasOwn(hooksOverrides, ruleId) &&
+        !Object.hasOwn(refreshOverrides, ruleId),
     ),
   );
 
@@ -145,7 +161,7 @@ async function react({
       rules: {
         ...enableAllRules("@html-eslint/react", htmlReact.default.rules ?? {}),
         ...htmlReactRules,
-        ...overrides,
+        ...otherOverrides,
       },
     },
     {
@@ -167,7 +183,7 @@ async function react({
             ...scope,
             name: "@cravingmaker/eslint-config/react/refresh",
             plugins: { "react-refresh": refreshModule.reactRefresh.plugin },
-            rules: { ...refreshRules(refresh), ...overrides },
+            rules: { ...refreshRules(refresh), ...refreshOverrides },
           },
         ]),
   ];
