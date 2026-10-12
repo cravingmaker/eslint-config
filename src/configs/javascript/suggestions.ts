@@ -336,7 +336,7 @@ const suggestionRules: Rules = {
   "prefer-named-capture-group": "off",
   "require-unicode-regexp": "off",
   "sort-imports": [
-    "error", // Off while perfectionist is on, see src/overlaps.ts
+    "off", // Covered by `perfectionist/sort-imports`, see src/overlaps.ts
     {
       allowSeparatedGroups: false,
       ignoreCase: false,
@@ -346,7 +346,7 @@ const suggestionRules: Rules = {
     },
   ],
   "sort-keys": [
-    "error", // Off while perfectionist is on, see src/overlaps.ts
+    "off", // Covered by `perfectionist/sort-objects`, see src/overlaps.ts
     "asc",
     {
       allowLineSeparatedGroups: false,
@@ -374,11 +374,10 @@ const suggestionRules: Rules = {
   ],
 
   curly: ["off", "all"], // Covered by `prettier`
+  "no-nested-ternary": "error", // Instead of `unicorn/no-nested-ternary`, whose parentheses Prettier removes
 
-  // Off while unicorn is on, see src/overlaps.ts
-  "no-negated-condition": "error",
-  "no-nested-ternary": "error",
-  "no-warning-comments": "error",
+  "no-negated-condition": "error", // Off while unicorn is on, see src/overlaps.ts
+  "no-warning-comments": "off", // Covered by `unicorn/expiring-todo-comments`, see src/overlaps.ts
 } as const;
 
 export { suggestionRules };

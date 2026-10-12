@@ -331,19 +331,20 @@ export default createConfig({
 
 ## Rules that replace other rules
 
-Some plugins check what another plugin's rule also checks. For each such pair, one feature owns the check: while the owner is on, the rule it replaces is off in the files that both features lint.
+Some plugins check what another plugin's rule also checks. For each such pair, one feature owns the check: while the owner is on, the rule it replaces is off in the files that both features lint. Where the owner does not lint, a replaced rule comes back only if it makes the same check as the owner's rule, so that turning the owner off does not change which code passes. A style rule asks for something else, such as another order of the imports, and is always off.
 
-| Owner           | Replaced rules                                                                                                                                           |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import`                                                    |
-| `perfectionist` | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/adjacent-overload-signatures`, `@typescript-eslint/member-ordering` |
-| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                                                                              |
-| `unicorn`       | `no-negated-condition`, `no-warning-comments`, `n/no-process-exit`, `n/prefer-node-protocol`                                                             |
-| `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                                                                    |
+| Owner           | Replaced checks                                                                                       | Replaced style rules                                                                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import` |                                                                                                                                                          |
+| `perfectionist` |                                                                                                       | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/adjacent-overload-signatures`, `@typescript-eslint/member-ordering` |
+| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                           |                                                                                                                                                          |
+| `unicorn`       | `no-negated-condition`, `n/no-process-exit`, `n/prefer-node-protocol`                                 | `no-warning-comments`                                                                                                                                    |
+| `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                 |                                                                                                                                                          |
 
-- Turning the owner off turns the rules it replaces back on.
-- Limiting the owner with `files` or `ignores` turns them back on outside the owner's files.
-- Setting a replaced rule in the overrides of the feature that holds it keeps it on, as `node: { overrides: { "n/no-process-exit": "error" } }` does. For `typescript`, that includes `overridesTypeAware` in the files that [typed linting](#typed-linting) covers. Outside them, a rule that only `overridesTypeAware` sets is still replaced.
+- Turning the owner off turns the checks it replaces back on. The style rules stay off: without `perfectionist`, nothing checks the order of imports or object keys, and without `unicorn`, nothing reports a to-do comment.
+- Limiting the owner with `files` or `ignores` turns the checks back on outside the owner's files. The style rules stay off there too.
+- `n/no-missing-import` comes back in JavaScript files only. It does not resolve imports as TypeScript does, so it is off in TypeScript files and Svelte components, where the compiler reports a missing module.
+- Setting a replaced rule in the overrides of the feature that holds it turns it on, also where its owner lints, as `node: { overrides: { "n/no-process-exit": "error" } }` does. For `n/no-missing-import`, that includes TypeScript files and Svelte components. For `typescript`, that includes `overridesTypeAware` in the files that [typed linting](#typed-linting) covers. Outside them, a rule that only `overridesTypeAware` sets is still replaced.
 
 ## File-role exceptions
 

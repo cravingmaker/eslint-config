@@ -22,7 +22,7 @@ The rewrite restructured the package after 0.1.0: one 587-line `src/index.ts` be
 | `plugins`                    | Removed. Extra plugins go in `userConfigs`, where they can be scoped with `files`                                 |
 | CommonJS                     | Not supported. `.cjs` and `.cts` files get no rules                                                               |
 | Composition                  | `Promise<Linter.Config[]>` built from native flat configs, without a composer class                               |
-| Rule overlap between plugins | One table, `src/overlaps.ts`, applied by the factory only while the owning feature is on                          |
+| Rule overlap between plugins | One table, `src/overlaps.ts`: replaced checks are off only while their owner is on, replaced style rules always   |
 | New upstream rules           | The effective-policy snapshots are the review gate. `enableAllRules` turns on every rule of most plugins          |
 | File-role exceptions         | A dedicated module, `configs/exceptions.ts`, added to only with evidence                                          |
 | Rule option typing           | Generated with `eslint-typegen` into `src/typegen.d.ts`, which is not committed                                   |

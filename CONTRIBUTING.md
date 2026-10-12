@@ -150,6 +150,15 @@ consumers in `tests/package/` as well.
   feature takes only the overrides of its own plugin's rules, and
   `react/html` also those of any other rule. `calculateConfigForFile`
   shows the error, so a test of the resolved configuration catches it.
+- **A replaced rule comes back only as the same check.**
+  `src/overlaps.ts` lists the rules that another feature's rules replace,
+  in two parts. A rule under `checks` is on in its rule map, and the
+  factory turns it off where its owner lints, so it comes back while the
+  owner is off and in the files that the owner leaves out. It must accept
+  what the owner's rule accepts: `tests/policy/fixtures.test.ts` lints
+  the fixtures with each owner off. A rule that asks for something else,
+  such as another order of the imports, goes under `style` and is `"off"`
+  in its rule map.
 - **Type information follows the type-aware scope.** Only
   `typescript/parser-type-aware` sets `projectService`, over
   `context.typeAware`, which stays within the files that
