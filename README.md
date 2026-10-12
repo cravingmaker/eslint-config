@@ -78,7 +78,7 @@ export default createConfig({
 
 | Option                                                                                                                    | Default         | Description                                                                                                                                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `projectRootDirectory`                                                                                                    | `process.cwd()` | The directory whose `package.json` decides the `"auto"` features. It is also the default of `typescript.tsconfigRootDir`.                                                                   |
+| `projectRootDirectory`                                                                                                    | `process.cwd()` | The directory whose `package.json` decides the `"auto"` features. It is also the default of `typescript.tsconfigRootDir`. A relative path is resolved from the working directory.           |
 | `ignores`                                                                                                                 | `[]`            | Patterns of files that no feature lints, in addition to `**/dist/`, `**/build/`, and `**/coverage/`.                                                                                        |
 | `environments`                                                                                                            | `[]`            | Runtimes whose globals are defined in JavaScript, TypeScript, and Svelte files, named as in the [globals](https://www.npmjs.com/package/globals) package: `"browser"`, `"node"`, and so on. |
 | `globals`                                                                                                                 | `{}`            | More globals, or changes to those of `environments`, such as `{ MY_GLOBAL: "readonly" }`.                                                                                                   |
@@ -256,13 +256,13 @@ The `express` feature turns on nine rules of eslint-plugin-express-security, suc
 
 TypeScript files are parsed by typescript-eslint. By default, the parser reads no type information, and the rules that need it are off.
 
-| Option               | Default                  | Description                                                                                                                                                                                    |
-| -------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `typeChecked`        | `false`                  | Lint with type information.                                                                                                                                                                    |
-| `filesTypeAware`     | The files of the feature | Files that the parser reads with type information and that get the rules that need it. They match only the TypeScript files that the feature lints, so a directory such as `src/**` is enough. |
-| `ignoresTypeAware`   | `[]`                     | Files to lint without type information, such as scripts that no tsconfig includes.                                                                                                             |
-| `overridesTypeAware` | `{}`                     | Rule settings for the files that typed linting covers, applied after the rules that need type information and after `overrides`.                                                               |
-| `tsconfigRootDir`    | `projectRootDirectory`   | The directory that holds the root `tsconfig.json`, for typescript-eslint and the TypeScript import resolver.                                                                                   |
+| Option               | Default                  | Description                                                                                                                                                                                           |
+| -------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `typeChecked`        | `false`                  | Lint with type information.                                                                                                                                                                           |
+| `filesTypeAware`     | The files of the feature | Files that the parser reads with type information and that get the rules that need it. They match only the TypeScript files that the feature lints, so a directory such as `src/**` is enough.        |
+| `ignoresTypeAware`   | `[]`                     | Files to lint without type information, such as scripts that no tsconfig includes.                                                                                                                    |
+| `overridesTypeAware` | `{}`                     | Rule settings for the files that typed linting covers, applied after the rules that need type information and after `overrides`.                                                                      |
+| `tsconfigRootDir`    | `projectRootDirectory`   | The directory that holds the root `tsconfig.json`, for typescript-eslint and the TypeScript import resolver. A relative path is resolved from the working directory, not from `projectRootDirectory`. |
 
 `files`, `ignores`, and `overrides` work as for every feature.
 
@@ -393,7 +393,7 @@ To add a plugin, import it in `eslint.config.js` and pass a config object that r
 
 ## Monorepos
 
-`projectRootDirectory` decides which `package.json` turns on the frameworks, and it is the default `tsconfigRootDir`. Its default is the working directory of ESLint, which can differ between the command line and an editor. `import.meta.dirname` ties it to the directory of the config file instead.
+`projectRootDirectory` decides which `package.json` turns on the frameworks, and it is the default `tsconfigRootDir`. Its default is the working directory of ESLint, which can differ between the command line and an editor, and a relative path is resolved from it. `import.meta.dirname` ties it to the directory of the config file instead.
 
 With one config at the root of a monorepo, a framework that only a workspace declares is not detected. Turn it on and limit it to that workspace with `files`:
 

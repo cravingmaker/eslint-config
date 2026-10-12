@@ -26,7 +26,7 @@ A step is in one of three states:
 
 - [x] **Step 6.** Reject options that `createConfig` does not know. Not blocked. [#82](https://github.com/cravingmaker/eslint-config/pull/82)
 
-- [ ] **Step 7.** Resolve the root directories to absolute paths. Not blocked.
+- [x] **Step 7.** Resolve the root directories to absolute paths. Not blocked. [#88](https://github.com/cravingmaker/eslint-config/pull/88)
 
 - [ ] **Step 8.** Give each React override to the block that has its plugin. Not blocked.
 

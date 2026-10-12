@@ -15,7 +15,7 @@ type Context = {
   */
   readonly globals: Readonly<Linter.Globals>;
   /**
-  The directory that holds the consumer's `package.json`.
+  The directory that holds the consumer's `package.json`, as an absolute path.
   */
   readonly projectRootDirectory: string;
   /**
@@ -25,7 +25,8 @@ type Context = {
   */
   readonly svelteComponents: ReadonlyArray<string | readonly string[]>;
   /**
-  The directory that holds `tsconfig.json`: `typescript.tsconfigRootDir`, or the project root.
+  The directory that holds `tsconfig.json`, as an absolute path: `typescript.tsconfigRootDir`, or
+  the project root.
   */
   readonly tsconfigRootDir: string;
   /**
@@ -109,7 +110,7 @@ type Options = {
   /**
   The directory that holds the consumer's `package.json`, whose `dependencies`,
   `devDependencies`, and `peerDependencies` decide the `"auto"` features. Defaults to
-  `process.cwd()`.
+  `process.cwd()`. A relative path is resolved from the working directory.
   */
   readonly projectRootDirectory?: string;
   readonly promise?: Feature;
@@ -188,7 +189,8 @@ type TypeScriptOptions = FeatureOptions & {
   */
   readonly overridesTypeAware?: Rules;
   /**
-  The directory that holds `tsconfig.json`. Defaults to `projectRootDirectory`.
+  The directory that holds `tsconfig.json`. Defaults to `projectRootDirectory`. A relative path
+  is resolved from the working directory, not from `projectRootDirectory`.
   */
   readonly tsconfigRootDir?: string;
   /**

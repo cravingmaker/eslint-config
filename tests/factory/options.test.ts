@@ -1,3 +1,4 @@
+import path from "node:path";
 import process from "node:process";
 
 import globalVariables from "globals";
@@ -28,6 +29,14 @@ const allDetected = {
   reactRefresh: "vite",
   svelte: true,
 } as const;
+// Relative paths, each with the segments that lead to it from the working directory.
+const relativeDirectories: ReadonlyArray<
+  readonly [relative: string, segments: readonly string[]]
+> = [
+  [".", []],
+  ["packages/api", ["packages", "api"]],
+  ["../sibling", ["..", "sibling"]],
+];
 
 describe("resolveOptions", () => {
   it.each(featuresOnByDefault)("turns %s on by default", (feature) => {
@@ -111,6 +120,53 @@ describe("resolveOptions", () => {
       typeChecked: false,
     });
     expect(resolved.typeAware).toBeUndefined();
+  });
+
+  // typescript-eslint takes an absolute `tsconfigRootDir` only, so both directories are resolved.
+  it.each(relativeDirectories)(
+    "resolves the relative project root %j from the working directory",
+    (relative, segments) => {
+      const absolute = path.join(process.cwd(), ...segments);
+      const resolved = resolveOptions({ projectRootDirectory: relative });
+
+      expect(resolved.projectRootDirectory).toBe(absolute);
+      // The tsconfig directory defaults to the project root as it is resolved.
+      expect(resolved.typescript?.tsconfigRootDir).toBe(absolute);
+    },
+  );
+
+  it.each(relativeDirectories)(
+    "resolves the relative tsconfig directory %j from the working directory",
+    (relative, segments) => {
+      // A relative tsconfig directory does not start from the project root, which is elsewhere.
+      const projectRootDirectory = path.join(process.cwd(), "projects", "app");
+      const resolved = resolveOptions({
+        projectRootDirectory,
+        typescript: { tsconfigRootDir: relative },
+      });
+
+      expect(resolved.typescript?.tsconfigRootDir).toBe(
+        path.join(process.cwd(), ...segments),
+      );
+      expect(resolved.projectRootDirectory).toBe(projectRootDirectory);
+    },
+  );
+
+  it("keeps absolute root directories as they are", () => {
+    // Outside the working directory, on any system.
+    const projectRootDirectory = path.join(
+      path.parse(process.cwd()).root,
+      "project",
+    );
+    const tsconfigRootDir = path.join(projectRootDirectory, "packages", "api");
+
+    expect(resolveOptions({ projectRootDirectory })).toMatchObject({
+      projectRootDirectory,
+      typescript: { tsconfigRootDir: projectRootDirectory },
+    });
+    expect(
+      resolveOptions({ projectRootDirectory, typescript: { tsconfigRootDir } }),
+    ).toMatchObject({ projectRootDirectory, typescript: { tsconfigRootDir } });
   });
 
   it("scopes type-aware rules to TypeScript files when type checking is on", () => {
