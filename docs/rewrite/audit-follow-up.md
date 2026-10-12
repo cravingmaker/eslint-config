@@ -28,7 +28,7 @@ A step is in one of three states:
 
 - [x] **Step 7.** Resolve the root directories to absolute paths. Not blocked. [#88](https://github.com/cravingmaker/eslint-config/pull/88)
 
-- [ ] **Step 8.** Give each React override to the block that has its plugin. Not blocked.
+- [x] **Step 8.** Give each React override to the block that has its plugin. Not blocked. [#89](https://github.com/cravingmaker/eslint-config/pull/89)
 
 - [ ] **Step 9.** Make the rules that come back for an owner fit together. Blocked by decision D1.
 
