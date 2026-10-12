@@ -6,6 +6,7 @@ import pluginPromise from "eslint-plugin-promise";
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-promise.
 const promiseRules: Rules = {
@@ -37,9 +38,10 @@ function promise(
       },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/promise/rules",
       rules: { ...promiseRules, ...overrides },

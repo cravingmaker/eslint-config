@@ -3,7 +3,7 @@
 import type { Linter } from "eslint";
 import type { Feature, Options } from "../../src/types.js";
 
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
@@ -192,10 +192,44 @@ const features = [
 }>;
 // The features whose default is `"auto"`.
 const autoFeatures = new Set<ToggledFeature>(["express", "react", "svelte"]);
+// Every feature, `javascript` among them, which is always on.
+const scopedFeatures = [
+  { feature: "javascript", fileNames: ["example.js"], ruleId: "eqeqeq" },
+  ...features,
+] as const;
+/*
+The files of a project under `app/`: one of each type that a feature lints, and a CommonJS file,
+which no feature lints. A directory pattern such as `app/**` matches them all.
+*/
+const appFiles = {
+  "app/Component.svelte":
+    '<script lang="ts">\n  let count: number = $state(0);\n</script>\n\n<button onclick={() => count++}>{count}</button>\n',
+  "app/Component.tsx":
+    "export function Component() {\n  return <p>example</p>;\n}\n",
+  "app/data.json": '{ "name": "example" }\n',
+  "app/data.json5": "{ name: 'example' }\n",
+  "app/example.cjs": "module.exports = {};\n",
+  "app/example.js": "export const example = 1;\n",
+  "app/example.ts": "export const example: number = 1;\n",
+  "app/index.html":
+    '<!doctype html>\n<html lang="en">\n  <head>\n    <title>Example</title>\n  </head>\n  <body></body>\n</html>\n',
+  "app/package.json": JSON.stringify({
+    name: "app",
+    private: true,
+    type: "module",
+  }),
+  "app/README.md": "# Example\n\nSome text.\n",
+  "app/settings.jsonc": '{\n  // A comment\n  "name": "example"\n}\n',
+  "app/state.svelte.ts": "export const state = $state({ count: 0 });\n",
+} as const;
+const appPaths = Object.keys(appFiles);
 
-const temporaryDirectory = await mkdtemp(
+const createdDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-feature-toggles-"),
 );
+// ESLint names the files that it lints by their real paths, and the temporary directory can be a
+// symbolic link, as it is on macOS.
+const temporaryDirectory = await realpath(createdDirectory);
 /*
 Project roots for the `"auto"` default: one whose manifest declares every framework, and one whose
 manifest declares none. Every optional peer is installed in this repository, so the second shows
@@ -207,6 +241,36 @@ const declaredRoot = await createProject("declared", [
   "svelte",
 ]);
 const undeclaredRoot = await createProject("undeclared", []);
+/*
+The project of `appFiles`. Its manifest declares every framework, and Vite, so every feature is on
+by default there, React Refresh included. Its tsconfig includes `app/`, for the features that are
+checked with typed linting.
+*/
+const scopedRoot = await createProject("scoped", [
+  "express",
+  "react",
+  "svelte",
+  "vite",
+]);
+await Promise.all(
+  Object.entries({
+    ...appFiles,
+    "tsconfig.json": JSON.stringify({
+      compilerOptions: {
+        jsx: "preserve",
+        module: "nodenext",
+        noEmit: true,
+        strict: true,
+        target: "es2024",
+      },
+      include: ["app"],
+    }),
+  }).map(async ([fileName, content]) => {
+    const filePath = path.join(scopedRoot, fileName);
+    await mkdir(path.dirname(filePath), { recursive: true });
+    await writeFile(filePath, content, "utf8");
+  }),
+);
 
 function createEslint(configs: readonly Linter.Config[]): ESLint {
   return new ESLint({ overrideConfig: [...configs], overrideConfigFile: true });
@@ -228,6 +292,17 @@ async function createProject(
   );
   return directory;
 }
+// ESLint for the scoped project with `options`, which runs there and reads its manifest.
+async function createScopedEslint(options: Options): Promise<ESLint> {
+  return new ESLint({
+    cwd: scopedRoot,
+    overrideConfig: await createConfig({
+      ...options,
+      projectRootDirectory: scopedRoot,
+    }),
+    overrideConfigFile: true,
+  });
+}
 /*
 The configuration that ESLint resolves for `filePath`, as reviewable text without the plugins
 line: setup blocks register their plugins for every file, whatever the feature's files are.
@@ -242,6 +317,15 @@ async function describeFile(eslint: ESLint, filePath: string): Promise<string> {
     .split("\n")
     .filter((line) => !line.startsWith("plugins: "))
     .join("\n");
+}
+// The description of each of `filePaths`, in their order.
+async function describeFiles(
+  eslint: ESLint,
+  filePaths: readonly string[],
+): Promise<readonly string[]> {
+  return await Promise.all(
+    filePaths.map(async (filePath) => await describeFile(eslint, filePath)),
+  );
 }
 // The feature segment of each block name, without repeats.
 function getFeatureNames(configs: readonly Linter.Config[]): readonly string[] {
@@ -268,11 +352,17 @@ async function getSeverity(
 // `options` with `feature` set to `value`.
 function withFeature(
   options: Options,
-  feature: ToggledFeature,
+  feature: ToggledFeature | "javascript",
   value: Feature | "auto" | undefined,
 ): Options {
   return { ...options, [feature]: value };
 }
+
+// How ESLint resolves each file of `app/` with the defaults, without and with typed linting.
+const defaultDescriptions = {
+  typed: await describeFiles(await createScopedEslint(typedOptions), appPaths),
+  untyped: await describeFiles(await createScopedEslint(baseOptions), appPaths),
+};
 
 describe.each(features)(
   "$feature feature",
@@ -352,6 +442,69 @@ describe.each(features)(
 afterAll(async () => {
   await rm(temporaryDirectory, { force: true, recursive: true });
 });
+
+/*
+`files` limits a feature to the files among its default files that match one of its patterns. A
+directory is such a pattern, and it also matches the files there that the feature does not lint:
+those of other languages, which its rules cannot read, and CommonJS files.
+*/
+describe.each(scopedFeatures)(
+  "$feature feature with a directory as its files",
+  ({ feature, fileNames, ruleId, ...settings }) => {
+    const isTyped = "typed" in settings;
+    const [fileName] = fileNames;
+    // One instance for the three tests: ESLint keeps what it resolves for a file.
+    const scoped = createScopedEslint(
+      withFeature(isTyped ? typedOptions : baseOptions, feature, {
+        files: ["app/**"],
+      }),
+    );
+
+    // So a JSON or Markdown file there gets none of its rules, a Svelte component keeps those
+    // that it has by default, and each file is still linted by the feature for its own type.
+    it("lints the files there as with its default files, whatever their type", async () => {
+      expect(await describeFiles(await scoped, appPaths)).toEqual(
+        isTyped ? defaultDescriptions.typed : defaultDescriptions.untyped,
+      );
+    });
+
+    it("has its rules on there, and not outside", async () => {
+      const eslint = await scoped;
+
+      expect(await getSeverity(eslint, `app/${fileName}`, ruleId)).toBeOneOf([
+        1, 2,
+      ]);
+      expect(
+        await getSeverity(eslint, `lib/${fileName}`, ruleId),
+      ).toBeUndefined();
+    });
+
+    // A rule that cannot read a file's language stops ESLint for every file, and a resolved
+    // configuration does not show that, so the files are linted.
+    it("lints every file there without an error", async () => {
+      const eslint = await scoped;
+      const results = await eslint.lintFiles(["app"]);
+
+      expect(
+        new Set(
+          results.map(({ filePath }) =>
+            path.relative(scopedRoot, filePath).replaceAll(path.sep, "/"),
+          ),
+        ),
+      ).toEqual(new Set(appPaths));
+      expect(
+        results.flatMap(({ filePath, messages }) =>
+          messages
+            .filter(({ fatal }) => fatal === true)
+            .map(
+              ({ message }) =>
+                `${path.relative(scopedRoot, filePath)}: ${message}`,
+            ),
+        ),
+      ).toEqual([]);
+    });
+  },
+);
 
 describe.each(features.filter(({ feature }) => autoFeatures.has(feature)))(
   "$feature feature with auto",
@@ -436,21 +589,23 @@ describe("javascript feature", () => {
 });
 
 describe("json feature", () => {
-  it("applies files to JSON files, and ignores to every JSON language", async () => {
+  it("applies files and ignores to every JSON language", async () => {
     const eslint = createEslint(
       await createConfig({
         ...baseOptions,
-        json: { files: ["app/**/*.json"], ignores: featureIgnores },
+        json: { files: ["app/**"], ignores: featureIgnores },
       }),
     );
     const expected = {
       "app/data.json": 2,
+      "app/data.json5": 2,
+      "app/data.jsonc": 2,
       "app/generated/data.json": undefined,
       "app/generated/data.json5": undefined,
       "app/generated/data.jsonc": undefined,
       "lib/data.json": undefined,
-      "lib/data.json5": 2,
-      "lib/data.jsonc": 2,
+      "lib/data.json5": undefined,
+      "lib/data.jsonc": undefined,
     };
 
     const severities = await Promise.all(
@@ -463,5 +618,37 @@ describe("json feature", () => {
     );
 
     expect(Object.fromEntries(severities)).toEqual(expected);
+  });
+});
+
+describe("the files of a feature", () => {
+  it("cannot add a file type: a pattern outside its default files matches nothing", async () => {
+    const eslint = createEslint(
+      await createConfig({
+        ...baseOptions,
+        javascript: { files: ["**/*.{js,cjs}"] },
+        json: { files: ["**/*.json", "**/.babelrc"] },
+        markdown: { files: ["**/*.md", "**/*.markdown"] },
+      }),
+    );
+    // Each feature with a file of its default files, a file that only its `files` name, and one
+    // of its rules.
+    const cases = [
+      ["data.json", ".babelrc", "json/no-duplicate-keys"],
+      ["README.md", "notes.markdown", "markdown/no-bare-urls"],
+      ["src/example.js", "src/example.cjs", "eqeqeq"],
+    ] as const;
+
+    const severities = await Promise.all(
+      cases.map(
+        async ([defaultFile, addedFile, ruleId]) =>
+          await Promise.all([
+            getSeverity(eslint, defaultFile, ruleId),
+            getSeverity(eslint, addedFile, ruleId),
+          ]),
+      ),
+    );
+
+    expect(severities).toEqual(cases.map(() => [2, undefined]));
   });
 });

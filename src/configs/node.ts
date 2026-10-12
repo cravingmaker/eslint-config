@@ -77,9 +77,10 @@ function node(
       plugins: { n: pluginNode },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/node/rules",
       rules: { ...nodeRules, ...overrides },

@@ -153,9 +153,10 @@ function imports(
       plugins: { "import-x": pluginImportX },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/imports/rules",
       rules: { ...importsRules, ...overrides },

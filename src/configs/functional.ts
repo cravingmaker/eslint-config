@@ -7,6 +7,7 @@ import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { disableConfigRules, enableAllRules } from "../utilities/all-rules.js";
 import {
+  narrowFiles,
   overridesWithoutTypeInformation,
   typeAwareConfig,
 } from "../utilities/type-aware.js";
@@ -123,9 +124,10 @@ function functional(
       plugins: { functional: pluginFunctional },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/functional/rules",
       rules: {

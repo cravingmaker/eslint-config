@@ -12,6 +12,7 @@ import type {
 import { reactFiles, sourceFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 import { importPeer } from "../utilities/import-peer.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 type ReactFeatureOptions = FeatureOptions & {
   /**
@@ -111,9 +112,10 @@ function overridesOf(overrides: Readonly<Rules>, pluginName: string): Rules {
 }
 // Builds the flat config for React: one block for the @html-eslint React rules and one for React
 // Refresh, unless `refresh` is `false`, in files that can hold components, and one for the hooks
-// rules in every JavaScript and TypeScript source, where custom hooks also live. `files` replaces
-// both scopes. Each block takes the overrides of its own plugin's rules, and the first one also
-// those of any other rule. A missing plugin fails with a message that names it.
+// rules in every JavaScript and TypeScript source, where custom hooks also live. `files` limits
+// each of the two scopes to the files in it that match one of its patterns. Each block takes the
+// overrides of its own plugin's rules, and the first one also those of any other rule. A missing
+// plugin fails with a message that names it.
 async function react({
   files,
   ignores = [],
@@ -137,7 +139,10 @@ async function react({
           "refresh",
         ),
   ]);
-  const scope = { files: [...(files ?? reactFiles)], ignores: [...ignores] };
+  const scope = {
+    files: narrowFiles(reactFiles, files),
+    ignores: [...ignores],
+  };
   // ESLint rejects a rule that is on in a file whose configuration lacks its plugin, so the
   // overrides of a plugin's rules go only to the block that registers it. The hooks block reaches
   // modules without JSX, which have no other React plugin, and the React Refresh block is missing
@@ -165,7 +170,7 @@ async function react({
       },
     },
     {
-      files: [...(files ?? sourceFiles)],
+      files: narrowFiles(sourceFiles, files),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/react/hooks",
       plugins: {

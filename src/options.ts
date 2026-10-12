@@ -188,10 +188,10 @@ function resolveSvelteComponents(
 }
 /**
 Resolves the files that the parser reads with type information and that get type-aware rules:
-`filesTypeAware` without `ignoresTypeAware`, within the files that the TypeScript feature
-parses, because type information needs its parser, and without Svelte components, whose parser
-reads none, whatever `files` names. Each list of ignores is applied on its own, so a negated
-pattern brings back only what its own list left out.
+`filesTypeAware` without `ignoresTypeAware`, within the TypeScript sources that the TypeScript
+feature parses, because type information needs its parser, and without Svelte components, whose
+parser reads none, whatever `files` names. Each list of ignores is applied on its own, so a
+negated pattern brings back only what its own list left out.
 */
 function resolveTypeAwareScope(
   value: Feature<TypeScriptOptions> = true,
@@ -200,14 +200,15 @@ function resolveTypeAwareScope(
   if (typescript?.typeChecked !== true) return undefined;
 
   const {
-    files = typescriptFiles,
+    files,
     filesTypeAware,
     ignores = [],
     ignoresTypeAware = [],
   } = typescript;
-  // The files that typescript-eslint parses itself: those of the feature, without components.
+  // The files that typescript-eslint parses itself: the TypeScript sources among the files of
+  // the feature, without components.
   const parsed = withoutIgnores(
-    withoutIgnores(files, svelteComponentFiles),
+    withoutIgnores(narrowFiles(typescriptFiles, files), svelteComponentFiles),
     ignores,
   );
   return withoutIgnores(narrowFiles(parsed, filesTypeAware), ignoresTypeAware);

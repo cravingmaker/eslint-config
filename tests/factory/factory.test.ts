@@ -281,6 +281,35 @@ describe("createConfig", () => {
     expect(config?.rules?.["no-console"]?.[0]).toBe(2);
   });
 
+  // A feature's `files` cannot add a file type, so the README names this way to lint one.
+  it("lints another file type with a user config that copies a block and gives it files", async () => {
+    const configs = await createConfig(baseOptions);
+    const eslint = new ESLint({
+      overrideConfig: [
+        ...configs,
+        { ...findBlock(configs, "markdown/rules"), files: ["**/*.markdown"] },
+        { ...findBlock(configs, "json/rules-jsonc"), files: ["**/.babelrc"] },
+      ],
+      overrideConfigFile: true,
+    });
+    // A bare URL, and a comment before a key that is there twice.
+    const [[notes], [babelrc]] = await Promise.all([
+      eslint.lintText("# Notes\n\nSee https://example.com for more.\n", {
+        filePath: "docs/notes.markdown",
+      }),
+      eslint.lintText(
+        '{\n  // Presets\n  "presets": [],\n  "presets": []\n}\n',
+        { filePath: ".babelrc" },
+      ),
+    ]);
+
+    expect(
+      [notes, babelrc].map((result) =>
+        result.messages.map(({ message, ruleId }) => ruleId ?? message),
+      ),
+    ).toEqual([["markdown/no-bare-urls"], ["json/no-duplicate-keys"]]);
+  });
+
   // typescript-eslint takes an absolute `tsconfigRootDir` only, and reports any other as a parsing
   // error in every file of the type-aware scope. The tests run in this repository, so `.` is its
   // root, and the fixture is a TypeScript file that a tsconfig includes.

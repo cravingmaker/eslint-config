@@ -6,6 +6,7 @@ import pluginUnicorn from "eslint-plugin-unicorn";
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-unicorn.
 const unicornRules: Rules = {
@@ -106,9 +107,10 @@ function unicorn(
       plugins: { unicorn: pluginUnicorn },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/unicorn/rules",
       rules: { ...unicornRules, ...overrides },

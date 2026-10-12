@@ -45,7 +45,8 @@ Options that every feature accepts.
 */
 type FeatureOptions = {
   /**
-  File patterns for the feature, instead of its defaults.
+  File patterns that limit the feature to some of its default files, such as `src/**`: it lints a
+  file that matches one of its default patterns and one of these. They cannot add a file type.
   */
   readonly files?: readonly string[];
   /**
@@ -129,9 +130,9 @@ type Options = {
 /**
 Options of the `react` feature. By default, the hooks rules apply to every JavaScript and
 TypeScript file, where custom hooks also live, and the other React rules to JSX and TSX files.
-`files` replaces both defaults. Overrides of hooks rules apply wherever the hooks rules do, and
-other overrides where the other React rules do. While React Refresh is off, overrides of its rule
-apply nowhere.
+`files` limits both to the files that match one of its patterns. Overrides of hooks rules apply
+wherever the hooks rules do, and other overrides where the other React rules do. While React
+Refresh is off, overrides of its rule apply nowhere.
 */
 type ReactOptions = FeatureOptions & {
   /**

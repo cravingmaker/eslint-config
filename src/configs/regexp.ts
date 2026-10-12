@@ -6,6 +6,7 @@ import pluginRegexp from "eslint-plugin-regexp";
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-regexp.
 const regexpRules: Rules = {
@@ -38,9 +39,10 @@ function regexp(
       plugins: { regexp: pluginRegexp },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/regexp/rules",
       rules: { ...regexpRules, ...overrides },
