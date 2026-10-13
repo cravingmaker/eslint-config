@@ -258,6 +258,11 @@ package integrity checks. Package tests exercise the tarball in temporary
 consumer projects. Some install it from the npm registry, so the tests need
 network access.
 
+Vitest runs at most two test files at once to limit memory pressure: each
+worker loads ESLint and TypeScript, and the package tests also start child
+processes. The limit applies to local tests, validation, CI, and the
+pre-push hook.
+
 For faster feedback, run `npm run test:unit` for unit tests or
 `npm run test:package` for package consumer tests. Both commands build the
 package first; their `:built` variants reuse an existing build.
