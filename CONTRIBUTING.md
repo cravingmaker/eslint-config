@@ -114,6 +114,20 @@ consumers in `tests/package/` as well.
   file is linted even when no block of this config matches it, with only
   the blocks that have no `files`. That is why `.cjs` files are still
   parsed, while `.cts` files are skipped.
+- **A feature's `files` narrows its default files.** A block takes
+  `narrowFiles(defaults, files)`, never `files ?? defaults`: it reaches
+  a file that matches one of its default patterns and one of `files`.
+  `files` usually names a directory, such as `src/**`. On its own, that
+  pattern would reach the files of other languages there, and a rule
+  that cannot read a file's language stops the whole run, with "The
+  following rules do not support the language" or an error of its own.
+  It would also select no file for linting, as any pattern that ends in
+  `/**`, so ESLint would skip the HTML, JSON, and Markdown files that no
+  other block matches. A feature with more than one default narrows each
+  of them, as `json` does for its three languages and `react` for its
+  two scopes. A new feature goes into the table of
+  `tests/factory/feature-toggles.test.ts`, which gives every feature a
+  directory as its `files`.
 - **The defaults detect frameworks from this repository's manifest.**
   `"auto"` reads the manifest at `projectRootDirectory`, which defaults
   to the working directory. A test that runs in this repository with the

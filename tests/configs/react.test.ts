@@ -138,6 +138,35 @@ describe("react feature", () => {
     expect(data).toBeUndefined();
   });
 
+  it("limits each of its scopes to the files that match files", async () => {
+    const eslint = new ESLint({
+      overrideConfig: await react({ files: ["app/**"] }),
+      overrideConfigFile: true,
+    });
+    const [component, hooksModule, ...others] = await Promise.all(
+      [
+        "app/Component.tsx",
+        "app/use-counter.ts",
+        "app/data.json",
+        "lib/Component.tsx",
+        "lib/use-counter.ts",
+      ].map(async (filePath) => await getEffectiveConfig(eslint, filePath)),
+    );
+
+    expect(getPluginNames(component)).toEqual([
+      "@",
+      "@html-eslint/react",
+      "react-hooks",
+      "react-refresh",
+    ]);
+    // A module without JSX gets the hooks rules and no others, as with the default files.
+    expect([getPluginNames(hooksModule), hooksModule?.rules]).toEqual([
+      ["@", "react-hooks"],
+      getHooksRules(component),
+    ]);
+    expect(others).toEqual([undefined, undefined, undefined]);
+  });
+
   it("applies overrides of the hooks rules wherever those apply, and other overrides to component files", async () => {
     const eslint = new ESLint({
       overrideConfig: await react({

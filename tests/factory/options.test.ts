@@ -194,7 +194,7 @@ describe("resolveOptions", () => {
     } as const;
 
     expect(resolveOptions({ typescript }).typeAware).toEqual([
-      ["app/**/*.ts", "!**/*.svelte", "!**/*.generated.ts"],
+      [...typescriptFiles, "app/**/*.ts", "!**/*.svelte", "!**/*.generated.ts"],
     ]);
     expect(
       resolveOptions({
@@ -206,6 +206,7 @@ describe("resolveOptions", () => {
       }).typeAware,
     ).toEqual([
       [
+        ...typescriptFiles,
         "app/**/*.ts",
         "!**/*.svelte",
         "!**/*.generated.ts",
@@ -215,13 +216,21 @@ describe("resolveOptions", () => {
     ]);
   });
 
-  it("leaves Svelte components out of the type-aware scope, whatever the files of the TypeScript feature name", () => {
+  it("keeps the type-aware scope within TypeScript files, whatever the files of the TypeScript feature name", () => {
+    // A directory also holds JavaScript and JSON files, and Svelte components, whose parser
+    // reads no type information.
+    expect(
+      resolveOptions({
+        svelte: true,
+        typescript: { files: ["src/**"], typeChecked: true },
+      }).typeAware,
+    ).toEqual([[...typescriptFiles, "src/**", "!**/*.svelte"]]);
     expect(
       resolveOptions({
         svelte: true,
         typescript: { files: ["src/**/*.{ts,svelte}"], typeChecked: true },
       }).typeAware,
-    ).toEqual([["src/**/*.{ts,svelte}", "!**/*.svelte"]]);
+    ).toEqual([[...typescriptFiles, "src/**/*.{ts,svelte}", "!**/*.svelte"]]);
   });
 
   it("applies each list of ignores to the type-aware scope on its own", () => {

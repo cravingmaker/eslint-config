@@ -5,6 +5,7 @@ import pluginMarkdown from "@eslint/markdown";
 
 import { markdownFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for @eslint/markdown.
 const markdownRules: Rules = {
@@ -17,7 +18,7 @@ const markdownRules: Rules = {
 // Builds the flat config for Markdown files, with GitHub Flavored Markdown, YAML front matter,
 // and math.
 function markdown({
-  files = markdownFiles,
+  files,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Linter.Config[] {
@@ -32,7 +33,7 @@ function markdown({
       },
     },
     {
-      files: [...files],
+      files: narrowFiles(markdownFiles, files),
       ignores: [...ignores],
       language: "markdown/gfm",
       languageOptions: {

@@ -13,6 +13,7 @@ import { typescriptTypeAwareRules } from "./rules-type-aware.js";
 import { typescriptRules } from "./rules.js";
 import { disableConfigRules } from "../../utilities/all-rules.js";
 import {
+  narrowFiles,
   overridesWithoutTypeInformation,
   typeAwareConfig,
 } from "../../utilities/type-aware.js";
@@ -30,7 +31,7 @@ async function typescript(
   context: Context = defaultContext,
 ): Promise<Linter.Config[]> {
   const {
-    files = withSvelteComponents(typescriptFiles, context.svelteComponents),
+    files,
     ignores = [],
     overrides = {},
     overridesTypeAware = {},
@@ -51,7 +52,10 @@ async function typescript(
   return [
     ...parserConfigs,
     {
-      files: [...files],
+      files: narrowFiles(
+        withSvelteComponents(typescriptFiles, context.svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/typescript/rules",
       rules: {

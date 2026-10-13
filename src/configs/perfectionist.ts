@@ -5,6 +5,7 @@ import pluginPerfectionist from "eslint-plugin-perfectionist";
 
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 const commonOptions = {
   fallbackSort: { type: "unsorted" },
@@ -405,9 +406,10 @@ function perfectionist(
       plugins: { perfectionist: pluginPerfectionist },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/perfectionist/rules",
       rules: { ...perfectionistRules, ...overrides },

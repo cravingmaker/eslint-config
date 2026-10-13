@@ -371,6 +371,23 @@ describe("type-aware scope", () => {
     });
   });
 
+  it("keeps the feature within TypeScript files when its files name a directory", async () => {
+    // A directory pattern also matches the JavaScript and JSON files in it.
+    const eslint = await createEslint({ files: ["src/**"] });
+
+    expect(
+      await lintByPath(
+        eslint,
+        ["src/data.json", "src/index.ts", "src/util.js"],
+        "@typescript-eslint/no-floating-promises",
+      ),
+    ).toEqual({
+      "src/data.json": { fatal: [], reported: false },
+      "src/index.ts": { fatal: [], reported: true },
+      "src/util.js": { fatal: [], reported: false },
+    });
+  });
+
   it("lints a TypeScript file that the TypeScript feature leaves out without type-aware rules", async () => {
     const eslint = await createEslint({ ignores: ["**/*.generated.ts"] });
 
@@ -412,6 +429,19 @@ describe("type-aware scope", () => {
         "src/index.ts": typed,
         "src/legacy/index.ts": typed,
         "src/read.generated.ts": untyped,
+      },
+    ],
+    // `n/no-sync` needs type information in TypeScript files only, so a JavaScript file keeps it.
+    [
+      "within the TypeScript files of a directory that is the files of the TypeScript feature",
+      { files: ["src/**"] },
+      {
+        "scripts/build.ts": untyped,
+        "src/data.json": untyped,
+        "src/index.ts": typed,
+        "src/legacy/index.ts": typed,
+        "src/read.generated.ts": typed,
+        "src/util.js": { projectService: false, typeAwareRules: ["n/no-sync"] },
       },
     ],
   ] as const)(

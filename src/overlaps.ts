@@ -171,7 +171,7 @@ function overlapConfigs(
     ({ defaultFiles, feature, overrides, overridesTypeAware, settings }) => {
       if (settings === undefined) return [];
 
-      const files = settings.files ?? defaultFiles;
+      const files = narrowFiles(defaultFiles, settings.files);
       const ignores = settings.ignores ?? [];
       const replaced = owners.flatMap(
         ({ name, replacedRules, settings: ownerSettings }) => {

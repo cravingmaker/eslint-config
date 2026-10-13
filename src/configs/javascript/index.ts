@@ -5,6 +5,7 @@ import { defaultContext } from "../../context.js";
 import { jsxFiles, sourceFiles, withSvelteComponents } from "../../globs.js";
 import { possibleProblemRules } from "./possible-problems.js";
 import { suggestionRules } from "./suggestions.js";
+import { narrowFiles } from "../../utilities/type-aware.js";
 
 // Policy for every non-deprecated ESLint core rule, shared by JavaScript and TypeScript files.
 const javascriptRules: Rules = {
@@ -21,9 +22,10 @@ function javascript(
 ): Linter.Config[] {
   return [
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       languageOptions: {
         ecmaVersion: "latest",

@@ -135,6 +135,34 @@ describe("typescript feature", () => {
     expect(outside).toBeUndefined();
   });
 
+  it("keeps to TypeScript files and the Svelte components of the context within a directory that is its files", async () => {
+    const eslint = new ESLint({
+      overrideConfig: await typescript(
+        { files: ["app/**"] },
+        { ...defaultContext, svelteComponents: ["**/*.svelte"] },
+      ),
+      overrideConfigFile: true,
+    });
+    const [source, component, script, ...others] = await Promise.all(
+      [
+        "app/example.ts",
+        "app/Component.svelte",
+        "app/example.js",
+        "app/data.json",
+        "lib/example.ts",
+        "lib/Component.svelte",
+      ].map(async (filePath) => await getEffectiveConfig(eslint, filePath)),
+    );
+
+    expect(source?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(2);
+    expect(component?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(
+      2,
+    );
+    // ESLint's own configuration matches a JavaScript file, which gets no rule of the feature.
+    expect(Object.keys(script?.rules ?? {})).toEqual([]);
+    expect(others).toEqual([undefined, undefined, undefined]);
+  });
+
   it("sets the rules that need type information in a type-aware block after the overrides", async () => {
     const configs = await typescript(
       {

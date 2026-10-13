@@ -91,6 +91,64 @@ describe("json feature", () => {
     ]);
   });
 
+  it("limits each JSON language to the files that match files", async () => {
+    const eslint = new ESLint({
+      overrideConfig: json({ files: ["config/**"] }),
+      overrideConfigFile: true,
+    });
+    const plugins = ["@", "json"];
+    const outside = { language: undefined, plugins: [], severity: undefined };
+
+    expect(
+      await Promise.all(
+        [
+          "config/data.json",
+          "config/data.jsonc",
+          "config/data.json5",
+          "config/tsconfig.json",
+          "data.json",
+          "data.jsonc",
+          "data.json5",
+          "tsconfig.json",
+        ].map(
+          async (filePath) =>
+            await describeFile(eslint, filePath, "json/no-duplicate-keys"),
+        ),
+      ),
+    ).toEqual([
+      { language: "json/json", plugins, severity: 2 },
+      { language: "json/jsonc", plugins, severity: 2 },
+      { language: "json/json5", plugins, severity: 2 },
+      { language: "json/jsonc", plugins, severity: 2 },
+      outside,
+      outside,
+      outside,
+      outside,
+    ]);
+  });
+
+  it("leaves a JSON language out when no pattern of files matches its files", async () => {
+    // A pattern with an extension names one language. The tsconfig is a JSONC file by its name.
+    const eslint = new ESLint({
+      overrideConfig: json({ files: ["**/*.json"] }),
+      overrideConfigFile: true,
+    });
+
+    expect(
+      await Promise.all(
+        ["data.json", "tsconfig.json", "data.jsonc", "data.json5"].map(
+          async (filePath) =>
+            await describeRule(eslint, filePath, "json/no-duplicate-keys"),
+        ),
+      ),
+    ).toEqual([
+      { entry: [2], language: "json/json" },
+      { entry: [2], language: "json/jsonc" },
+      { entry: undefined, language: undefined },
+      { entry: undefined, language: undefined },
+    ]);
+  });
+
   it("keeps the options of overrides out of JSONC files, whatever files names", async () => {
     // Every block turns this rule on with a severity alone, which keeps the options of an earlier
     // block: a JSONC file that the JSON block reached as well would take them from `overrides`.

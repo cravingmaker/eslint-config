@@ -95,7 +95,7 @@ Every option from `javascript` down is a feature, and takes one of these values:
 - `false` turns the feature off, so none of its rules apply.
 - `true` turns it on with its defaults.
 - An object turns it on with these options:
-  - `files`: patterns of the files to lint, instead of the feature's default files.
+  - `files`: patterns that limit the feature to some of its default files, such as `src/**`. The feature lints a file that matches one of its default patterns and one of these.
   - `ignores`: patterns of files that the feature leaves out. Other features still lint them.
   - `overrides`: rule settings applied after the feature's own rules, in the feature's files.
 - `"auto"`, for `react`, `svelte`, and `express` only, turns the feature on when the project declares the framework. It is their default.
@@ -116,7 +116,7 @@ export default createConfig({
 
 Three things to keep in mind:
 
-- **Give each `files` pattern an extension,** such as `src/**/*.ts`. A pattern without one, such as `src/**`, also matches the JSON and Markdown files there, and ESLint stops with an error such as `The following rules do not support the language "json/json"`. `ignores` patterns need no extension.
+- **`files` limits a feature and cannot extend it.** A directory is enough: with `files: ["src/**"]`, a feature for sources lints the sources and the Svelte components in `src/`, and leaves the JSON and Markdown files there to their own features. A pattern with an extension, such as `src/**/*.ts`, also leaves out every other file that the feature lints by default, Svelte components included. A pattern that matches none of the default files, such as `**/*.markdown` for `markdown`, matches nothing. To lint another file type, see [Other file types](#other-file-types).
 - **Override a rule in the feature that holds it:** a core rule in `javascript`, and a plugin's rule in the feature of that plugin, listed in [Features](#features). The blocks of each feature come after those of the features before it, so `javascript: { overrides: { "unicorn/no-null": "off" } }` changes nothing, while `unicorn: { overrides: { "unicorn/no-null": "off" } }` turns the rule off. To change a rule in some files only, use a [user config](#user-configs).
 - **An override of a rule that needs type information applies only where typed linting does.** Such a rule stops ESLint in a file without type information, so an override that turns it on, also one that only changes its options, applies in the files that [typed linting](#typed-linting) covers. In the other files of the feature the rule stays off, and so it does in every file while `typeChecked` is `false`. An override that turns such a rule off applies in every file. These rules are the ones of typescript-eslint and eslint-plugin-functional that need type information, and `n/no-sync`. `n/no-sync` needs it only in TypeScript files and Svelte components, so in JavaScript files an override of it applies as any other does.
 
@@ -154,7 +154,7 @@ The `json` feature lints three languages:
 - JSONC: `**/*.jsonc`, `**/tsconfig*.json`, `**/.vscode/*.json`, and `**/.devcontainer/*.json`.
 - JSON5: `**/*.json5`.
 
-`json.files` and `json.overrides` apply to JSON files only. JSONC and JSON5 files keep their patterns and take their overrides from `json.overridesJsonc` and `json.overridesJson5`. `json.ignores` applies to all three.
+`json.files` and `json.ignores` apply to all three languages. `json.overrides` apply to JSON files only: JSONC and JSON5 files take their overrides from `json.overridesJsonc` and `json.overridesJson5`.
 
 Nothing else is linted: not CommonJS files (see [CommonJS](#commonjs)), not the code blocks in Markdown files, and no other file type, such as CSS, YAML, Vue, or Astro.
 
@@ -201,7 +201,7 @@ The `react` feature has three parts:
 - **Hooks.** The Rules of Hooks, `exhaustive-deps`, and the React Compiler rules of eslint-plugin-react-hooks, in every source, because custom hooks live in `.js` and `.ts` files too. The compiler rules analyze functions named like a component, with a capital letter, or like a hook, with `use` and a capital letter or digit.
 - **React Refresh.** `react-refresh/only-export-components`, as a warning, in JSX and TSX files.
 
-`react.files` replaces the files of all three parts. Overrides of `react-hooks/*` rules apply wherever the hooks rules do, and other overrides where the other two parts do. While React Refresh is off, an override of a `react-refresh/*` rule applies nowhere, because its plugin is not loaded.
+`react.files` limits all three parts: the hooks rules to the sources that match it, and the other two parts to the JSX and TSX files that match it. Overrides of `react-hooks/*` rules apply wherever the hooks rules do, and other overrides where the other two parts do. While React Refresh is off, an override of a `react-refresh/*` rule applies nowhere, because its plugin is not loaded.
 
 `react.refresh` selects the React Refresh variant, which decides what a file may export next to its components:
 
@@ -392,19 +392,36 @@ export default createConfig(
 
 To add a plugin, import it in `eslint.config.js` and pass a config object that registers it under `plugins` and sets its rules, with `files` that limit it to the files it is meant for.
 
+### Other file types
+
+A feature's `files` cannot add a file type, such as `.markdown` files to `markdown`. To lint such files with the rules of a feature, copy the feature's block from the array that `createConfig()` resolves to, and give the copy its own `files`:
+
+```js
+import { createConfig } from "@cravingmaker/eslint-config";
+
+const configs = await createConfig();
+const markdownRules = configs.find(
+  ({ name }) => name === "@cravingmaker/eslint-config/markdown/rules",
+);
+
+export default [...configs, { ...markdownRules, files: ["**/*.markdown"] }];
+```
+
+The copy keeps the language, the rules, and the `ignores` of the block. In the same way, a copy of `json/rules-jsonc` lints a JSON file with comments that has another name, such as `.babelrc`. Every block is named `@cravingmaker/eslint-config/<feature>/<part>`, and `configs.map(({ name }) => name)` lists the names.
+
 ## Monorepos
 
 `projectRootDirectory` decides which `package.json` turns on the frameworks, and it is the default `tsconfigRootDir`. Its default is the working directory of ESLint, which can differ between the command line and an editor, and a relative path is resolved from it. `import.meta.dirname` ties it to the directory of the config file instead.
 
-With one config at the root of a monorepo, a framework that only a workspace declares is not detected. Turn it on and limit it to that workspace with `files`:
+With one config at the root of a monorepo, a framework that only a workspace declares is not detected. Turn it on and limit it to the directory of that workspace with `files`:
 
 ```js
 import { createConfig } from "@cravingmaker/eslint-config";
 
 export default createConfig({
-  express: { files: ["packages/api/**/*.ts"] },
+  express: { files: ["packages/api/**"] },
   projectRootDirectory: import.meta.dirname,
-  react: { files: ["apps/web/**/*.{ts,tsx}"] },
+  react: { files: ["apps/web/**"] },
   typescript: {
     filesTypeAware: ["packages/api/**"],
     typeChecked: true,
@@ -422,6 +439,7 @@ CommonJS is not supported, and `.cjs` and `.cts` files get no rules:
 
 - ESLint still parses `.cjs` files, because its default config matches them. `eslint .` therefore reports syntax errors and unused disable directives in them, but nothing else.
 - `eslint .` skips `.cts` files. A `.cts` path passed explicitly, as lint-staged and editors do, gets the warning "File ignored because no matching configuration was supplied."
+- A feature's `files` does not bring them in. It only limits the feature's default files, and no CommonJS file is among them.
 
 ### Known issues
 

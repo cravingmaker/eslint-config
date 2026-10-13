@@ -102,6 +102,9 @@ const withComponents = {
   files: ["src/**/*.{ts,svelte}"],
   typeChecked: true,
 } as const;
+// Files of the TypeScript feature that name a directory, which also holds JavaScript files and a
+// component. The script is outside it.
+const withDirectory = { files: ["src/**"], typeChecked: true } as const;
 /*
 Overrides that turn on a rule that needs type information, each in the feature that holds the
 rule and with options that the policy does not have. A feature's base block reaches files without
@@ -134,8 +137,10 @@ const typescriptOverride = {
 ESLint reads an ignore list in order, so a negated pattern brings back files that the patterns
 before it left out. It does so within its own list, as in `ignoresTypeAware` below, and must not
 across two lists: joined lists used to bring a file back into a type-aware block. Every shape
-leaves the script out of typed linting. The ninth is a control without a negated pattern, and the
-shapes after it have one override each, with typed linting on and with typed linting off.
+leaves the script out of typed linting. The eighth and ninth set the files of the TypeScript
+feature, which limit it to some of its default files and so bring no other file into the
+type-aware scope. The tenth is a control without a negated pattern, and the shapes after it have
+one override each, with typed linting on and with typed linting off.
 */
 const shapes: readonly Shape[] = [
   [
@@ -206,6 +211,11 @@ const shapes: readonly Shape[] = [
       "src/state.svelte.ts",
       "src/types.d.ts",
     ],
+  ],
+  [
+    "a directory as the files of typescript",
+    { typescript: withDirectory },
+    typedSources,
   ],
   [
     "ignores without a negated pattern",

@@ -10,6 +10,7 @@ import {
   noUnusedVarsOptions,
 } from "./shared-options.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-unused-imports.
 const unusedImportsRules: Rules = {
@@ -29,9 +30,10 @@ function unusedImports(
       plugins: { "unused-imports": pluginUnusedImports },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/unused-imports/rules",
       rules: { ...unusedImportsRules, ...overrides },
