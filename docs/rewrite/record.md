@@ -1,6 +1,6 @@
 # Rewrite record
 
-The rewrite restructured the package after 0.1.0: one 587-line `src/index.ts` became one builder per feature under `src/configs/`, composed by `src/factory.ts` and set up with per-feature options. It ran in six stages on 6 and 7 October 2026 and is complete. The [README](../../README.md) documents the result and the migration from 0.1.0, and each pull request describes its stage in detail.
+The rewrite restructured the package after 0.1.0: one 587-line `src/index.ts` became one builder per feature under `src/configs/`, composed by `src/factory.ts` and set up with per-feature options. It ran in six stages on 6 and 7 October 2026 and is complete. The [README](../../README.md) documents the result and the migration from 0.1.0, and each pull request describes its stage in detail. An audit of the result led to twelve more steps, which ran from 8 to 13 October 2026 and are complete as well: see [Audit follow-up](#audit-follow-up).
 
 | Stage | Pull requests                                                                                                                | Result                                                                                                                                                                                                                 |
 | ----- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -10,6 +10,32 @@ The rewrite restructured the package after 0.1.0: one 587-line `src/index.ts` be
 | 3     | [#64](https://github.com/cravingmaker/eslint-config/pull/64) to [#73](https://github.com/cravingmaker/eslint-config/pull/73) | Parameter immutability, file-role exceptions, no CommonJS, feature toggles, strict peer loading, detection from the manifest, hooks scope, type-aware scope, formatter ownership, and the scripts of Svelte components |
 | 4     | [#74](https://github.com/cravingmaker/eslint-config/pull/74)                                                                 | Fixtures of each file type, real installs of the packed package, and tests that follow the source layout                                                                                                               |
 | 5     | [#75](https://github.com/cravingmaker/eslint-config/pull/75)                                                                 | The README, a test that runs each of its examples in a real install, and this record                                                                                                                                   |
+
+## Audit follow-up
+
+Two independent audits read the result at `df14104`, the commit of stage 5, on 8 October 2026. They agreed on five findings, and one of them had eight more. [The plan](audit-follow-up.md) made twelve steps of the 13 findings, each one pull request, and it keeps the reproduction of every finding.
+
+| Step | Pull requests                                                                                                                   | Result                                                                                                                                                                                           |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Plan | [#76](https://github.com/cravingmaker/eslint-config/pull/76)                                                                    | The plan: for each finding a reproduction, the change, and the tests                                                                                                                             |
+| 1    | [#77](https://github.com/cravingmaker/eslint-config/pull/77)                                                                    | The package tests create their temporary directories by real path, so they pass where that directory is a symbolic link, as on macOS                                                             |
+| 2    | [#78](https://github.com/cravingmaker/eslint-config/pull/78)                                                                    | The type-aware scope is a list of `files` patterns, and its blocks have no `ignores`, so a negated ignore pattern cannot bring a file back into typed linting. Svelte components are never in it |
+| 3    | [#79](https://github.com/cravingmaker/eslint-config/pull/79)                                                                    | An override of `functional`, `node`, or `typescript` that turns on a rule that needs type information applies only where typed linting does                                                      |
+| 4    | [#80](https://github.com/cravingmaker/eslint-config/pull/80)                                                                    | A replaced rule that only `typescript.overridesTypeAware` sets is left to that override in the type-aware scope, and is replaced outside it                                                      |
+| 5    | [#81](https://github.com/cravingmaker/eslint-config/pull/81)                                                                    | The JSON block leaves out the files of the JSONC block, so `json.overrides` do not reach them                                                                                                    |
+| 6    | [#82](https://github.com/cravingmaker/eslint-config/pull/82)                                                                    | `createConfig` rejects an option that it does not know, at the top level and in a feature, and names what replaces an option of 0.1.0                                                            |
+| 7    | [#88](https://github.com/cravingmaker/eslint-config/pull/88)                                                                    | `projectRootDirectory` and `typescript.tsconfigRootDir` become absolute paths, resolved from the working directory                                                                               |
+| 8    | [#89](https://github.com/cravingmaker/eslint-config/pull/89)                                                                    | Each block of the React feature takes the overrides of its own plugin's rules, so an override of a `react-refresh/*` rule applies only while React Refresh is on                                 |
+| 9    | [#90](https://github.com/cravingmaker/eslint-config/pull/90)                                                                    | Decision D1: a replaced check comes back where its owner does not lint, `n/no-missing-import` in JavaScript files only, and a replaced style rule stays off                                      |
+| 10   | [#91](https://github.com/cravingmaker/eslint-config/pull/91)                                                                    | Decision D2: a feature's `files` narrows its default files, in every block of the feature                                                                                                        |
+| 11   | [#93](https://github.com/cravingmaker/eslint-config/pull/93), with [#92](https://github.com/cravingmaker/eslint-config/pull/92) | The TypeScript range, workspace path aliases, and the JSX extensions, as [documented limits](#documented-limits). #92 limits Vitest to two workers, after tests timed out under load             |
+| 12   | [#94](https://github.com/cravingmaker/eslint-config/pull/94)                                                                    | Every reproduction run again, and this section                                                                                                                                                   |
+
+The maintainer made the two decisions. They are the rows "Rule overlap between plugins" and "A feature's `files`" of the [decisions](#decisions).
+
+Step 12 ran every reproduction of the plan on `fd1121d`, and on `df14104` as a control. At `df14104`, each reproduction of steps 1 to 10 shows the problem that the plan describes. On `fd1121d`, each gives the result that the plan expects, and the three limits of step 11 are as documented. One result is the same on both commits, as decision D2 intends: a pattern with an extension, such as `src/**/*.ts`, still leaves Svelte components out of the feature, and it is the directory, `src/**`, that keeps them now.
+
+What the audits noticed and no step covers is under ["Not planned"](audit-follow-up.md#not-planned) in the plan.
 
 ## Decisions
 
@@ -32,7 +58,7 @@ The rewrite restructured the package after 0.1.0: one 587-line `src/index.ts` be
 
 ## Documented limits
 
-Step 11 of the audit follow-up reproduced these on `b4c947f`, with no change to the configuration or its default policy:
+Step 11 of the [audit follow-up](#audit-follow-up) reproduced these on `b4c947f`, and step 12 again on `fd1121d`, with no change to the configuration or its default policy:
 
 - **TypeScript compatibility.** The installed typescript-eslint 8.70.0 declares `>=4.8.4 <6.1.0` in `peerDependencies.typescript`. A consumer without TypeScript gets 6.0.3 automatically. With TypeScript 7.0.2 installed, npm succeeds with `ERESOLVE overriding peer dependency`, but ESLint exits with code 2 while loading the config: `TypeError: Cannot read properties of undefined (reading 'Intrinsic')` from ts-api-utils. The README's requirements state the supported range and exclude TypeScript 7.
 - **Workspace path aliases.** The import resolver starts at `tsconfigRootDir` and follows the root tsconfig's `references`; it does not discover workspace tsconfigs as typed linting does. An alias defined only in a workspace's `compilerOptions.paths` is reported by `import-x/no-unresolved`. Referencing that workspace from the root, or adding a user config for its files with `import-x/resolver-next` pointed at its tsconfig, resolves the alias. The README's "Monorepos" section describes both.
@@ -42,7 +68,7 @@ Step 11's comment cleanup is skipped: step 9 already moved `no-nested-ternary` o
 
 ## Open questions
 
-Each of these needs a decision. The README lists those that affect users as known issues. They were reproduced against the release candidate on 7 October 2026.
+Each of these needs a decision. The README lists those that affect users as known issues. They were reproduced against the release candidate on 7 October 2026, and again on `fd1121d` on 13 October 2026, when the audit follow-up closed. The follow-up settled one of them: "`files` without an extension" became the decision "A feature's `files`" in step 10. The others stand as they were.
 
 ### TypeScript files that the TypeScript feature leaves out
 
@@ -50,6 +76,8 @@ The JavaScript and code-quality blocks match TypeScript files through `sourceFil
 
 - **Leave those files unlinted,** as every other language feature does: the shared blocks reach TypeScript files only where the TypeScript feature does. Every shared feature's default files would then depend on the `typescript` options, and `typescript.ignores` would reach the other blocks as negated patterns in AND arrays, such as `[["**/*.ts", "!**/*.generated.ts"]]`, which ESLint 10.11 supports. The type-aware scope stays narrowed to `typescript.files` without `typescript.ignores`, as it is now.
 - **Keep them parseable:** `typescript/parser`, and the core rules that the compiler checks, cover every TypeScript file that a shared block lints, and `files` and `ignores` narrow only the TypeScript rules. Core rules that typescript-eslint replaces would then run on TypeScript code without their replacements, and `typescript: false` would still need the first direction. `resolveTypeAwareScope` would narrow to that wider scope, so the type-aware rules of `functional` and `node` would reach those files again, with type information.
+
+The audit follow-up did not settle this, and changed two things around it. Since step 2, `withoutIgnores` builds the type-aware scope out of the negated patterns that the first direction needs. Since step 10, a directory is enough as `typescript.files`, which makes the problem easier to meet: with `typescript: { files: ["packages/api/**"] }`, the TypeScript files of every other directory fail to parse.
 
 ### Found, not changed
 
