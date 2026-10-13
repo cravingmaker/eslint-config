@@ -30,6 +30,16 @@ The rewrite restructured the package after 0.1.0: one 587-line `src/index.ts` be
 | Formatting                   | Prettier runs separately. Layout rules are off in the rule maps, and `tests/policy/formatter.test.ts` guards them |
 | Scope anchoring              | No `basePath`. `projectRootDirectory` decides the manifest, the tsconfig directory, and the import resolver       |
 
+## Documented limits
+
+Step 11 of the audit follow-up reproduced these on `b4c947f`, with no change to the configuration or its default policy:
+
+- **TypeScript compatibility.** The installed typescript-eslint 8.70.0 declares `>=4.8.4 <6.1.0` in `peerDependencies.typescript`. A consumer without TypeScript gets 6.0.3 automatically. With TypeScript 7.0.2 installed, npm succeeds with `ERESOLVE overriding peer dependency`, but ESLint exits with code 2 while loading the config: `TypeError: Cannot read properties of undefined (reading 'Intrinsic')` from ts-api-utils. The README's requirements state the supported range and exclude TypeScript 7.
+- **Workspace path aliases.** The import resolver starts at `tsconfigRootDir` and follows the root tsconfig's `references`; it does not discover workspace tsconfigs as typed linting does. An alias defined only in a workspace's `compilerOptions.paths` is reported by `import-x/no-unresolved`. Referencing that workspace from the root, or adding a user config for its files with `import-x/resolver-next` pointed at its tsconfig, resolves the alias. The README's "Monorepos" section describes both.
+- **JSX extensions.** `.js` files with JSX fail with `Parsing error: Unexpected token <`, even with React on. `.mtsx` is in the TypeScript and React globs, but `<div />` fails with `Parsing error: '>' expected.`. `.jsx`, `.mjsx`, and `.tsx` parse the same source. The README's "Limits" section names these extensions.
+
+Step 11's comment cleanup is skipped: step 9 already moved `no-nested-ternary` out from under "Off while unicorn is on" and gave it its own explanation in #90.
+
 ## Open questions
 
 Each of these needs a decision. The README lists those that affect users as known issues. They were reproduced against the release candidate on 7 October 2026.
