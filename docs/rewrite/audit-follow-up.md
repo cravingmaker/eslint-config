@@ -2,6 +2,8 @@
 
 This is the to-do list that came out of the audit of the config rewrite (pull requests #59 to #62 and #64 to #75) at commit `df14104`, on 8 October 2026. Two independent audits agreed on five findings, and one of them found eight more. Each step below fixes one or more of them and is one pull request. Line numbers refer to `df14104`. The problems that [the rewrite record](record.md) already lists are not repeated here.
 
+All twelve steps are done. [The record](record.md#audit-follow-up) has the result of each step, and what is still open.
+
 ## How to use it
 
 Work the steps one at a time, each with an agent and one of the [prompts](#prompts) at the end. The checklist is in the order to work in: step 1 makes local validation pass on macOS, and steps 2 to 4 close two crashes and a wrong result in typed linting. Seven steps can start now: 1, 2, 5, 6, 7, 8, and 11.
@@ -36,7 +38,7 @@ A step is in one of three states:
 
 - [x] **Step 11.** Document the TypeScript range and two limits. Not blocked. [#93](https://github.com/cravingmaker/eslint-config/pull/93)
 
-- [ ] **Step 12.** Close out. Blocked by every other step.
+- [x] **Step 12.** Close out. Blocked by every other step. [#94](https://github.com/cravingmaker/eslint-config/pull/94)
 
 ## Decisions
 
