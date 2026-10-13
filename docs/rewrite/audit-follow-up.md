@@ -34,7 +34,7 @@ A step is in one of three states:
 
 - [x] **Step 10.** Settle what a feature's `files` means. Blocked by decision D2, and by steps 2 to 4. [#91](https://github.com/cravingmaker/eslint-config/pull/91)
 
-- [ ] **Step 11.** Document the TypeScript range and two limits. Not blocked.
+- [x] **Step 11.** Document the TypeScript range and two limits. Not blocked. [#93](https://github.com/cravingmaker/eslint-config/pull/93)
 
 - [ ] **Step 12.** Close out. Blocked by every other step.
 

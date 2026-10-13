@@ -73,6 +73,12 @@ consumers in `tests/package/` as well.
 - **Build before linting and testing.** `eslint.config.js` and most
   tests import `./dist/index.mjs`. After changing `src/`, run
   `npm run build` first, or you lint and test the previous build.
+- **TypeScript support follows typescript-eslint's peer range.** Read
+  `peerDependencies.typescript` in
+  `node_modules/typescript-eslint/package.json` when updating the README's
+  requirements. A TypeScript version outside that range can install with
+  a peer warning yet stop ESLint while loading the config, as TypeScript 7
+  does.
 - **Internal builders are tested from source.** Feature builders are not
   exported from the package root. Tests for them import from `src/`, as
   `tests/configs/javascript/index.test.ts` does.
@@ -200,6 +206,17 @@ consumers in `tests/package/` as well.
   `Parsing error: Unexpected token :`. A test of those options that only
   compares resolved configurations does not show this; lint real
   TypeScript source with `lintText`.
+- **Workspace aliases use the import resolver's tsconfig.** Typed linting
+  reads each file's nearest tsconfig, but the import resolver starts at
+  `tsconfigRootDir` and follows its `references`. Reproduce a workspace's
+  `paths` with an import in a real file: without a root reference,
+  `import-x/no-unresolved` reports it. A user config scoped to that workspace
+  can set `import-x/resolver-next` to a resolver for its tsconfig, as
+  described in the README's "Monorepos" section.
+- **JSX parsing depends on the extension.** `.jsx`, `.mjsx`, and `.tsx`
+  parse JSX. `.js` does not, even with React on, and `.mtsx` does not,
+  despite appearing in the TypeScript and React globs. Lint JSX source to
+  check parsing; a matching feature block alone does not prove it parses.
 - **A missing peer needs a consumer.** Every optional peer is a dev
   dependency of this repository, so a test that runs in this repository
   always finds them. A test of a missing or partial peer set runs in a

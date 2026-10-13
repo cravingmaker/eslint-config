@@ -26,6 +26,7 @@ The policy is strict. For most plugins, every rule that is not deprecated is on,
 
 - Node.js 24.15.0 or later.
 - ESLint 10.4.0 or later, below 11.
+- TypeScript `>=4.8.4 <6.1.0`, the peer range of the installed typescript-eslint. npm installs a version in that range when the project has none. TypeScript 7 is not supported yet: npm can install it with an `ERESOLVE overriding peer dependency` warning, but ESLint then stops while loading the config, before linting any file, with `TypeError: Cannot read properties of undefined (reading 'Intrinsic')` from ts-api-utils.
 - ES modules. The package is ESM-only, so the config file must be an ES module: `eslint.config.js` in a package with `"type": "module"`, or `eslint.config.mjs`. JavaScript and TypeScript files are linted as ES modules, and CommonJS files get no rules (see [CommonJS](#commonjs)).
 
 ## Installation
@@ -431,7 +432,17 @@ export default createConfig({
 
 The TypeScript files of the API then read type information through the nearest tsconfig, the one of their workspace, and the other TypeScript files are linted without it. Alternatively, give each workspace its own `eslint.config.js` with `projectRootDirectory: import.meta.dirname`.
 
+Import resolution uses the tsconfig in `tsconfigRootDir` and follows its `references`; it does not discover each workspace's tsconfig as typed linting does. If a workspace defines `compilerOptions.paths` but the root tsconfig does not reference it, `import-x/no-unresolved` reports imports through those aliases, even when typed linting reads the workspace's tsconfig.
+
+Add the workspace to the root tsconfig's `references`, or pass a [user config](#user-configs) scoped to that workspace, such as `files: ["packages/api/**"]`. In that config, set `settings["import-x/resolver-next"]` to an array containing a resolver created with `createTypeScriptImportResolver` from `eslint-import-resolver-typescript`. Give it `alwaysTryTypes: true` and `project` set to the absolute path of the workspace's `tsconfig.json`. Add the resolver package to the project's dev dependencies when importing it in the config.
+
 ## Limits
+
+### JSX file extensions
+
+JSX parses in `.jsx`, `.mjsx`, and `.tsx` files only. A `.js` file containing JSX, such as a page in a JavaScript Next.js project, fails with `Parsing error: Unexpected token <`, even with `react: true`. Use `.jsx` or `.mjsx` for JavaScript that contains JSX.
+
+The TypeScript and React feature globs include `.mtsx`, but JSX does not parse in that extension: `<div />` fails with `Parsing error: '>' expected.`. Use `.tsx` for TypeScript that contains JSX.
 
 ### CommonJS
 
