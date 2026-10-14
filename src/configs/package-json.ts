@@ -7,6 +7,7 @@ import * as jsoncParser from "jsonc-eslint-parser";
 
 import { packageJsonFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for package.json files, from eslint-plugin-package-json and eslint-enforce-package-type.
 const packageJsonRules: Rules = {
@@ -59,7 +60,7 @@ const packageJsonRules: Rules = {
 
 // Builds the flat config for package.json files.
 function packageJson({
-  files = packageJsonFiles,
+  files,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Linter.Config[] {
@@ -69,7 +70,7 @@ function packageJson({
       plugins: { "package-json": pluginPackageJson },
     },
     {
-      files: [...files],
+      files: narrowFiles(packageJsonFiles, files),
       ignores: [...ignores],
       languageOptions: { parser: jsoncParser },
       name: "@cravingmaker/eslint-config/package-json/rules",

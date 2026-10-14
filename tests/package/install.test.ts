@@ -45,10 +45,51 @@ const reactFixtures = [
   "fixtures/react/Counter.tsx",
   "fixtures/react/use-toggle.ts",
 ] as const;
+// The TypeScript fixtures that need no optional peer. The tsconfig of the fixtures includes them.
+const typescriptFixtures = [
+  "fixtures/format-date.d.ts",
+  "fixtures/settle.mts",
+  "fixtures/temperature.ts",
+] as const;
 const defaultConfig = `import { createConfig } from "@cravingmaker/eslint-config";
 
 export default createConfig();
 `;
+// A config that turns on the rule of React Refresh through the overrides of the React feature.
+const refreshOverrideConfig = `import { createConfig } from "@cravingmaker/eslint-config";
+
+export default createConfig({
+  react: {
+    overrides: { "react-refresh/only-export-components": "error" },
+  },
+});
+`;
+/*
+Configs with typed linting and a root directory that is a relative path, each by the option that
+has it. ESLint runs in the consumer, so `.` is the consumer and `fixtures` is the directory of
+the tsconfig.
+*/
+const relativeRootConfigs = [
+  [
+    "projectRootDirectory",
+    `import { createConfig } from "@cravingmaker/eslint-config";
+
+export default createConfig({
+  projectRootDirectory: ".",
+  typescript: { typeChecked: true },
+});
+`,
+  ],
+  [
+    "typescript.tsconfigRootDir",
+    `import { createConfig } from "@cravingmaker/eslint-config";
+
+export default createConfig({
+  typescript: { tsconfigRootDir: "fixtures", typeChecked: true },
+});
+`,
+  ],
+] as const;
 
 const temporaryDirectory = await createTemporaryDirectory(
   "eslint-config-install-",
@@ -260,6 +301,18 @@ describe("a consumer without optional peers", () => {
     ).toEqual(withoutMessages(fixturesWithoutPeers));
   }, 120_000);
 
+  // typescript-eslint takes an absolute `tsconfigRootDir` only, and reports any other as a parsing
+  // error in every file that it reads with type information.
+  it.each(relativeRootConfigs)(
+    "lints the TypeScript fixtures with type information when %s is a relative path",
+    async (_option, config) => {
+      expect(await lint(withoutPeers, config, typescriptFixtures)).toEqual(
+        withoutMessages(typescriptFixtures),
+      );
+    },
+    120_000,
+  );
+
   it("fails with an install message for a framework that is on or that the project declares, and needs no peer for one that is off", async () => {
     const declaresReact = await createProjectRoot(withoutPeers, "react", [
       "react",
@@ -421,6 +474,16 @@ describe("a consumer with a partial peer set", () => {
     expect(await lint(withPartialPeers, defaultConfig, filePaths)).toEqual(
       withoutMessages(filePaths),
     );
+  }, 120_000);
+
+  // Without React Refresh, no block registers its plugin, which this consumer has not installed.
+  // ESLint stops when a rule is on in a file whose configuration lacks its plugin.
+  it("lints the React fixtures with an override of the React Refresh rule, which applies nowhere without React Refresh", async () => {
+    const filePaths = ["fixtures/react/Greeting.jsx", ...reactFixtures];
+
+    expect(
+      await lint(withPartialPeers, refreshOverrideConfig, filePaths),
+    ).toEqual(withoutMessages(filePaths));
   }, 120_000);
 
   it("fails with an install message for a missing peer, and with Node's message for a missing peer of a peer", async () => {

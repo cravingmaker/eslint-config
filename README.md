@@ -26,6 +26,7 @@ The policy is strict. For most plugins, every rule that is not deprecated is on,
 
 - Node.js 24.15.0 or later.
 - ESLint 10.4.0 or later, below 11.
+- TypeScript `>=4.8.4 <6.1.0`, the peer range of the installed typescript-eslint. npm installs a version in that range when the project has none. TypeScript 7 is not supported yet: npm can install it with an `ERESOLVE overriding peer dependency` warning, but ESLint then stops while loading the config, before linting any file, with `TypeError: Cannot read properties of undefined (reading 'Intrinsic')` from ts-api-utils.
 - ES modules. The package is ESM-only, so the config file must be an ES module: `eslint.config.js` in a package with `"type": "module"`, or `eslint.config.mjs`. JavaScript and TypeScript files are linted as ES modules, and CommonJS files get no rules (see [CommonJS](#commonjs)).
 
 ## Installation
@@ -78,7 +79,7 @@ export default createConfig({
 
 | Option                                                                                                                    | Default         | Description                                                                                                                                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `projectRootDirectory`                                                                                                    | `process.cwd()` | The directory whose `package.json` decides the `"auto"` features. It is also the default of `typescript.tsconfigRootDir`.                                                                   |
+| `projectRootDirectory`                                                                                                    | `process.cwd()` | The directory whose `package.json` decides the `"auto"` features. It is also the default of `typescript.tsconfigRootDir`. A relative path is resolved from the working directory.           |
 | `ignores`                                                                                                                 | `[]`            | Patterns of files that no feature lints, in addition to `**/dist/`, `**/build/`, and `**/coverage/`.                                                                                        |
 | `environments`                                                                                                            | `[]`            | Runtimes whose globals are defined in JavaScript, TypeScript, and Svelte files, named as in the [globals](https://www.npmjs.com/package/globals) package: `"browser"`, `"node"`, and so on. |
 | `globals`                                                                                                                 | `{}`            | More globals, or changes to those of `environments`, such as `{ MY_GLOBAL: "readonly" }`.                                                                                                   |
@@ -95,7 +96,7 @@ Every option from `javascript` down is a feature, and takes one of these values:
 - `false` turns the feature off, so none of its rules apply.
 - `true` turns it on with its defaults.
 - An object turns it on with these options:
-  - `files`: patterns of the files to lint, instead of the feature's default files.
+  - `files`: patterns that limit the feature to some of its default files, such as `src/**`. The feature lints a file that matches one of its default patterns and one of these.
   - `ignores`: patterns of files that the feature leaves out. Other features still lint them.
   - `overrides`: rule settings applied after the feature's own rules, in the feature's files.
 - `"auto"`, for `react`, `svelte`, and `express` only, turns the feature on when the project declares the framework. It is their default.
@@ -116,7 +117,7 @@ export default createConfig({
 
 Three things to keep in mind:
 
-- **Give each `files` pattern an extension,** such as `src/**/*.ts`. A pattern without one, such as `src/**`, also matches the JSON and Markdown files there, and ESLint stops with an error such as `The following rules do not support the language "json/json"`. `ignores` patterns need no extension.
+- **`files` limits a feature and cannot extend it.** A directory is enough: with `files: ["src/**"]`, a feature for sources lints the sources and the Svelte components in `src/`, and leaves the JSON and Markdown files there to their own features. A pattern with an extension, such as `src/**/*.ts`, also leaves out every other file that the feature lints by default, Svelte components included. A pattern that matches none of the default files, such as `**/*.markdown` for `markdown`, matches nothing. To lint another file type, see [Other file types](#other-file-types).
 - **Override a rule in the feature that holds it:** a core rule in `javascript`, and a plugin's rule in the feature of that plugin, listed in [Features](#features). The blocks of each feature come after those of the features before it, so `javascript: { overrides: { "unicorn/no-null": "off" } }` changes nothing, while `unicorn: { overrides: { "unicorn/no-null": "off" } }` turns the rule off. To change a rule in some files only, use a [user config](#user-configs).
 - **An override of a rule that needs type information applies only where typed linting does.** Such a rule stops ESLint in a file without type information, so an override that turns it on, also one that only changes its options, applies in the files that [typed linting](#typed-linting) covers. In the other files of the feature the rule stays off, and so it does in every file while `typeChecked` is `false`. An override that turns such a rule off applies in every file. These rules are the ones of typescript-eslint and eslint-plugin-functional that need type information, and `n/no-sync`. `n/no-sync` needs it only in TypeScript files and Svelte components, so in JavaScript files an override of it applies as any other does.
 
@@ -154,7 +155,7 @@ The `json` feature lints three languages:
 - JSONC: `**/*.jsonc`, `**/tsconfig*.json`, `**/.vscode/*.json`, and `**/.devcontainer/*.json`.
 - JSON5: `**/*.json5`.
 
-`json.files` and `json.overrides` apply to JSON files only. JSONC and JSON5 files keep their patterns and take their overrides from `json.overridesJsonc` and `json.overridesJson5`. `json.ignores` applies to all three.
+`json.files` and `json.ignores` apply to all three languages. `json.overrides` apply to JSON files only: JSONC and JSON5 files take their overrides from `json.overridesJsonc` and `json.overridesJson5`.
 
 Nothing else is linted: not CommonJS files (see [CommonJS](#commonjs)), not the code blocks in Markdown files, and no other file type, such as CSS, YAML, Vue, or Astro.
 
@@ -201,7 +202,7 @@ The `react` feature has three parts:
 - **Hooks.** The Rules of Hooks, `exhaustive-deps`, and the React Compiler rules of eslint-plugin-react-hooks, in every source, because custom hooks live in `.js` and `.ts` files too. The compiler rules analyze functions named like a component, with a capital letter, or like a hook, with `use` and a capital letter or digit.
 - **React Refresh.** `react-refresh/only-export-components`, as a warning, in JSX and TSX files.
 
-`react.files` replaces the files of all three parts. Overrides of `react-hooks/*` rules apply wherever the hooks rules do, and other overrides where the other two parts do.
+`react.files` limits all three parts: the hooks rules to the sources that match it, and the other two parts to the JSX and TSX files that match it. Overrides of `react-hooks/*` rules apply wherever the hooks rules do, and other overrides where the other two parts do. While React Refresh is off, an override of a `react-refresh/*` rule applies nowhere, because its plugin is not loaded.
 
 `react.refresh` selects the React Refresh variant, which decides what a file may export next to its components:
 
@@ -256,13 +257,13 @@ The `express` feature turns on nine rules of eslint-plugin-express-security, suc
 
 TypeScript files are parsed by typescript-eslint. By default, the parser reads no type information, and the rules that need it are off.
 
-| Option               | Default                  | Description                                                                                                                                                                                    |
-| -------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `typeChecked`        | `false`                  | Lint with type information.                                                                                                                                                                    |
-| `filesTypeAware`     | The files of the feature | Files that the parser reads with type information and that get the rules that need it. They match only the TypeScript files that the feature lints, so a directory such as `src/**` is enough. |
-| `ignoresTypeAware`   | `[]`                     | Files to lint without type information, such as scripts that no tsconfig includes.                                                                                                             |
-| `overridesTypeAware` | `{}`                     | Rule settings for the files that typed linting covers, applied after the rules that need type information and after `overrides`.                                                               |
-| `tsconfigRootDir`    | `projectRootDirectory`   | The directory that holds the root `tsconfig.json`, for typescript-eslint and the TypeScript import resolver.                                                                                   |
+| Option               | Default                  | Description                                                                                                                                                                                           |
+| -------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `typeChecked`        | `false`                  | Lint with type information.                                                                                                                                                                           |
+| `filesTypeAware`     | The files of the feature | Files that the parser reads with type information and that get the rules that need it. They match only the TypeScript files that the feature lints, so a directory such as `src/**` is enough.        |
+| `ignoresTypeAware`   | `[]`                     | Files to lint without type information, such as scripts that no tsconfig includes.                                                                                                                    |
+| `overridesTypeAware` | `{}`                     | Rule settings for the files that typed linting covers, applied after the rules that need type information and after `overrides`.                                                                      |
+| `tsconfigRootDir`    | `projectRootDirectory`   | The directory that holds the root `tsconfig.json`, for typescript-eslint and the TypeScript import resolver. A relative path is resolved from the working directory, not from `projectRootDirectory`. |
 
 `files`, `ignores`, and `overrides` work as for every feature.
 
@@ -331,19 +332,20 @@ export default createConfig({
 
 ## Rules that replace other rules
 
-Some plugins check what another plugin's rule also checks. For each such pair, one feature owns the check: while the owner is on, the rule it replaces is off in the files that both features lint.
+Some plugins check what another plugin's rule also checks. For each such pair, one feature owns the check: while the owner is on, the rule it replaces is off in the files that both features lint. Where the owner does not lint, a replaced rule comes back only if it makes the same check as the owner's rule, so that turning the owner off does not change which code passes. A style rule asks for something else, such as another order of the imports, and is always off.
 
-| Owner           | Replaced rules                                                                                                                                           |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import`                                                    |
-| `perfectionist` | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/adjacent-overload-signatures`, `@typescript-eslint/member-ordering` |
-| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                                                                              |
-| `unicorn`       | `no-negated-condition`, `no-warning-comments`, `n/no-process-exit`, `n/prefer-node-protocol`                                                             |
-| `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                                                                    |
+| Owner           | Replaced checks                                                                                       | Replaced style rules                                                                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import` |                                                                                                                                                          |
+| `perfectionist` |                                                                                                       | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/adjacent-overload-signatures`, `@typescript-eslint/member-ordering` |
+| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                           |                                                                                                                                                          |
+| `unicorn`       | `no-negated-condition`, `n/no-process-exit`, `n/prefer-node-protocol`                                 | `no-warning-comments`                                                                                                                                    |
+| `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                 |                                                                                                                                                          |
 
-- Turning the owner off turns the rules it replaces back on.
-- Limiting the owner with `files` or `ignores` turns them back on outside the owner's files.
-- Setting a replaced rule in the overrides of the feature that holds it keeps it on, as `node: { overrides: { "n/no-process-exit": "error" } }` does. For `typescript`, that includes `overridesTypeAware` in the files that [typed linting](#typed-linting) covers. Outside them, a rule that only `overridesTypeAware` sets is still replaced.
+- Turning the owner off turns the checks it replaces back on. The style rules stay off: without `perfectionist`, nothing checks the order of imports or object keys, and without `unicorn`, nothing reports a to-do comment.
+- Limiting the owner with `files` or `ignores` turns the checks back on outside the owner's files. The style rules stay off there too.
+- `n/no-missing-import` comes back in JavaScript files only. It does not resolve imports as TypeScript does, so it is off in TypeScript files and Svelte components, where the compiler reports a missing module.
+- Setting a replaced rule in the overrides of the feature that holds it turns it on, also where its owner lints, as `node: { overrides: { "n/no-process-exit": "error" } }` does. For `n/no-missing-import`, that includes TypeScript files and Svelte components. For `typescript`, that includes `overridesTypeAware` in the files that [typed linting](#typed-linting) covers. Outside them, a rule that only `overridesTypeAware` sets is still replaced.
 
 ## File-role exceptions
 
@@ -391,19 +393,36 @@ export default createConfig(
 
 To add a plugin, import it in `eslint.config.js` and pass a config object that registers it under `plugins` and sets its rules, with `files` that limit it to the files it is meant for.
 
+### Other file types
+
+A feature's `files` cannot add a file type, such as `.markdown` files to `markdown`. To lint such files with the rules of a feature, copy the feature's block from the array that `createConfig()` resolves to, and give the copy its own `files`:
+
+```js
+import { createConfig } from "@cravingmaker/eslint-config";
+
+const configs = await createConfig();
+const markdownRules = configs.find(
+  ({ name }) => name === "@cravingmaker/eslint-config/markdown/rules",
+);
+
+export default [...configs, { ...markdownRules, files: ["**/*.markdown"] }];
+```
+
+The copy keeps the language, the rules, and the `ignores` of the block. In the same way, a copy of `json/rules-jsonc` lints a JSON file with comments that has another name, such as `.babelrc`. Every block is named `@cravingmaker/eslint-config/<feature>/<part>`, and `configs.map(({ name }) => name)` lists the names.
+
 ## Monorepos
 
-`projectRootDirectory` decides which `package.json` turns on the frameworks, and it is the default `tsconfigRootDir`. Its default is the working directory of ESLint, which can differ between the command line and an editor. `import.meta.dirname` ties it to the directory of the config file instead.
+`projectRootDirectory` decides which `package.json` turns on the frameworks, and it is the default `tsconfigRootDir`. Its default is the working directory of ESLint, which can differ between the command line and an editor, and a relative path is resolved from it. `import.meta.dirname` ties it to the directory of the config file instead.
 
-With one config at the root of a monorepo, a framework that only a workspace declares is not detected. Turn it on and limit it to that workspace with `files`:
+With one config at the root of a monorepo, a framework that only a workspace declares is not detected. Turn it on and limit it to the directory of that workspace with `files`:
 
 ```js
 import { createConfig } from "@cravingmaker/eslint-config";
 
 export default createConfig({
-  express: { files: ["packages/api/**/*.ts"] },
+  express: { files: ["packages/api/**"] },
   projectRootDirectory: import.meta.dirname,
-  react: { files: ["apps/web/**/*.{ts,tsx}"] },
+  react: { files: ["apps/web/**"] },
   typescript: {
     filesTypeAware: ["packages/api/**"],
     typeChecked: true,
@@ -413,7 +432,17 @@ export default createConfig({
 
 The TypeScript files of the API then read type information through the nearest tsconfig, the one of their workspace, and the other TypeScript files are linted without it. Alternatively, give each workspace its own `eslint.config.js` with `projectRootDirectory: import.meta.dirname`.
 
+Import resolution uses the tsconfig in `tsconfigRootDir` and follows its `references`; it does not discover each workspace's tsconfig as typed linting does. If a workspace defines `compilerOptions.paths` but the root tsconfig does not reference it, `import-x/no-unresolved` reports imports through those aliases, even when typed linting reads the workspace's tsconfig.
+
+Add the workspace to the root tsconfig's `references`, or pass a [user config](#user-configs) scoped to that workspace, such as `files: ["packages/api/**"]`. In that config, set `settings["import-x/resolver-next"]` to an array containing a resolver created with `createTypeScriptImportResolver` from `eslint-import-resolver-typescript`. Give it `alwaysTryTypes: true` and `project` set to the absolute path of the workspace's `tsconfig.json`. Add the resolver package to the project's dev dependencies when importing it in the config.
+
 ## Limits
+
+### JSX file extensions
+
+JSX parses in `.jsx`, `.mjsx`, and `.tsx` files only. A `.js` file containing JSX, such as a page in a JavaScript Next.js project, fails with `Parsing error: Unexpected token <`, even with `react: true`. Use `.jsx` or `.mjsx` for JavaScript that contains JSX.
+
+The TypeScript and React feature globs include `.mtsx`, but JSX does not parse in that extension: `<div />` fails with `Parsing error: '>' expected.`. Use `.tsx` for TypeScript that contains JSX.
 
 ### CommonJS
 
@@ -421,6 +450,7 @@ CommonJS is not supported, and `.cjs` and `.cts` files get no rules:
 
 - ESLint still parses `.cjs` files, because its default config matches them. `eslint .` therefore reports syntax errors and unused disable directives in them, but nothing else.
 - `eslint .` skips `.cts` files. A `.cts` path passed explicitly, as lint-staged and editors do, gets the warning "File ignored because no matching configuration was supplied."
+- A feature's `files` does not bring them in. It only limits the feature's default files, and no CommonJS file is among them.
 
 ### Known issues
 

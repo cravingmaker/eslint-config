@@ -5,25 +5,27 @@ import { defaultContext } from "../../context.js";
 import { jsxFiles, sourceFiles, withSvelteComponents } from "../../globs.js";
 import { possibleProblemRules } from "./possible-problems.js";
 import { suggestionRules } from "./suggestions.js";
+import { narrowFiles } from "../../utilities/type-aware.js";
 
 // Policy for every non-deprecated ESLint core rule, shared by JavaScript and TypeScript files.
-const javascriptRules: Rules = {
+const coreRules: Rules = {
   ...possibleProblemRules,
   ...suggestionRules,
 };
 
-// Builds the flat config for ESLint's built-in rules on JavaScript and TypeScript files, which
-// are ES modules, and on the scripts of Svelte components. JSX parses in `.jsx` files without any
-// React plugin.
-function javascript(
+// Builds the flat config of the `javascript` feature: ESLint's built-in rules on JavaScript and
+// TypeScript files, which are ES modules, and on the scripts of Svelte components. JSX parses in
+// `.jsx` files without any React plugin.
+function core(
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { globals, svelteComponents }: Context = defaultContext,
 ): Linter.Config[] {
   return [
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       languageOptions: {
         ecmaVersion: "latest",
@@ -31,7 +33,7 @@ function javascript(
         sourceType: "module",
       },
       name: "@cravingmaker/eslint-config/javascript/rules",
-      rules: { ...javascriptRules, ...overrides },
+      rules: { ...coreRules, ...overrides },
     },
     {
       files: [...jsxFiles],
@@ -41,4 +43,4 @@ function javascript(
   ];
 }
 
-export { javascript, javascriptRules };
+export { core, coreRules };

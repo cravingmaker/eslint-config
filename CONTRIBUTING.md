@@ -73,9 +73,15 @@ consumers in `tests/package/` as well.
 - **Build before linting and testing.** `eslint.config.js` and most
   tests import `./dist/index.mjs`. After changing `src/`, run
   `npm run build` first, or you lint and test the previous build.
+- **TypeScript support follows typescript-eslint's peer range.** Read
+  `peerDependencies.typescript` in
+  `node_modules/typescript-eslint/package.json` when updating the README's
+  requirements. A TypeScript version outside that range can install with
+  a peer warning yet stop ESLint while loading the config, as TypeScript 7
+  does.
 - **Internal builders are tested from source.** Feature builders are not
   exported from the package root. Tests for them import from `src/`, as
-  `tests/configs/javascript/index.test.ts` does.
+  `tests/configs/core/index.test.ts` does.
 - **Snapshots record the policy.** `tests/policy/__snapshots__/` holds
   the configuration that ESLint resolves for representative paths, one
   rule per line. A changed line is a changed policy: update the snapshots
@@ -114,6 +120,20 @@ consumers in `tests/package/` as well.
   file is linted even when no block of this config matches it, with only
   the blocks that have no `files`. That is why `.cjs` files are still
   parsed, while `.cts` files are skipped.
+- **A feature's `files` narrows its default files.** A block takes
+  `narrowFiles(defaults, files)`, never `files ?? defaults`: it reaches
+  a file that matches one of its default patterns and one of `files`.
+  `files` usually names a directory, such as `src/**`. On its own, that
+  pattern would reach the files of other languages there, and a rule
+  that cannot read a file's language stops the whole run, with "The
+  following rules do not support the language" or an error of its own.
+  It would also select no file for linting, as any pattern that ends in
+  `/**`, so ESLint would skip the HTML, JSON, and Markdown files that no
+  other block matches. A feature with more than one default narrows each
+  of them, as `json` does for its three languages and `react` for its
+  two scopes. A new feature goes into the table of
+  `tests/factory/feature-toggles.test.ts`, which gives every feature a
+  directory as its `files`.
 - **The defaults detect frameworks from this repository's manifest.**
   `"auto"` reads the manifest at `projectRootDirectory`, which defaults
   to the working directory. A test that runs in this repository with the
@@ -142,11 +162,23 @@ consumers in `tests/package/` as well.
 - **A rule that is on needs its plugin in every file it reaches.** ESLint
   rejects the configuration of a file where a rule is on but no block
   registers its plugin, with `Could not find plugin`; a rule that is only
-  `"off"` passes. A block that reaches more files than the blocks that
-  register its feature's other plugins must not spread all of the
-  feature's `overrides`, which is why `react/hooks` takes only the
-  `react-hooks/*` overrides. `calculateConfigForFile` shows the error, so
-  a test of the resolved configuration catches it.
+  `"off"` passes. A feature whose plugins are registered in different
+  blocks must therefore not spread all of its `overrides` into each of
+  them. A block can reach more files than the blocks of the other
+  plugins, as `react/hooks` does, and a block can be missing, as
+  `react/refresh` is while React Refresh is off. Each block of the React
+  feature takes only the overrides of its own plugin's rules, and
+  `react/html` also those of any other rule. `calculateConfigForFile`
+  shows the error, so a test of the resolved configuration catches it.
+- **A replaced rule comes back only as the same check.**
+  `src/overlaps.ts` lists the rules that another feature's rules replace,
+  in two parts. A rule under `checks` is on in its rule map, and the
+  factory turns it off where its owner lints, so it comes back while the
+  owner is off and in the files that the owner leaves out. It must accept
+  what the owner's rule accepts: `tests/policy/fixtures.test.ts` lints
+  the fixtures with each owner off. A rule that asks for something else,
+  such as another order of the imports, goes under `style` and is `"off"`
+  in its rule map.
 - **Type information follows the type-aware scope.** Only
   `typescript/parser-type-aware` sets `projectService`, over
   `context.typeAware`, which stays within the files that
@@ -174,6 +206,17 @@ consumers in `tests/package/` as well.
   `Parsing error: Unexpected token :`. A test of those options that only
   compares resolved configurations does not show this; lint real
   TypeScript source with `lintText`.
+- **Workspace aliases use the import resolver's tsconfig.** Typed linting
+  reads each file's nearest tsconfig, but the import resolver starts at
+  `tsconfigRootDir` and follows its `references`. Reproduce a workspace's
+  `paths` with an import in a real file: without a root reference,
+  `import-x/no-unresolved` reports it. A user config scoped to that workspace
+  can set `import-x/resolver-next` to a resolver for its tsconfig, as
+  described in the README's "Monorepos" section.
+- **JSX parsing depends on the extension.** `.jsx`, `.mjsx`, and `.tsx`
+  parse JSX. `.js` does not, even with React on, and `.mtsx` does not,
+  despite appearing in the TypeScript and React globs. Lint JSX source to
+  check parsing; a matching feature block alone does not prove it parses.
 - **A missing peer needs a consumer.** Every optional peer is a dev
   dependency of this repository, so a test that runs in this repository
   always finds them. A test of a missing or partial peer set runs in a
@@ -231,6 +274,11 @@ This runs formatting checks, a build, typechecking, linting, tests, and
 package integrity checks. Package tests exercise the tarball in temporary
 consumer projects. Some install it from the npm registry, so the tests need
 network access.
+
+Vitest runs at most two test files at once to limit memory pressure: each
+worker loads ESLint and TypeScript, and the package tests also start child
+processes. The limit applies to local tests, validation, CI, and the
+pre-push hook.
 
 For faster feedback, run `npm run test:unit` for unit tests or
 `npm run test:package` for package consumer tests. Both commands build the

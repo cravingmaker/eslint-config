@@ -5,6 +5,7 @@ import pluginSecurity from "eslint-plugin-security";
 
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-security: its recommended config.
 const securityRules: Rules = {
@@ -23,9 +24,10 @@ function security(
       plugins: { security: pluginSecurity },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/security/rules",
       rules: { ...securityRules, ...overrides },

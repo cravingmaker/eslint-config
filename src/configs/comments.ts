@@ -6,6 +6,7 @@ import pluginComments from "@eslint-community/eslint-plugin-eslint-comments";
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for ESLint directive comments, from @eslint-community/eslint-plugin-eslint-comments.
 const commentsRules: Rules = {
@@ -34,9 +35,10 @@ function comments(
       plugins: { "@eslint-community/eslint-comments": pluginComments },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/comments/rules",
       rules: { ...commentsRules, ...overrides },

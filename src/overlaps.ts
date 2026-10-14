@@ -7,54 +7,82 @@ import { resolveOptions } from "./options.js";
 import { narrowFiles, narrowTypeAwareScope } from "./utilities/type-aware.js";
 
 /**
+A feature whose rules make the same check as rules of other features.
+*/
+type CheckOwner = "imports" | "regexp" | "unicorn" | "unusedImports";
+/**
 A feature whose rules replace rules of other features.
 */
-type Owner =
-  "imports" | "perfectionist" | "regexp" | "unicorn" | "unusedImports";
+type Owner = CheckOwner | StyleOwner;
 /**
 A feature whose rule map holds rules that an owner replaces.
 */
 type ReplacedFeature = "imports" | "javascript" | "node" | "typescript";
+/**
+The rules that an owner replaces, each with the owner's rules that cover it.
+*/
+type ReplacedRules = Readonly<Record<string, readonly string[]>>;
+/**
+A feature whose rules cover style rules of other features in their own way.
+*/
+type StyleOwner = "perfectionist" | "unicorn";
 
 /**
-Each owner, the rules it replaces, and its own rules that cover them. A replaced rule is on in
-its own feature's rule map. While its owner is on, the factory turns it off in the files that
-both features lint, unless the user sets it in that feature's overrides.
+Each owner, the rules of other features that it replaces, and its own rules that cover them, in
+two parts.
+
+A check reports the same code as the rules of its owner. It is on in its own feature's rule map.
+While its owner is on, the factory turns it off in the files that both features lint, unless the
+user sets it in that feature's overrides. So it comes back while its owner is off, and in the
+files that its owner leaves out, and the same code passes either way.
+
+A style rule asks for something that the rules of its owner do not: another order of the same
+code, or no to-do comment at all. It is off in its own feature's rule map and never comes back,
+so that turning its owner off, or leaving a file out of it, does not turn on a rule that passing
+code breaks. Only the user's overrides turn it on.
 */
-const overlaps: Readonly<
-  Record<Owner, Readonly<Record<string, readonly string[]>>>
-> = {
-  imports: {
-    "n/file-extension-in-import": ["import-x/extensions"],
-    "n/no-extraneous-import": ["import-x/no-extraneous-dependencies"],
-    "n/no-missing-import": ["import-x/no-unresolved"],
-    "no-duplicate-imports": ["import-x/no-duplicates"],
+const overlaps: {
+  readonly checks: Readonly<Record<CheckOwner, ReplacedRules>>;
+  readonly style: Readonly<Record<StyleOwner, ReplacedRules>>;
+} = {
+  checks: {
+    imports: {
+      "n/file-extension-in-import": ["import-x/extensions"],
+      "n/no-extraneous-import": ["import-x/no-extraneous-dependencies"],
+      // In JavaScript files only, see `configs/node.ts`.
+      "n/no-missing-import": ["import-x/no-unresolved"],
+      "no-duplicate-imports": ["import-x/no-duplicates"],
+    },
+    regexp: {
+      "no-empty-character-class": ["regexp/no-empty-character-class"],
+      "no-invalid-regexp": ["regexp/no-invalid-regexp"],
+      "no-useless-backreference": ["regexp/no-useless-backreference"],
+    },
+    unicorn: {
+      "n/no-process-exit": ["unicorn/no-process-exit"],
+      "n/prefer-node-protocol": ["unicorn/prefer-node-protocol"],
+      "no-negated-condition": ["unicorn/no-negated-condition"],
+    },
+    unusedImports: {
+      "no-unused-vars": ["unused-imports/no-unused-vars"],
+      "@typescript-eslint/no-unused-vars": ["unused-imports/no-unused-vars"],
+    },
   },
-  perfectionist: {
-    "import-x/first": ["perfectionist/sort-imports"],
-    "import-x/order": ["perfectionist/sort-imports"],
-    "sort-imports": ["perfectionist/sort-imports"],
-    "sort-keys": ["perfectionist/sort-objects"],
-    "@typescript-eslint/adjacent-overload-signatures": [
-      "perfectionist/sort-interfaces",
-      "perfectionist/sort-object-types",
-    ],
-    "@typescript-eslint/member-ordering": ["perfectionist/sort-classes"],
-  },
-  regexp: {
-    "no-empty-character-class": ["regexp/no-empty-character-class"],
-    "no-invalid-regexp": ["regexp/no-invalid-regexp"],
-    "no-useless-backreference": ["regexp/no-useless-backreference"],
-  },
-  unicorn: {
-    "n/no-process-exit": ["unicorn/no-process-exit"],
-    "n/prefer-node-protocol": ["unicorn/prefer-node-protocol"],
-    "no-negated-condition": ["unicorn/no-negated-condition"],
-    "no-warning-comments": ["unicorn/expiring-todo-comments"],
-  },
-  unusedImports: {
-    "no-unused-vars": ["unused-imports/no-unused-vars"],
-    "@typescript-eslint/no-unused-vars": ["unused-imports/no-unused-vars"],
+  style: {
+    perfectionist: {
+      "import-x/first": ["perfectionist/sort-imports"],
+      "import-x/order": ["perfectionist/sort-imports"],
+      "sort-imports": ["perfectionist/sort-imports"],
+      "sort-keys": ["perfectionist/sort-objects"],
+      "@typescript-eslint/adjacent-overload-signatures": [
+        "perfectionist/sort-interfaces",
+        "perfectionist/sort-object-types",
+      ],
+      "@typescript-eslint/member-ordering": ["perfectionist/sort-classes"],
+    },
+    unicorn: {
+      "no-warning-comments": ["unicorn/expiring-todo-comments"],
+    },
   },
 };
 // The feature of each plugin whose rules can be replaced. Core rules belong to `javascript`.
@@ -79,12 +107,13 @@ function hasOwnScope({ files, ignores = [] }: FeatureOptions): boolean {
   return files !== undefined || ignores.length > 0;
 }
 /**
-Builds the blocks that turn off replaced rules where their owner lints, for each feature that
-holds such rules. The rules of every owner that keeps its default scope are off in one block
+Builds the blocks that turn off replaced checks where their owner lints, for each feature that
+holds such rules. The checks of every owner that keeps its default scope are off in one block
 over that feature's files. An owner with files or ignores of its own gets a block that is
 narrowed to them. A rule that the holding feature's overrides set stays on.
 `typescript.overridesTypeAware` apply in the type-aware scope only, so a rule that only they set
-is turned off with the others, and a last block sets it again over that scope.
+is turned off with the others, and a last block sets it again over that scope. The replaced
+style rules need no block: their rule maps turn them off.
 */
 function overlapConfigs(
   options: ResolvedOptions = resolveOptions(),
@@ -92,31 +121,26 @@ function overlapConfigs(
   const owners = [
     {
       name: "imports",
-      replacedRules: overlaps.imports,
+      replacedRules: overlaps.checks.imports,
       settings: options.imports,
     },
     {
-      name: "perfectionist",
-      replacedRules: overlaps.perfectionist,
-      settings: options.perfectionist,
-    },
-    {
       name: "regexp",
-      replacedRules: overlaps.regexp,
+      replacedRules: overlaps.checks.regexp,
       settings: options.regexp,
     },
     {
       name: "unicorn",
-      replacedRules: overlaps.unicorn,
+      replacedRules: overlaps.checks.unicorn,
       settings: options.unicorn,
     },
     {
       name: "unused-imports",
-      replacedRules: overlaps.unusedImports,
+      replacedRules: overlaps.checks.unusedImports,
       settings: options.unusedImports,
     },
   ];
-  // The default files of the features that hold replaced rules, Svelte components included.
+  // The default files of the features that hold replaced checks, Svelte components included.
   const sources = withSvelteComponents(sourceFiles, options.svelteComponents);
   const scopes = [
     {
@@ -130,12 +154,6 @@ function overlapConfigs(
       feature: "node",
       overrides: options.node?.overrides,
       settings: options.node,
-    },
-    {
-      defaultFiles: sources,
-      feature: "imports",
-      overrides: options.imports?.overrides,
-      settings: options.imports,
     },
     {
       defaultFiles: withSvelteComponents(
@@ -153,7 +171,7 @@ function overlapConfigs(
     ({ defaultFiles, feature, overrides, overridesTypeAware, settings }) => {
       if (settings === undefined) return [];
 
-      const files = settings.files ?? defaultFiles;
+      const files = narrowFiles(defaultFiles, settings.files);
       const ignores = settings.ignores ?? [];
       const replaced = owners.flatMap(
         ({ name, replacedRules, settings: ownerSettings }) => {

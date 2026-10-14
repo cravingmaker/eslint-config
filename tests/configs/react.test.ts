@@ -1,7 +1,14 @@
+/* eslint-disable security/detect-non-literal-fs-filename -- The project is written to a temporary directory. */
+
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+
 import { ESLint } from "eslint";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { react } from "../../src/configs/react.js";
+import { createConfig } from "../../src/factory.js";
 import { expectLintError, expectNoLintError } from "../utilities.js";
 
 type EffectiveConfig = {
@@ -39,6 +46,25 @@ const nextSpecificExportCode = [
 ].join("\n");
 
 const rule = "react-refresh/only-export-components";
+
+// A project root whose manifest declares React and no bundler, so React Refresh is off there
+// unless `react.refresh` names a variant.
+const projectRootDirectory = await mkdtemp(
+  path.join(os.tmpdir(), "eslint-config-react-"),
+);
+await writeFile(
+  path.join(projectRootDirectory, "package.json"),
+  JSON.stringify({
+    dependencies: { react: "19.0.0" },
+    private: true,
+    type: "module",
+  }),
+  "utf8",
+);
+
+afterAll(async () => {
+  await rm(projectRootDirectory, { force: true, recursive: true });
+});
 
 async function getEffectiveConfig(
   eslint: ESLint,
@@ -112,6 +138,35 @@ describe("react feature", () => {
     expect(data).toBeUndefined();
   });
 
+  it("limits each of its scopes to the files that match files", async () => {
+    const eslint = new ESLint({
+      overrideConfig: await react({ files: ["app/**"] }),
+      overrideConfigFile: true,
+    });
+    const [component, hooksModule, ...others] = await Promise.all(
+      [
+        "app/Component.tsx",
+        "app/use-counter.ts",
+        "app/data.json",
+        "lib/Component.tsx",
+        "lib/use-counter.ts",
+      ].map(async (filePath) => await getEffectiveConfig(eslint, filePath)),
+    );
+
+    expect(getPluginNames(component)).toEqual([
+      "@",
+      "@html-eslint/react",
+      "react-hooks",
+      "react-refresh",
+    ]);
+    // A module without JSX gets the hooks rules and no others, as with the default files.
+    expect([getPluginNames(hooksModule), hooksModule?.rules]).toEqual([
+      ["@", "react-hooks"],
+      getHooksRules(component),
+    ]);
+    expect(others).toEqual([undefined, undefined, undefined]);
+  });
+
   it("applies overrides of the hooks rules wherever those apply, and other overrides to component files", async () => {
     const eslint = new ESLint({
       overrideConfig: await react({
@@ -163,6 +218,54 @@ describe("react feature", () => {
     ]);
   });
 
+  it("gives each override to the block that registers its plugin, and the override of any other rule to the first block", async () => {
+    const overrides = {
+      "@html-eslint/react/no-obsolete-tags": "off",
+      "no-console": "off",
+      // A rule of another plugin, whose name only starts with the name of the hooks plugin.
+      "react-hooks-extra/no-direct-set-state-in-use-effect": "off",
+      "react-hooks/exhaustive-deps": "warn",
+      "react-refresh/only-export-components": "error",
+    } as const;
+    // The overrides that each block holds, by the name of the block. Every setting differs from
+    // the one of the feature, so a block holds an override when it has the setting.
+    const describeBlocks = async (
+      refresh: false | "generic",
+    ): Promise<Readonly<Record<string, readonly string[]>>> => {
+      const configs = await react({ overrides, refresh });
+      return Object.fromEntries(
+        configs.map((config): readonly [string, readonly string[]] => {
+          const rules = new Map(Object.entries(config.rules ?? {}));
+          return [
+            config.name ?? "",
+            Object.entries(overrides)
+              .filter(([ruleId, entry]) => rules.get(ruleId) === entry)
+              .map(([ruleId]) => ruleId),
+          ];
+        }),
+      );
+    };
+    const withoutRefresh = {
+      "@cravingmaker/eslint-config/react/hooks": [
+        "react-hooks/exhaustive-deps",
+      ],
+      "@cravingmaker/eslint-config/react/html": [
+        "@html-eslint/react/no-obsolete-tags",
+        "no-console",
+        "react-hooks-extra/no-direct-set-state-in-use-effect",
+      ],
+    };
+
+    expect(await describeBlocks("generic")).toEqual({
+      ...withoutRefresh,
+      "@cravingmaker/eslint-config/react/refresh": [
+        "react-refresh/only-export-components",
+      ],
+    });
+    // Without its block, the override of the React Refresh rule has no block to go to.
+    expect(await describeBlocks(false)).toEqual(withoutRefresh);
+  });
+
   it.each([
     ["generic", false],
     ["next", false],
@@ -187,6 +290,52 @@ describe("react feature", () => {
 
     expect(configs.map((config) => config.name)).not.toContain(
       "@cravingmaker/eslint-config/react/refresh",
+    );
+  });
+});
+
+// Only the React Refresh block registers `react-refresh`, and ESLint rejects the configuration of
+// a file where a rule is on without its plugin, so the override must reach a file only with it.
+describe("an override of the React Refresh rule", () => {
+  it.each([
+    // The setting of the override replaces the one of the variant, options included.
+    [
+      "in component files with a variant",
+      { refresh: "vite" },
+      ["@html-eslint/react", "react-hooks", "react-refresh"],
+      [2],
+    ],
+    [
+      "nowhere while `refresh` is `false`",
+      { refresh: false },
+      ["@html-eslint/react", "react-hooks"],
+      undefined,
+    ],
+    [
+      "nowhere while the project declares no bundler, which leaves React Refresh off",
+      {},
+      ["@html-eslint/react", "react-hooks"],
+      undefined,
+    ],
+  ] as const)("applies %s", async (_case, options, plugins, entry) => {
+    const eslint = new ESLint({
+      overrideConfig: await createConfig({
+        projectRootDirectory,
+        react: {
+          ...options,
+          overrides: { "react-refresh/only-export-components": "error" },
+        },
+      }),
+      overrideConfigFile: true,
+    });
+    const component = await getEffectiveConfig(eslint, "src/App.tsx");
+
+    // The project declares React, so the plugins of the two other parts are there in each case.
+    expect(
+      getPluginNames(component).filter((name) => name.includes("react")),
+    ).toEqual(plugins);
+    expect(component?.rules?.["react-refresh/only-export-components"]).toEqual(
+      entry,
     );
   });
 });

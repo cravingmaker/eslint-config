@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 326 (error 247, off 64, warn 15)
+rules: 326 (error 244, off 67, warn 15)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -156,7 +156,7 @@ no-dupe-class-members: error
 no-dupe-else-if: error
 no-dupe-keys: error
 no-duplicate-case: error
-no-duplicate-imports: error [{"allowSeparateTypeImports":false,"includeExports":false}]
+no-duplicate-imports: error [{"allowSeparateTypeImports":true,"includeExports":false}]
 no-else-return: error [{"allowElseIf":false}]
 no-empty: error [{"allowEmptyCatch":true}]
 no-empty-character-class: error
@@ -259,7 +259,7 @@ no-useless-rename: error [{"ignoreDestructuring":false,"ignoreExport":false,"ign
 no-useless-return: error
 no-var: error
 no-void: error [{"allowAsStatement":false}]
-no-warning-comments: error [{"location":"start","terms":["todo","fixme","xxx"]}]
+no-warning-comments: off [{"location":"start","terms":["todo","fixme","xxx"]}]
 no-with: error
 object-shorthand: error ["always",{"avoidExplicitReturnArrows":true,"avoidQuotes":false,"ignoreConstructors":false}]
 one-var: error ["never"]
@@ -330,8 +330,8 @@ security/detect-object-injection: warn
 security/detect-possible-timing-attacks: warn
 security/detect-pseudoRandomBytes: warn
 security/detect-unsafe-regex: warn
-sort-imports: error [{"allowSeparatedGroups":false,"ignoreCase":false,"ignoreDeclarationSort":false,"ignoreMemberSort":false,"memberSyntaxSortOrder":["none","all","multiple","single"]}]
-sort-keys: error ["asc",{"allowLineSeparatedGroups":false,"caseSensitive":true,"ignoreComputedKeys":false,"minKeys":2,"natural":false}]
+sort-imports: off [{"allowSeparatedGroups":false,"ignoreCase":false,"ignoreDeclarationSort":false,"ignoreMemberSort":false,"memberSyntaxSortOrder":["none","all","multiple","single"]}]
+sort-keys: off ["asc",{"allowLineSeparatedGroups":false,"caseSensitive":true,"ignoreComputedKeys":false,"minKeys":2,"natural":false}]
 sort-vars: off [{"ignoreCase":false}]
 strict: off ["safe"]
 symbol-description: error

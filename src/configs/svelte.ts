@@ -5,13 +5,14 @@ import { defaultContext } from "../context.js";
 import { svelteFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
 import { importPeer } from "../utilities/import-peer.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Builds the flat config for Svelte components and rune modules. Script blocks are parsed with
 // the typescript-eslint parser, and the features for JavaScript and TypeScript sources lint the
 // scripts of the components that this block parses. A missing @html-eslint/eslint-plugin-svelte
 // or svelte-eslint-parser fails with a message that names it.
 async function svelte(
-  { files = svelteFiles, ignores = [], overrides = {} }: FeatureOptions = {},
+  { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { globals }: Context = defaultContext,
 ): Promise<Linter.Config[]> {
   const [plugin, parser] = await Promise.all([
@@ -28,7 +29,7 @@ async function svelte(
 
   return [
     {
-      files: [...files],
+      files: narrowFiles(svelteFiles, files),
       ignores: [...ignores],
       languageOptions: {
         globals: { ...globals },
