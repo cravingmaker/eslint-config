@@ -4,13 +4,13 @@ import type { Options } from "./types.js";
 import { defineConfig } from "eslint/config";
 
 import { comments } from "./configs/comments.js";
+import { core } from "./configs/core/index.js";
 import { exceptions } from "./configs/exceptions.js";
 import { express } from "./configs/express.js";
 import { functional } from "./configs/functional.js";
 import { html } from "./configs/html.js";
 import { ignores } from "./configs/ignores.js";
 import { imports } from "./configs/imports.js";
-import { javascript } from "./configs/javascript/index.js";
 import { json } from "./configs/json.js";
 import { markdown } from "./configs/markdown.js";
 import { node } from "./configs/node.js";
@@ -64,7 +64,7 @@ async function createConfig(
   return defineConfig([
     ...ignores(resolved.ignores),
 
-    ...javascript(resolved.javascript, context),
+    ...core(resolved.javascript, context),
     ...(resolved.comments === undefined
       ? []
       : comments(resolved.comments, context)),

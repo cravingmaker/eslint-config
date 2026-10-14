@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createConfig } from "../../../dist/index.mjs";
 import { expectLintError, expectNoLintError } from "../../utilities.js";
 
-describe("js suggestion rules", () => {
+describe("core suggestion rules", () => {
   it.each(["test.js", "test.ts"])(
     "no-restricted-globals: directs Buffer users to Uint8Array in %s",
     async (filePath) => {
