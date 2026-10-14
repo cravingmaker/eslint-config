@@ -2,7 +2,7 @@ import { ESLint } from "eslint";
 import { builtinRules } from "eslint/use-at-your-own-risk";
 import { describe, expect, it } from "vitest";
 
-import { javascript } from "../../../src/configs/javascript/index.js";
+import { core } from "../../../src/configs/core/index.js";
 import { defaultContext } from "../../../src/context.js";
 
 type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
@@ -17,9 +17,9 @@ async function getRules(
   return config?.rules;
 }
 
-describe("javascript feature", () => {
+describe("core builder", () => {
   it("contains only ESLint core rules in one named block without plugins", async () => {
-    const configs = javascript();
+    const configs = core();
     const eslint = new ESLint({
       overrideConfig: configs,
       overrideConfigFile: true,
@@ -47,9 +47,9 @@ describe("javascript feature", () => {
     };
     const [byDefault, withDirectory, withExtension] = await Promise.all(
       [
-        javascript({}, svelteContext),
-        javascript({ files: ["src/**"] }, svelteContext),
-        javascript({ files: ["**/*.js"] }, svelteContext),
+        core({}, svelteContext),
+        core({ files: ["src/**"] }, svelteContext),
+        core({ files: ["**/*.js"] }, svelteContext),
       ].map(
         async (configs) =>
           await getRules(
@@ -66,7 +66,7 @@ describe("javascript feature", () => {
 
   it("keeps to its default files within a directory that is its files", async () => {
     const eslint = new ESLint({
-      overrideConfig: javascript({ files: ["src/**"] }),
+      overrideConfig: core({ files: ["src/**"] }),
       overrideConfigFile: true,
     });
     // A CommonJS file still has ESLint's own configuration, without rules.
@@ -93,7 +93,7 @@ describe("javascript feature", () => {
 
   it("keeps files, ignores, and overrides local to the feature", async () => {
     const eslint = new ESLint({
-      overrideConfig: javascript({
+      overrideConfig: core({
         files: ["app/**/*.js"],
         ignores: ["**/*.generated.js"],
         overrides: { eqeqeq: ["warn", "smart"] },

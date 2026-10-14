@@ -2,7 +2,7 @@ import { describe, it } from "vitest";
 
 import { expectLintError } from "../../utilities.js";
 
-describe("js possible problem rules", () => {
+describe("core possible problem rules", () => {
   it("no-undef: reports typeof checks against undeclared variables", async () => {
     await expectLintError(
       `export const isMissing = typeof missingValue === 'undefined';\n`,

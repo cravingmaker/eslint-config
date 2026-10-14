@@ -81,7 +81,7 @@ consumers in `tests/package/` as well.
   does.
 - **Internal builders are tested from source.** Feature builders are not
   exported from the package root. Tests for them import from `src/`, as
-  `tests/configs/javascript/index.test.ts` does.
+  `tests/configs/core/index.test.ts` does.
 - **Snapshots record the policy.** `tests/policy/__snapshots__/` holds
   the configuration that ESLint resolves for representative paths, one
   rule per line. A changed line is a changed policy: update the snapshots
