@@ -1,14 +1,19 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- The consumers are created in a temporary directory. */
 
-import { execFile } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import os from "node:os";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
 
 import { afterAll, describe, expect, it } from "vitest";
+
+import {
+  createConsumer,
+  createTarball,
+  createTemporaryDirectory,
+  execute,
+  getOutput,
+  runCommand,
+} from "./consumers.js";
 
 type LintResult = {
   readonly filePath: string;
@@ -19,21 +24,7 @@ type LintResult = {
     readonly ruleId: string | null;
   }>;
 };
-type Manifest = { readonly devDependencies: Readonly<Record<string, string>> };
 type Messages = Readonly<Record<string, readonly string[]>>;
-
-// eslint-disable-next-line @typescript-eslint/strict-void-return -- promisify takes the callback form of execFile, which also returns its child process.
-const execute = promisify(execFile);
-const projectDirectory = fileURLToPath(new URL("../..", import.meta.url));
-const fixturesDirectory = fileURLToPath(
-  new URL("../fixtures", import.meta.url),
-);
-// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- This repository's manifest has this shape.
-const manifest = JSON.parse(
-  await readFile(path.join(projectDirectory, "package.json"), "utf8"),
-) as Manifest;
-// ESLint and the peers are the versions that this repository tests with.
-const testedVersions = new Map(Object.entries(manifest.devDependencies));
 
 // The fixtures that need no optional peer, the JSX component among them.
 const fixturesWithoutPeers = [
@@ -54,13 +45,54 @@ const reactFixtures = [
   "fixtures/react/Counter.tsx",
   "fixtures/react/use-toggle.ts",
 ] as const;
+// The TypeScript fixtures that need no optional peer. The tsconfig of the fixtures includes them.
+const typescriptFixtures = [
+  "fixtures/format-date.d.ts",
+  "fixtures/settle.mts",
+  "fixtures/temperature.ts",
+] as const;
 const defaultConfig = `import { createConfig } from "@cravingmaker/eslint-config";
 
 export default createConfig();
 `;
+// A config that turns on the rule of React Refresh through the overrides of the React feature.
+const refreshOverrideConfig = `import { createConfig } from "@cravingmaker/eslint-config";
 
-const temporaryDirectory = await mkdtemp(
-  path.join(os.tmpdir(), "eslint-config-install-"),
+export default createConfig({
+  react: {
+    overrides: { "react-refresh/only-export-components": "error" },
+  },
+});
+`;
+/*
+Configs with typed linting and a root directory that is a relative path, each by the option that
+has it. ESLint runs in the consumer, so `.` is the consumer and `fixtures` is the directory of
+the tsconfig.
+*/
+const relativeRootConfigs = [
+  [
+    "projectRootDirectory",
+    `import { createConfig } from "@cravingmaker/eslint-config";
+
+export default createConfig({
+  projectRootDirectory: ".",
+  typescript: { typeChecked: true },
+});
+`,
+  ],
+  [
+    "typescript.tsconfigRootDir",
+    `import { createConfig } from "@cravingmaker/eslint-config";
+
+export default createConfig({
+  typescript: { tsconfigRootDir: "fixtures", typeChecked: true },
+});
+`,
+  ],
+] as const;
+
+const temporaryDirectory = await createTemporaryDirectory(
+  "eslint-config-install-",
 );
 
 afterAll(async () => {
@@ -69,45 +101,6 @@ afterAll(async () => {
 
 function compareText(left: string, right: string): number {
   return left.localeCompare(right);
-}
-/*
-A project that installs the packed package, ESLint, and `peers` from the registry, as a consumer
-does, with this repository's install policy: no install scripts, and no version less than seven
-days old. The fixtures are copied into `fixtures/`.
-*/
-async function createConsumer(
-  name: string,
-  tarball: string,
-  peers: readonly string[],
-): Promise<string> {
-  const directory = path.join(temporaryDirectory, name);
-  await mkdir(directory);
-  await writeFile(
-    path.join(directory, "package.json"),
-    JSON.stringify({ name: `consumer-${name}`, private: true, type: "module" }),
-  );
-  await writeFile(
-    path.join(directory, ".npmrc"),
-    "audit=false\nfund=false\nignore-scripts=true\nmin-release-age=7\n",
-  );
-  await execute(
-    "npm",
-    [
-      "install",
-      "--prefer-offline",
-      "--save-exact",
-      tarball,
-      ...["eslint", ...peers].map(
-        (packageName) =>
-          `${packageName}@${testedVersions.get(packageName) ?? "missing"}`,
-      ),
-    ],
-    { cwd: directory },
-  );
-  await cp(fixturesDirectory, path.join(directory, "fixtures"), {
-    recursive: true,
-  });
-  return directory;
 }
 // A project root in the consumer in `directory` whose manifest declares `dependencies`.
 async function createProjectRoot(
@@ -125,43 +118,6 @@ async function createProjectRoot(
     JSON.stringify({ devDependencies, private: true, type: "module" }),
   );
   return projectRootDirectory;
-}
-// The package as published: `npm pack` of the current build, in `destination`.
-async function createTarball(destination: string): Promise<string> {
-  const { stdout } = await execute(
-    "npm",
-    ["pack", "--ignore-scripts", "--json", "--pack-destination", destination],
-    { cwd: projectDirectory },
-  );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- `npm pack --json` prints this shape.
-  const [{ filename }] = JSON.parse(stdout) as readonly [
-    { readonly filename: string },
-  ];
-  return path.join(destination, filename);
-}
-/*
-Runs a command and returns what it prints, also when it exits with an error, as ESLint does when
-it reports a problem and TypeScript does when it finds one.
-*/
-async function getOutput(
-  command: string,
-  commandArguments: readonly string[],
-  directory: string,
-): Promise<string> {
-  try {
-    const { stdout } = await execute(command, [...commandArguments], {
-      cwd: directory,
-      maxBuffer: 16 * 1024 * 1024,
-    });
-    return stdout;
-  } catch (error) {
-    return typeof error === "object" &&
-      error !== null &&
-      "stdout" in error &&
-      typeof error.stdout === "string"
-      ? error.stdout
-      : String(error);
-  }
 }
 /*
 Runs the ESLint CLI of the consumer in `directory` with `config` as `eslint.config.js` on
@@ -242,14 +198,14 @@ function withoutMessages(filePaths: readonly string[]): Messages {
 const tarball = await createTarball(temporaryDirectory);
 // Three peer sets, installed in parallel: none, a partial set, and every optional peer.
 const [withoutPeers, withPartialPeers, withAllPeers] = await Promise.all([
-  createConsumer("without-peers", tarball, []),
-  createConsumer("partial-peers", tarball, [
+  createConsumer(temporaryDirectory, "without-peers", tarball, []),
+  createConsumer(temporaryDirectory, "partial-peers", tarball, [
     "@html-eslint/eslint-plugin-react",
     "@html-eslint/eslint-plugin-svelte",
     "eslint-plugin-react-hooks",
     "react",
   ]),
-  createConsumer("all-peers", tarball, [
+  createConsumer(temporaryDirectory, "all-peers", tarball, [
     "@html-eslint/eslint-plugin-react",
     "@html-eslint/eslint-plugin-svelte",
     "eslint-plugin-express-security",
@@ -300,11 +256,62 @@ describe("the packed package", () => {
 });
 
 describe("a consumer without optional peers", () => {
+  it("reports Buffer globals, imports, and types from the installed package", async () => {
+    const output = await run(
+      withoutPeers,
+      String.raw`
+        import { ESLint } from "eslint";
+        import { createConfig } from "@cravingmaker/eslint-config";
+
+        const eslint = new ESLint({
+          overrideConfig: await createConfig({ environments: ["node"] }),
+          overrideConfigFile: true,
+        });
+        const cases = [
+          ["buffer-global.js", "export const bytes = Buffer.from('data');\n"],
+          ["buffer-import.js", "import { Buffer } from 'buffer';\nexport const bytes = Buffer.from('data');\n"],
+          ["buffer-import.ts", "import { Buffer } from 'node:buffer';\nexport const bytes = Buffer.from('data');\n"],
+          ["buffer-type.ts", "export type Bytes = Buffer;\n"],
+          ["uint8array.ts", "export const bytes = new Uint8Array([1, 2]);\n"],
+        ];
+        const rules = [];
+        for (const [filePath, code] of cases) {
+          const results = await eslint.lintText(code, { filePath });
+          if (await eslint.isPathIgnored(filePath) || results.some((result) => result.fatalErrorCount !== 0)) {
+            throw new Error(filePath + " was ignored or failed to parse");
+          }
+          rules.push(results.flatMap((result) => result.messages).map((message) => message.ruleId));
+        }
+        process.stdout.write(JSON.stringify(rules));
+      `,
+    );
+
+    expect(JSON.parse(output)).toEqual([
+      expect.arrayContaining(["no-restricted-globals"]),
+      expect.arrayContaining(["no-restricted-imports"]),
+      expect.arrayContaining(["no-restricted-imports"]),
+      expect.arrayContaining(["@typescript-eslint/no-restricted-types"]),
+      [],
+    ]);
+  });
+
   it("lints the fixtures that need no peer, the JSX component among them, without messages", async () => {
     expect(
       await lint(withoutPeers, defaultConfig, fixturesWithoutPeers),
     ).toEqual(withoutMessages(fixturesWithoutPeers));
   }, 120_000);
+
+  // typescript-eslint takes an absolute `tsconfigRootDir` only, and reports any other as a parsing
+  // error in every file that it reads with type information.
+  it.each(relativeRootConfigs)(
+    "lints the TypeScript fixtures with type information when %s is a relative path",
+    async (_option, config) => {
+      expect(await lint(withoutPeers, config, typescriptFixtures)).toEqual(
+        withoutMessages(typescriptFixtures),
+      );
+    },
+    120_000,
+  );
 
   it("fails with an install message for a framework that is on or that the project declares, and needs no peer for one that is off", async () => {
     const declaresReact = await createProjectRoot(withoutPeers, "react", [
@@ -333,6 +340,41 @@ describe("a consumer without optional peers", () => {
       undeclared: [],
     });
   });
+
+  it("stops ESLint before it lints, with a message that names what replaces the options of 0.1.0", async () => {
+    await writeFile(
+      path.join(withoutPeers, "eslint.config.js"),
+      `import { createConfig } from "@cravingmaker/eslint-config";
+
+export default createConfig({
+  reactRefreshVariant: "vite",
+  rules: { js: { "no-console": "error" } },
+  tsTypeChecked: true,
+});
+`,
+    );
+    const { exitCode, stderr, stdout } = await runCommand(
+      process.execPath,
+      [
+        path.join(withoutPeers, "node_modules", "eslint", "bin", "eslint.js"),
+        "fixtures/format-date.js",
+      ],
+      withoutPeers,
+    );
+
+    // ESLint exits with 2 when it cannot load the config, and with 0 or 1 once it has linted.
+    expect(exitCode, stderr).toBe(2);
+    expect(stdout).toBe("");
+    expect(stderr).toContain(
+      [
+        "Error: createConfig() does not know these options:",
+        "- `reactRefreshVariant`: an option of 0.1.0, now `react.refresh`.",
+        "- `rules`: an option of 0.1.0, now the `overrides` of each feature: `javascript.overrides` for core rules, and the `overrides` of a plugin's feature for the plugin's rules.",
+        "- `tsTypeChecked`: an option of 0.1.0, now `typescript.typeChecked`.",
+        'See "Migrating from 0.1.0" in the README.',
+      ].join("\n"),
+    );
+  }, 120_000);
 
   it("compiles a TypeScript example of the options, and rejects invalid ones", async () => {
     await writeFile(
@@ -432,6 +474,16 @@ describe("a consumer with a partial peer set", () => {
     expect(await lint(withPartialPeers, defaultConfig, filePaths)).toEqual(
       withoutMessages(filePaths),
     );
+  }, 120_000);
+
+  // Without React Refresh, no block registers its plugin, which this consumer has not installed.
+  // ESLint stops when a rule is on in a file whose configuration lacks its plugin.
+  it("lints the React fixtures with an override of the React Refresh rule, which applies nowhere without React Refresh", async () => {
+    const filePaths = ["fixtures/react/Greeting.jsx", ...reactFixtures];
+
+    expect(
+      await lint(withPartialPeers, refreshOverrideConfig, filePaths),
+    ).toEqual(withoutMessages(filePaths));
   }, 120_000);
 
   it("fails with an install message for a missing peer, and with Node's message for a missing peer of a peer", async () => {

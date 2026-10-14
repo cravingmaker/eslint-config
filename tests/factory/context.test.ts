@@ -75,10 +75,9 @@ describe("createContext", () => {
     expect(context.projectRootDirectory).toBe(projectRootDirectory);
     expect(context.globals.process).toBe(false);
     expect(context.tsconfigRootDir).toBe(projectRootDirectory);
-    expect(context.typeAware).toEqual({
-      files: [["src/**/*.ts", ...typescriptFiles]],
-      ignores: [],
-    });
+    expect(context.typeAware).toEqual([
+      [...typescriptFiles, "!**/*.svelte", "src/**/*.ts"],
+    ]);
   });
 
   it("uses the tsconfig directory of the TypeScript options when it is set", async () => {

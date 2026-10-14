@@ -133,10 +133,11 @@ describe.each(features)("$name feature", ({ build, name, plugin, rule }) => {
     ]);
   });
 
-  it("turns its rules on for the Svelte components of the context by default", async () => {
-    const [byDefault, withFiles] = [
+  it("turns its rules on for the Svelte components of the context that its files match", async () => {
+    const [byDefault, withDirectory, withExtension] = [
       build({}, svelteContext),
-      build({ files: ["app/**/*.js"] }, svelteContext),
+      build({ files: ["src/**"] }, svelteContext),
+      build({ files: ["src/**/*.js"] }, svelteContext),
     ].map(
       (configs) =>
         new ESLint({ overrideConfig: configs, overrideConfigFile: true }),
@@ -144,11 +145,44 @@ describe.each(features)("$name feature", ({ build, name, plugin, rule }) => {
     const severities = await Promise.all([
       getSeverity(byDefault, "src/Component.svelte", rule),
       getSeverity(byDefault, "src/generated/Component.svelte", rule),
-      getSeverity(withFiles, "src/Component.svelte", rule),
+      getSeverity(withDirectory, "src/Component.svelte", rule),
+      // A component that the context leaves out is not read by svelte-eslint-parser.
+      getSeverity(withDirectory, "src/generated/Component.svelte", rule),
+      getSeverity(withDirectory, "lib/Component.svelte", rule),
+      getSeverity(withExtension, "src/Component.svelte", rule),
     ]);
 
     expect(severities).toEqual([
       expect.toBeOneOf([1, 2]),
+      undefined,
+      expect.toBeOneOf([1, 2]),
+      undefined,
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("keeps to its default files within a directory that is its files", async () => {
+    const eslint = new ESLint({
+      overrideConfig: build({ files: ["src/**"] }),
+      overrideConfigFile: true,
+    });
+    const severities = await Promise.all(
+      [
+        "src/example.js",
+        "src/example.ts",
+        "src/example.cjs",
+        "src/data.json",
+        "src/README.md",
+        "lib/example.js",
+      ].map(async (filePath) => await getSeverity(eslint, filePath, rule)),
+    );
+
+    expect(severities).toEqual([
+      expect.toBeOneOf([1, 2]),
+      expect.toBeOneOf([1, 2]),
+      undefined,
+      undefined,
       undefined,
       undefined,
     ]);

@@ -113,7 +113,7 @@ const possibleProblemRules: Rules = {
   "no-duplicate-imports": [
     "error", // Off while import-x is on, see src/overlaps.ts
     {
-      allowSeparateTypeImports: false,
+      allowSeparateTypeImports: true, // As `import-x/no-duplicates`, which takes a type import next to a value import
       includeExports: false,
     },
   ],

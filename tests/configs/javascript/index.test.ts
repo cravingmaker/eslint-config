@@ -40,14 +40,15 @@ describe("javascript feature", () => {
     ).toEqual([]);
   });
 
-  it("lints the Svelte components of the context unless its files are set", async () => {
+  it("lints the Svelte components of the context that its files match", async () => {
     const svelteContext = {
       ...defaultContext,
       svelteComponents: ["**/*.svelte"],
     };
-    const [byDefault, withFiles] = await Promise.all(
+    const [byDefault, withDirectory, withExtension] = await Promise.all(
       [
         javascript({}, svelteContext),
+        javascript({ files: ["src/**"] }, svelteContext),
         javascript({ files: ["**/*.js"] }, svelteContext),
       ].map(
         async (configs) =>
@@ -59,7 +60,35 @@ describe("javascript feature", () => {
     );
 
     expect(byDefault).toHaveProperty(["eqeqeq", 0], 2);
-    expect(withFiles).toBeUndefined();
+    expect(withDirectory).toHaveProperty(["eqeqeq", 0], 2);
+    expect(withExtension).toBeUndefined();
+  });
+
+  it("keeps to its default files within a directory that is its files", async () => {
+    const eslint = new ESLint({
+      overrideConfig: javascript({ files: ["src/**"] }),
+      overrideConfigFile: true,
+    });
+    // A CommonJS file still has ESLint's own configuration, without rules.
+    const [script, typescript, ...others] = await Promise.all(
+      [
+        "src/example.js",
+        "src/example.ts",
+        "src/example.cjs",
+        "src/data.json",
+        "src/README.md",
+        "lib/example.js",
+      ].map(async (filePath) => await getRules(eslint, filePath)),
+    );
+
+    expect(script).toHaveProperty(["eqeqeq", 0], 2);
+    expect(typescript).toHaveProperty(["eqeqeq", 0], 2);
+    expect(others.map((rules) => Object.keys(rules ?? {}))).toEqual([
+      [],
+      [],
+      [],
+      [],
+    ]);
   });
 
   it("keeps files, ignores, and overrides local to the feature", async () => {

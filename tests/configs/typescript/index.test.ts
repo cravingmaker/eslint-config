@@ -16,7 +16,7 @@ type EffectiveConfig = {
 const typedContext: Context = {
   ...defaultContext,
   tsconfigRootDir: "/project",
-  typeAware: { files: ["**/*.ts"], ignores: [] },
+  typeAware: ["**/*.ts"],
 };
 
 async function getEffectiveConfig(
@@ -78,7 +78,7 @@ describe("typescript feature", () => {
         {},
         {
           ...typedContext,
-          typeAware: { files: ["src/**/*.ts"], ignores: ["src/legacy/**"] },
+          typeAware: [["src/**/*.ts", "!src/legacy/**"]],
         },
       ),
       overrideConfigFile: true,
@@ -135,13 +135,41 @@ describe("typescript feature", () => {
     expect(outside).toBeUndefined();
   });
 
+  it("keeps to TypeScript files and the Svelte components of the context within a directory that is its files", async () => {
+    const eslint = new ESLint({
+      overrideConfig: await typescript(
+        { files: ["app/**"] },
+        { ...defaultContext, svelteComponents: ["**/*.svelte"] },
+      ),
+      overrideConfigFile: true,
+    });
+    const [source, component, script, ...others] = await Promise.all(
+      [
+        "app/example.ts",
+        "app/Component.svelte",
+        "app/example.js",
+        "app/data.json",
+        "lib/example.ts",
+        "lib/Component.svelte",
+      ].map(async (filePath) => await getEffectiveConfig(eslint, filePath)),
+    );
+
+    expect(source?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(2);
+    expect(component?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(
+      2,
+    );
+    // ESLint's own configuration matches a JavaScript file, which gets no rule of the feature.
+    expect(Object.keys(script?.rules ?? {})).toEqual([]);
+    expect(others).toEqual([undefined, undefined, undefined]);
+  });
+
   it("sets the rules that need type information in a type-aware block after the overrides", async () => {
     const configs = await typescript(
       {
         overrides: { "@typescript-eslint/no-floating-promises": "warn" },
         overridesTypeAware: { "@typescript-eslint/await-thenable": "warn" },
       },
-      { ...typedContext, typeAware: { files: ["src/**"], ignores: [] } },
+      { ...typedContext, typeAware: ["src/**"] },
     );
     const eslint = new ESLint({
       overrideConfig: configs,
@@ -163,5 +191,92 @@ describe("typescript feature", () => {
     ]);
     expect(inside?.rules?.["@typescript-eslint/await-thenable"]).toEqual([1]);
     expect(outside?.rules?.["@typescript-eslint/await-thenable"]).toEqual([0]);
+  });
+
+  it("applies an override that turns on a rule that needs type information in the type-aware scope only", async () => {
+    const eslint = new ESLint({
+      overrideConfig: await typescript(
+        {
+          overrides: {
+            "@typescript-eslint/no-explicit-any": "warn",
+            "@typescript-eslint/no-floating-promises": [
+              "error",
+              { ignoreVoid: false },
+            ],
+          },
+        },
+        {
+          ...typedContext,
+          svelteComponents: ["**/*.svelte"],
+          typeAware: ["src/**/*.ts"],
+        },
+      ),
+      overrideConfigFile: true,
+    });
+    const [inside, outside, component] = await Promise.all([
+      getEffectiveConfig(eslint, "src/example.ts"),
+      getEffectiveConfig(eslint, "scripts/example.ts"),
+      getEffectiveConfig(eslint, "src/Component.svelte"),
+    ]);
+
+    expect(inside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual([
+      2,
+      { ignoreVoid: false },
+    ]);
+    expect(outside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual(
+      [0],
+    );
+    expect(
+      component?.rules?.["@typescript-eslint/no-floating-promises"],
+    ).toEqual([0]);
+    // An override of a rule that needs no type information applies in every file.
+    expect(outside?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(1);
+    expect(component?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(
+      1,
+    );
+  });
+
+  it("does not apply such an override without typed linting", async () => {
+    const eslint = new ESLint({
+      overrideConfig: await typescript({
+        overrides: { "@typescript-eslint/no-floating-promises": "warn" },
+      }),
+      overrideConfigFile: true,
+    });
+    const config = await getEffectiveConfig(eslint, "src/example.ts");
+
+    expect(config?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual([
+      0,
+    ]);
+  });
+
+  it("applies an override that turns such a rule off in every file, and overridesTypeAware after it", async () => {
+    const eslint = new ESLint({
+      overrideConfig: await typescript(
+        {
+          overrides: {
+            "@typescript-eslint/await-thenable": "off",
+            "@typescript-eslint/no-floating-promises": "off",
+          },
+          overridesTypeAware: {
+            "@typescript-eslint/no-floating-promises": "warn",
+          },
+        },
+        { ...typedContext, typeAware: ["src/**"] },
+      ),
+      overrideConfigFile: true,
+    });
+    const [inside, outside] = await Promise.all([
+      getEffectiveConfig(eslint, "src/example.ts"),
+      getEffectiveConfig(eslint, "scripts/example.ts"),
+    ]);
+
+    expect(inside?.rules?.["@typescript-eslint/await-thenable"]).toEqual([0]);
+    expect(inside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual([
+      1,
+    ]);
+    expect(outside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual(
+      [0],
+    );
   });
 });

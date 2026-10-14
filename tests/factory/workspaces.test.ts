@@ -23,7 +23,9 @@ type Scope = {
 
 /*
 A monorepo whose root declares no framework. The web app declares React, the API declares Express,
-and only the API has a tsconfig. Each feature is scoped to its workspace with `files`.
+and only the API has a tsconfig. Each feature is scoped to the directory of its workspace with
+`files`, as in "Monorepos" of the README. The directories also hold a manifest, a tsconfig, and a
+Markdown file, which the rules of those features cannot read.
 */
 const monorepoFiles = {
   "apps/web/package.json": JSON.stringify({
@@ -31,6 +33,7 @@ const monorepoFiles = {
     private: true,
     type: "module",
   }),
+  "apps/web/README.md": "# Web\n\nThe web app.\n",
   "package.json": JSON.stringify({
     private: true,
     type: "module",
@@ -73,9 +76,9 @@ await Promise.all(
 const eslint = new ESLint({
   cwd: rootDirectory,
   overrideConfig: await createConfig({
-    express: { files: ["packages/api/**/*.ts"] },
+    express: { files: ["packages/api/**"] },
     projectRootDirectory: rootDirectory,
-    react: { files: ["apps/web/**/*.{ts,tsx}"] },
+    react: { files: ["apps/web/**"] },
     typescript: {
       filesTypeAware: ["packages/api/**"],
       tsconfigRootDir: rootDirectory,
@@ -133,6 +136,33 @@ describe("features scoped to workspaces", () => {
     };
 
     expect(await describeScopes(Object.keys(expected))).toEqual(expected);
+  });
+
+  it("leave the other files of their workspace to the features for those files", async () => {
+    const filePaths = [
+      "apps/web/package.json",
+      "apps/web/README.md",
+      "packages/api/package.json",
+      "packages/api/tsconfig.json",
+    ];
+    const results = await eslint.lintFiles(filePaths);
+
+    // A message without a rule is a parsing error, or says that ESLint did not lint the file.
+    expect(
+      results.flatMap(({ messages }) =>
+        messages
+          .filter(({ ruleId }) => typeof ruleId !== "string")
+          .map(({ message }) => message),
+      ),
+    ).toEqual([]);
+    expect(await describeScopes(filePaths)).toEqual(
+      Object.fromEntries(
+        filePaths.map((filePath) => [
+          filePath,
+          { projectService: false, rules: [] },
+        ]),
+      ),
+    );
   });
 
   it("read type information through the tsconfig of their workspace", async () => {

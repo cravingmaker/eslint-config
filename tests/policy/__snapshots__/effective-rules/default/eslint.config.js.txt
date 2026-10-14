@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 815 (error 692, off 108, warn 15)
+rules: 815 (error 693, off 107, warn 15)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -161,7 +161,7 @@ n/no-unpublished-require: off
 n/no-unsupported-features/es-builtins: error
 n/no-unsupported-features/es-syntax: error
 n/no-unsupported-features/node-builtins: error
-n/prefer-global/buffer: error ["never"]
+n/prefer-global/buffer: off
 n/prefer-global/console: error
 n/prefer-global/crypto: error ["never"]
 n/prefer-global/process: error ["never"]
@@ -202,7 +202,7 @@ no-dupe-class-members: error
 no-dupe-else-if: error
 no-dupe-keys: error
 no-duplicate-case: error
-no-duplicate-imports: off [{"allowSeparateTypeImports":false,"includeExports":false}]
+no-duplicate-imports: off [{"allowSeparateTypeImports":true,"includeExports":false}]
 no-else-return: error [{"allowElseIf":false}]
 no-empty: error [{"allowEmptyCatch":true}]
 no-empty-character-class: off
@@ -258,8 +258,8 @@ no-prototype-builtins: error
 no-redeclare: error [{"builtinGlobals":true}]
 no-regex-spaces: error
 no-restricted-exports: off [{}]
-no-restricted-globals: off
-no-restricted-imports: off [{}]
+no-restricted-globals: error [{"message":"Use Uint8Array instead.","name":"Buffer"}]
+no-restricted-imports: error [{"message":"Use Uint8Array instead.","name":"buffer"},{"message":"Use Uint8Array instead.","name":"node:buffer"}]
 no-restricted-properties: off
 no-restricted-syntax: off
 no-return-assign: error ["always"]

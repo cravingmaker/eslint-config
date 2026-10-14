@@ -21,6 +21,8 @@ const allFeatures = {
   svelte: true,
   typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
 } as const satisfies Options;
+// Files of a feature that name the CommonJS extensions next to those of ES modules.
+const withCommonJs = { files: ["**/*.{js,cjs,ts,cts}"] } as const;
 
 async function createEslint(options: Options): Promise<ESLint> {
   return new ESLint({
@@ -65,6 +67,44 @@ describe("CommonJS files", () => {
         eslint,
         Object.keys(expected),
         (config) => Object.keys(config?.rules ?? {}).length,
+      ),
+    ).toEqual(expected);
+  });
+
+  // `files` limits a feature to some of its default files, which hold no CommonJS file.
+  it("get no rules from a feature whose files name them", async () => {
+    const eslint = await createEslint({
+      ...allFeatures,
+      comments: withCommonJs,
+      express: withCommonJs,
+      functional: withCommonJs,
+      imports: withCommonJs,
+      javascript: withCommonJs,
+      node: withCommonJs,
+      perfectionist: withCommonJs,
+      promise: withCommonJs,
+      react: withCommonJs,
+      regexp: withCommonJs,
+      security: withCommonJs,
+      typescript: { ...allFeatures.typescript, ...withCommonJs },
+      unicorn: withCommonJs,
+      unusedImports: withCommonJs,
+    });
+    const expected = {
+      "eslint.config.cjs": false,
+      "src/example.cjs": false,
+      "src/example.cts": false,
+      "src/example.d.cts": false,
+      "src/example.js": true,
+      "src/example.test.cts": false,
+      "src/example.ts": true,
+    };
+
+    expect(
+      await describeByPath(
+        eslint,
+        Object.keys(expected),
+        (config) => Object.keys(config?.rules ?? {}).length > 0,
       ),
     ).toEqual(expected);
   });

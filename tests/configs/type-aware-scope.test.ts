@@ -1,6 +1,7 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
 
-import type { TypeScriptOptions } from "../../src/types.js";
+import type { Linter } from "eslint";
+import type { Rules, TypeScriptOptions } from "../../src/types.js";
 
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -10,6 +11,10 @@ import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { createConfig } from "../../src/factory.js";
+import {
+  overridesWithoutTypeInformation,
+  withoutIgnores,
+} from "../../src/utilities/type-aware.js";
 
 type EffectiveConfig = {
   readonly languageOptions?: {
@@ -52,6 +57,61 @@ const projectFiles = {
     include: ["src/**/*.ts"],
   }),
 } as const;
+// Paths that the ignore lists below tell apart.
+const scopedPaths = [
+  "index.ts",
+  "scripts/build.ts",
+  "src/generated/data.ts",
+  "src/generated/deep/keep.ts",
+  "src/generated/keep.ts",
+  "src/index.ts",
+] as const;
+// Ignore lists, each with the paths that it leaves in when ESLint reads it in order.
+const ignoreLists: ReadonlyArray<
+  readonly [ignores: readonly string[], leftIn: readonly string[]]
+> = [
+  [[], scopedPaths],
+  [
+    ["scripts/**"],
+    [
+      "index.ts",
+      "src/generated/data.ts",
+      "src/generated/deep/keep.ts",
+      "src/generated/keep.ts",
+      "src/index.ts",
+    ],
+  ],
+  [
+    ["**/generated/**", "!**/generated/keep.ts"],
+    ["index.ts", "scripts/build.ts", "src/generated/keep.ts", "src/index.ts"],
+  ],
+  [["**/*", "!scripts/**"], ["scripts/build.ts"]],
+  // A negated pattern brings back only what the patterns before it left out.
+  [["!scripts/**", "**/*"], []],
+  // A later pattern leaves a file out again.
+  [
+    ["**/generated/**", "!**/generated/keep.ts", "**/keep.ts"],
+    ["index.ts", "scripts/build.ts", "src/index.ts"],
+  ],
+  [
+    ["**/*", "!src/**", "src/generated/**", "!src/generated/deep/**"],
+    ["src/generated/deep/keep.ts", "src/index.ts"],
+  ],
+  [
+    ["src/**", "scripts/**", "!src/index.ts", "!scripts/**"],
+    ["index.ts", "scripts/build.ts", "src/index.ts"],
+  ],
+  // ESLint reads any number of leading `!` as one.
+  [
+    ["**/generated/**", "!!**/generated/keep.ts"],
+    ["index.ts", "scripts/build.ts", "src/generated/keep.ts", "src/index.ts"],
+  ],
+  // ESLint drops a leading `./`, also after the `!`.
+  [
+    ["./src/generated/**", "!./src/generated/keep.ts"],
+    ["index.ts", "scripts/build.ts", "src/generated/keep.ts", "src/index.ts"],
+  ],
+];
 // One rule that needs type information from each feature that has them.
 const typeAwareRuleIds = [
   "functional/readonly-type",
@@ -62,6 +122,23 @@ const typed: TypeInformation = {
   projectService: true,
   typeAwareRules: typeAwareRuleIds,
 };
+// `example/typed` stands for a rule that needs type information. The settings below turn a rule
+// off, or on, with the severity alone or first in an array.
+const exampleTypeAwareRuleIds = ["example/typed"];
+const turnedOff: ReadonlyArray<{ readonly entry: Linter.RuleEntry }> = [
+  { entry: "off" },
+  { entry: 0 },
+  { entry: ["off"] },
+  { entry: [0, { option: true }] },
+];
+const turnedOn: ReadonlyArray<{ readonly entry: Linter.RuleEntry }> = [
+  { entry: "warn" },
+  { entry: 1 },
+  { entry: "error" },
+  { entry: 2 },
+  { entry: ["warn"] },
+  { entry: [2, { option: true }] },
+];
 const untyped: TypeInformation = { projectService: false, typeAwareRules: [] };
 
 const projectDirectory = await mkdtemp(
@@ -93,6 +170,45 @@ async function createEslint(typescript: TypeScriptOptions): Promise<ESLint> {
     }),
     overrideConfigFile: true,
   });
+}
+/*
+The paths that each of two blocks reaches: one with `ignores` as its ignore list, which ESLint
+reads in order, and one with the files of `withoutIgnores` and no ignore list.
+*/
+async function describeLeftIn(ignores: readonly string[]): Promise<{
+  readonly byFiles: readonly string[];
+  readonly byIgnores: readonly string[];
+}> {
+  const eslint = new ESLint({
+    overrideConfig: [
+      {
+        files: ["**/*.ts"],
+        ignores: [...ignores],
+        rules: { "no-debugger": "error" },
+      },
+      {
+        files: withoutIgnores(["**/*.ts"], ignores),
+        rules: { "no-console": "error" },
+      },
+    ],
+    overrideConfigFile: true,
+  });
+  const reached = await Promise.all(
+    scopedPaths.map(async (filePath) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
+      const config = (await eslint.calculateConfigForFile(filePath)) as
+        EffectiveConfig | undefined;
+      return { filePath, ruleIds: Object.keys(config?.rules ?? {}) };
+    }),
+  );
+  const pathsWith = (ruleId: string): readonly string[] =>
+    reached
+      .filter(({ ruleIds }) => ruleIds.includes(ruleId))
+      .map(({ filePath }) => filePath);
+  return {
+    byFiles: pathsWith("no-console"),
+    byIgnores: pathsWith("no-debugger"),
+  };
 }
 // How each of `filePaths` is linted, by path.
 async function describeTypeInformation(
@@ -144,6 +260,80 @@ async function lintByPath(
   );
 }
 
+describe("withoutIgnores", () => {
+  it.each(ignoreLists)(
+    "leaves in the files that ESLint leaves in with the ignores %j",
+    async (ignores, leftIn) => {
+      expect(await describeLeftIn(ignores)).toEqual({
+        byFiles: leftIn,
+        byIgnores: leftIn,
+      });
+    },
+  );
+
+  it("limits every set of patterns of the scope, and keeps the scope without ignores", () => {
+    const scope = ["scripts/**/*.ts", ["src/**", "**/*.ts"]] as const;
+
+    expect(withoutIgnores(scope, [])).toEqual(scope);
+    expect(
+      withoutIgnores(scope, ["**/generated/**", "!**/generated/keep.ts"]),
+    ).toEqual([
+      ["scripts/**/*.ts", "!**/generated/**"],
+      ["scripts/**/*.ts", "**/generated/keep.ts"],
+      ["src/**", "**/*.ts", "!**/generated/**"],
+      ["src/**", "**/*.ts", "**/generated/keep.ts"],
+    ]);
+  });
+});
+
+describe("overridesWithoutTypeInformation", () => {
+  it.each(turnedOff)(
+    "keeps the override $entry of a rule that needs type information, which turns it off",
+    ({ entry }) => {
+      const overrides = { "example/typed": entry };
+
+      expect(
+        overridesWithoutTypeInformation(overrides, exampleTypeAwareRuleIds),
+      ).toEqual(overrides);
+    },
+  );
+
+  it.each(turnedOn)(
+    "leaves out the override $entry of a rule that needs type information, which turns it on",
+    ({ entry }) => {
+      expect(
+        overridesWithoutTypeInformation(
+          { "example/typed": entry },
+          exampleTypeAwareRuleIds,
+        ),
+      ).toEqual({});
+    },
+  );
+
+  it("keeps settings that ESLint rejects, so that ESLint reports them", () => {
+    const overrides = { "example/typed": undefined };
+
+    // `toEqual` takes a property that is `undefined` for a missing one.
+    expect(
+      overridesWithoutTypeInformation(overrides, exampleTypeAwareRuleIds),
+    ).toStrictEqual(overrides);
+  });
+
+  it("keeps the overrides of the rules that need no type information", () => {
+    const plain: Rules = {
+      "example/other": "off",
+      "example/plain": ["error", { option: true }],
+    };
+
+    expect(
+      overridesWithoutTypeInformation(
+        { ...plain, "example/typed": "error" },
+        exampleTypeAwareRuleIds,
+      ),
+    ).toEqual(plain);
+  });
+});
+
 describe("type-aware scope", () => {
   it("lints typed sources with type information and other TypeScript files without it", async () => {
     const eslint = await createEslint({
@@ -167,6 +357,23 @@ describe("type-aware scope", () => {
   it("keeps type information and type-aware rules within TypeScript files", async () => {
     // A directory pattern also matches the JavaScript and JSON files in it.
     const eslint = await createEslint({ filesTypeAware: ["src/**"] });
+
+    expect(
+      await lintByPath(
+        eslint,
+        ["src/data.json", "src/index.ts", "src/util.js"],
+        "@typescript-eslint/no-floating-promises",
+      ),
+    ).toEqual({
+      "src/data.json": { fatal: [], reported: false },
+      "src/index.ts": { fatal: [], reported: true },
+      "src/util.js": { fatal: [], reported: false },
+    });
+  });
+
+  it("keeps the feature within TypeScript files when its files name a directory", async () => {
+    // A directory pattern also matches the JavaScript and JSON files in it.
+    const eslint = await createEslint({ files: ["src/**"] });
 
     expect(
       await lintByPath(
@@ -222,6 +429,19 @@ describe("type-aware scope", () => {
         "src/index.ts": typed,
         "src/legacy/index.ts": typed,
         "src/read.generated.ts": untyped,
+      },
+    ],
+    // `n/no-sync` needs type information in TypeScript files only, so a JavaScript file keeps it.
+    [
+      "within the TypeScript files of a directory that is the files of the TypeScript feature",
+      { files: ["src/**"] },
+      {
+        "scripts/build.ts": untyped,
+        "src/data.json": untyped,
+        "src/index.ts": typed,
+        "src/legacy/index.ts": typed,
+        "src/read.generated.ts": typed,
+        "src/util.js": { projectService: false, typeAwareRules: ["n/no-sync"] },
       },
     ],
   ] as const)(

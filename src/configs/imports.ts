@@ -132,9 +132,9 @@ const importsRules: Rules = {
   "import-x/dynamic-import-chunkname": "off", // Project specific, only target Webpack
   "import-x/no-webpack-loader-syntax": "off", // Project specific, only target Webpack
 
-  // Off while perfectionist is on, see src/overlaps.ts
-  "import-x/first": "error",
-  "import-x/order": "error",
+  // Covered by `perfectionist/sort-imports`, see src/overlaps.ts
+  "import-x/first": "off",
+  "import-x/order": "off",
 } as const;
 
 // Builds the flat config for eslint-plugin-import-x. TypeScript files and Svelte components
@@ -153,9 +153,10 @@ function imports(
       plugins: { "import-x": pluginImportX },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/imports/rules",
       rules: { ...importsRules, ...overrides },

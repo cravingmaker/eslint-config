@@ -2,10 +2,11 @@
 
 import { execFileSync } from "node:child_process";
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 
 import { afterAll, describe, expect, it } from "vitest";
+
+import { createTemporaryDirectory } from "./consumers.js";
 
 type ConsumerOptions = {
   readonly dependencies: readonly string[];
@@ -51,8 +52,8 @@ const optionalPeerDependencies: readonly string[] = [
   "svelte-eslint-parser",
 ];
 
-const temporaryDirectory = await fs.mkdtemp(
-  path.join(os.tmpdir(), "eslint-config-package-"),
+const temporaryDirectory = await createTemporaryDirectory(
+  "eslint-config-package-",
 );
 
 const linkDependency = async (

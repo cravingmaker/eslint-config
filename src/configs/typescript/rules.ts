@@ -138,7 +138,7 @@ const stylisticRules: Rules = {
   ],
   "@typescript-eslint/consistent-type-definitions": ["error", "type"],
 
-  "@typescript-eslint/adjacent-overload-signatures": "error", // Off while perfectionist is on, see src/overlaps.ts
+  "@typescript-eslint/adjacent-overload-signatures": "off", // Covered by `perfectionist/sort-interfaces` and `perfectionist/sort-object-types`, see src/overlaps.ts
 } as const;
 
 // The other typescript-eslint rules that work without type information.
@@ -171,7 +171,7 @@ const otherRules: Rules = {
   ],
 
   "@typescript-eslint/member-ordering": [
-    "error", // Off while perfectionist is on, see src/overlaps.ts
+    "off", // Covered by `perfectionist/sort-classes`, see src/overlaps.ts
     {
       default: {
         memberTypes: [
@@ -293,7 +293,18 @@ const otherRules: Rules = {
       allowTypedFunctionExpressions: true,
     },
   ],
-  "@typescript-eslint/no-restricted-types": "off",
+  "@typescript-eslint/no-restricted-types": [
+    "error",
+    {
+      types: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention -- The key must match the restricted TypeScript type name
+        Buffer: {
+          message: "Use Uint8Array instead.",
+          suggest: ["Uint8Array"],
+        },
+      },
+    },
+  ],
   "@typescript-eslint/parameter-properties": "off",
 
   // 'init-declarations': 'off', //Uncomment this if @typescript-eslint/init-declarations is enabled

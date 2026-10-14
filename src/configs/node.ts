@@ -16,7 +16,7 @@ import { narrowFiles, typeAwareConfig } from "../utilities/type-aware.js";
 const nodeRules: Rules = {
   ...enableAllRules("n", pluginNode.rules ?? {}),
 
-  "n/prefer-global/buffer": ["error", "never"],
+  "n/prefer-global/buffer": "off", // Buffer globals and imports are restricted in favor of Uint8Array
   "n/prefer-global/crypto": ["error", "never"],
   "n/prefer-global/process": ["error", "never"],
 
@@ -40,7 +40,7 @@ const nodeRules: Rules = {
   // Off while their replacements are on, see src/overlaps.ts
   "n/file-extension-in-import": "error",
   "n/no-extraneous-import": "error",
-  "n/no-missing-import": "error",
+  "n/no-missing-import": "error", // Off in TypeScript files and Svelte components, see `node`
   "n/no-process-exit": "error",
   "n/prefer-node-protocol": "error",
 
@@ -59,7 +59,12 @@ const nodeRules: Rules = {
 const typeAwareRules: Rules = { "n/no-sync": nodeRules["n/no-sync"] };
 
 // Builds the flat config for eslint-plugin-n. In TypeScript files and Svelte components,
-// `n/no-sync` is off unless they are in the type-aware scope.
+// `n/no-sync` is off unless they are in the type-aware scope, also when an override turns it on.
+// The rules block applies the overrides to every file of the feature, so the block that turns
+// the rule off takes none. `n/no-missing-import` is off in those files as well, unless an
+// override sets it. It does not resolve imports as TypeScript does: in a TypeScript file it
+// reports `./date.js` when `date.js` has a declaration file, and in a component also when the
+// module is `date.ts`. The compiler reports a module that is missing there.
 function node(
   options: FeatureOptions = {},
   { svelteComponents, typeAware }: Context = defaultContext,
@@ -72,9 +77,10 @@ function node(
       plugins: { n: pluginNode },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/node/rules",
       rules: { ...nodeRules, ...overrides },
@@ -86,7 +92,12 @@ function node(
       ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/node/rules-typescript",
-      rules: { "n/no-sync": "off", ...overrides },
+      rules: {
+        "n/no-sync": "off",
+        ...(!Object.hasOwn(overrides, "n/no-missing-import") && {
+          "n/no-missing-import": "off",
+        }),
+      },
     },
     ...(typeAware === undefined
       ? []

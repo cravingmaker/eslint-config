@@ -12,11 +12,17 @@ type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 
 const typedContext: Context = {
   ...defaultContext,
-  typeAware: { files: typescriptFiles, ignores: ["**/*.d.ts"] },
+  typeAware: [[...typescriptFiles, "!**/*.d.ts"]],
 };
 const tsOptions = {
   filePath: "tests/utilities.ts",
   tsTypeChecked: true,
+} as const;
+// Options of `functional/prefer-immutable-types` that the policy does not have.
+const deepParameters = {
+  enforcement: "None",
+  ignoreInferredTypes: true,
+  parameters: { enforcement: "ReadonlyDeep" },
 } as const;
 
 async function getRules(
@@ -85,6 +91,118 @@ describe("functional feature", () => {
     expect(inside?.["functional/prefer-immutable-types"]).toEqual([1]);
     expect(inside?.["functional/readonly-type"]?.[0]).toBe(2);
     expect(outside?.["functional/readonly-type"]).toBeUndefined();
+  });
+
+  it("keeps the type-aware block within the type-aware scope, whatever its ignores bring back", async () => {
+    // The feature lints `src/` only, declaration files included, which the scope leaves out.
+    const eslint = new ESLint({
+      overrideConfig: functional(
+        { ignores: ["**/*", "!src/**"] },
+        typedContext,
+      ),
+      overrideConfigFile: true,
+    });
+    const severities = await Promise.all([
+      getSeverity(eslint, "src/example.ts", "functional/readonly-type"),
+      getSeverity(eslint, "src/example.d.ts", "functional/readonly-type"),
+      getSeverity(eslint, "lib/example.ts", "functional/readonly-type"),
+    ]);
+
+    expect(severities).toEqual([2, 0, undefined]);
+  });
+
+  it("applies an override that turns on a rule that needs type information in the type-aware scope only", async () => {
+    const eslint = new ESLint({
+      overrideConfig: functional(
+        {
+          overrides: {
+            "functional/no-let": "warn",
+            "functional/prefer-immutable-types": ["error", deepParameters],
+          },
+        },
+        typedContext,
+      ),
+      overrideConfigFile: true,
+    });
+    const [typed, declaration, script] = await Promise.all([
+      getRules(eslint, "src/example.ts"),
+      getRules(eslint, "src/example.d.ts"),
+      getRules(eslint, "src/example.js"),
+    ]);
+
+    expect(typed?.["functional/prefer-immutable-types"]).toEqual([
+      2,
+      deepParameters,
+    ]);
+    expect(declaration?.["functional/prefer-immutable-types"]).toEqual([0]);
+    expect(script?.["functional/prefer-immutable-types"]).toEqual([0]);
+    // An override of a rule that needs no type information applies in every file.
+    expect(script?.["functional/no-let"]?.[0]).toBe(1);
+  });
+
+  it("does not apply such an override without typed linting", async () => {
+    const eslint = new ESLint({
+      overrideConfig: functional({
+        overrides: {
+          "functional/prefer-immutable-types": ["error", deepParameters],
+        },
+      }),
+      overrideConfigFile: true,
+    });
+    const rules = await Promise.all([
+      getRules(eslint, "src/example.ts"),
+      getRules(eslint, "src/example.js"),
+    ]);
+
+    expect(
+      rules.map((entries) => entries?.["functional/prefer-immutable-types"]),
+    ).toEqual([[0], [0]]);
+  });
+
+  it("applies an override that turns such a rule off in every file", async () => {
+    const eslint = new ESLint({
+      overrideConfig: functional(
+        { overrides: { "functional/readonly-type": ["off", "generic"] } },
+        typedContext,
+      ),
+      overrideConfigFile: true,
+    });
+    const rules = await Promise.all([
+      getRules(eslint, "src/example.ts"),
+      getRules(eslint, "src/example.d.ts"),
+      getRules(eslint, "src/example.js"),
+    ]);
+
+    expect(
+      rules.map((entries) => entries?.["functional/readonly-type"]),
+    ).toEqual([
+      [0, "generic"],
+      [0, "generic"],
+      [0, "generic"],
+    ]);
+  });
+
+  it("counts a deprecated rule that needs type information, which the policy does not set", async () => {
+    // With `checkImplicit`, the rule asks for the type of a constant without a type annotation.
+    const implicit = { checkImplicit: true };
+    const eslint = new ESLint({
+      overrideConfig: functional(
+        {
+          overrides: { "functional/prefer-readonly-type": ["error", implicit] },
+        },
+        typedContext,
+      ),
+      overrideConfigFile: true,
+    });
+    const rules = await Promise.all([
+      getRules(eslint, "src/example.ts"),
+      getRules(eslint, "src/example.d.ts"),
+      getRules(eslint, "src/example.js"),
+    ]);
+
+    expect(
+      rules.map((entries) => entries?.["functional/prefer-readonly-type"]),
+    ).toEqual([[2, implicit], undefined, undefined]);
   });
 });
 

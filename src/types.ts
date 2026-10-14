@@ -15,7 +15,7 @@ type Context = {
   */
   readonly globals: Readonly<Linter.Globals>;
   /**
-  The directory that holds the consumer's `package.json`.
+  The directory that holds the consumer's `package.json`, as an absolute path.
   */
   readonly projectRootDirectory: string;
   /**
@@ -25,7 +25,8 @@ type Context = {
   */
   readonly svelteComponents: ReadonlyArray<string | readonly string[]>;
   /**
-  The directory that holds `tsconfig.json`: `typescript.tsconfigRootDir`, or the project root.
+  The directory that holds `tsconfig.json`, as an absolute path: `typescript.tsconfigRootDir`, or
+  the project root.
   */
   readonly tsconfigRootDir: string;
   /**
@@ -44,7 +45,8 @@ Options that every feature accepts.
 */
 type FeatureOptions = {
   /**
-  File patterns for the feature, instead of its defaults.
+  File patterns that limit the feature to some of its default files, such as `src/**`: it lints a
+  file that matches one of its default patterns and one of these. They cannot add a file type.
   */
   readonly files?: readonly string[];
   /**
@@ -52,7 +54,8 @@ type FeatureOptions = {
   */
   readonly ignores?: readonly string[];
   /**
-  Rule settings applied after the feature's own rules.
+  Rule settings applied after the feature's own rules. Settings that turn on a rule that needs
+  type information apply only in the files that typed linting covers.
   */
   readonly overrides?: Rules;
 };
@@ -108,7 +111,7 @@ type Options = {
   /**
   The directory that holds the consumer's `package.json`, whose `dependencies`,
   `devDependencies`, and `peerDependencies` decide the `"auto"` features. Defaults to
-  `process.cwd()`.
+  `process.cwd()`. A relative path is resolved from the working directory.
   */
   readonly projectRootDirectory?: string;
   readonly promise?: Feature;
@@ -127,8 +130,9 @@ type Options = {
 /**
 Options of the `react` feature. By default, the hooks rules apply to every JavaScript and
 TypeScript file, where custom hooks also live, and the other React rules to JSX and TSX files.
-`files` replaces both defaults. Overrides of hooks rules apply wherever the hooks rules do, and
-other overrides where the other React rules do.
+`files` limits both to the files that match one of its patterns. Overrides of hooks rules apply
+wherever the hooks rules do, and other overrides where the other React rules do. While React
+Refresh is off, overrides of its rule apply nowhere.
 */
 type ReactOptions = FeatureOptions & {
   /**
@@ -161,13 +165,11 @@ schemas; any other rule ID is accepted, for plugins added in user configs.
 type Rules = Record<string, Linter.RuleEntry | undefined> & RuleOptions;
 /**
 Files that the parser reads with type information and that receive type-aware rules, within the
-files that the TypeScript feature parses. Each nested array is a set of patterns that a file must
-all match.
+files that the TypeScript feature parses and without Svelte components. Each nested array is a
+set of patterns that a file must all match. The scope has no ignore list: ESLint reads one in
+order, so the ignores of a block that takes the scope could bring back a file that it leaves out.
 */
-type TypeAwareScope = {
-  readonly files: ReadonlyArray<string | readonly string[]>;
-  readonly ignores: readonly string[];
-};
+type TypeAwareScope = ReadonlyArray<string | readonly string[]>;
 /**
 Options of the `typescript` feature.
 */
@@ -184,11 +186,13 @@ type TypeScriptOptions = FeatureOptions & {
   */
   readonly ignoresTypeAware?: readonly string[];
   /**
-  Rule settings applied after the type-aware rules.
+  Rule settings for the files that typed linting covers, applied after the type-aware rules and
+  after `overrides`.
   */
   readonly overridesTypeAware?: Rules;
   /**
-  The directory that holds `tsconfig.json`. Defaults to `projectRootDirectory`.
+  The directory that holds `tsconfig.json`. Defaults to `projectRootDirectory`. A relative path
+  is resolved from the working directory, not from `projectRootDirectory`.
   */
   readonly tsconfigRootDir?: string;
   /**

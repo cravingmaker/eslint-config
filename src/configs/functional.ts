@@ -6,7 +6,11 @@ import pluginFunctional from "eslint-plugin-functional";
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { disableConfigRules, enableAllRules } from "../utilities/all-rules.js";
-import { typeAwareConfig } from "../utilities/type-aware.js";
+import {
+  narrowFiles,
+  overridesWithoutTypeInformation,
+  typeAwareConfig,
+} from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-functional, including the rules that need type information.
 const functionalRules: Rules = {
@@ -94,6 +98,10 @@ const typeAwareRulesOff = disableConfigRules(
   pluginFunctional.rules,
   pluginFunctional.configs.disableTypeChecked.rules,
 );
+// Every rule of that config, also the deprecated ones, which `typeAwareRulesOff` leaves out.
+const typeAwareRuleIds = Object.keys(
+  pluginFunctional.configs.disableTypeChecked.rules ?? {},
+);
 // The policy for the rules that need type information.
 const typeAwareRules: Rules = Object.fromEntries(
   Object.entries(functionalRules).filter(([ruleId]) =>
@@ -102,7 +110,8 @@ const typeAwareRules: Rules = Object.fromEntries(
 );
 
 // Builds the flat config for eslint-plugin-functional. The rules that need type information
-// are off, and turned on again for the type-aware scope when typed linting is on.
+// are off, and turned on again for the type-aware scope when typed linting is on. An override
+// that turns such a rule on applies in that scope only.
 function functional(
   options: FeatureOptions = {},
   { svelteComponents, typeAware }: Context = defaultContext,
@@ -115,12 +124,17 @@ function functional(
       plugins: { functional: pluginFunctional },
     },
     {
-      files: [
-        ...(files ?? withSvelteComponents(sourceFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(sourceFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/functional/rules",
-      rules: { ...functionalRules, ...typeAwareRulesOff, ...overrides },
+      rules: {
+        ...functionalRules,
+        ...typeAwareRulesOff,
+        ...overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
+      },
     },
     ...(typeAware === undefined
       ? []

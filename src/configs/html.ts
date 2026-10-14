@@ -6,6 +6,7 @@ import htmlParser from "@html-eslint/parser";
 
 import { htmlFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for @html-eslint/eslint-plugin.
 const htmlRules: Rules = {
@@ -159,13 +160,13 @@ const htmlRules: Rules = {
 
 // Builds the flat config for HTML files.
 function html({
-  files = htmlFiles,
+  files,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Linter.Config[] {
   return [
     {
-      files: [...files],
+      files: narrowFiles(htmlFiles, files),
       ignores: [...ignores],
       languageOptions: { parser: htmlParser },
       name: "@cravingmaker/eslint-config/html/rules",

@@ -3,7 +3,10 @@ import type { Context, FeatureOptions } from "../../types.js";
 
 import { defaultContext } from "../../context.js";
 import { typescriptFiles, withSvelteComponents } from "../../globs.js";
-import { narrowTypeAwareScope } from "../../utilities/type-aware.js";
+import {
+  narrowFiles,
+  narrowTypeAwareScope,
+} from "../../utilities/type-aware.js";
 
 /**
 Builds the blocks that parse TypeScript files with typescript-eslint and register its plugin,
@@ -25,9 +28,10 @@ async function typescriptParser(
 
   return [
     {
-      files: [
-        ...(files ?? withSvelteComponents(typescriptFiles, svelteComponents)),
-      ],
+      files: narrowFiles(
+        withSvelteComponents(typescriptFiles, svelteComponents),
+        files,
+      ),
       ignores: [...ignores],
       languageOptions: { globals: { ...globals }, parser, parserOptions: {} },
       name: "@cravingmaker/eslint-config/typescript/parser",
@@ -37,7 +41,8 @@ async function typescriptParser(
       ? []
       : [
           {
-            ...narrowTypeAwareScope(typeAware, options),
+            // The scope stays within the feature's files and ignores, so they are not applied again.
+            files: narrowTypeAwareScope(typeAware),
             languageOptions: {
               parserOptions: { projectService: true, tsconfigRootDir },
             },

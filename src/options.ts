@@ -11,12 +11,13 @@ import type {
   TypeScriptOptions,
 } from "./types.js";
 
+import path from "node:path";
 import process from "node:process";
 
 import globalVariables from "globals";
 
 import { svelteComponentFiles, typescriptFiles } from "./globs.js";
-import { narrowFiles } from "./utilities/type-aware.js";
+import { narrowFiles, withoutIgnores } from "./utilities/type-aware.js";
 
 /**
 What the project uses, for the options whose default is `"auto"`.
@@ -110,12 +111,16 @@ function resolveGlobals(
 /**
 Applies the defaults to the options of `createConfig`. Every feature is on unless it is
 `false`, except `react`, `svelte`, and `express`, whose `"auto"` default follows `detection`.
+The project root becomes an absolute path: a relative one is resolved from the working
+directory, which is also its default.
 */
 function resolveOptions(
   options: Options = {},
   detection: Detection = undetected,
 ): ResolvedOptions {
-  const projectRootDirectory = options.projectRootDirectory ?? process.cwd();
+  const projectRootDirectory = path.resolve(
+    options.projectRootDirectory ?? process.cwd(),
+  );
   const svelte = resolveDetectedFeature(detection.svelte, options.svelte);
 
   return {
@@ -183,8 +188,10 @@ function resolveSvelteComponents(
 }
 /**
 Resolves the files that the parser reads with type information and that get type-aware rules:
-`filesTypeAware` without `ignoresTypeAware`, within the files that the TypeScript feature
-parses, because type information needs its parser.
+`filesTypeAware` without `ignoresTypeAware`, within the TypeScript sources that the TypeScript
+feature parses, because type information needs its parser, and without Svelte components, whose
+parser reads none, whatever `files` names. Each list of ignores is applied on its own, so a
+negated pattern brings back only what its own list left out.
 */
 function resolveTypeAwareScope(
   value: Feature<TypeScriptOptions> = true,
@@ -193,17 +200,24 @@ function resolveTypeAwareScope(
   if (typescript?.typeChecked !== true) return undefined;
 
   const {
-    files = typescriptFiles,
+    files,
     filesTypeAware,
     ignores = [],
     ignoresTypeAware = [],
   } = typescript;
-  return {
-    files:
-      filesTypeAware === undefined ? files : narrowFiles(filesTypeAware, files),
-    ignores: [...ignores, ...ignoresTypeAware],
-  };
+  // The files that typescript-eslint parses itself: the TypeScript sources among the files of
+  // the feature, without components.
+  const parsed = withoutIgnores(
+    withoutIgnores(narrowFiles(typescriptFiles, files), svelteComponentFiles),
+    ignores,
+  );
+  return withoutIgnores(narrowFiles(parsed, filesTypeAware), ignoresTypeAware);
 }
+/**
+Applies the defaults to the options of the TypeScript feature. typescript-eslint takes an
+absolute `tsconfigRootDir` only, so the tsconfig directory becomes an absolute path: a relative
+one is resolved from the working directory, as the project root is, and not from that root.
+*/
 function resolveTypeScript(
   projectRootDirectory: string,
   value: Feature<TypeScriptOptions> = true,
@@ -213,7 +227,9 @@ function resolveTypeScript(
 
   return {
     ...typescript,
-    tsconfigRootDir: typescript.tsconfigRootDir ?? projectRootDirectory,
+    tsconfigRootDir: path.resolve(
+      typescript.tsconfigRootDir ?? projectRootDirectory,
+    ),
     typeChecked: typescript.typeChecked ?? false,
   };
 }

@@ -3,6 +3,7 @@ import type { FeatureOptions, Rules } from "../types.js";
 
 import { expressFiles } from "../globs.js";
 import { importPeer } from "../utilities/import-peer.js";
+import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-express-security, an optional peer.
 const expressRules: Rules = {
@@ -22,7 +23,7 @@ const expressRules: Rules = {
 // Builds the flat config for Express apps. A missing eslint-plugin-express-security fails with a
 // message that names it.
 async function express({
-  files = expressFiles,
+  files,
   ignores = [],
   overrides = {},
 }: FeatureOptions = {}): Promise<Linter.Config[]> {
@@ -32,7 +33,7 @@ async function express({
 
   return [
     {
-      files: [...files],
+      files: narrowFiles(expressFiles, files),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/express/rules",
       plugins: { "express-security": plugin.default },

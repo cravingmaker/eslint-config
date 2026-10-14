@@ -1,3 +1,6 @@
+import type { Owner } from "../../src/overlaps.js";
+import type { Options } from "../../src/types.js";
+
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -43,23 +46,34 @@ const fixtures: readonly Fixture[] = [
   { fileType: "Package manifest", path: "package.json" },
   { fileType: "Markdown", path: "README.md" },
 ];
+// The options that turn off each feature whose rules replace rules of other features.
+const withoutOwner = {
+  imports: { imports: false },
+  perfectionist: { perfectionist: false },
+  regexp: { regexp: false },
+  unicorn: { unicorn: false },
+  unusedImports: { unusedImports: false },
+} as const satisfies Readonly<Record<Owner, Options>>;
 
 function compareText(left: string, right: string): number {
   return left.localeCompare(right);
 }
 /*
-Lints every fixture with every feature and framework on, and returns the messages of each by path.
-React Refresh uses its strictest variant, which allows nothing but components to be exported next
-to them. The React fixtures are left out of typed linting. React ships no type declarations, so
-every value from React would be an error type, which the type-aware rules report; and with them,
-typed linting reports the components themselves, which the plan records under stage 4.
+Lints every fixture with every feature and framework on, apart from the features that `options`
+turn off, and returns the messages of each by path. React Refresh uses its strictest variant,
+which allows nothing but components to be exported next to them. The React fixtures are left out
+of typed linting. React ships no type declarations, so every value from React would be an error
+type, which the type-aware rules report; and with them, typed linting reports the components
+themselves, one of the known issues in the README.
 */
 async function lintFixtures(
   isTypeChecked: boolean,
+  options: Options = {},
 ): Promise<ReadonlyMap<string, readonly string[]>> {
   const eslint = new ESLint({
     cwd: fixturesDirectory,
     overrideConfig: await createConfig({
+      ...options,
       express: true,
       projectRootDirectory: fixturesDirectory,
       react: { refresh: "generic" },
@@ -138,4 +152,24 @@ describe("fixtures", () => {
       },
     );
   });
+
+  /*
+  While such a feature is off, the checks that it replaces come back, and the style rules that it
+  replaces stay off. So code that passes with the feature on still passes.
+  */
+  describe.each(Object.entries(withoutOwner))(
+    "with typed linting and %s off",
+    (_owner, options) => {
+      const lintResults = lintFixtures(true, options);
+
+      it.each(fixtures)(
+        "$fileType: $path parses and has no lint messages",
+        async (fixture) => {
+          const messages = await lintResults;
+
+          expect(messages.get(fixture.path)).toEqual([]);
+        },
+      );
+    },
+  );
 });

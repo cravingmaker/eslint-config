@@ -1,3 +1,4 @@
+import path from "node:path";
 import process from "node:process";
 
 import globalVariables from "globals";
@@ -28,6 +29,14 @@ const allDetected = {
   reactRefresh: "vite",
   svelte: true,
 } as const;
+// Relative paths, each with the segments that lead to it from the working directory.
+const relativeDirectories: ReadonlyArray<
+  readonly [relative: string, segments: readonly string[]]
+> = [
+  [".", []],
+  ["packages/api", ["packages", "api"]],
+  ["../sibling", ["..", "sibling"]],
+];
 
 describe("resolveOptions", () => {
   it.each(featuresOnByDefault)("turns %s on by default", (feature) => {
@@ -113,10 +122,57 @@ describe("resolveOptions", () => {
     expect(resolved.typeAware).toBeUndefined();
   });
 
+  // typescript-eslint takes an absolute `tsconfigRootDir` only, so both directories are resolved.
+  it.each(relativeDirectories)(
+    "resolves the relative project root %j from the working directory",
+    (relative, segments) => {
+      const absolute = path.join(process.cwd(), ...segments);
+      const resolved = resolveOptions({ projectRootDirectory: relative });
+
+      expect(resolved.projectRootDirectory).toBe(absolute);
+      // The tsconfig directory defaults to the project root as it is resolved.
+      expect(resolved.typescript?.tsconfigRootDir).toBe(absolute);
+    },
+  );
+
+  it.each(relativeDirectories)(
+    "resolves the relative tsconfig directory %j from the working directory",
+    (relative, segments) => {
+      // A relative tsconfig directory does not start from the project root, which is elsewhere.
+      const projectRootDirectory = path.join(process.cwd(), "projects", "app");
+      const resolved = resolveOptions({
+        projectRootDirectory,
+        typescript: { tsconfigRootDir: relative },
+      });
+
+      expect(resolved.typescript?.tsconfigRootDir).toBe(
+        path.join(process.cwd(), ...segments),
+      );
+      expect(resolved.projectRootDirectory).toBe(projectRootDirectory);
+    },
+  );
+
+  it("keeps absolute root directories as they are", () => {
+    // Outside the working directory, on any system.
+    const projectRootDirectory = path.join(
+      path.parse(process.cwd()).root,
+      "project",
+    );
+    const tsconfigRootDir = path.join(projectRootDirectory, "packages", "api");
+
+    expect(resolveOptions({ projectRootDirectory })).toMatchObject({
+      projectRootDirectory,
+      typescript: { tsconfigRootDir: projectRootDirectory },
+    });
+    expect(
+      resolveOptions({ projectRootDirectory, typescript: { tsconfigRootDir } }),
+    ).toMatchObject({ projectRootDirectory, typescript: { tsconfigRootDir } });
+  });
+
   it("scopes type-aware rules to TypeScript files when type checking is on", () => {
     expect(
       resolveOptions({ typescript: { typeChecked: true } }).typeAware,
-    ).toEqual({ files: typescriptFiles, ignores: [] });
+    ).toEqual([[...typescriptFiles, "!**/*.svelte"]]);
     expect(
       resolveOptions({
         typescript: {
@@ -125,10 +181,9 @@ describe("resolveOptions", () => {
           typeChecked: true,
         },
       }).typeAware,
-    ).toEqual({
-      files: [["src/**", ...typescriptFiles]],
-      ignores: ["src/**/*.test.ts"],
-    });
+    ).toEqual([
+      [...typescriptFiles, "!**/*.svelte", "src/**", "!src/**/*.test.ts"],
+    ]);
   });
 
   it("keeps the type-aware scope within the files and ignores of the TypeScript feature", () => {
@@ -138,10 +193,9 @@ describe("resolveOptions", () => {
       typeChecked: true,
     } as const;
 
-    expect(resolveOptions({ typescript }).typeAware).toEqual({
-      files: ["app/**/*.ts"],
-      ignores: ["**/*.generated.ts"],
-    });
+    expect(resolveOptions({ typescript }).typeAware).toEqual([
+      [...typescriptFiles, "app/**/*.ts", "!**/*.svelte", "!**/*.generated.ts"],
+    ]);
     expect(
       resolveOptions({
         typescript: {
@@ -150,10 +204,79 @@ describe("resolveOptions", () => {
           ignoresTypeAware: ["app/server/legacy/**"],
         },
       }).typeAware,
-    ).toEqual({
-      files: [["app/server/**", "app/**/*.ts"]],
-      ignores: ["**/*.generated.ts", "app/server/legacy/**"],
-    });
+    ).toEqual([
+      [
+        ...typescriptFiles,
+        "app/**/*.ts",
+        "!**/*.svelte",
+        "!**/*.generated.ts",
+        "app/server/**",
+        "!app/server/legacy/**",
+      ],
+    ]);
+  });
+
+  it("keeps the type-aware scope within TypeScript files, whatever the files of the TypeScript feature name", () => {
+    // A directory also holds JavaScript and JSON files, and Svelte components, whose parser
+    // reads no type information.
+    expect(
+      resolveOptions({
+        svelte: true,
+        typescript: { files: ["src/**"], typeChecked: true },
+      }).typeAware,
+    ).toEqual([[...typescriptFiles, "src/**", "!**/*.svelte"]]);
+    expect(
+      resolveOptions({
+        svelte: true,
+        typescript: { files: ["src/**/*.{ts,svelte}"], typeChecked: true },
+      }).typeAware,
+    ).toEqual([[...typescriptFiles, "src/**/*.{ts,svelte}", "!**/*.svelte"]]);
+  });
+
+  it("applies each list of ignores to the type-aware scope on its own", () => {
+    // A negated pattern brings back only what its own list left out. The one of `ignores` does
+    // not bring back the file that `ignoresTypeAware` leaves out.
+    expect(
+      resolveOptions({
+        typescript: {
+          ignores: ["**/generated/**", "!**/generated/keep.ts"],
+          ignoresTypeAware: ["**/generated/keep.ts"],
+          typeChecked: true,
+        },
+      }).typeAware,
+    ).toEqual([
+      [
+        ...typescriptFiles,
+        "!**/*.svelte",
+        "!**/generated/**",
+        "!**/generated/keep.ts",
+      ],
+      [
+        ...typescriptFiles,
+        "!**/*.svelte",
+        "**/generated/keep.ts",
+        "!**/generated/keep.ts",
+      ],
+    ]);
+    // Nor does the one of `ignoresTypeAware` bring back a file that `ignores` leaves out, which
+    // the parser of the feature does not read.
+    expect(
+      resolveOptions({
+        typescript: {
+          ignores: ["**/generated/**"],
+          ignoresTypeAware: ["!**/generated/keep.ts"],
+          typeChecked: true,
+        },
+      }).typeAware,
+    ).toEqual([
+      [...typescriptFiles, "!**/*.svelte", "!**/generated/**"],
+      [
+        ...typescriptFiles,
+        "!**/*.svelte",
+        "!**/generated/**",
+        "**/generated/keep.ts",
+      ],
+    ]);
   });
 
   it("resolves the Svelte components that the Svelte feature parses", () => {

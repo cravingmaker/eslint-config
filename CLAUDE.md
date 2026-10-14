@@ -24,11 +24,8 @@ Node.js 24.15 or later is required at runtime. Check `node --version` before any
 - Never bypass the git hooks with `--no-verify`.
 - `tests/policy/__snapshots__/` records the effective lint policy. A changed line there is a changed policy: update with `npx vitest run tests/policy -u` only when the change is intended, and explain the diff. Never edit those files by hand.
 - `functional/prefer-immutable-types` can give different results depending on which files are linted together when a parameter's type is a mapped type such as `Partial<Readonly<T>>`; write `Readonly<Partial<T>>` instead. Before committing, lint both the whole repository and only the files you changed.
+- Before changing anything under `src/` or `tests/`, read "Things to know" in `CONTRIBUTING.md`. `docs/rewrite/record.md` lists the design decisions and the open questions that wait for the maintainer.
 
 ## Releases
 
 Do not merge Release Please pull requests, create tags, or publish GitHub Releases. Merging a release pull request publishes to npm. The maintainer does this.
-
-## Rewrite in progress
-
-The package is being restructured in stages. Before changing anything under `src/` or `tests/`, read `docs/rewrite/handoff.md` and `docs/rewrite/implementation-plan.md`, and keep to the stage you were asked to work on.

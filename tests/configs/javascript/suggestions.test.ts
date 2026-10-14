@@ -1,8 +1,53 @@
-import { describe, it } from "vitest";
+import { ESLint } from "eslint";
+import { describe, expect, it } from "vitest";
 
+import { createConfig } from "../../../dist/index.mjs";
 import { expectLintError, expectNoLintError } from "../../utilities.js";
 
 describe("js suggestion rules", () => {
+  it.each(["test.js", "test.ts"])(
+    "no-restricted-globals: directs Buffer users to Uint8Array in %s",
+    async (filePath) => {
+      const eslint = new ESLint({
+        overrideConfig: await createConfig({ environments: ["node"] }),
+        overrideConfigFile: true,
+      });
+      const results = await eslint.lintText(
+        `export const bytes = Buffer.from('data');\n`,
+        { filePath },
+      );
+      const messages = results.flatMap((result) => result.messages);
+
+      expect(messages.some((message) => message.fatal === true)).toBe(false);
+      expect(messages).toContainEqual(
+        expect.objectContaining({
+          message: "Unexpected use of 'Buffer'. Use Uint8Array instead.",
+          ruleId: "no-restricted-globals",
+          severity: 2,
+        }),
+      );
+      expect(messages).not.toContainEqual(
+        expect.objectContaining({ ruleId: "n/prefer-global/buffer" }),
+      );
+    },
+  );
+
+  it.each([
+    { filePath: "test.js", source: "buffer" },
+    { filePath: "test.js", source: "node:buffer" },
+    { filePath: "test.ts", source: "buffer" },
+    { filePath: "test.ts", source: "node:buffer" },
+  ])(
+    "no-restricted-imports: reports $source in $filePath",
+    async ({ filePath, source }) => {
+      await expectLintError(
+        `import { Buffer as Bytes } from '${source}';\nexport const bytes = Bytes.from('data');\n`,
+        "no-restricted-imports",
+        { filePath },
+      );
+    },
+  );
+
   it("func-style: stays disabled so declarations and expressions can coexist", async () => {
     await expectNoLintError(
       `function declared() {\n\treturn 'declared';\n}\nconst expressed = () => 'expressed';\nconsole.log(declared(), expressed());\n`,

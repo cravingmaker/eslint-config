@@ -11,7 +11,7 @@ type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 
 const typedContext: Context = {
   ...defaultContext,
-  typeAware: { files: typescriptFiles, ignores: ["**/*.d.ts"] },
+  typeAware: [[...typescriptFiles, "!**/*.d.ts"]],
 };
 const svelteContext: Context = {
   ...defaultContext,
@@ -71,5 +71,126 @@ describe("node feature", () => {
     expect(await getSeverity(eslint, "src/Component.svelte", "n/no-sync")).toBe(
       0,
     );
+  });
+
+  it("keeps the type-aware block within the type-aware scope, whatever its ignores bring back", async () => {
+    // The feature lints `src/` only, declaration files included, which the scope leaves out.
+    const eslint = new ESLint({
+      overrideConfig: node({ ignores: ["**/*", "!src/**"] }, typedContext),
+      overrideConfigFile: true,
+    });
+    const severities = await Promise.all([
+      getSeverity(eslint, "src/example.ts", "n/no-sync"),
+      getSeverity(eslint, "src/example.d.ts", "n/no-sync"),
+      getSeverity(eslint, "lib/example.ts", "n/no-sync"),
+    ]);
+
+    expect(severities).toEqual([2, 0, undefined]);
+  });
+
+  it("applies an override that turns n/no-sync on only where the rule needs no type information or has it", async () => {
+    const eslint = new ESLint({
+      overrideConfig: node(
+        { overrides: { "n/no-sync": ["error", { allowAtRootLevel: false }] } },
+        { ...typedContext, svelteComponents: svelteContext.svelteComponents },
+      ),
+      overrideConfigFile: true,
+    });
+    const [script, typed, declaration, component] = await Promise.all([
+      getRules(eslint, "src/example.js"),
+      getRules(eslint, "src/example.ts"),
+      getRules(eslint, "src/example.d.ts"),
+      getRules(eslint, "src/Component.svelte"),
+    ]);
+    // ESLint adds the default of `ignores` while the rule is on.
+    const overridden = [2, { allowAtRootLevel: false, ignores: [] }];
+
+    expect(script?.["n/no-sync"]).toEqual(overridden);
+    expect(typed?.["n/no-sync"]).toEqual(overridden);
+    expect(declaration?.["n/no-sync"]?.[0]).toBe(0);
+    expect(component?.["n/no-sync"]?.[0]).toBe(0);
+  });
+
+  it("does not apply such an override in TypeScript files and Svelte components without typed linting", async () => {
+    const eslint = new ESLint({
+      overrideConfig: node(
+        { overrides: { "n/no-sync": ["error", { allowAtRootLevel: false }] } },
+        svelteContext,
+      ),
+      overrideConfigFile: true,
+    });
+    const severities = await Promise.all([
+      getSeverity(eslint, "src/example.js", "n/no-sync"),
+      getSeverity(eslint, "src/example.ts", "n/no-sync"),
+      getSeverity(eslint, "src/Component.svelte", "n/no-sync"),
+    ]);
+
+    expect(severities).toEqual([2, 0, 0]);
+  });
+
+  it("turns n/no-missing-import off in TypeScript files and Svelte components, whose imports it does not resolve as TypeScript does", async () => {
+    const eslint = new ESLint({
+      overrideConfig: node({}, svelteContext),
+      overrideConfigFile: true,
+    });
+    const severities = await Promise.all(
+      [
+        "src/example.js",
+        "src/state.svelte.js",
+        "src/example.ts",
+        "src/example.d.ts",
+        "src/state.svelte.ts",
+        "src/Component.svelte",
+      ].map(
+        async (filePath) =>
+          await getSeverity(eslint, filePath, "n/no-missing-import"),
+      ),
+    );
+
+    expect(severities).toEqual([2, 2, 0, 0, 0, 0]);
+  });
+
+  it("applies an override of n/no-missing-import in every file", async () => {
+    const eslint = new ESLint({
+      overrideConfig: node(
+        {
+          overrides: {
+            "n/no-missing-import": ["warn", { ignoreTypeImport: true }],
+          },
+        },
+        { ...typedContext, svelteComponents: svelteContext.svelteComponents },
+      ),
+      overrideConfigFile: true,
+    });
+    const rules = await Promise.all(
+      [
+        "src/example.js",
+        "src/example.ts",
+        "src/example.d.ts",
+        "src/Component.svelte",
+      ].map(async (filePath) => await getRules(eslint, filePath)),
+    );
+
+    expect(rules.map((entries) => entries?.["n/no-missing-import"])).toEqual(
+      rules.map(() => [1, { ignoreTypeImport: true }]),
+    );
+  });
+
+  it("applies an override that turns n/no-sync off in every file", async () => {
+    const eslint = new ESLint({
+      overrideConfig: node({ overrides: { "n/no-sync": "off" } }, typedContext),
+      overrideConfigFile: true,
+    });
+    const rules = await Promise.all([
+      getRules(eslint, "src/example.js"),
+      getRules(eslint, "src/example.ts"),
+      getRules(eslint, "src/example.d.ts"),
+    ]);
+
+    expect(rules.map((entries) => entries?.["n/no-sync"])).toEqual([
+      [0],
+      [0],
+      [0],
+    ]);
   });
 });
