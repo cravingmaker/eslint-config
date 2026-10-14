@@ -116,6 +116,106 @@ describe("createConfig", () => {
     expect(uniqueNames.size).toBe(names.length);
   });
 
+  // Users look a block up by its name, as an example in the README does. The project declares no
+  // framework, so its defaults leave out the blocks that a framework, typed linting, an owner with
+  // files of its own, or a replaced rule in `overridesTypeAware` adds.
+  it("names the blocks in a fixed order", async () => {
+    const projectRootDirectory = await createProject("block-names", []);
+    const [defaults, every] = await Promise.all([
+      createConfig({ ...baseOptions, projectRootDirectory }),
+      createConfig({
+        ...baseOptions,
+        express: true,
+        projectRootDirectory,
+        react: { refresh: "vite" },
+        regexp: { files: ["src/**"] },
+        svelte: true,
+        typescript: {
+          ...baseOptions.typescript,
+          overridesTypeAware: { "@typescript-eslint/no-unused-vars": "error" },
+          typeChecked: true,
+        },
+      }),
+    ]);
+    const everyName = [
+      "ignores",
+      "javascript/rules",
+      "javascript/jsx",
+      "comments/setup",
+      "comments/rules",
+      "node/setup",
+      "node/rules",
+      "node/rules-typescript",
+      "node/rules-type-aware",
+      "security/setup",
+      "security/rules",
+      "imports/setup",
+      "imports/rules",
+      "imports/resolver",
+      "unused-imports/setup",
+      "unused-imports/rules",
+      "promise/setup",
+      "promise/rules",
+      "regexp/setup",
+      "regexp/rules",
+      "unicorn/setup",
+      "unicorn/rules",
+      "functional/setup",
+      "functional/rules",
+      "functional/rules-type-aware",
+      "perfectionist/setup",
+      "perfectionist/rules",
+      "typescript/parser",
+      "typescript/parser-type-aware",
+      "typescript/rules",
+      "typescript/rules-type-aware",
+      "react/html",
+      "react/hooks",
+      "react/refresh",
+      "svelte/rules",
+      "express/rules",
+      "html/rules",
+      "json/rules",
+      "json/rules-jsonc",
+      "json/rules-json5",
+      "package-json/setup",
+      "package-json/rules",
+      "markdown/setup",
+      "markdown/rules",
+      "overlaps/javascript",
+      "overlaps/javascript/regexp",
+      "overlaps/node",
+      "overlaps/typescript",
+      "overlaps/typescript/overrides-type-aware",
+      "exceptions/config-files",
+      "exceptions/svelte-components",
+      "exceptions/test-files",
+    ];
+    const optionalNames: ReadonlySet<string> = new Set([
+      "exceptions/svelte-components",
+      "express/rules",
+      "functional/rules-type-aware",
+      "node/rules-type-aware",
+      "overlaps/javascript/regexp",
+      "overlaps/typescript/overrides-type-aware",
+      "react/hooks",
+      "react/html",
+      "react/refresh",
+      "svelte/rules",
+      "typescript/parser-type-aware",
+      "typescript/rules-type-aware",
+    ]);
+
+    expect(every.map((config) => config.name)).toEqual(
+      everyName.map((name) => `${prefix}${name}`),
+    );
+    expect(defaults.map((config) => config.name)).toEqual(
+      everyName
+        .filter((name) => !optionalNames.has(name))
+        .map((name) => `${prefix}${name}`),
+    );
+  });
+
   it("leaves out a feature that is off and keeps the others", async () => {
     const order = await getFeatureOrder({
       ...baseOptions,
