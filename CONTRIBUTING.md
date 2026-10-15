@@ -222,8 +222,8 @@ Three tools show what ESLint resolves:
   hold the reviewed configuration of representative paths. Each lists
   the settings that decide how ESLint parses the file, then one rule per
   line with its severity and options. The options include the defaults
-  that ESLint adds from the rule's schema. The comment at the top of
-  `tests/policy/effective-rules.test.ts` describes the scenarios; all of
+  that ESLint adds from the rule's schema.
+  `tests/policy/effective-scenarios.ts` describes the scenarios; all of
   them turn every framework on. The snapshots need no build:
 
   ```bash
