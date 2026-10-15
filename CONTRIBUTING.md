@@ -780,6 +780,51 @@ The pre-commit hook runs `npm run check:commit`, which invokes
 fixes to staged files. The pre-push hook runs the full test suite through
 `npm test`. Full validation runs through `npm run validate` and in CI.
 
+### Interactive test UI
+
+Use [Vitest UI](https://vitest.dev/guide/ui) to browse results, inspect timings
+and snapshot diffs, and rerun individual tests while developing:
+
+```bash
+npm run test:ui
+```
+
+This builds the package and watches the same regular tests as `npm run test:unit`.
+Packed-consumer tests have their own opt-in command because they pack the package
+and create temporary consumer projects, including npm installations:
+
+```bash
+npm run test:package:ui
+```
+
+Open the URL printed in the terminal, normally
+`http://localhost:51204/__vitest__/`, including its token when present. Use
+`-- --no-open` to prevent automatic browser opening. To run both commands at
+once, give the second command a different port:
+
+```bash
+npm run test:package:ui -- --api.port=51205
+```
+
+File and test-name filters also work with the UI:
+
+```bash
+npm run test:ui -- tests/configs/unicorn.test.ts -t "filename-case"
+```
+
+After editing `src/`, run `npm run build` in another terminal. The tests that
+import `dist/` and the packed consumers need the new build; the UI commands build
+once at startup. Watch mappings in `vitest.config.ts` rerun the selected suite
+after build output changes and rerun affected tests for fixtures, generated rule
+types, the README, and the lockfile. These inputs are read through the filesystem
+or subprocesses rather than ordinary test imports. The regular UI excludes
+package tests, and the package UI stays limited to `tests/package/`. Verify watch
+mapping changes with `npx vitest run tests/vitest-watch.test.ts`.
+
+Review snapshot changes before accepting them. Keep `vitest` and `@vitest/ui` on
+the same exact version; Dependabot groups their updates. Finish with
+`npm run validate` and `git diff --check`.
+
 ## Releases
 
 Before preparing a release, run:

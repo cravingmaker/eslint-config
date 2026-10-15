@@ -14,6 +14,12 @@ updates:
       semver-major-days: 21
       semver-minor-days: 14
       semver-patch-days: 7
+    groups:
+      # Vitest and its UI require matching exact versions.
+      vitest:
+        patterns:
+          - vitest
+          - "@vitest/ui"
 
   - package-ecosystem: "github-actions"
     directory: "/"

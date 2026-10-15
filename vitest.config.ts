@@ -1,3 +1,5 @@
+import { globSync } from "node:fs";
+
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -6,5 +8,39 @@ export default defineConfig({
     // Each worker loads ESLint and TypeScript; package tests also start child processes.
     maxWorkers: 2,
     testTimeout: 30_000,
+    // Files read through ESLint, TypeScript, or consumer subprocesses need explicit mappings.
+    watchTriggerPatterns: [
+      {
+        // Explicit mappings also handle outputs recreated by `npm run clean`.
+        pattern: /(?:^|\/)dist\/index\.(?:d\.mts|mjs)$/u,
+        testsToRun: (_filename) =>
+          // eslint-disable-next-line n/no-sync -- Vitest requires a synchronous list of current tests for each build event.
+          globSync("tests/**/*.test.ts", {
+            cwd: import.meta.dirname,
+          }),
+      },
+      {
+        pattern: /(?:^|\/)tests\/fixtures\//u,
+        testsToRun: (_filename) => [
+          "tests/factory/factory.test.ts",
+          "tests/policy/fixtures.test.ts",
+          "tests/policy/formatting.test.ts",
+          "tests/package/install.test.ts",
+          "tests/package/readme.test.ts",
+        ],
+      },
+      {
+        pattern: /(?:^|\/)src\/typegen\.d\.ts$/u,
+        testsToRun: (_filename) => "tests/typegen.test.ts",
+      },
+      {
+        pattern: /(?:^|\/)README\.md$/u,
+        testsToRun: (_filename) => "tests/package/readme.test.ts",
+      },
+      {
+        pattern: /(?:^|\/)package-lock\.json$/u,
+        testsToRun: (_filename) => "tests/package/contract.test.ts",
+      },
+    ],
   },
 });
