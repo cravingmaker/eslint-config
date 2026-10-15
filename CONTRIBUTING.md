@@ -132,9 +132,10 @@ The builders share these modules:
 
 The tests follow the sources: `tests/configs/` has a file for each
 module of `src/configs/`, `tests/factory/` tests `createConfig()` and
-its options, `tests/policy/` the effective policy, and `tests/package/`
-the packed package in temporary consumers. Many of them load the build,
-so build first, as [Builds and tests](#builds-and-tests) explains.
+its options, `tests/policy/` the effective policy, `tests/scripts/` the
+scripts in `scripts/`, and `tests/package/` the packed package in
+temporary consumers. Many of them load the build, so build first, as
+[Builds and tests](#builds-and-tests) explains.
 
 ### Where a rule is declared
 
@@ -222,8 +223,8 @@ Three tools show what ESLint resolves:
   hold the reviewed configuration of representative paths. Each lists
   the settings that decide how ESLint parses the file, then one rule per
   line with its severity and options. The options include the defaults
-  that ESLint adds from the rule's schema. The comment at the top of
-  `tests/policy/effective-rules.test.ts` describes the scenarios; all of
+  that ESLint adds from the rule's schema.
+  `tests/policy/effective-scenarios.ts` describes the scenarios; all of
   them turn every framework on. The snapshots need no build:
 
   ```bash
@@ -298,6 +299,35 @@ for (const { files, ignores, name, rules = {} } of await configs)
 ' ./node_modules/.cache/consumer.config.js no-unused-vars
 ```
 
+### Comparing the policy with a commit
+
+`npm run policy:diff` builds the package and compares the configuration
+of the working tree with the snapshots of a commit, `HEAD` unless
+`--base` names another. Fetch first to compare with the current `main`:
+
+```bash
+npm run policy:diff
+npm run policy:diff -- --base origin/main
+```
+
+It describes the snapshots of `tests/policy/effective-scenarios.ts` with
+the build, as the snapshot test does, reads those of the commit through
+Git, and lists the differences by scenario and file: the rules that were
+added or removed, the severities and options that changed, each option
+by its path, and the changes to whether ESLint ignores the file, its
+language, parser, plugins, globals, and settings, such as the import
+resolver. A snapshot that only one side has is listed as new or removed.
+The report starts with the commit, the Node.js and ESLint versions, and
+the packages whose locked version differs from the commit's
+`package-lock.json`, which tell a refactor from a dependency update, and
+ends with a summary.
+
+The report changes no file but `dist/`, which the build refreshes. It
+exits with 0 when it compares every snapshot, whatever the differences,
+and with 1 when the base is not a commit, the commit has no snapshots,
+the installed packages differ from `package-lock.json`, or a snapshot
+cannot be described or read.
+
 ## Common tasks
 
 Each recipe names the tests that cover its change. Before opening a
@@ -352,9 +382,12 @@ pull request, run the full [validation](#validation) as well.
    ```
 
 5. **Review the snapshots.** Without update mode, the snapshot test
-   fails on each line that the change touches, in every scenario. Check
-   that the diff holds the intended change and nothing else, then update
-   the snapshots as "Snapshots record the policy" describes.
+   fails on each line that the change touches, in every scenario.
+   `npm run policy:diff` lists the same changes by scenario and file,
+   with each option that changed; see
+   [Comparing the policy with a commit](#comparing-the-policy-with-a-commit).
+   Check that the diff holds the intended change and nothing else, then
+   update the snapshots as "Snapshots record the policy" describes.
 
 6. **Check the result** for a path with `--print-config`, as in
    [Inspecting the configuration](#inspecting-the-configuration), and
@@ -375,11 +408,14 @@ pull request, run the full [validation](#validation) as well.
    peer range" under [Dependencies and peers](#dependencies-and-peers).
 
 2. **Find the changed rules.** Read the release notes for new, removed,
-   deprecated, and changed rules. Then build, and run the policy tests
+   deprecated, and changed rules. Then run the
+   [policy report](#comparing-the-policy-with-a-commit), which builds the
+   package and lists what the update changes in every scenario, with the
+   packages that `package-lock.json` changed, and run the policy tests
    without update mode:
 
    ```bash
-   npm run build
+   npm run policy:diff
    npx vitest run tests/policy
    ```
 
@@ -591,9 +627,12 @@ The reference that the recipes link to, grouped by topic.
 - **A refactor keeps every snapshot.** Reorganizing the code, such as
   moving a rule map or renaming a module, must not change a line of the
   snapshots. When one changes, the refactor changed the policy: fix the
-  refactor, and do not update the snapshot. Keep an intended policy
-  change, such as a dependency update, in a commit of its own, so that
-  its snapshot diff has one cause.
+  refactor, and do not update the snapshot.
+  `npm run policy:diff -- --base origin/main` checks a whole branch: for
+  a refactor, it reports every snapshot unchanged and the same packages
+  as the baseline. Keep an intended policy change, such as a dependency
+  update, in a commit of its own, so that its snapshot diff has one
+  cause.
 - **A severity-only entry keeps earlier options.** When a later block
   sets a rule to only `"off"` or `"error"`, ESLint keeps the options from
   an earlier block, and the snapshots record them. Inside one block, an
@@ -816,8 +855,9 @@ After editing `src/`, run `npm run build` in another terminal. The tests that
 import `dist/` and the packed consumers need the new build; the UI commands build
 once at startup. Watch mappings in `vitest.config.ts` rerun the selected suite
 after build output changes and rerun affected tests for fixtures, generated rule
-types, the README, and the lockfile. These inputs are read through the filesystem
-or subprocesses rather than ordinary test imports. The regular UI excludes
+types, the README, the lockfile, and the modules of the policy report. These
+inputs are read through the filesystem or subprocesses rather than ordinary test
+imports. The regular UI excludes
 package tests, and the package UI stays limited to `tests/package/`. Verify watch
 mapping changes with `npx vitest run tests/vitest-watch.test.ts`.
 

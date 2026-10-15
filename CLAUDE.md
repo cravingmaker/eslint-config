@@ -9,6 +9,7 @@ A shareable ESLint flat config, published to npm as an ESM-only package. The pub
 - `npm run gen`: generate the rule option types in `src/typegen.d.ts`, which is not committed. `build` and `typecheck` run it first.
 - `npm run validate`: format check, build, typecheck, lint, tests, and package checks. Run it before pushing. It takes a few minutes and installs the packed package from the npm registry; use a long command timeout.
 - `npx vitest run <path>`: run one test file or directory.
+- `npm run policy:diff -- --base <git-ref>`: build, then report how the effective lint policy of the working tree differs from the snapshots at `<git-ref>`, `HEAD` by default. A refactor must report every snapshot unchanged.
 - `npx eslint .`: lint with this package's own config.
 
 ## Environment

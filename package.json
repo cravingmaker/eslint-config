@@ -51,6 +51,7 @@
     "lint:package": "npm run build && npm run lint:package:built",
     "lint:package:built": "publint --strict",
     "lint:staged": "npm run build && lint-staged",
+    "policy:diff": "npm run build && node scripts/policy-diff.ts",
     "prepare": "husky",
     "prepublishOnly": "npm run release:check",
     "release:check": "npm audit --audit-level=low && npm run validate && npm pack --dry-run --ignore-scripts",
