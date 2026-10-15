@@ -12,8 +12,8 @@ import {
 import { typescriptTypeAwareRules } from "./rules-type-aware.js";
 import { typescriptRules } from "./rules.js";
 import { disableConfigRules } from "../../utilities/all-rules.js";
+import { narrowFiles } from "../../utilities/file-scope.js";
 import {
-  narrowFiles,
   overridesWithoutTypeInformation,
   typeAwareConfig,
 } from "../../utilities/type-aware.js";

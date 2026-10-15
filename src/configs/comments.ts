@@ -6,7 +6,7 @@ import pluginComments from "@eslint-community/eslint-plugin-eslint-comments";
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 // Policy for ESLint directive comments, from @eslint-community/eslint-plugin-eslint-comments.
 const commentsRules: Rules = {

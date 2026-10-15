@@ -10,7 +10,8 @@ import {
   withSvelteComponents,
 } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles, typeAwareConfig } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
+import { typeAwareConfig } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-n.
 const nodeRules: Rules = {

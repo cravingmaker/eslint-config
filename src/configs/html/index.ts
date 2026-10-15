@@ -6,7 +6,7 @@ import htmlParser from "@html-eslint/parser";
 
 import { htmlFiles } from "../../globs.js";
 import { htmlRules } from "./rules.js";
-import { narrowFiles } from "../../utilities/type-aware.js";
+import { narrowFiles } from "../../utilities/file-scope.js";
 
 // Builds the flat config for HTML files.
 function html({

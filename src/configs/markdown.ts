@@ -5,7 +5,7 @@ import pluginMarkdown from "@eslint/markdown";
 
 import { markdownFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 // Policy for @eslint/markdown.
 const markdownRules: Rules = {

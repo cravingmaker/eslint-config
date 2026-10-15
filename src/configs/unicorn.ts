@@ -6,7 +6,7 @@ import pluginUnicorn from "eslint-plugin-unicorn";
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 // Policy for eslint-plugin-unicorn.
 const unicornRules: Rules = {
