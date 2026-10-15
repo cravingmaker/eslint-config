@@ -419,6 +419,45 @@ pull request, run the full [validation](#validation) as well.
      consumers, some of them from the npm registry; see "A missing peer
      needs a consumer". `npm run validate` runs all of these checks.
 
+### Inspect dependencies
+
+Use [Node Modules Inspector](https://github.com/antfu/node-modules-inspector)
+when reviewing dependency updates. It shows the installed dependency tree,
+filters production and development dependencies, and reports package sizes.
+
+Start the interactive UI:
+
+```bash
+npm run deps:inspect
+```
+
+Open the URL printed in the terminal, normally `http://localhost:9999/`.
+Use `-- --open` to open it automatically, or select another port with
+`npm run deps:inspect -- --port=10000`.
+
+Run reports without starting the UI:
+
+```bash
+npm run deps:report-duplicates
+npm run deps:report-sizes -- --limit 10
+```
+
+Both reports cover the installed tree, including development dependencies.
+UI filters do not limit the CLI reports. For JSON output, use `--silent`
+to keep npm's script banner out of stdout:
+
+```bash
+npm run --silent deps:report-duplicates -- --json
+npm run --silent deps:report-sizes -- --json --limit 10
+```
+
+Registry metadata is fetched by default and cached under
+`node_modules/.cache/node-modules-inspector/`. For local analysis without
+metadata requests, supply an inspector configuration with
+`fetchNpmMeta: false` using `-- --config /path/to/config.mjs`.
+
+Finish dependency changes with the required [validation](#validation).
+
 ### Explain an unexpected rule
 
 1. **Pin down the case:** the path of the file, the options, the user
