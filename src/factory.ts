@@ -10,7 +10,7 @@ import { express } from "./configs/express.js";
 import { functional } from "./configs/functional.js";
 import { html } from "./configs/html.js";
 import { ignores } from "./configs/ignores.js";
-import { imports } from "./configs/imports.js";
+import { imports } from "./configs/imports/index.js";
 import { json } from "./configs/json.js";
 import { markdown } from "./configs/markdown.js";
 import { node } from "./configs/node.js";

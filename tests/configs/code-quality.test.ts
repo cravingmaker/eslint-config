@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { comments } from "../../src/configs/comments.js";
 import { functional } from "../../src/configs/functional.js";
-import { imports } from "../../src/configs/imports.js";
+import { imports } from "../../src/configs/imports/index.js";
 import { node } from "../../src/configs/node.js";
 import { perfectionist } from "../../src/configs/perfectionist/index.js";
 import { promise } from "../../src/configs/promise.js";

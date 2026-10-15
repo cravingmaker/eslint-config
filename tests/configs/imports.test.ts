@@ -4,7 +4,7 @@ import type { Context } from "../../src/types.js";
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
-import { imports } from "../../src/configs/imports.js";
+import { imports } from "../../src/configs/imports/index.js";
 import { defaultContext } from "../../src/context.js";
 import { expectLintError } from "../utilities.js";
 
