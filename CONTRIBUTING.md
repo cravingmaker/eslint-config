@@ -101,7 +101,9 @@ public types from `src/types.ts`. Everything else is internal.
    Svelte components, the tsconfig directory, and the type-aware scope.
    The blocks come in a fixed order: the global ignores, `javascript`
    and the code-quality features, `typescript`, the frameworks, and the
-   file formats.
+   file formats. A feature that is a folder, such as `typescript`, has
+   its builder in `index.ts` and its rule maps in modules of their own,
+   such as `rules.ts`.
 4. `src/overlaps.ts` adds the blocks that turn off the rules that
    another feature replaces, where that feature lints. Then
    `src/configs/exceptions.ts` adds the blocks that turn off the rules
@@ -143,17 +145,17 @@ one feature. The rule map of that feature is the policy for its rules:
 | `@eslint-community/eslint-comments/`                    | `comments`      | `src/configs/comments.ts`                                                                                                                             |
 | `n/`                                                    | `node`          | `src/configs/node.ts`                                                                                                                                 |
 | `security/`                                             | `security`      | `src/configs/security.ts`                                                                                                                             |
-| `import-x/`                                             | `imports`       | `src/configs/imports.ts`                                                                                                                              |
+| `import-x/`                                             | `imports`       | `src/configs/imports/rules.ts`                                                                                                                        |
 | `unused-imports/`                                       | `unusedImports` | `src/configs/unused-imports.ts`                                                                                                                       |
 | `promise/`                                              | `promise`       | `src/configs/promise.ts`                                                                                                                              |
 | `regexp/`                                               | `regexp`        | `src/configs/regexp.ts`                                                                                                                               |
 | `unicorn/`                                              | `unicorn`       | `src/configs/unicorn.ts`                                                                                                                              |
 | `functional/`                                           | `functional`    | `src/configs/functional.ts`                                                                                                                           |
-| `perfectionist/`                                        | `perfectionist` | `src/configs/perfectionist.ts`                                                                                                                        |
+| `perfectionist/`                                        | `perfectionist` | `src/configs/perfectionist/rules.ts`                                                                                                                  |
 | `@html-eslint/react/`, `react-hooks/`, `react-refresh/` | `react`         | `src/configs/react.ts`                                                                                                                                |
 | `@html-eslint/svelte/`                                  | `svelte`        | `src/configs/svelte.ts`                                                                                                                               |
 | `express-security/`                                     | `express`       | `src/configs/express.ts`                                                                                                                              |
-| `@html-eslint/`                                         | `html`          | `src/configs/html.ts`                                                                                                                                 |
+| `@html-eslint/`                                         | `html`          | `src/configs/html/rules.ts`                                                                                                                           |
 | `json/`                                                 | `json`          | `src/configs/json.ts`                                                                                                                                 |
 | `package-json/`, `enforce-package-type/`                | `packageJson`   | `src/configs/package-json.ts`                                                                                                                         |
 | `markdown/`                                             | `markdown`      | `src/configs/markdown.ts`                                                                                                                             |

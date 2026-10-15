@@ -1,11 +1,4 @@
-import type { Linter } from "eslint";
-import type { Context, FeatureOptions, RuleOptionOf, Rules } from "../types.js";
-
-import pluginPerfectionist from "eslint-plugin-perfectionist";
-
-import { defaultContext } from "../context.js";
-import { sourceFiles, withSvelteComponents } from "../globs.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import type { RuleOptionOf, Rules } from "../../types.js";
 
 const commonOptions = {
   fallbackSort: { type: "unsorted" },
@@ -392,29 +385,7 @@ const perfectionistRules: Rules = {
     { ...commonTsCompositionRuleOptions },
   ],
 
-  "perfectionist/sort-variable-declarations": "off", // Prefer `one-var` rule
+  "perfectionist/sort-variable-declarations": "off", // Covered by `one-var`, which allows one declarator per declaration
 } as const;
 
-// Builds the flat config for eslint-plugin-perfectionist.
-function perfectionist(
-  { files, ignores = [], overrides = {} }: FeatureOptions = {},
-  { svelteComponents }: Context = defaultContext,
-): Linter.Config[] {
-  return [
-    {
-      name: "@cravingmaker/eslint-config/perfectionist/setup",
-      plugins: { perfectionist: pluginPerfectionist },
-    },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/perfectionist/rules",
-      rules: { ...perfectionistRules, ...overrides },
-    },
-  ];
-}
-
-export { perfectionist, perfectionistRules };
+export { perfectionistRules };

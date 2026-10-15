@@ -1,17 +1,8 @@
-import type { Linter } from "eslint";
-import type { Context, FeatureOptions, Rules } from "../types.js";
+import type { Rules } from "../../types.js";
 
-import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
-import pluginImportX, { createNodeResolver } from "eslint-plugin-import-x";
+import pluginImportX from "eslint-plugin-import-x";
 
-import { defaultContext } from "../context.js";
-import {
-  sourceFiles,
-  typescriptFiles,
-  withSvelteComponents,
-} from "../globs.js";
-import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { enableAllRules } from "../../utilities/all-rules.js";
 
 // Policy for eslint-plugin-import-x.
 const importsRules: Rules = {
@@ -132,53 +123,8 @@ const importsRules: Rules = {
   "import-x/dynamic-import-chunkname": "off", // Project specific, only target Webpack
   "import-x/no-webpack-loader-syntax": "off", // Project specific, only target Webpack
 
-  // Covered by `perfectionist/sort-imports`, see src/overlaps.ts
-  "import-x/first": "off",
-  "import-x/order": "off",
+  "import-x/first": "off", // Covered by `perfectionist/sort-imports`, see src/overlaps.ts
+  "import-x/order": "off", // Covered by `perfectionist/sort-imports`, see src/overlaps.ts
 } as const;
 
-// Builds the flat config for eslint-plugin-import-x. TypeScript files and Svelte components
-// within the feature's files resolve imports through the TypeScript resolver first, with the
-// project's tsconfig.
-function imports(
-  options: FeatureOptions = {},
-  { svelteComponents, tsconfigRootDir }: Context = defaultContext,
-): Linter.Config[] {
-  const { files, ignores = [], overrides = {} } = options;
-  const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
-
-  return [
-    {
-      name: "@cravingmaker/eslint-config/imports/setup",
-      plugins: { "import-x": pluginImportX },
-    },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/imports/rules",
-      rules: { ...importsRules, ...overrides },
-    },
-    {
-      files: narrowFiles(
-        withSvelteComponents(typescriptFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/imports/resolver",
-      settings: {
-        "import-x/resolver-next": [
-          createTypeScriptImportResolver({
-            alwaysTryTypes: true,
-            ...resolverProject,
-          }),
-          createNodeResolver(),
-        ],
-      },
-    },
-  ];
-}
-
-export { imports, importsRules };
+export { importsRules };

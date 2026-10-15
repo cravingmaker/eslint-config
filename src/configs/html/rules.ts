@@ -1,12 +1,8 @@
-import type { Linter } from "eslint";
-import type { FeatureOptions, Rules } from "../types.js";
+import type { Rules } from "../../types.js";
 
 import pluginHtml from "@html-eslint/eslint-plugin";
-import htmlParser from "@html-eslint/parser";
 
-import { htmlFiles } from "../globs.js";
-import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { enableAllRules } from "../../utilities/all-rules.js";
 
 // Policy for @html-eslint/eslint-plugin.
 const htmlRules: Rules = {
@@ -158,22 +154,4 @@ const htmlRules: Rules = {
   "@html-eslint/quotes": "off", // Covered by `prettier`
 } as const;
 
-// Builds the flat config for HTML files.
-function html({
-  files,
-  ignores = [],
-  overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
-  return [
-    {
-      files: narrowFiles(htmlFiles, files),
-      ignores: [...ignores],
-      languageOptions: { parser: htmlParser },
-      name: "@cravingmaker/eslint-config/html/rules",
-      plugins: { "@html-eslint": pluginHtml },
-      rules: { ...htmlRules, ...overrides },
-    },
-  ];
-}
-
-export { html };
+export { htmlRules };
