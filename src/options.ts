@@ -112,15 +112,15 @@ function resolveGlobals(
 Applies the defaults to the options of `createConfig`. Every feature is on unless it is
 `false`, except `react`, `svelte`, and `express`, whose `"auto"` default follows `detection`.
 The project root becomes an absolute path: a relative one is resolved from the working
-directory, which is also its default.
+directory, which is also its default. Preparation passes the root it used to read the manifest.
 */
 function resolveOptions(
   options: Options = {},
   detection: Detection = undetected,
+  projectRootDirectory: string = resolveProjectRootDirectory(
+    options.projectRootDirectory,
+  ),
 ): ResolvedOptions {
-  const projectRootDirectory = path.resolve(
-    options.projectRootDirectory ?? process.cwd(),
-  );
   const svelte = resolveDetectedFeature(detection.svelte, options.svelte);
 
   return {
@@ -149,6 +149,12 @@ function resolveOptions(
     unicorn: resolveFeature(options.unicorn),
     unusedImports: resolveFeature(options.unusedImports),
   };
+}
+/**
+Resolves the manifest directory without applying any feature defaults.
+*/
+function resolveProjectRootDirectory(projectRootDirectory?: string): string {
+  return path.resolve(projectRootDirectory ?? process.cwd());
 }
 function resolveReact(
   detection: Detection,
@@ -234,7 +240,7 @@ function resolveTypeScript(
   };
 }
 
-export { resolveOptions };
+export { resolveOptions, resolveProjectRootDirectory };
 export type {
   Detection,
   ResolvedOptions,
