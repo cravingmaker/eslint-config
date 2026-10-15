@@ -126,7 +126,8 @@ The builders share these modules:
 | `src/globs.ts`                  | The default files of the features                                                                            |
 | `src/configs/shared-options.ts` | Rule options that more than one rule map uses, such as those of a core rule and of the rule that replaces it |
 | `src/utilities/all-rules.ts`    | `enableAllRules()`, which turns on every rule of a plugin that is not deprecated, and `disableConfigRules()` |
-| `src/utilities/type-aware.ts`   | `narrowFiles()`, `withoutIgnores()`, and the helpers of the type-aware scope                                 |
+| `src/utilities/file-scope.ts`   | `narrowFiles()` and `withoutIgnores()`, which limit `files` patterns by other patterns and by an ignore list |
+| `src/utilities/type-aware.ts`   | The helpers of the type-aware scope, such as `typeAwareConfig()`                                             |
 | `src/utilities/import-peer.ts`  | `importPeer()`, which loads an optional peer or fails with a message that names it                           |
 | `src/typegen.d.ts`              | The rule option types, which `npm run gen` generates and which are not committed                             |
 
@@ -670,8 +671,9 @@ The reference that the recipes link to, grouped by topic.
   the blocks that have no `files`. That is why `.cjs` files are still
   parsed, while `.cts` files are skipped.
 - **A feature's `files` narrows its default files.** A block takes
-  `narrowFiles(defaults, files)`, never `files ?? defaults`: it reaches
-  a file that matches one of its default patterns and one of `files`.
+  `narrowFiles(defaults, files)` from `src/utilities/file-scope.ts`,
+  never `files ?? defaults`: it reaches a file that matches one of its
+  default patterns and one of `files`.
   `files` usually names a directory, such as `src/**`. On its own, that
   pattern would reach the files of other languages there, and a rule
   that cannot read a file's language stops the whole run, with "The

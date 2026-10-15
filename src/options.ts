@@ -17,7 +17,7 @@ import process from "node:process";
 import globalVariables from "globals";
 
 import { svelteComponentFiles, typescriptFiles } from "./globs.js";
-import { narrowFiles, withoutIgnores } from "./utilities/type-aware.js";
+import { narrowFiles, withoutIgnores } from "./utilities/file-scope.js";
 
 /**
 What the project uses, for the options whose default is `"auto"`.

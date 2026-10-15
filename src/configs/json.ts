@@ -5,7 +5,7 @@ import pluginJson from "@eslint/json";
 
 import { json5Files, jsoncFiles, jsonFiles, jsonIgnores } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 // Policy for @eslint/json, shared by JSON, JSONC, and JSON5 files.
 const jsonRules: Rules = {

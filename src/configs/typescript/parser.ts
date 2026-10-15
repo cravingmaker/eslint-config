@@ -3,10 +3,8 @@ import type { Context, FeatureOptions } from "../../types.js";
 
 import { defaultContext } from "../../context.js";
 import { typescriptFiles, withSvelteComponents } from "../../globs.js";
-import {
-  narrowFiles,
-  narrowTypeAwareScope,
-} from "../../utilities/type-aware.js";
+import { narrowFiles } from "../../utilities/file-scope.js";
+import { narrowTypeAwareScope } from "../../utilities/type-aware.js";
 
 /**
 Builds the blocks that parse TypeScript files with typescript-eslint and register its plugin,

@@ -4,8 +4,8 @@ import type { Context, FeatureOptions } from "../types.js";
 import { defaultContext } from "../context.js";
 import { svelteFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 import { importPeer } from "../utilities/import-peer.js";
-import { narrowFiles } from "../utilities/type-aware.js";
 
 // Builds the flat config for Svelte components and rune modules. Script blocks are parsed with
 // the typescript-eslint parser, and the features for JavaScript and TypeScript sources lint the

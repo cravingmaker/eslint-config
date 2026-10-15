@@ -11,7 +11,7 @@ import {
   withSvelteComponents,
 } from "../../globs.js";
 import { importsRules } from "./rules.js";
-import { narrowFiles } from "../../utilities/type-aware.js";
+import { narrowFiles } from "../../utilities/file-scope.js";
 
 // Builds the flat config for eslint-plugin-import-x. TypeScript files and Svelte components
 // within the feature's files resolve imports through the TypeScript resolver first, with the
