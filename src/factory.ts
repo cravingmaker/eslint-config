@@ -8,7 +8,7 @@ import { core } from "./configs/core/index.js";
 import { exceptions } from "./configs/exceptions.js";
 import { express } from "./configs/express.js";
 import { functional } from "./configs/functional.js";
-import { html } from "./configs/html.js";
+import { html } from "./configs/html/index.js";
 import { ignores } from "./configs/ignores.js";
 import { imports } from "./configs/imports/index.js";
 import { json } from "./configs/json.js";
