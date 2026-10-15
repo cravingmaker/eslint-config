@@ -539,6 +539,14 @@ export default createConfig({
 
 A disable comment for a rule that is now off, such as `// eslint-disable-next-line import-x/no-default-export` in a config file or any rule in a `.cjs` file, becomes an "Unused eslint-disable directive" warning, which ESLint reports by default. With `--max-warnings 0`, the run fails. `eslint --fix` removes such comments, but can leave a line with only spaces, which Prettier then removes.
 
+## Contributing and security
+
+See [CONTRIBUTING.md](https://github.com/cravingmaker/eslint-config/blob/main/CONTRIBUTING.md)
+for contribution and pull request guidance, and follow the
+[Code of Conduct](https://github.com/cravingmaker/eslint-config/blob/main/CODE_OF_CONDUCT.md)
+when participating in the project. Report vulnerabilities privately
+as described in [SECURITY.md](https://github.com/cravingmaker/eslint-config/blob/main/SECURITY.md).
+
 ## License
 
 MIT © [cravingmaker](https://github.com/cravingmaker)

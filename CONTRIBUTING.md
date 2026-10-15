@@ -1,5 +1,8 @@
 # Contributing
 
+Please follow the [Code of Conduct](CODE_OF_CONDUCT.md) in all project
+interactions.
+
 This guide starts with setup, a map of the code, and recipes for the
 common maintenance tasks. The recipes link to the detailed reference,
 [Things to know](#things-to-know), so you can start with the task at
