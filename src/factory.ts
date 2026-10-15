@@ -15,7 +15,7 @@ import { json } from "./configs/json.js";
 import { markdown } from "./configs/markdown.js";
 import { node } from "./configs/node.js";
 import { packageJson } from "./configs/package-json.js";
-import { perfectionist } from "./configs/perfectionist.js";
+import { perfectionist } from "./configs/perfectionist/index.js";
 import { promise } from "./configs/promise.js";
 import { react } from "./configs/react.js";
 import { regexp } from "./configs/regexp.js";
