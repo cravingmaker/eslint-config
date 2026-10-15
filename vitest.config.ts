@@ -41,6 +41,12 @@ export default defineConfig({
         pattern: /(?:^|\/)package-lock\.json$/u,
         testsToRun: (_filename) => "tests/package/contract.test.ts",
       },
+      {
+        // The policy report runs in a child process, which loads these modules itself.
+        pattern:
+          /(?:^|\/)(?:scripts\/policy-diff(?:\.ts$|\/)|tests\/policy\/effective-(?:config|scenarios)\.ts$)/u,
+        testsToRun: (_filename) => "tests/scripts/policy-diff.test.ts",
+      },
     ],
   },
 });

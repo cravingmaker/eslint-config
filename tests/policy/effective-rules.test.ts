@@ -6,7 +6,7 @@ import {
   effectiveScenarios,
 } from "./effective-scenarios.js";
 
-// `effective-scenarios.ts` describes the scenarios.
+// `effective-scenarios.ts` describes the scenarios, which `npm run policy:diff` compares as well.
 describe.each(effectiveScenarios)(
   "effective rules: $name",
   ({ options, snapshots }) => {

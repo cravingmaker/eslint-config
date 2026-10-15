@@ -135,8 +135,8 @@ const suites = [
 const reactRefreshVariants = ["generic", "next", "vite"] as const;
 
 /**
-Every scenario of the effective-rules snapshots, in the order that the snapshot test presents
-them.
+Every scenario of the effective-rules snapshots, in the order that the snapshot test and the
+policy difference report present them.
 */
 const effectiveScenarios: readonly EffectiveScenario[] = [
   ...suites.map(({ filePaths, name, options }) => ({

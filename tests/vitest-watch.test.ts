@@ -22,6 +22,7 @@ const testFiles = [
   "tests/factory/factory.test.ts",
   "tests/policy/fixtures.test.ts",
   "tests/policy/formatting.test.ts",
+  "tests/scripts/policy-diff.test.ts",
   "tests/typegen.test.ts",
   "tests/utilities.test.ts",
   ...packageTests,
@@ -45,6 +46,14 @@ const changes = [
   {
     filename: "package-lock.json",
     tests: ["tests/package/contract.test.ts"],
+  },
+  {
+    filename: "scripts/policy-diff/report.ts",
+    tests: ["tests/scripts/policy-diff.test.ts"],
+  },
+  {
+    filename: "tests/policy/effective-scenarios.ts",
+    tests: ["tests/scripts/policy-diff.test.ts"],
   },
   { filename: "package.json", tests: testFiles },
 ];
