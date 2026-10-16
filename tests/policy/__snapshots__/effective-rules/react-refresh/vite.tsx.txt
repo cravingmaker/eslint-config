@@ -1,1 +1,1 @@
-react-refresh/only-export-components: warn [{"allowConstantExport":true,"allowExportNames":[],"checkJS":false}]
+react-refresh/only-export-components: warn [{"allowCompoundComponents":false,"allowConstantExport":true,"allowExportNames":[],"checkJS":false,"extraHOCs":[]}]

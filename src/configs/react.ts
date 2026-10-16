@@ -10,9 +10,9 @@ import type {
 } from "../types.js";
 
 import { reactFiles, sourceFiles } from "../globs.js";
-import { enableAllRules } from "../utilities/all-rules.js";
 import { narrowFiles } from "../utilities/file-scope.js";
 import { importPeer } from "../utilities/import-peer.js";
+import { supportedPluginPolicy } from "../utilities/plugin-policy.js";
 
 type ReactFeatureOptions = FeatureOptions & {
   /**
@@ -25,8 +25,17 @@ const classNameOptions = {
   callees: ["classnames", "clsx", "cn", "cva", "tw", "twMerge"],
 } satisfies RuleOptionOf<"@html-eslint/react/classname-spacing">;
 
-// Settings for @html-eslint/eslint-plugin-react on top of all its rules.
+// Policy for @html-eslint/eslint-plugin-react.
 const htmlReactRules: Rules = {
+  "@html-eslint/react/no-ineffective-attrs": "error",
+  "@html-eslint/react/no-invalid-attr-value": ["error", { allow: [] }],
+  "@html-eslint/react/no-obsolete-attrs": "error",
+  "@html-eslint/react/no-obsolete-tags": "error",
+  "@html-eslint/react/no-restricted-attr-values": "error",
+  "@html-eslint/react/no-restricted-attrs": "error",
+  "@html-eslint/react/require-attrs": "error",
+  "@html-eslint/react/use-baseline": ["error", { available: "widely" }],
+
   "@html-eslint/react/classname-spacing": ["error", { ...classNameOptions }],
   "@html-eslint/react/no-duplicate-classname": [
     "error",
@@ -36,35 +45,60 @@ const htmlReactRules: Rules = {
 
 // Policy for eslint-plugin-react-hooks, including its React Compiler rules.
 const hooksRules: Rules = {
+  "react-hooks/capitalized-calls": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/exhaustive-effect-dependencies": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/fbt": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/hooks": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/invariant": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/memo-dependencies": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/memoized-effect-dependencies": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/no-deriving-state-in-effects": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/rule-suppression": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/syntax": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/todo": ["off", {}], // Not part of the enabled policy.
+  "react-hooks/void-use-memo": ["off", {}], // Not part of the enabled policy.
+
   // Core hooks rules
-  "react-hooks/exhaustive-deps": "error",
-  "react-hooks/rules-of-hooks": "error",
+  "react-hooks/exhaustive-deps": [
+    "error",
+    {
+      additionalHooks: "",
+      enableDangerousAutofixThisMayCauseInfiniteLoops: false,
+      // eslint-disable-next-line @typescript-eslint/naming-convention -- This is the option name defined by eslint-plugin-react-hooks.
+      experimental_autoDependenciesHooks: [],
+      requireExplicitEffectDeps: false,
+    },
+  ],
+  "react-hooks/rules-of-hooks": ["error", { additionalHooks: undefined }],
 
   // React Compiler rules
-  "react-hooks/config": "error",
-  "react-hooks/error-boundaries": "error",
-  "react-hooks/gating": "error",
-  "react-hooks/globals": "error",
-  "react-hooks/immutability": "error",
-  "react-hooks/incompatible-library": "error",
-  "react-hooks/preserve-manual-memoization": "error",
-  "react-hooks/purity": "error",
-  "react-hooks/refs": "error",
-  "react-hooks/set-state-in-effect": "error",
-  "react-hooks/set-state-in-render": "error",
-  "react-hooks/static-components": "error",
-  "react-hooks/unsupported-syntax": "error",
-  "react-hooks/use-memo": "error",
+  "react-hooks/config": ["error", {}],
+  "react-hooks/error-boundaries": ["error", {}],
+  "react-hooks/gating": ["error", {}],
+  "react-hooks/globals": ["error", {}],
+  "react-hooks/immutability": ["error", {}],
+  "react-hooks/incompatible-library": ["error", {}],
+  "react-hooks/preserve-manual-memoization": ["error", {}],
+  "react-hooks/purity": ["error", {}],
+  "react-hooks/refs": ["error", {}],
+  "react-hooks/set-state-in-effect": ["error", {}],
+  "react-hooks/set-state-in-render": ["error", {}],
+  "react-hooks/static-components": ["error", {}],
+  "react-hooks/unsupported-syntax": ["error", {}],
+  "react-hooks/use-memo": ["error", {}],
 } as const;
 
 // Options of `react-refresh/only-export-components` for each React Refresh variant.
 const refreshOptions = {
   generic: {
+    allowCompoundComponents: false,
     allowConstantExport: false,
     allowExportNames: [],
     checkJS: false,
+    extraHOCs: [],
   },
   next: {
+    allowCompoundComponents: false,
     allowConstantExport: false,
     allowExportNames: [
       // https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
@@ -95,8 +129,15 @@ const refreshOptions = {
       "generateStaticParams",
     ],
     checkJS: false,
+    extraHOCs: [],
   },
-  vite: { allowConstantExport: true, allowExportNames: [], checkJS: false },
+  vite: {
+    allowCompoundComponents: false,
+    allowConstantExport: true,
+    allowExportNames: [],
+    checkJS: false,
+    extraHOCs: [],
+  },
 } satisfies Record<
   ReactRefreshVariant,
   RuleOptionOf<"react-refresh/only-export-components">
@@ -164,8 +205,11 @@ async function react({
       name: "@cravingmaker/eslint-config/react/html",
       plugins: { "@html-eslint/react": htmlReact.default },
       rules: {
-        ...enableAllRules("@html-eslint/react", htmlReact.default.rules ?? {}),
-        ...htmlReactRules,
+        ...supportedPluginPolicy(
+          "@html-eslint/react",
+          htmlReactRules,
+          htmlReact.default.rules,
+        ),
         ...otherOverrides,
       },
     },
@@ -179,7 +223,14 @@ async function react({
           Linter.Config["plugins"]
         >[string],
       },
-      rules: { ...hooksRules, ...hooksOverrides },
+      rules: {
+        ...supportedPluginPolicy(
+          "react-hooks",
+          hooksRules,
+          hooks.default.rules,
+        ),
+        ...hooksOverrides,
+      },
     },
     ...(refreshModule === undefined || refresh === false
       ? []
@@ -188,7 +239,14 @@ async function react({
             ...scope,
             name: "@cravingmaker/eslint-config/react/refresh",
             plugins: { "react-refresh": refreshModule.reactRefresh.plugin },
-            rules: { ...refreshRules(refresh), ...refreshOverrides },
+            rules: {
+              ...supportedPluginPolicy(
+                "react-refresh",
+                refreshRules(refresh),
+                refreshModule.reactRefresh.plugin.rules,
+              ),
+              ...refreshOverrides,
+            },
           },
         ]),
   ];

@@ -9,21 +9,64 @@ import {
   typescriptFiles,
   withSvelteComponents,
 } from "../globs.js";
-import { enableAllRules } from "../utilities/all-rules.js";
 import { narrowFiles } from "../utilities/file-scope.js";
 import { typeAwareConfig } from "../utilities/type-aware.js";
 
-// Policy for eslint-plugin-n.
+// Policy for eslint-plugin-n. Unset version and resolution options keep the
+// consumer's settings, package engines, and tsconfig inference.
 const nodeRules: Rules = {
-  ...enableAllRules("n", pluginNode.rules ?? {}),
+  "n/callback-return": ["error", ["callback", "cb", "next"]],
+  "n/handle-callback-err": ["error", "err"],
+  "n/no-callback-literal": "error",
+  "n/no-path-concat": "error",
+  "n/no-unpublished-bin": ["error", { convertPath: undefined }],
+  "n/no-unpublished-import": [
+    "error",
+    {
+      allowModules: undefined,
+      convertPath: undefined,
+      ignorePrivate: true,
+      ignoreTypeImport: false,
+      resolvePaths: undefined,
+      resolverConfig: undefined,
+      tryExtensions: undefined,
+    },
+  ],
+  "n/no-unsupported-features/es-builtins": [
+    "error",
+    { ignores: [], version: undefined },
+  ],
+  "n/no-unsupported-features/es-syntax": [
+    "error",
+    { ignores: [], version: undefined },
+  ],
+  "n/no-unsupported-features/node-builtins": [
+    "error",
+    { allowExperimental: false, ignores: [], version: undefined },
+  ],
+  "n/prefer-global/console": ["error", "always"],
+  "n/prefer-global/text-decoder": ["error", "always"],
+  "n/prefer-global/text-encoder": ["error", "always"],
+  "n/prefer-global/timers": ["error", "always"],
+  "n/prefer-global/url": ["error", "always"],
+  "n/prefer-global/url-search-params": ["error", "always"],
+  "n/prefer-import/assert-strict": "error",
+  "n/prefer-process-get-builtin-module": ["error", { version: undefined }],
+  "n/prefer-promises/dns": "error",
+  "n/prefer-promises/fs": "error",
+  "n/process-exit-as-throw": "error",
 
-  "n/prefer-global/buffer": "off", // Buffer globals and imports are restricted in favor of Uint8Array
+  "n/prefer-global/buffer": ["off", "always"], // Buffer globals and imports are restricted in favor of Uint8Array
   "n/prefer-global/crypto": ["error", "never"],
   "n/prefer-global/process": ["error", "never"],
 
   "n/hashbang": [
     "error",
     {
+      convertPath: undefined,
+
+      additionalExecutables: [],
+
       executableMap: {
         ".js": "node",
         ".mjs": "node",
@@ -31,30 +74,87 @@ const nodeRules: Rules = {
       ignoreUnpublished: true,
     },
   ],
-  "n/no-deprecated-api": ["error", { ignoreIndirectDependencies: true }],
-  "n/no-sync": ["error", { allowAtRootLevel: true }], // Needs type information in TypeScript files
+  "n/no-deprecated-api": [
+    "error",
+    {
+      version: undefined,
+
+      ignoreGlobalItems: [],
+      ignoreIndirectDependencies: true,
+      ignoreModuleItems: [],
+    },
+  ],
+  "n/no-sync": ["error", { allowAtRootLevel: true, ignores: [] }], // Needs type information in TypeScript files
 
   "n/no-process-env": ["warn", { allowedVariables: ["NODE_ENV"] }],
 
-  "n/no-restricted-import": "off", // Project specific
+  "n/no-restricted-import": ["off", []], // Project specific
 
   // Off while their replacements are on, see src/overlaps.ts
-  "n/file-extension-in-import": "error",
-  "n/no-extraneous-import": "error",
-  "n/no-missing-import": "error", // Off in TypeScript files and Svelte components, see `node`
+  "n/file-extension-in-import": ["error", "always", {}],
+  "n/no-extraneous-import": [
+    "error",
+    {
+      allowModules: undefined,
+      convertPath: undefined,
+      resolvePaths: undefined,
+      resolverConfig: undefined,
+    },
+  ],
+  "n/no-missing-import": [
+    "error",
+    {
+      allowModules: undefined,
+      ignoreTypeImport: false,
+      resolvePaths: undefined,
+      resolverConfig: undefined,
+      tryExtensions: undefined,
+      tsconfigPath: undefined,
+      typescriptExtensionMap: undefined,
+    },
+  ], // Off in TypeScript files and Svelte components, see `node`
   "n/no-process-exit": "error",
-  "n/prefer-node-protocol": "error",
+  "n/prefer-node-protocol": ["error", { version: undefined }],
 
-  "n/exports-style": "off", // Irrelevant for ESM-only project
+  "n/exports-style": ["off", "module.exports", { allowBatchAssign: false }], // Irrelevant for ESM-only project
   "n/global-require": "off", // Irrelevant for ESM-only project
   "n/no-exports-assign": "off", // Irrelevant for ESM-only project
-  "n/no-extraneous-require": "off", // Irrelevant for ESM-only project
-  "n/no-missing-require": "off", // Irrelevant for ESM-only project
-  "n/no-mixed-requires": "off", // Irrelevant for ESM-only project
+  "n/no-extraneous-require": [
+    "off",
+    {
+      allowModules: undefined,
+      convertPath: undefined,
+      resolvePaths: undefined,
+      resolverConfig: undefined,
+      tryExtensions: undefined,
+    },
+  ], // Irrelevant for ESM-only project
+  "n/no-missing-require": [
+    "off",
+    {
+      allowModules: undefined,
+      resolvePaths: undefined,
+      resolverConfig: undefined,
+      tryExtensions: undefined,
+      tsconfigPath: undefined,
+      typescriptExtensionMap: undefined,
+    },
+  ], // Irrelevant for ESM-only project
+  "n/no-mixed-requires": ["off", { allowCall: false, grouping: false }], // Irrelevant for ESM-only project
   "n/no-new-require": "off", // Irrelevant for ESM-only project
-  "n/no-restricted-require": "off", // Irrelevant for ESM-only project
-  "n/no-top-level-await": "off", // Irrelevant for ESM-only project
-  "n/no-unpublished-require": "off", // Irrelevant for ESM-only project
+  "n/no-restricted-require": ["off", []], // Irrelevant for ESM-only project
+  "n/no-top-level-await": ["off", { convertPath: undefined, ignoreBin: false }], // Irrelevant for ESM-only project
+  "n/no-unpublished-require": [
+    "off",
+    {
+      allowModules: undefined,
+      convertPath: undefined,
+      ignorePrivate: true,
+      resolvePaths: undefined,
+      resolverConfig: undefined,
+      tryExtensions: undefined,
+    },
+  ], // Irrelevant for ESM-only project
 };
 // The rules that need type information in TypeScript files.
 const typeAwareRules: Rules = { "n/no-sync": nodeRules["n/no-sync"] };

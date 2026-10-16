@@ -9,14 +9,18 @@ import {
   replacementRules,
   typeAwareReplacementRules,
 } from "./replacements.js";
-import { typescriptTypeAwareRules } from "./rules-type-aware.js";
+import {
+  typescriptTypeAwareRules,
+  typescriptTypeAwareRulesOff,
+} from "./rules-type-aware.js";
 import { typescriptRules } from "./rules.js";
-import { disableConfigRules } from "../../utilities/all-rules.js";
 import { narrowFiles } from "../../utilities/file-scope.js";
 import {
   overridesWithoutTypeInformation,
   typeAwareConfig,
 } from "../../utilities/type-aware.js";
+
+const typeAwareRuleIds = Object.keys(typescriptTypeAwareRulesOff);
 
 /**
 Builds the flat config for TypeScript files and Svelte components, whose scripts
@@ -36,18 +40,7 @@ async function typescript(
     overrides = {},
     overridesTypeAware = {},
   } = options;
-  const [parserConfigs, { configs, plugin }] = await Promise.all([
-    typescriptParser(options, context),
-    import("typescript-eslint"),
-  ]);
-  // Off as in typescript-eslint's `disableTypeChecked` config. The plugin's type omits its rules.
-  const typeAwareRulesOff = disableConfigRules(
-    "@typescript-eslint",
-    "rules" in plugin ? plugin.rules : {},
-    configs.disableTypeChecked.rules,
-  );
-  // Every rule of that config, also a deprecated one, which `typeAwareRulesOff` leaves out.
-  const typeAwareRuleIds = Object.keys(configs.disableTypeChecked.rules ?? {});
+  const parserConfigs = await typescriptParser(options, context);
 
   return [
     ...parserConfigs,
@@ -62,7 +55,7 @@ async function typescript(
         ...compilerCheckedRules,
         ...replacementRules,
         ...typescriptRules,
-        ...typeAwareRulesOff,
+        ...typescriptTypeAwareRulesOff,
         ...overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
       },
     },
