@@ -1,6 +1,6 @@
 # Maintainer Experience Implementation Plan
 
-Status: planned. This document specifies future implementation work; it does not implement the changes.
+Status: historical staged plan. The subsequent explicit-rule-policy refactor supersedes its earlier automatic rule-enabling requirement. Current rules and fixed option defaults are declared locally, and new upstream rules require explicit review.
 
 Baseline: `main` at `0c29d66b9fbc40f13e62187cfff789f144f6ce6b`, inspected on 14 October 2026. Recheck the branch, open pull requests, and current implementation before starting a stage so work already completed elsewhere is not duplicated.
 
@@ -26,7 +26,7 @@ The public configuration API, dependency versions, and lint policy remain the ba
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Public API               | Keep `createConfig(options, ...userConfigs)`, its promise of a flat config array, existing exported types, option names, defaults, and ESM-only package exports. Internal helpers remain internal.            |
 | Core naming              | Keep the public `javascript` option and the emitted `javascript/rules` and `javascript/jsx` block names. The rename applies to internal implementation names and matching test organization.                  |
-| Policy                   | Preserve every rule's severity and complete options, including disabled rules. Preserve `enableAllRules()` behavior, deprecated-rule handling, and automatic inclusion of new upstream rules.                 |
+| Policy                   | Preserve every rule's severity and complete options, including disabled rules. Keep deprecated rules absent. Declare current rule settings explicitly; new upstream rules require review.                     |
 | Composition              | Preserve config block names, order, plugin registrations, parser settings, resolver settings, feature override semantics, exceptions, and user-config precedence. Consumers can inspect or copy named blocks. |
 | File selection           | Preserve default patterns, narrowing through `files`, global and feature-local ignores, ordered negated ignores, language separation, and current unsupported file behavior.                                  |
 | Replacements             | Preserve the distinction between equivalent checks that return outside their owner's scope and style rules that remain disabled. Preserve explicit override handling.                                         |
@@ -91,7 +91,7 @@ Scope: `CONTRIBUTING.md`. Update a link in `README.md` only if needed to expose 
 
 Put a short architecture map and four task recipes before the detailed contributor reference:
 
-1. **Change a rule:** locate the owning policy declaration; identify whether it comes from `enableAllRules()`; inspect replacements, file-role exceptions, and typed-linting restrictions; run the relevant feature tests and inspect the effective configuration.
+1. **Change a rule:** locate the owning policy declaration; read its explicit severity and options; inspect replacements, file-role exceptions, and typed-linting restrictions; run the relevant feature tests and inspect the effective configuration.
 2. **Update a plugin:** keep the dependency change separate from refactors; identify new, removed, deprecated, and changed rules; review effective-policy changes; validate rule options, formatter compatibility, and installed consumers.
 3. **Explain an unexpected rule:** select a concrete file and options; inspect the matching blocks and final rule entry; trace policy, replacements, exceptions, and user overrides in order.
 4. **Change a file exception:** locate the existing exception, explain its file-role requirement, and identify the tests that prove its scope. An actual behavior change requires its own implementation task.
@@ -102,7 +102,7 @@ Preserve the detailed technical guidance, grouping it under the task it supports
 
 Validation: format and lint the edited Markdown, check local links and command names, and manually follow the rule-location and inspection recipes. Do not change a rule merely to demonstrate a recipe.
 
-Acceptance: a new maintainer can locate a built-in rule, an automatically enabled plugin rule, and a replaced rule using the guide. Existing caveats remain available without requiring the reader to start with the entire reference section.
+Acceptance: a new maintainer can locate a built-in rule, an explicitly configured plugin rule, and a replaced rule using the guide. Existing caveats remain available without requiring the reader to start with the entire reference section.
 
 ## Stage 3: Separate policy from assembly in large features
 

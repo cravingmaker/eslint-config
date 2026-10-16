@@ -15,7 +15,10 @@ const recommendedPossibleProblemRules: Rules = {
   "no-compare-neg-zero": "error",
   "no-cond-assign": ["error", "except-parens"],
   "no-const-assign": "error",
-  "no-constant-binary-expression": "error",
+  "no-constant-binary-expression": [
+    "error",
+    { checkRelationalComparisons: false },
+  ],
   "no-constant-condition": ["error", { checkLoops: "allExceptWhileTrue" }],
   "no-control-regex": "error", // Compatibility with `eslint-plugin-regexp`
   "no-debugger": "error",
@@ -29,6 +32,8 @@ const recommendedPossibleProblemRules: Rules = {
   "no-fallthrough": [
     "error",
     {
+      commentPattern: undefined,
+
       allowEmptyCase: false,
       reportUnusedFallthroughComment: false,
     },
@@ -88,7 +93,7 @@ const recommendedPossibleProblemRules: Rules = {
 
   // Off while their replacements are on, see src/overlaps.ts
   "no-empty-character-class": "error",
-  "no-invalid-regexp": "error",
+  "no-invalid-regexp": ["error", { allowConstructorFlags: undefined }],
   "no-unused-vars": ["error", { ...noUnusedVarsOptions }],
   "no-useless-backreference": "error",
 } as const;
@@ -106,7 +111,10 @@ const possibleProblemRules: Rules = {
   "no-promise-executor-return": ["error", { allowVoid: false }],
   "no-self-compare": "error",
   "no-template-curly-in-string": "error",
-  "no-unmodified-loop-condition": "error",
+  "no-unmodified-loop-condition": [
+    "error",
+    { checkConditionalExpressions: false },
+  ],
   "no-unreachable-loop": ["error", { ignore: [] }],
   "no-use-before-define": ["error", { ...noUseBeforeDefineOptions }],
 

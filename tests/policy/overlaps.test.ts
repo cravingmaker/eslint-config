@@ -740,8 +740,12 @@ describe("overlaps owned by the javascript feature", () => {
   it("stay in the rule maps, because the javascript feature is always on", async () => {
     const rules = await getRules(baseOptions, "src/example.js");
 
-    expect(rules.get("arrow-body-style")).toEqual([2, "as-needed"]);
-    expect(rules.has("unicorn/consistent-arrow-return-style")).toBe(false);
+    expect(rules.get("arrow-body-style")).toEqual([
+      2,
+      "as-needed",
+      { requireReturnForObjectLiteral: false },
+    ]);
+    expect(rules.get("unicorn/consistent-arrow-return-style")).toEqual([0]);
     expect(rules.get("perfectionist/sort-variable-declarations")?.[0]).toBe(0);
     expect(rules.get("unicorn/try-complexity")?.[0]).toBe(0);
   });
