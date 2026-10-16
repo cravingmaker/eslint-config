@@ -73,4 +73,4 @@ function promise(
   ];
 }
 
-export { promise, promiseRules };
+export { promise };

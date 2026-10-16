@@ -1,0 +1,5 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["tests/fixtures/**/*.{js,jsx,mjs,mts,svelte,ts,tsx}"],
+  "treatConfigHintsAsErrors": true
+}

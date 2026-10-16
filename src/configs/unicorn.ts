@@ -648,4 +648,4 @@ function unicorn(
   ];
 }
 
-export { unicorn, unicornRules };
+export { unicorn };

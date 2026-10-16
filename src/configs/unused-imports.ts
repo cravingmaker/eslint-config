@@ -59,4 +59,4 @@ function unusedImports(
   ];
 }
 
-export { unusedImports, unusedImportsRules };
+export { unusedImports };

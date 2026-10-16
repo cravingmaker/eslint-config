@@ -54,4 +54,4 @@ function core(
   ];
 }
 
-export { core, coreRules };
+export { core };

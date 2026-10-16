@@ -47,4 +47,4 @@ function security(
   ];
 }
 
-export { security, securityRules };
+export { security };

@@ -433,7 +433,7 @@ function unionOfKeys(
   return keys.union(new Set(right.keys())).values().toArray();
 }
 
-export type { Change, CurrentSnapshot, Description, SnapshotResult };
+export type { CurrentSnapshot, SnapshotResult };
 export {
   compareDescriptions,
   compareSnapshots,

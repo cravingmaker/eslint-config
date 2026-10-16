@@ -199,4 +199,4 @@ function regexp(
   ];
 }
 
-export { regexp, regexpRules };
+export { regexp };

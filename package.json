@@ -47,6 +47,7 @@
     "gen": "node scripts/typegen.ts",
     "inspect": "npm run build && eslint-config-inspector --no-open",
     "inspect:build": "npm run build && eslint-config-inspector build --outDir node_modules/.cache/eslint-config-inspector",
+    "knip": "knip",
     "lint": "npm run build && npm run lint:built",
     "lint:built": "eslint . --max-warnings 0",
     "lint:package": "npm run build && npm run lint:package:built",
@@ -68,7 +69,7 @@
     "typecheck": "npm run gen && tsc --noEmit",
     "typecheck:package": "npm run build && npm run typecheck:package:built",
     "typecheck:package:built": "attw --pack . --profile esm-only",
-    "validate": "npm run format:check && npm run build && npm run typecheck && npm run lint:built && npm test && npm run lint:package:built && npm run typecheck:package:built"
+    "validate": "npm run format:check && npm run build && npm run typecheck && npm run knip && npm run lint:built && npm test && npm run lint:package:built && npm run typecheck:package:built"
   },
   "lint-staged": {
     "*.{ts,mts,tsx,js,mjs,jsx}": [
@@ -129,6 +130,7 @@
     "eslint-plugin-react-refresh": "0.5.7",
     "eslint-typegen": "2.3.1",
     "husky": "9.1.7",
+    "knip": "6.40.0",
     "lint-staged": "17.6.0",
     "node-modules-inspector": "2.7.0",
     "prettier": "3.9.9",

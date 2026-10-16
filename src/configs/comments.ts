@@ -55,4 +55,4 @@ function comments(
   ];
 }
 
-export { comments, commentsRules };
+export { comments };

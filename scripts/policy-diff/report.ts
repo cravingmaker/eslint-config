@@ -540,7 +540,6 @@ function withoutGitVariables(
 
 export {
   compareLockedPackages,
-  createReport,
   describeCurrentSnapshots,
   findInstallMismatches,
   formatResults,

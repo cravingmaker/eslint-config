@@ -550,6 +550,25 @@ metadata requests, supply an inspector configuration with
 
 Finish dependency changes with the required [validation](#validation).
 
+### Find unused code and dependencies
+
+Run [Knip](https://knip.dev/) to check for unused files, exports, types,
+and dependencies, as well as missing dependencies and unresolved imports:
+
+```bash
+npm run knip
+```
+
+Knip discovers the build entry point, scripts, tool configurations, and
+Vitest tests through its built-in plugins. [knip.json](knip.json) also
+marks the fixtures as entry points: the tests lint those samples and copy
+them into packed consumers by path. Public exports and fixture exports are
+intentional, while internal modules are checked for unused exports.
+
+`npm run validate` includes this check, so it also runs in CI and during
+release checks. Findings and stale configuration hints fail validation.
+Review each finding before removing code or adding an exception.
+
 ### Explain an unexpected rule
 
 1. **Pin down the case:** the path of the file, the options, the user
@@ -861,8 +880,8 @@ Before opening a pull request, run:
 npm run validate
 ```
 
-This runs formatting checks, a build, typechecking, linting, tests, and
-package integrity checks. Package tests exercise the tarball in temporary
+This runs formatting checks, a build, typechecking, Knip, linting, tests,
+and package integrity checks. Package tests exercise the tarball in temporary
 consumer projects. Some install it from the npm registry, so the tests need
 network access.
 

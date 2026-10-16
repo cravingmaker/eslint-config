@@ -89,4 +89,4 @@ function fileRoles({
   };
 }
 
-export { exceptions, fileRoles };
+export { exceptions };
