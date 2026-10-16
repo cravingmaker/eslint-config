@@ -11,8 +11,8 @@ import type {
 
 import { reactFiles, sourceFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 import { importPeer } from "../utilities/import-peer.js";
-import { narrowFiles } from "../utilities/type-aware.js";
 
 type ReactFeatureOptions = FeatureOptions & {
   /**

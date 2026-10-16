@@ -6,8 +6,8 @@ import pluginFunctional from "eslint-plugin-functional";
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { disableConfigRules, enableAllRules } from "../utilities/all-rules.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 import {
-  narrowFiles,
   overridesWithoutTypeInformation,
   typeAwareConfig,
 } from "../utilities/type-aware.js";

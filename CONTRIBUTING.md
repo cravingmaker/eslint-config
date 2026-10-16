@@ -126,15 +126,17 @@ The builders share these modules:
 | `src/globs.ts`                  | The default files of the features                                                                            |
 | `src/configs/shared-options.ts` | Rule options that more than one rule map uses, such as those of a core rule and of the rule that replaces it |
 | `src/utilities/all-rules.ts`    | `enableAllRules()`, which turns on every rule of a plugin that is not deprecated, and `disableConfigRules()` |
-| `src/utilities/type-aware.ts`   | `narrowFiles()`, `withoutIgnores()`, and the helpers of the type-aware scope                                 |
+| `src/utilities/file-scope.ts`   | `narrowFiles()` and `withoutIgnores()`, which limit `files` patterns by other patterns and by an ignore list |
+| `src/utilities/type-aware.ts`   | The helpers of the type-aware scope, such as `typeAwareConfig()`                                             |
 | `src/utilities/import-peer.ts`  | `importPeer()`, which loads an optional peer or fails with a message that names it                           |
 | `src/typegen.d.ts`              | The rule option types, which `npm run gen` generates and which are not committed                             |
 
 The tests follow the sources: `tests/configs/` has a file for each
 module of `src/configs/`, `tests/factory/` tests `createConfig()` and
-its options, `tests/policy/` the effective policy, and `tests/package/`
-the packed package in temporary consumers. Many of them load the build,
-so build first, as [Builds and tests](#builds-and-tests) explains.
+its options, `tests/policy/` the effective policy, `tests/scripts/` the
+scripts in `scripts/`, and `tests/package/` the packed package in
+temporary consumers. Many of them load the build, so build first, as
+[Builds and tests](#builds-and-tests) explains.
 
 ### Where a rule is declared
 
@@ -222,8 +224,8 @@ Three tools show what ESLint resolves:
   hold the reviewed configuration of representative paths. Each lists
   the settings that decide how ESLint parses the file, then one rule per
   line with its severity and options. The options include the defaults
-  that ESLint adds from the rule's schema. The comment at the top of
-  `tests/policy/effective-rules.test.ts` describes the scenarios; all of
+  that ESLint adds from the rule's schema.
+  `tests/policy/effective-scenarios.ts` describes the scenarios; all of
   them turn every framework on. The snapshots need no build:
 
   ```bash
@@ -234,14 +236,56 @@ Three tools show what ESLint resolves:
   ESLint resolves for one path, as JSON. The file need not exist. It
   prints `undefined` when ESLint ignores the path or no block matches
   it.
-- **`npm run inspect`** builds the package and opens
-  `@eslint/config-inspector` at <http://localhost:7777>, which lists
-  every block with its files and rules. Its "Test matching with
-  filepath" field shows the blocks that match a path.
+- **`npm run inspect`** builds the package and starts
+  [ESLint Config Inspector](https://github.com/eslint/config-inspector),
+  which lists every block with its files and rules. Its "Test matching
+  with filepath" field shows the blocks that match a path.
 
 The last two load `eslint.config.js`, which imports `dist/index.mjs`.
 `npm run inspect` builds first, but `--print-config` shows the previous
 build until you run `npm run build`.
+
+### Interactive Config Inspector
+
+Start the inspector from the repository root:
+
+```bash
+npm run inspect
+```
+
+Open the URL printed in the terminal, normally <http://localhost:7777/>.
+The command keeps running until you press Ctrl+C. It does not open a
+browser automatically; use `npm run inspect -- --open` to do so, or
+`npm run inspect -- --port=7778` to choose another port.
+
+Try paths such as `src/factory.ts`, `eslint.config.js`, and `package.json`
+to see which named blocks apply and how their rules combine. The Rules
+view also shows rule metadata and links to the upstream documentation.
+
+Config Inspector 3.5.0 omits this package's `*-type-aware` blocks from
+file matches when their `files` contain nested negated globs. Clear the
+filepath field to see those blocks, and confirm their final rules with
+`npx eslint --print-config src/factory.ts`. For example, ESLint enables
+`@typescript-eslint/no-floating-promises` there even when the inspector's
+merged view shows it off. This limitation also affects static snapshots.
+
+The inspector reloads edits to `eslint.config.js`. After editing `src/`,
+restart `npm run inspect` so it rebuilds `dist/index.mjs` before loading
+the config; the command builds only once at startup.
+
+To save a static snapshot of the current configuration:
+
+```bash
+npm run inspect:build
+```
+
+This builds the package and writes a standalone inspector to
+`node_modules/.cache/eslint-config-inspector/`. Serve that directory with
+a static HTTP server to browse it. The snapshot stays outside the
+published `dist/` directory, is ignored by Git and the repository checks,
+and is removed by `npm ci`. Run the command again after config changes.
+Inspector options can be forwarded with `--`, for example
+`npm run inspect:build -- --base /eslint-config/` for hosting at a subpath.
 
 ### This repository's options are not the defaults
 
@@ -298,6 +342,35 @@ for (const { files, ignores, name, rules = {} } of await configs)
 ' ./node_modules/.cache/consumer.config.js no-unused-vars
 ```
 
+### Comparing the policy with a commit
+
+`npm run policy:diff` builds the package and compares the configuration
+of the working tree with the snapshots of a commit, `HEAD` unless
+`--base` names another. Fetch first to compare with the current `main`:
+
+```bash
+npm run policy:diff
+npm run policy:diff -- --base origin/main
+```
+
+It describes the snapshots of `tests/policy/effective-scenarios.ts` with
+the build, as the snapshot test does, reads those of the commit through
+Git, and lists the differences by scenario and file: the rules that were
+added or removed, the severities and options that changed, each option
+by its path, and the changes to whether ESLint ignores the file, its
+language, parser, plugins, globals, and settings, such as the import
+resolver. A snapshot that only one side has is listed as new or removed.
+The report starts with the commit, the Node.js and ESLint versions, and
+the packages whose locked version differs from the commit's
+`package-lock.json`, which tell a refactor from a dependency update, and
+ends with a summary.
+
+The report changes no file but `dist/`, which the build refreshes. It
+exits with 0 when it compares every snapshot, whatever the differences,
+and with 1 when the base is not a commit, the commit has no snapshots,
+the installed packages differ from `package-lock.json`, or a snapshot
+cannot be described or read.
+
 ## Common tasks
 
 Each recipe names the tests that cover its change. Before opening a
@@ -352,9 +425,12 @@ pull request, run the full [validation](#validation) as well.
    ```
 
 5. **Review the snapshots.** Without update mode, the snapshot test
-   fails on each line that the change touches, in every scenario. Check
-   that the diff holds the intended change and nothing else, then update
-   the snapshots as "Snapshots record the policy" describes.
+   fails on each line that the change touches, in every scenario.
+   `npm run policy:diff` lists the same changes by scenario and file,
+   with each option that changed; see
+   [Comparing the policy with a commit](#comparing-the-policy-with-a-commit).
+   Check that the diff holds the intended change and nothing else, then
+   update the snapshots as "Snapshots record the policy" describes.
 
 6. **Check the result** for a path with `--print-config`, as in
    [Inspecting the configuration](#inspecting-the-configuration), and
@@ -375,11 +451,14 @@ pull request, run the full [validation](#validation) as well.
    peer range" under [Dependencies and peers](#dependencies-and-peers).
 
 2. **Find the changed rules.** Read the release notes for new, removed,
-   deprecated, and changed rules. Then build, and run the policy tests
+   deprecated, and changed rules. Then run the
+   [policy report](#comparing-the-policy-with-a-commit), which builds the
+   package and lists what the update changes in every scenario, with the
+   packages that `package-lock.json` changed, and run the policy tests
    without update mode:
 
    ```bash
-   npm run build
+   npm run policy:diff
    npx vitest run tests/policy
    ```
 
@@ -591,9 +670,12 @@ The reference that the recipes link to, grouped by topic.
 - **A refactor keeps every snapshot.** Reorganizing the code, such as
   moving a rule map or renaming a module, must not change a line of the
   snapshots. When one changes, the refactor changed the policy: fix the
-  refactor, and do not update the snapshot. Keep an intended policy
-  change, such as a dependency update, in a commit of its own, so that
-  its snapshot diff has one cause.
+  refactor, and do not update the snapshot.
+  `npm run policy:diff -- --base origin/main` checks a whole branch: for
+  a refactor, it reports every snapshot unchanged and the same packages
+  as the baseline. Keep an intended policy change, such as a dependency
+  update, in a commit of its own, so that its snapshot diff has one
+  cause.
 - **A severity-only entry keeps earlier options.** When a later block
   sets a rule to only `"off"` or `"error"`, ESLint keeps the options from
   an earlier block, and the snapshots record them. Inside one block, an
@@ -631,8 +713,9 @@ The reference that the recipes link to, grouped by topic.
   the blocks that have no `files`. That is why `.cjs` files are still
   parsed, while `.cts` files are skipped.
 - **A feature's `files` narrows its default files.** A block takes
-  `narrowFiles(defaults, files)`, never `files ?? defaults`: it reaches
-  a file that matches one of its default patterns and one of `files`.
+  `narrowFiles(defaults, files)` from `src/utilities/file-scope.ts`,
+  never `files ?? defaults`: it reaches a file that matches one of its
+  default patterns and one of `files`.
   `files` usually names a directory, such as `src/**`. On its own, that
   pattern would reach the files of other languages there, and a rule
   that cannot read a file's language stops the whole run, with "The
@@ -816,8 +899,9 @@ After editing `src/`, run `npm run build` in another terminal. The tests that
 import `dist/` and the packed consumers need the new build; the UI commands build
 once at startup. Watch mappings in `vitest.config.ts` rerun the selected suite
 after build output changes and rerun affected tests for fixtures, generated rule
-types, the README, and the lockfile. These inputs are read through the filesystem
-or subprocesses rather than ordinary test imports. The regular UI excludes
+types, the README, the lockfile, and the modules of the policy report. These
+inputs are read through the filesystem or subprocesses rather than ordinary test
+imports. The regular UI excludes
 package tests, and the package UI stays limited to `tests/package/`. Verify watch
 mapping changes with `npx vitest run tests/vitest-watch.test.ts`.
 

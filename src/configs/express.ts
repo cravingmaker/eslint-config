@@ -2,8 +2,8 @@ import type { Linter } from "eslint";
 import type { FeatureOptions, Rules } from "../types.js";
 
 import { expressFiles } from "../globs.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 import { importPeer } from "../utilities/import-peer.js";
-import { narrowFiles } from "../utilities/type-aware.js";
 
 // Policy for eslint-plugin-express-security, an optional peer.
 const expressRules: Rules = {

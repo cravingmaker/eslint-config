@@ -4,7 +4,8 @@ import type { FeatureOptions } from "./types.js";
 
 import { sourceFiles, typescriptFiles, withSvelteComponents } from "./globs.js";
 import { resolveOptions } from "./options.js";
-import { narrowFiles, narrowTypeAwareScope } from "./utilities/type-aware.js";
+import { narrowFiles } from "./utilities/file-scope.js";
+import { narrowTypeAwareScope } from "./utilities/type-aware.js";
 
 /**
 A feature whose rules make the same check as rules of other features.

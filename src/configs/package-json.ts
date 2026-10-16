@@ -7,7 +7,7 @@ import * as jsoncParser from "jsonc-eslint-parser";
 
 import { packageJsonFiles } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 // Policy for package.json files, from eslint-plugin-package-json and eslint-enforce-package-type.
 const packageJsonRules: Rules = {

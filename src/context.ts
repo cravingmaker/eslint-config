@@ -1,26 +1,30 @@
-import type { Detection } from "./options.js";
+import type { Detection, ResolvedOptions } from "./options.js";
 import type { Context, Options, ReactRefreshVariant } from "./types.js";
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { resolveOptions } from "./options.js";
+import { resolveOptions, resolveProjectRootDirectory } from "./options.js";
+import { rejectUnknownOptions } from "./unknown-options.js";
+
+type PreparedConfig = {
+  readonly context: Context;
+  readonly resolved: ResolvedOptions;
+};
 
 /**
-Builds the context for `options` in a project whose manifest declares `dependencies`.
+Derives the shared context from the completed options and the project's declared dependencies.
 */
 function buildContext(
-  options: Options = {},
-  dependencies: ReadonlySet<string> = new Set(),
-): Context {
-  const {
+  {
     globals,
     projectRootDirectory,
     svelteComponents,
     typeAware,
     typescript,
-  } = resolveOptions(options, detectFeatures(dependencies));
-
+  }: ResolvedOptions,
+  dependencies: ReadonlySet<string> = new Set(),
+): Context {
   return {
     dependencies,
     globals,
@@ -36,9 +40,8 @@ that its manifest declares, the resolved globals, the Svelte components, the tsc
 and the type-aware scope.
 */
 async function createContext(options: Options = {}): Promise<Context> {
-  const { projectRootDirectory } = resolveOptions(options);
-
-  return buildContext(options, await readDependencies(projectRootDirectory));
+  const { context } = await prepareConfig(options);
+  return context;
 }
 /**
 Detects what the `"auto"` defaults of `react`, `svelte`, and `express` turn on from the package
@@ -65,6 +68,24 @@ function detectReactRefreshVariant(
 }
 function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+/**
+Rejects unknown options before locating the manifest, detects the declared frameworks, and
+applies defaults once. The factory and its builders share these resolved options and context.
+*/
+async function prepareConfig(options: Options = {}): Promise<PreparedConfig> {
+  const knownOptions = rejectUnknownOptions(options);
+  const projectRootDirectory = resolveProjectRootDirectory(
+    knownOptions.projectRootDirectory,
+  );
+  const dependencies = await readDependencies(projectRootDirectory);
+  const resolved = resolveOptions(
+    knownOptions,
+    detectFeatures(dependencies),
+    projectRootDirectory,
+  );
+
+  return { context: buildContext(resolved, dependencies), resolved };
 }
 /**
 Reads the package names that the manifest at the project root declares in `dependencies`,
@@ -98,11 +119,12 @@ async function readDependencies(
 The context of `createConfig()` without options in a project that declares no dependencies.
 Feature builders fall back to it when they are called on their own, as in tests.
 */
-const defaultContext: Context = buildContext();
+const defaultContext: Context = buildContext(resolveOptions());
 
 export {
   createContext,
   defaultContext,
   detectFeatures,
   detectReactRefreshVariant,
+  prepareConfig,
 };

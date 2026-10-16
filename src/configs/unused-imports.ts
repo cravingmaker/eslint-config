@@ -10,7 +10,7 @@ import {
   noUnusedVarsOptions,
 } from "./shared-options.js";
 import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 // Policy for eslint-plugin-unused-imports.
 const unusedImportsRules: Rules = {

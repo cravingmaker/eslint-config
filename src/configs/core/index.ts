@@ -5,7 +5,7 @@ import { defaultContext } from "../../context.js";
 import { jsxFiles, sourceFiles, withSvelteComponents } from "../../globs.js";
 import { possibleProblemRules } from "./possible-problems.js";
 import { suggestionRules } from "./suggestions.js";
-import { narrowFiles } from "../../utilities/type-aware.js";
+import { narrowFiles } from "../../utilities/file-scope.js";
 
 // Policy for every non-deprecated ESLint core rule, shared by JavaScript and TypeScript files.
 const coreRules: Rules = {

@@ -24,10 +24,8 @@ import { svelte } from "./configs/svelte.js";
 import { typescript } from "./configs/typescript/index.js";
 import { unicorn } from "./configs/unicorn.js";
 import { unusedImports } from "./configs/unused-imports.js";
-import { createContext, detectFeatures } from "./context.js";
-import { resolveOptions } from "./options.js";
+import { prepareConfig } from "./context.js";
 import { overlapConfigs } from "./overlaps.js";
-import { rejectUnknownOptions } from "./unknown-options.js";
 
 /**
 Builds the ESLint flat config. Every feature is on unless it is `false`, except `react`,
@@ -45,12 +43,7 @@ async function createConfig(
   // eslint-disable-next-line functional/functional-parameters, functional/prefer-immutable-types -- The public signature takes user configs as rest arguments of ESLint's mutable config type.
   ...userConfigs: Linter.Config[]
 ): Promise<Linter.Config[]> {
-  const knownOptions = rejectUnknownOptions(options);
-  const context = await createContext(knownOptions);
-  const resolved = resolveOptions(
-    knownOptions,
-    detectFeatures(context.dependencies),
-  );
+  const { context, resolved } = await prepareConfig(options);
   const [typescriptConfigs, reactConfigs, svelteConfigs, expressConfigs] =
     await Promise.all([
       resolved.typescript === undefined

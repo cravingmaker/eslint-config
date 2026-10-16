@@ -5,7 +5,7 @@ import pluginSecurity from "eslint-plugin-security";
 
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 // Policy for eslint-plugin-security: its recommended config.
 const securityRules: Rules = {

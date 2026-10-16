@@ -3,7 +3,7 @@ import type { ResolvedOptions } from "../options.js";
 
 import { configFiles, sourceFiles, testFiles } from "../globs.js";
 import { resolveOptions } from "../options.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 /**
 A feature that holds rules a file role turns off.

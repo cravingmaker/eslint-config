@@ -6,7 +6,7 @@ import pluginRegexp from "eslint-plugin-regexp";
 import { defaultContext } from "../context.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
 import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 // Policy for eslint-plugin-regexp.
 const regexpRules: Rules = {
