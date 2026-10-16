@@ -13,13 +13,13 @@ linterOptions:
 settings: null
 rules: 65 (error 52, off 9, warn 4)
 
-@html-eslint/attrs-newline: off
+@html-eslint/attrs-newline: off [{"closeStyle":"newline","ifAttrsMoreThan":2,"inline":[],"skip":[]}]
 @html-eslint/class-spacing: off
 @html-eslint/css-no-empty-blocks: error
-@html-eslint/element-newline: off
-@html-eslint/head-order: error
-@html-eslint/id-naming-convention: error ["kebab-case"]
-@html-eslint/indent: off
+@html-eslint/element-newline: off [{"inline":[],"skip":["pre","code"]}]
+@html-eslint/head-order: error [{"ignores":[]}]
+@html-eslint/id-naming-convention: error ["kebab-case",{}]
+@html-eslint/indent: off [4,{"Attribute":1,"ignoreComment":false,"tagChildrenIndent":{},"templateIndentBase":"templateTag"}]
 @html-eslint/lowercase: error
 @html-eslint/max-element-depth: error [{"max":6}]
 @html-eslint/no-abstract-roles: error
@@ -31,15 +31,15 @@ rules: 65 (error 52, off 9, warn 4)
 @html-eslint/no-duplicate-id: error
 @html-eslint/no-duplicate-in-head: error
 @html-eslint/no-empty-headings: error
-@html-eslint/no-extra-spacing-tags: off
-@html-eslint/no-extra-spacing-text: off
+@html-eslint/no-extra-spacing-tags: off [{"disallowInAssignment":false,"disallowMissing":false,"disallowTabs":false,"enforceBeforeSelfClose":false}]
+@html-eslint/no-extra-spacing-text: off [{"skip":[]}]
 @html-eslint/no-heading-inside-button: error
 @html-eslint/no-ineffective-attrs: error
-@html-eslint/no-inline-styles: warn
-@html-eslint/no-invalid-attr-value: error
+@html-eslint/no-inline-styles: warn [{"allowExpressions":false}]
+@html-eslint/no-invalid-attr-value: error [{"allow":[]}]
 @html-eslint/no-invalid-entity: error
 @html-eslint/no-invalid-role: error
-@html-eslint/no-multiple-empty-lines: off
+@html-eslint/no-multiple-empty-lines: off [{"max":2}]
 @html-eslint/no-multiple-h1: error
 @html-eslint/no-nested-interactive: error
 @html-eslint/no-non-scalable-viewport: error
@@ -54,19 +54,19 @@ rules: 65 (error 52, off 9, warn 4)
 @html-eslint/no-skip-heading-levels: error
 @html-eslint/no-target-blank: error
 @html-eslint/no-trailing-spaces: off
-@html-eslint/no-whitespace-only-children: error
+@html-eslint/no-whitespace-only-children: error [{"tagPatterns":[]}]
 @html-eslint/prefer-https: error
-@html-eslint/quotes: off
+@html-eslint/quotes: off ["double",{"enforceTemplatedAttrValue":false}]
 @html-eslint/require-attrs: error [{"attr":"alt","message":"Add an alt attribute to images to support screen readers and ensure accessibility.","tag":"img"},{"attr":"width","message":"Set the width attribute on images to reserve space and prevent page layout shifting as the image loads.","tag":"img"},{"attr":"height","message":"Set the height attribute on images to reserve space and prevent page layout shifting as the image loads.","tag":"img"},{"attr":"loading","message":"Include the loading attribute to control image load priority and improve initial page performance.","tag":"img"},{"attr":"decoding","message":"Include the decoding attribute to optimize how the browser renders the image.","tag":"img"},{"attr":"title","message":"Add a title attribute to iframes to describe the nested content for screen readers.","tag":"iframe"},{"attr":"type","message":"Set the type attribute on input fields to ensure predictable user input handling and mobile keyboard behavior.","tag":"input"}]
 @html-eslint/require-button-type: error
 @html-eslint/require-closing-tags: warn [{"selfClosing":"always","selfClosingCustomPatterns":["-"]}]
 @html-eslint/require-content: error
 @html-eslint/require-details-summary: error
 @html-eslint/require-doctype: error
-@html-eslint/require-explicit-size: error
+@html-eslint/require-explicit-size: error [{"allowClass":[],"allowId":[]}]
 @html-eslint/require-form-method: error
 @html-eslint/require-frame-title: error
-@html-eslint/require-img-alt: error
+@html-eslint/require-img-alt: error [{"substitute":[]}]
 @html-eslint/require-input-label: error
 @html-eslint/require-lang: error
 @html-eslint/require-li-container: error
@@ -77,4 +77,4 @@ rules: 65 (error 52, off 9, warn 4)
 @html-eslint/require-title: error
 @html-eslint/sort-attrs: error [{"priority":[{"pattern":"client:.*"},{"pattern":"(is|set):.*"},{"pattern":"bind:.*"},{"pattern":"on:.*"},{"pattern":"use:.*"},{"pattern":"(transition|in|out|animate):.*"},{"pattern":"(class|style):.*"},{"pattern":"v-.*"},{"pattern":"x-.*"},{"pattern":"hx-.*"},"id","class","name","type","for","href","src","value","alt","title","role",{"pattern":"aria-.*"},"disabled","readonly","required",{"pattern":"data-.*"},{"pattern":"on.*"},"style"]}]
 @html-eslint/svg-require-viewbox: error
-@html-eslint/use-baseline: error
+@html-eslint/use-baseline: error [{"available":"widely"}]

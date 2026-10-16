@@ -124,7 +124,10 @@ describe("react feature", () => {
       "react-hooks",
       "react-refresh",
     ]);
-    expect(hooksRules["react-hooks/rules-of-hooks"]).toEqual([2]);
+    expect(hooksRules["react-hooks/rules-of-hooks"]).toEqual([
+      2,
+      { additionalHooks: undefined },
+    ]);
     // Custom hooks also live in modules without JSX, which get the hooks rules and no others.
     expect(
       [hooksModule, hooksScript].map((config) => [
@@ -394,7 +397,7 @@ describe("react-hooks rules", () => {
 
   // fbt depends on Meta's FBT library, and todo and rule-suppression serve Meta-internal tracking.
   // No sample triggers them without Meta's compiler settings, so the test reads the configuration.
-  it("leaves out the React Compiler rules that are internal to Meta", async () => {
+  it("explicitly disables the React Compiler rules that are internal to Meta", async () => {
     const internalRuleIds = [
       "react-hooks/fbt",
       "react-hooks/rule-suppression",
@@ -408,12 +411,14 @@ describe("react-hooks rules", () => {
       hooks?.plugins?.["react-hooks"]?.rules ?? {},
     ).map((ruleName) => `react-hooks/${ruleName}`);
 
+    const declaredRules = new Map(Object.entries(hooks?.rules ?? {}));
+
     expect(pluginRuleIds).toEqual(expect.arrayContaining(internalRuleIds));
-    expect(
-      internalRuleIds.filter((ruleId) =>
-        Object.hasOwn(hooks?.rules ?? {}, ruleId),
-      ),
-    ).toEqual([]);
+    expect(internalRuleIds.map((ruleId) => declaredRules.get(ruleId))).toEqual([
+      ["off", {}],
+      ["off", {}],
+      ["off", {}],
+    ]);
   });
 });
 

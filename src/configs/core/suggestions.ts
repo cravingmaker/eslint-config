@@ -18,7 +18,7 @@ const recommendedSuggestionRules: Rules = {
   "no-case-declarations": "error",
   "no-delete-var": "error",
   "no-empty-static-block": "error",
-  "no-extra-boolean-cast": ["error", {}],
+  "no-extra-boolean-cast": ["error", { enforceForInnerExpressions: false }],
   "no-global-assign": ["error", { exceptions: [] }],
   "no-nonoctal-decimal-escape": "error",
   "no-octal": "error",
@@ -28,7 +28,10 @@ const recommendedSuggestionRules: Rules = {
   "no-useless-catch": "error",
   "no-useless-escape": ["error", { allowRegexCharacters: [] }],
   "no-with": "error",
-  "preserve-caught-error": ["error", { requireCatchParameter: false }],
+  "preserve-caught-error": [
+    "error",
+    { errorClassNames: [], requireCatchParameter: false },
+  ],
   "require-yield": "error",
 
   // Rules with overridden options
@@ -47,7 +50,11 @@ const suggestionRules: Rules = {
       setWithoutGet: true,
     },
   ],
-  "arrow-body-style": ["error", "as-needed"],
+  "arrow-body-style": [
+    "error",
+    "as-needed",
+    { requireReturnForObjectLiteral: false },
+  ],
   "block-scoped-var": "error",
   camelcase: [
     "error",
@@ -59,25 +66,30 @@ const suggestionRules: Rules = {
       properties: "always",
     },
   ],
-  "class-methods-use-this": ["error", { ...classMethodsUseThisOptions }],
+  "class-methods-use-this": [
+    "error",
+    { ignoreClassesWithImplements: undefined, ...classMethodsUseThisOptions },
+  ],
   complexity: [
     "error",
     {
+      maximum: undefined,
+
       max: 20,
       variant: "classic",
     },
   ],
-  "default-case": ["error", {}],
+  "default-case": ["error", { commentPattern: undefined }],
   "default-case-last": "error",
   "default-param-last": "error",
-  "dot-notation": ["error", { ...dotNotationOptions }],
-  eqeqeq: ["error", "always"],
+  "dot-notation": ["error", { allowPattern: "", ...dotNotationOptions }],
+  eqeqeq: ["error", "always", { null: "always" }],
   "logical-assignment-operators": [
     "error",
     "always",
     { enforceForIfStatements: false },
   ],
-  "max-depth": ["error", { max: 4 }],
+  "max-depth": ["error", { max: 4, maximum: undefined }],
   "no-alert": "error",
   "no-array-constructor": "error",
   "no-bitwise": [
@@ -162,7 +174,7 @@ const suggestionRules: Rules = {
   "prefer-rest-params": "error",
   "prefer-spread": "error",
   "prefer-template": "error",
-  radix: "error",
+  radix: ["error", "always"],
   "require-await": "error",
   yoda: [
     "error",
@@ -174,7 +186,11 @@ const suggestionRules: Rules = {
   ],
 
   // Rules with overridden options
-  "func-style": "off", // Prefer allowing declarations and expressions based on local readability
+  "func-style": [
+    "off",
+    "expression",
+    { allowArrowFunctions: false, allowTypeAnnotation: false, overrides: {} },
+  ], // Prefer allowing declarations and expressions based on local readability
 
   "func-name-matching": [
     "error",
@@ -201,7 +217,15 @@ const suggestionRules: Rules = {
     },
   ],
   "max-nested-callbacks": ["error", 4],
-  "max-params": ["error", { ...maxParamsOptions }],
+  "max-params": [
+    "error",
+    {
+      countThis: "except-void",
+      countVoidThis: undefined,
+      maximum: undefined,
+      ...maxParamsOptions,
+    },
+  ],
   "no-else-return": ["error", { allowElseIf: false }],
   "no-return-assign": ["error", "always"],
   "no-sequences": ["error", { allowInParentheses: false }],
@@ -215,6 +239,7 @@ const suggestionRules: Rules = {
       avoidExplicitReturnArrows: true,
       avoidQuotes: false,
       ignoreConstructors: false,
+      methodsIgnorePattern: undefined,
     },
   ],
   "one-var": ["error", "never"],
@@ -230,6 +255,8 @@ const suggestionRules: Rules = {
     "off",
     "always",
     {
+      ignorePattern: "",
+
       ignoreConsecutiveComments: false,
       ignoreInlineComments: false,
     },
@@ -276,10 +303,13 @@ const suggestionRules: Rules = {
       skipComments: true,
     },
   ],
-  "max-statements": ["off", 10],
+  "max-statements": ["off", 10, { ignoreTopLevelFunctions: false }],
   "new-cap": [
     "off",
     {
+      capIsNewExceptionPattern: undefined,
+      newIsCapExceptionPattern: undefined,
+
       capIsNew: true,
       capIsNewExceptions: [],
       newIsCap: true,
@@ -287,14 +317,19 @@ const suggestionRules: Rules = {
       properties: true,
     },
   ],
-  "no-console": "off",
+  "no-console": ["off", { allow: undefined }],
   "no-continue": "off",
   "no-div-regex": "off",
-  "no-inline-comments": ["off", {}],
+  "no-inline-comments": ["off", { ignorePattern: "" }],
   "no-invalid-this": ["off", { capIsConstructor: true }],
   "no-magic-numbers": [
     "off",
     {
+      ignoreEnums: false,
+      ignoreNumericLiteralTypes: false,
+      ignoreReadonlyClassProperties: false,
+      ignoreTypeIndexes: false,
+
       detectObjects: false,
       enforceConst: false,
       ignore: [],
@@ -305,7 +340,13 @@ const suggestionRules: Rules = {
   ],
 
   "no-plusplus": ["off", { allowForLoopAfterthoughts: false }],
-  "no-restricted-exports": ["off", {}],
+  "no-restricted-exports": [
+    "off",
+    {
+      restrictedNamedExports: undefined,
+      restrictedNamedExportsPattern: undefined,
+    },
+  ],
   "no-restricted-globals": [
     "error",
     { message: "Use Uint8Array instead.", name: "Buffer" },
@@ -334,7 +375,7 @@ const suggestionRules: Rules = {
     },
   ],
   "prefer-named-capture-group": "off",
-  "require-unicode-regexp": "off",
+  "require-unicode-regexp": ["off", { requireFlag: undefined }],
   "sort-imports": [
     "off", // Covered by `perfectionist/sort-imports`, see src/overlaps.ts
     {
@@ -377,7 +418,14 @@ const suggestionRules: Rules = {
   "no-nested-ternary": "error", // Instead of `unicorn/no-nested-ternary`, whose parentheses Prettier removes
 
   "no-negated-condition": "error", // Off while unicorn is on, see src/overlaps.ts
-  "no-warning-comments": "off", // Covered by `unicorn/expiring-todo-comments`, see src/overlaps.ts
+  "no-warning-comments": [
+    "off",
+    {
+      decoration: undefined,
+      location: "start",
+      terms: ["todo", "fixme", "xxx"],
+    },
+  ], // Covered by `unicorn/expiring-todo-comments`, see src/overlaps.ts
 } as const;
 
 export { suggestionRules };

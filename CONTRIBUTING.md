@@ -121,15 +121,15 @@ holds the rules that need type information, over the type-aware scope.
 
 The builders share these modules:
 
-| Module                          | Holds                                                                                                        |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `src/globs.ts`                  | The default files of the features                                                                            |
-| `src/configs/shared-options.ts` | Rule options that more than one rule map uses, such as those of a core rule and of the rule that replaces it |
-| `src/utilities/all-rules.ts`    | `enableAllRules()`, which turns on every rule of a plugin that is not deprecated, and `disableConfigRules()` |
-| `src/utilities/file-scope.ts`   | `narrowFiles()` and `withoutIgnores()`, which limit `files` patterns by other patterns and by an ignore list |
-| `src/utilities/type-aware.ts`   | The helpers of the type-aware scope, such as `typeAwareConfig()`                                             |
-| `src/utilities/import-peer.ts`  | `importPeer()`, which loads an optional peer or fails with a message that names it                           |
-| `src/typegen.d.ts`              | The rule option types, which `npm run gen` generates and which are not committed                             |
+| Module                           | Holds                                                                                                        |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `src/globs.ts`                   | The default files of the features                                                                            |
+| `src/configs/shared-options.ts`  | Rule options that more than one rule map uses, such as those of a core rule and of the rule that replaces it |
+| `src/utilities/file-scope.ts`    | `narrowFiles()` and `withoutIgnores()`, which limit `files` patterns by other patterns and by an ignore list |
+| `src/utilities/type-aware.ts`    | The helpers of the type-aware scope, such as `typeAwareConfig()`                                             |
+| `src/utilities/import-peer.ts`   | `importPeer()`, which loads an optional peer or fails with a message that names it                           |
+| `src/utilities/plugin-policy.ts` | Limits the explicit framework policy to rules and option fields supported by an installed optional peer      |
+| `src/typegen.d.ts`               | The rule option types, which `npm run gen` generates and which are not committed                             |
 
 The tests follow the sources: `tests/configs/` has a file for each
 module of `src/configs/`, `tests/factory/` tests `createConfig()` and
@@ -165,12 +165,25 @@ one feature. The rule map of that feature is the policy for its rules:
 | `package-json/`, `enforce-package-type/`                | `packageJson`   | `src/configs/package-json.ts`                                                                                                                         |
 | `markdown/`                                             | `markdown`      | `src/configs/markdown.ts`                                                                                                                             |
 
-Most rule maps start with `enableAllRules()`, which turns on every rule
-of the plugin that is not deprecated, as `"error"` with the plugin's
-default options. The entries after it change some of those rules.
-`grep -rn 'enableAllRules(' src/configs` lists these rule maps. The
-others list each rule, apart from `security`, which takes its plugin's
-`recommended` config.
+Every current non-deprecated core and plugin rule has an explicit setting
+in its owning rule map, including the rules that are off. The maps declare
+fixed option defaults locally; no plugin preset or rule-registry loop
+chooses the policy. For optional peers, `supportedPluginPolicy()` applies
+only declared rules and option fields that the installed version supports;
+core defaults also respect the host ESLint's option schemas. Feature
+overrides follow this compatibility step unchanged. New upstream
+rules remain unconfigured until a
+maintainer classifies them, and `tests/policy/rule-coverage.test.ts` fails
+on an unclassified rule.
+
+An option set to `undefined` deliberately retains inference from settings,
+the project's engines or tsconfig, or a rule's optional behavior without a
+neutral schema-valid value. Mutually exclusive option forms keep the
+selected form. Variadic lists of restrictions can be empty; a bare
+severity then declares no restrictions. `import-x/no-unused-modules` takes
+no options while off because its schema requires an active export check
+whenever options are supplied. Suppression blocks use severity-only
+entries to retain the owning map's options when ESLint merges the blocks.
 
 ### The `javascript` option and the `core` module
 
@@ -387,15 +400,13 @@ pull request, run the full [validation](#validation) as well.
    grep -rn '"no-unused-vars"' src/configs src/overlaps.ts
    ```
 
-2. **Without an entry, check how the rule map starts.** A rule map that
-   starts with `enableAllRules()` turns the rule on as `"error"`, with
-   its plugin's default options, and the one of `security` takes its
-   plugin's `recommended` config. In the other rule maps, a rule without
-   an entry is not set, so it is off. To change the rule, add an entry,
-   after the `enableAllRules()` spread where there is one, and give an
-   `"off"` its reason in a comment, as the other entries do. Every core
-   and typescript-eslint rule has an entry:
-   `tests/policy/rule-coverage.test.ts` fails on one without.
+2. **Read its explicit setting and options.** Every current non-deprecated
+   core and plugin rule has an entry in its owning map. A missing entry is
+   unconfigured, and the coverage test reports it. Change that entry and
+   give an `"off"` its reason in a comment. Declare fixed defaults rather
+   than reading a preset or a plugin's `defaultOptions` at runtime. Keep
+   inferred or optional values explicitly unset where replacing them with
+   a fixed value would change consumer behavior.
 
 3. **Check the other blocks that set it.**
    - `src/overlaps.ts` lists the rules that another feature replaces. A
@@ -462,19 +473,21 @@ pull request, run the full [validation](#validation) as well.
    npx vitest run tests/policy
    ```
 
-   - A new rule of a plugin that `enableAllRules()` covers appears in
-     the snapshots as `error`. A new core or typescript-eslint rule
-     fails `tests/policy/rule-coverage.test.ts` until its rule map has
-     an entry for it.
-   - `enableAllRules()` leaves out a deprecated rule, and
-     `tests/policy/deprecated-rules.test.ts` fails while a rule map
-     names a deprecated rule of a plugin.
+   - A new core or plugin rule stays unconfigured and fails
+     `tests/policy/rule-coverage.test.ts` until its rule map has an explicit
+     enabled or disabled entry and its options are reviewed.
+   - Remove a rule that becomes deprecated from its map.
+     `tests/policy/deprecated-rules.test.ts` rejects deprecated plugin rules.
    - A removed rule that a rule map turns on stops ESLint with
      `Could not find "<rule>" in plugin "<plugin>"`. An `"off"` entry
      for it passes without a message, so search the rule maps for each
      removed rule.
-   - A changed default changes the options in the snapshots, which
-     record the options that ESLint resolves.
+   - Fixed defaults are declared locally. Review new or changed options
+     against the installed schema; `tests/policy/rule-options.test.ts`
+     checks explicit options in the selected schema form and validates
+     disabled rules too.
+     Context-derived options and upstream implementations can still change
+     behavior, so review the effective snapshots and actual lint results.
 
 3. **Review the policy change.** Decide each changed snapshot line: keep
    a new rule on, or turn it off in its rule map with a reason. Then
@@ -560,8 +573,8 @@ Finish dependency changes with the required [validation](#validation).
    it.
 
 4. **Trace them in order:**
-   1. The rule map of the feature that holds the rule, through an entry
-      or `enableAllRules()`, and then the feature's `overrides`.
+   1. The explicit entry in the rule map of the feature that holds the
+      rule, and then the feature's `overrides`.
    2. The later blocks that change it. `typescript/rules` turns off
       core rules in TypeScript files and Svelte components,
       `node/rules-typescript` turns off `n/no-sync` and
@@ -667,7 +680,11 @@ The reference that the recipes link to, grouped by topic.
   and why. A dependency update that brings new or changed rules shows up
   the same way. Never edit a snapshot by hand. The snapshots are `.txt`
   files, which keeps ESLint and Prettier away from them.
-- **A refactor keeps every snapshot.** Reorganizing the code, such as
+- **A refactor keeps every snapshot.** Making previously implicit default
+  options explicit can add option fields without changing diagnostics or
+  fixes, and explicitly disabling previously unconfigured rules can add
+  `off` entries. Review those changes and verify their behavior before
+  updating the snapshots. Other reorganizations, such as
   moving a rule map or renaming a module, must not change a line of the
   snapshots. When one changes, the refactor changed the policy: fix the
   refactor, and do not update the snapshot.
