@@ -32,6 +32,20 @@ describe("express feature", () => {
     expect(server?.rules?.["express-security/require-helmet"]).toEqual([0]);
     expect(server?.rules?.["express-security/require-rate-limiting"]).toEqual([
       2,
+      {
+        allowInTests: false,
+        alternativeMiddleware: [],
+        appReceiverNames: [
+          "app",
+          "server",
+          "router",
+          "express",
+          "api",
+          "apiRouter",
+          "routes",
+        ],
+        assumeRateLimiting: false,
+      },
     ]);
     expect(component).toBeUndefined();
   });

@@ -127,7 +127,10 @@ const stylisticRules: Rules = {
   "@typescript-eslint/prefer-function-type": "error",
 
   // Rules with overridden options
-  "@typescript-eslint/array-type": ["error", { default: "array-simple" }],
+  "@typescript-eslint/array-type": [
+    "error",
+    { default: "array-simple", readonly: undefined },
+  ],
   "@typescript-eslint/consistent-type-assertions": [
     "error",
     {
@@ -162,6 +165,8 @@ const otherRules: Rules = {
   "@typescript-eslint/explicit-member-accessibility": [
     "error",
     {
+      ignoredMethodNames: [],
+
       accessibility: "no-public",
       overrides: {
         constructors: "off",
@@ -173,6 +178,11 @@ const otherRules: Rules = {
   "@typescript-eslint/member-ordering": [
     "off", // Covered by `perfectionist/sort-classes`, see src/overlaps.ts
     {
+      classes: undefined,
+      classExpressions: undefined,
+      interfaces: undefined,
+      typeLiterals: undefined,
+
       default: {
         memberTypes: [
           // Static state (shared across instances — most "global", declared first)
@@ -305,22 +315,43 @@ const otherRules: Rules = {
       },
     },
   ],
-  "@typescript-eslint/parameter-properties": "off",
+  "@typescript-eslint/parameter-properties": [
+    "off",
+    { allow: [], prefer: "class-property" },
+  ],
 
   // 'init-declarations': 'off', //Uncomment this if @typescript-eslint/init-declarations is enabled
-  "@typescript-eslint/init-declarations": "off",
+  "@typescript-eslint/init-declarations": ["off", "always"],
 
   // 'no-dupe-class-members': 'off', // Uncomment this if @typescript-eslint/no-dupe-class-members is enabled
   "@typescript-eslint/no-dupe-class-members": "off", // Not recommended to enable this in new TypeScript projects
 
   // 'no-invalid-this': 'off', // Uncomment this if @typescript-eslint/no-invalid-this is enabled
-  "@typescript-eslint/no-invalid-this": "off", // Not recommended to enable this in new TypeScript projects
+  "@typescript-eslint/no-invalid-this": ["off", { capIsConstructor: true }], // Not recommended to enable this in new TypeScript projects
 
   // 'no-magic-numbers': 'off', // Uncomment this if @typescript-eslint/no-magic-numbers is enabled
-  "@typescript-eslint/no-magic-numbers": "off",
+  "@typescript-eslint/no-magic-numbers": [
+    "off",
+    {
+      ignoreClassFieldInitialValues: false,
+      ignoreDefaultValues: false,
+
+      detectObjects: false,
+      enforceConst: false,
+      ignore: [],
+      ignoreArrayIndexes: false,
+      ignoreEnums: false,
+      ignoreNumericLiteralTypes: false,
+      ignoreReadonlyClassProperties: false,
+      ignoreTypeIndexes: false,
+    },
+  ],
 
   // 'no-redeclare': 'off', // Uncomment this if @typescript-eslint/no-redeclare is enabled
-  "@typescript-eslint/no-redeclare": "off", // Not recommended to enable this in new TypeScript projects
+  "@typescript-eslint/no-redeclare": [
+    "off",
+    { builtinGlobals: true, ignoreDeclarationMerge: true },
+  ], // Not recommended to enable this in new TypeScript projects
 } as const;
 
 // Every typescript-eslint rule that works without type information.

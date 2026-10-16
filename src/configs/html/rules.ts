@@ -1,16 +1,64 @@
 import type { Rules } from "../../types.js";
 
-import pluginHtml from "@html-eslint/eslint-plugin";
-
-import { enableAllRules } from "../../utilities/all-rules.js";
-
 // Policy for @html-eslint/eslint-plugin.
 const htmlRules: Rules = {
-  ...enableAllRules("@html-eslint", pluginHtml.rules),
+  "@html-eslint/css-no-empty-blocks": "error",
+  "@html-eslint/head-order": ["error", { ignores: [] }],
+  "@html-eslint/lowercase": "error",
+  "@html-eslint/no-abstract-roles": "error",
+  "@html-eslint/no-accesskey-attrs": "error",
+  "@html-eslint/no-aria-hidden-body": "error",
+  "@html-eslint/no-aria-hidden-on-focusable": "error",
+  "@html-eslint/no-duplicate-attrs": "error",
+  "@html-eslint/no-duplicate-class": "error",
+  "@html-eslint/no-duplicate-id": "error",
+  "@html-eslint/no-duplicate-in-head": "error",
+  "@html-eslint/no-empty-headings": "error",
+  "@html-eslint/no-heading-inside-button": "error",
+  "@html-eslint/no-ineffective-attrs": "error",
+  "@html-eslint/no-invalid-attr-value": ["error", { allow: [] }],
+  "@html-eslint/no-invalid-entity": "error",
+  "@html-eslint/no-invalid-role": "error",
+  "@html-eslint/no-multiple-h1": "error",
+  "@html-eslint/no-nested-interactive": "error",
+  "@html-eslint/no-non-scalable-viewport": "error",
+  "@html-eslint/no-obsolete-attrs": "error",
+  "@html-eslint/no-obsolete-tags": "error",
+  "@html-eslint/no-positive-tabindex": "error",
+  "@html-eslint/no-redundant-role": "error",
+  "@html-eslint/no-script-style-type": "error",
+  "@html-eslint/no-skip-heading-levels": "error",
+  "@html-eslint/no-target-blank": "error",
+  "@html-eslint/no-whitespace-only-children": ["error", { tagPatterns: [] }],
+  "@html-eslint/prefer-https": "error",
+  "@html-eslint/require-button-type": "error",
+  "@html-eslint/require-content": "error",
+  "@html-eslint/require-details-summary": "error",
+  "@html-eslint/require-doctype": "error",
+  "@html-eslint/require-explicit-size": [
+    "error",
+    { allowClass: [], allowId: [] },
+  ],
+  "@html-eslint/require-form-method": "error",
+  "@html-eslint/require-frame-title": "error",
+  "@html-eslint/require-img-alt": ["error", { substitute: [] }],
+  "@html-eslint/require-input-label": "error",
+  "@html-eslint/require-lang": "error",
+  "@html-eslint/require-li-container": "error",
+  "@html-eslint/require-meta-charset": "error",
+  "@html-eslint/require-meta-description": "error",
+  "@html-eslint/require-meta-viewport": "error",
+  "@html-eslint/require-title": "error",
+  "@html-eslint/svg-require-viewbox": "error",
+  "@html-eslint/use-baseline": ["error", { available: "widely" }],
 
-  "@html-eslint/id-naming-convention": ["error", "kebab-case"],
+  "@html-eslint/id-naming-convention": [
+    "error",
+    "kebab-case",
+    { flags: undefined, pattern: undefined },
+  ],
   "@html-eslint/max-element-depth": ["error", { max: 6 }],
-  "@html-eslint/no-inline-styles": "warn",
+  "@html-eslint/no-inline-styles": ["warn", { allowExpressions: false }],
   "@html-eslint/no-restricted-attr-values": [
     "error",
     {
@@ -143,15 +191,49 @@ const htmlRules: Rules = {
   ],
 
   // Layout: whitespace, line breaks, indentation, and attribute quotes
-  "@html-eslint/attrs-newline": "off", // Covered by `prettier`
+  "@html-eslint/attrs-newline": [
+    "off",
+    {
+      closeStyle: "newline",
+      ifAttrsMoreThan: 2,
+      inline: [],
+      maxLen: undefined,
+      skip: [],
+    },
+  ], // Covered by `prettier`
   "@html-eslint/class-spacing": "off", // Covered by `prettier`
-  "@html-eslint/element-newline": "off", // Covered by `prettier`
-  "@html-eslint/indent": "off", // Covered by `prettier`
-  "@html-eslint/no-extra-spacing-tags": "off", // Covered by `prettier`
-  "@html-eslint/no-extra-spacing-text": "off", // Covered by `prettier`
-  "@html-eslint/no-multiple-empty-lines": "off", // Covered by `prettier`
+  "@html-eslint/element-newline": [
+    "off",
+    { inline: [], skip: ["pre", "code"] },
+  ], // Covered by `prettier`
+  "@html-eslint/indent": [
+    "off",
+    4,
+    {
+      // eslint-disable-next-line @typescript-eslint/naming-convention -- The rule schema names AST nodes in PascalCase.
+      Attribute: 1,
+      ignoreComment: false,
+      tagChildrenIndent: {},
+      templateIndentBase: "templateTag",
+    },
+  ], // Covered by `prettier`
+  "@html-eslint/no-extra-spacing-tags": [
+    "off",
+    {
+      disallowInAssignment: false,
+      disallowMissing: false,
+      disallowTabs: false,
+      enforceBeforeSelfClose: false,
+    },
+  ], // Covered by `prettier`
+  "@html-eslint/no-extra-spacing-text": ["off", { skip: [] }], // Covered by `prettier`
+  "@html-eslint/no-multiple-empty-lines": ["off", { max: 2 }], // Covered by `prettier`
   "@html-eslint/no-trailing-spaces": "off", // Covered by `prettier`
-  "@html-eslint/quotes": "off", // Covered by `prettier`
+  "@html-eslint/quotes": [
+    "off",
+    "double",
+    { enforceTemplatedAttrValue: false },
+  ], // Covered by `prettier`
 } as const;
 
 export { htmlRules };

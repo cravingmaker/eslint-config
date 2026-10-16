@@ -1,11 +1,25 @@
 import type { Linter } from "eslint";
-import type { Context, FeatureOptions } from "../types.js";
+import type { Context, FeatureOptions, Rules } from "../types.js";
 
 import { defaultContext } from "../context.js";
 import { svelteFiles } from "../globs.js";
-import { enableAllRules } from "../utilities/all-rules.js";
 import { narrowFiles } from "../utilities/file-scope.js";
 import { importPeer } from "../utilities/import-peer.js";
+import { supportedPluginPolicy } from "../utilities/plugin-policy.js";
+
+// Policy for @html-eslint/eslint-plugin-svelte.
+const svelteRules: Rules = {
+  "@html-eslint/svelte/class-spacing": "error",
+  "@html-eslint/svelte/no-duplicate-class": "error",
+  "@html-eslint/svelte/no-ineffective-attrs": "error",
+  "@html-eslint/svelte/no-invalid-attr-value": ["error", { allow: [] }],
+  "@html-eslint/svelte/no-obsolete-attrs": "error",
+  "@html-eslint/svelte/no-obsolete-tags": "error",
+  "@html-eslint/svelte/no-restricted-attr-values": "error",
+  "@html-eslint/svelte/no-restricted-attrs": "error",
+  "@html-eslint/svelte/require-attrs": "error",
+  "@html-eslint/svelte/use-baseline": ["error", { available: "widely" }],
+};
 
 // Builds the flat config for Svelte components and rune modules. Script blocks are parsed with
 // the typescript-eslint parser, and the features for JavaScript and TypeScript sources lint the
@@ -39,7 +53,11 @@ async function svelte(
       name: "@cravingmaker/eslint-config/svelte/rules",
       plugins: { "@html-eslint/svelte": plugin.default },
       rules: {
-        ...enableAllRules("@html-eslint/svelte", plugin.default.rules ?? {}),
+        ...supportedPluginPolicy(
+          "@html-eslint/svelte",
+          svelteRules,
+          plugin.default.rules,
+        ),
         ...overrides,
       },
       settings: {
