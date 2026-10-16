@@ -247,9 +247,4 @@ const resolveOptions = (
   };
 };
 export { resolveOptions, resolveProjectRootDirectory };
-export type {
-  Detection,
-  ResolvedOptions,
-  ResolvedReactOptions,
-  ResolvedTypeScriptOptions,
-};
+export type { Detection, ResolvedOptions };

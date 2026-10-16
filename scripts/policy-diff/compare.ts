@@ -528,7 +528,7 @@ const formatChanges = (changes: readonly Change[]): readonly string[] => {
       : formatSettingChange(change);
   });
 };
-export type { Change, CurrentSnapshot, Description, SnapshotResult };
+export type { CurrentSnapshot, SnapshotResult };
 export {
   compareDescriptions,
   compareSnapshots,

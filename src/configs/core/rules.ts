@@ -24,4 +24,4 @@ const supportedCoreRules: Rules = Object.fromEntries(
   }),
 );
 
-export { coreRules, supportedCoreRules };
+export { supportedCoreRules };
