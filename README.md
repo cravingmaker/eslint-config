@@ -2,7 +2,7 @@
 
 Craving Maker's opinionated ESLint configuration. One call, `createConfig()`, returns a flat config that lints the JavaScript, TypeScript, React, Svelte, Express, HTML, JSON, `package.json`, and Markdown files of an ES module project.
 
-The policy is strict. For most plugins, every rule that is not deprecated is on, apart from the rules that the policy turns off for a stated reason. Formatting is left to Prettier. Each part of the config is a feature that you can turn off, limit to some files, or adjust with rule overrides.
+The policy is strict. Every current non-deprecated rule has an explicit enabled or disabled setting, with its options declared in the owning rule map. New upstream rules stay unconfigured until the policy is reviewed. Formatting is left to Prettier. Each part of the config is a feature that you can turn off, limit to some files, or adjust with rule overrides.
 
 ## Contents
 
@@ -35,7 +35,7 @@ The policy is strict. For most plugins, every rule that is not deprecated is on,
 npm install --save-dev --save-exact eslint @cravingmaker/eslint-config
 ```
 
-Most features turn on every rule of their plugin, so a release that updates a plugin can report new problems in code that passed before. Pin the exact version, as `--save-exact` does, and update on purpose.
+Rule settings and fixed option defaults are declared locally rather than inherited from plugin presets. A release can still change lint results through a reviewed policy change or an upstream bug fix. Pin the exact version, as `--save-exact` does, and update on purpose.
 
 React, Svelte, and Express need plugins of their own; see [Peer dependencies](#peer-dependencies).
 
@@ -169,7 +169,7 @@ Nothing else is linted: not CommonJS files (see [CommonJS](#commonjs)), not the 
 
 ### Peer dependencies
 
-The plugins of each framework are optional peer dependencies. Install the ones for the frameworks that you use:
+The plugins of each framework are optional peer dependencies. The explicit policy uses the rules and option fields supported by the installed peer version. Install the ones for the frameworks that you use:
 
 ```bash
 # React

@@ -49,12 +49,28 @@ const commonTsCompositionRuleOptions = {
 const perfectionistRules: Rules = {
   "perfectionist/sort-array-includes": [
     "error",
-    { ...commonCollectionRuleOptions },
+    {
+      alphabet: "",
+      customGroups: [],
+      groups: ["literal"],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      useConfigurationIf: {},
+      ...commonCollectionRuleOptions,
+    },
   ],
 
   "perfectionist/sort-arrays": [
     "error",
     {
+      alphabet: "",
+      customGroups: [],
+      groups: ["literal"],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+
       ...commonCollectionRuleOptions,
       useConfigurationIf: {
         matchesAstSelector: "TSAsExpression > ArrayExpression", // Only fires on `[...] as const` — safe to sort
@@ -65,6 +81,19 @@ const perfectionistRules: Rules = {
   "perfectionist/sort-classes": [
     "error",
     {
+      alphabet: "",
+      fallbackSort: { type: "unsorted" },
+      ignoreCallbackDependenciesPatterns: [],
+      locales: "en-US",
+      newlinesBetween: "ignore",
+      newlinesBetweenOverloadSignatures: 0,
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      specialCharacters: "keep",
+      useConfigurationIf: {},
+      useExperimentalDependencyDetection: true,
+
       customGroups: [
         // #private static property
         {
@@ -252,27 +281,116 @@ const perfectionistRules: Rules = {
     },
   ],
 
-  "perfectionist/sort-decorators": ["error", { ...commonOptions }],
+  "perfectionist/sort-decorators": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      groups: [],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      sortOnAccessors: true,
+      sortOnClasses: true,
+      sortOnMethods: true,
+      sortOnParameters: true,
+      sortOnProperties: true,
+      ...commonOptions,
+    },
+  ],
 
   "perfectionist/sort-enums": [
     "error",
     {
+      alphabet: "",
+      customGroups: [],
+      groups: [],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      sortByValue: "ifNumericEnum",
+      useConfigurationIf: {},
+      useExperimentalDependencyDetection: true,
+
       ...commonOptions,
       partitionByNewLine: true,
     },
   ],
 
-  "perfectionist/sort-export-attributes": ["error", { ...commonOptions }],
+  "perfectionist/sort-export-attributes": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      groups: [],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      useConfigurationIf: {},
+      ...commonOptions,
+    },
+  ],
 
-  "perfectionist/sort-exports": ["error", { ...commonOptions }],
+  "perfectionist/sort-exports": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      groups: [],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      ...commonOptions,
+    },
+  ],
 
-  "perfectionist/sort-heritage-clauses": ["error", { ...commonOptions }],
+  "perfectionist/sort-heritage-clauses": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      groups: [],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      useConfigurationIf: {},
+      ...commonOptions,
+    },
+  ],
 
-  "perfectionist/sort-import-attributes": ["error", { ...commonOptions }],
+  "perfectionist/sort-import-attributes": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      groups: [],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      useConfigurationIf: {},
+      ...commonOptions,
+    },
+  ],
 
   "perfectionist/sort-imports": [
     "error",
     {
+      alphabet: "",
+      environment: "node",
+      maxLineLength: Infinity,
+      newlinesInside: 0,
+      partitionByComment: false,
+      partitionByNewLine: false,
+      sortBy: "path",
+      sortSideEffects: false,
+      tsconfig: { rootDir: "" },
+      useExperimentalDependencyDetection: true,
+
       ...commonOptions,
       customGroups: [
         {
@@ -309,16 +427,43 @@ const perfectionistRules: Rules = {
     },
   ],
 
-  "perfectionist/sort-interfaces": ["error", { ...commonTsShapeRuleOptions }],
+  "perfectionist/sort-interfaces": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      partitionByComment: false,
+      partitionByNewLine: false,
+      sortBy: "name",
+      useConfigurationIf: {},
+      ...commonTsShapeRuleOptions,
+    },
+  ],
 
   "perfectionist/sort-intersection-types": [
     "error",
-    { ...commonTsCompositionRuleOptions },
+    {
+      alphabet: "",
+      customGroups: [],
+      ignoreCallableTypes: true,
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      useConfigurationIf: {},
+      ...commonTsCompositionRuleOptions,
+    },
   ],
 
   "perfectionist/sort-jsx-props": [
     "error",
     {
+      alphabet: "",
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByNewLine: false,
+      useConfigurationIf: {},
+
       ...commonOptions,
       customGroups: [
         {
@@ -330,11 +475,33 @@ const perfectionistRules: Rules = {
     },
   ],
 
-  "perfectionist/sort-maps": ["error", { ...commonCollectionRuleOptions }],
+  "perfectionist/sort-maps": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      groups: [],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      useConfigurationIf: {},
+      ...commonCollectionRuleOptions,
+    },
+  ],
 
   "perfectionist/sort-modules": [
     "error",
     {
+      additionalModuleBlockTypes: [],
+      alphabet: "",
+      customGroups: [],
+      newlinesBetweenOverloadSignatures: 0,
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      tsconfig: { rootDir: "" },
+      useExperimentalDependencyDetection: true,
+
       ...commonOptions,
       groups: [
         ["interface", "type", "declare-interface", "declare-type"],
@@ -365,27 +532,122 @@ const perfectionistRules: Rules = {
   "perfectionist/sort-named-exports": [
     "error",
     {
+      alphabet: "",
+      customGroups: [],
+      ignoreAlias: false,
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      useConfigurationIf: {},
+
       ...commonOptions,
       groups: ["type-export", "value-export", "unknown"],
     },
   ],
 
-  "perfectionist/sort-named-imports": ["error", { ...commonOptions }],
+  "perfectionist/sort-named-imports": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      groups: [],
+      ignoreAlias: false,
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      useConfigurationIf: {},
+      ...commonOptions,
+    },
+  ],
 
-  "perfectionist/sort-object-types": ["error", { ...commonTsShapeRuleOptions }],
+  "perfectionist/sort-object-types": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      partitionByComment: false,
+      partitionByNewLine: false,
+      sortBy: "name",
+      useConfigurationIf: {},
+      ...commonTsShapeRuleOptions,
+    },
+  ],
 
-  "perfectionist/sort-objects": ["error", { ...commonCollectionRuleOptions }],
+  "perfectionist/sort-objects": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      groups: [],
+      ignoreCallbackDependenciesPatterns: [],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByComputedKey: false,
+      sortBy: "name",
+      styledComponents: true,
+      useConfigurationIf: {},
+      useExperimentalDependencyDetection: true,
+      ...commonCollectionRuleOptions,
+    },
+  ],
 
-  "perfectionist/sort-sets": ["error", { ...commonCollectionRuleOptions }],
+  "perfectionist/sort-sets": [
+    "error",
+    {
+      alphabet: "",
+      customGroups: [],
+      groups: ["literal"],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      useConfigurationIf: {},
+      ...commonCollectionRuleOptions,
+    },
+  ],
 
-  "perfectionist/sort-switch-case": ["error", { ...commonOptions }],
+  "perfectionist/sort-switch-case": [
+    "error",
+    { alphabet: "", ...commonOptions },
+  ],
 
   "perfectionist/sort-union-types": [
     "error",
-    { ...commonTsCompositionRuleOptions },
+    {
+      alphabet: "",
+      customGroups: [],
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      useConfigurationIf: {},
+      ...commonTsCompositionRuleOptions,
+    },
   ],
 
-  "perfectionist/sort-variable-declarations": "off", // Covered by `one-var`, which allows one declarator per declaration
+  "perfectionist/sort-variable-declarations": [
+    "off",
+    {
+      alphabet: "",
+      customGroups: [],
+      fallbackSort: { type: "unsorted" },
+      groups: [],
+      ignoreCallbackDependenciesPatterns: [],
+      ignoreCase: true,
+      locales: "en-US",
+      newlinesBetween: "ignore",
+      newlinesInside: "newlinesBetween",
+      order: "asc",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      specialCharacters: "keep",
+      type: "alphabetical",
+      useConfigurationIf: {},
+      useExperimentalDependencyDetection: true,
+    },
+  ], // Covered by `one-var`, which allows one declarator per declaration
 } as const;
 
 export { perfectionistRules };

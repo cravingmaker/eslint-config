@@ -39,22 +39,22 @@ Two lists remain. What the audits noticed and no step covers is under ["Not plan
 
 ## Decisions
 
-| Topic                        | Decision                                                                                                          |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Source layout                | One tree, `src/configs/`. A feature is one file and becomes a folder only when it outgrows one                    |
-| Public API                   | `createConfig(options, ...userConfigs)` and its types. Feature builders stay internal                             |
-| Old option names             | Clean break, no compatibility adapter. The README has the migration notes                                         |
-| `environments` and `globals` | Kept as in 0.1.0, applied to every JavaScript, TypeScript, and Svelte block                                       |
-| `plugins`                    | Removed. Extra plugins go in `userConfigs`, where they can be scoped with `files`                                 |
-| CommonJS                     | Not supported. `.cjs` and `.cts` files get no rules                                                               |
-| Composition                  | `Promise<Linter.Config[]>` built from native flat configs, without a composer class                               |
-| Rule overlap between plugins | One table, `src/overlaps.ts`: replaced checks are off only while their owner is on, replaced style rules always   |
-| New upstream rules           | The effective-policy snapshots are the review gate. `enableAllRules` turns on every rule of most plugins          |
-| File-role exceptions         | A dedicated module, `configs/exceptions.ts`, added to only with evidence                                          |
-| A feature's `files`          | Narrows the feature's default files and cannot add a file type, which takes a user config that copies a block     |
-| Rule option typing           | Generated with `eslint-typegen` into `src/typegen.d.ts`, which is not committed                                   |
-| Formatting                   | Prettier runs separately. Layout rules are off in the rule maps, and `tests/policy/formatter.test.ts` guards them |
-| Scope anchoring              | No `basePath`. `projectRootDirectory` decides the manifest, the tsconfig directory, and the import resolver       |
+| Topic                        | Decision                                                                                                                           |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Source layout                | One tree, `src/configs/`. A feature is one file and becomes a folder only when it outgrows one                                     |
+| Public API                   | `createConfig(options, ...userConfigs)` and its types. Feature builders stay internal                                              |
+| Old option names             | Clean break, no compatibility adapter. The README has the migration notes                                                          |
+| `environments` and `globals` | Kept as in 0.1.0, applied to every JavaScript, TypeScript, and Svelte block                                                        |
+| `plugins`                    | Removed. Extra plugins go in `userConfigs`, where they can be scoped with `files`                                                  |
+| CommonJS                     | Not supported. `.cjs` and `.cts` files get no rules                                                                                |
+| Composition                  | `Promise<Linter.Config[]>` built from native flat configs, without a composer class                                                |
+| Rule overlap between plugins | One table, `src/overlaps.ts`: replaced checks are off only while their owner is on, replaced style rules always                    |
+| New upstream rules           | The effective-policy snapshots are the review gate. Every current rule is classified explicitly; new upstream rules require review |
+| File-role exceptions         | A dedicated module, `configs/exceptions.ts`, added to only with evidence                                                           |
+| A feature's `files`          | Narrows the feature's default files and cannot add a file type, which takes a user config that copies a block                      |
+| Rule option typing           | Generated with `eslint-typegen` into `src/typegen.d.ts`, which is not committed                                                    |
+| Formatting                   | Prettier runs separately. Layout rules are off in the rule maps, and `tests/policy/formatter.test.ts` guards them                  |
+| Scope anchoring              | No `basePath`. `projectRootDirectory` decides the manifest, the tsconfig directory, and the import resolver                        |
 
 ## Documented limits
 
@@ -91,8 +91,8 @@ The audit follow-up did not settle this, and changed two things around it. Since
 - **Legacy Svelte types.** Legacy TypeScript components type their props, events, and slots with the interfaces `$$Props`, `$$Events`, and `$$Slots`. `unicorn/name-replacements` asks for `$$Properties`, which Svelte's tooling does not read, and `unused-imports/no-unused-vars` reports `$$Events` and `$$Slots`, which no code references. `import-x/no-duplicates` reports `svelte/animate` and `svelte/transition` imported in one file, because the TypeScript resolver maps both to `svelte/types/index.d.ts`.
 - **Global declaration files.** A declaration file without imports or exports, such as the `vite-env.d.ts` that Vite generates, is reported by `import-x/unambiguous`, and its `/// <reference types="vite/client" />` by `@typescript-eslint/triple-slash-reference`. The module form, `declare global` with `export {}`, passes.
 - **A blank line inside a doc comment.** `perfectionist/sort-modules` counts the blank lines inside the documentation comment of a member as spacing between it and the member before it in the same group, and reports "Extra spacing". Its fix leaves the comment alone, so ESLint reports circular fixes and the problem stays. `unicorn/no-asterisk-prefix-in-documentation-comments` makes every paragraph break in a doc comment an empty line.
-- **A type-aware rule outside the type-aware blocks.** `unicorn/no-non-function-verb-prefix` declares that it needs type information and is on in every source, because `enableAllRules` turns it on. It does nothing in a file without type information, so it is harmless, and `tests/policy/type-information.test.ts` lists it as an exception. Moving it to a unicorn type-aware block would change the snapshots.
-- **Express rules.** Unlike most features, `express` lists its rules instead of turning on every rule of its plugin: nine are on and `no-exposed-debug-endpoints` is off. eslint-plugin-express-security 3.2.4 has 28 rules, so 18 are not on. A rule that the policy turns on must exist in every supported version of the plugin, which starts at 1.2.0.
+- **A type-aware rule outside the type-aware blocks.** `unicorn/no-non-function-verb-prefix` declares that it needs type information and is on in every source, because the explicit Unicorn policy keeps it on. It does nothing in a file without type information, so it is harmless, and `tests/policy/type-information.test.ts` lists it as an exception. Moving it to a unicorn type-aware block would change the snapshots.
+- **Express rules.** The explicit policy enables nine of the 28 rules in eslint-plugin-express-security 3.2.4 and disables the other 19. Supported peer versions start at 1.2.0; each receives the declared rules and option fields it supports.
 
 ### Found by the audit follow-up, not changed
 

@@ -51,7 +51,10 @@ const replacementRules: Rules = {
   ],
 
   "no-unused-vars": "off",
-  "@typescript-eslint/no-unused-vars": ["error", { ...noUnusedVarsOptions }], // Off while unused-imports is on, see src/overlaps.ts
+  "@typescript-eslint/no-unused-vars": [
+    "error",
+    { enableAutofixRemoval: { imports: false }, ...noUnusedVarsOptions },
+  ], // Off while unused-imports is on, see src/overlaps.ts
 
   "no-empty-function": "off",
   "@typescript-eslint/no-empty-function": [
@@ -92,6 +95,8 @@ const replacementRules: Rules = {
   "@typescript-eslint/max-params": [
     "error",
     {
+      maximum: undefined,
+
       ...maxParamsOptions,
       countVoidThis: false,
     },
@@ -141,6 +146,8 @@ const typeAwareReplacementRules: Rules = {
   "@typescript-eslint/dot-notation": [
     "error",
     {
+      allowPattern: "",
+
       ...dotNotationOptions,
       allowIndexSignaturePropertyAccess: false,
       allowPrivateClassPropertyAccess: false,

@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 326 (error 244, off 67, warn 15)
+rules: 353 (error 244, off 94, warn 15)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -20,14 +20,14 @@ rules: 326 (error 244, off 67, warn 15)
 @eslint-community/eslint-comments/no-restricted-disable: off
 @eslint-community/eslint-comments/no-unlimited-disable: error
 @eslint-community/eslint-comments/no-unused-enable: error
-@eslint-community/eslint-comments/no-use: error [{"allow":["eslint-disable","eslint-enable","eslint-disable-next-line"]}]
-@eslint-community/eslint-comments/require-description: error
+@eslint-community/eslint-comments/no-use: error [{"additionalDirectives":[],"allow":["eslint-disable","eslint-enable","eslint-disable-next-line"]}]
+@eslint-community/eslint-comments/require-description: error [{"additionalDirectives":[],"ignore":[]}]
 accessor-pairs: error [{"enforceForClassMembers":true,"enforceForTSTypes":false,"getWithoutSet":false,"setWithoutGet":true}]
 array-callback-return: error [{"allowImplicit":true,"allowVoid":false,"checkForEach":false}]
-arrow-body-style: error ["as-needed"]
+arrow-body-style: error ["as-needed",{"requireReturnForObjectLiteral":false}]
 block-scoped-var: error
 camelcase: error [{"allow":[],"ignoreDestructuring":false,"ignoreGlobals":false,"ignoreImports":false,"properties":"always"}]
-capitalized-comments: off ["always",{"ignoreConsecutiveComments":false,"ignoreInlineComments":false}]
+capitalized-comments: off ["always",{"ignoreConsecutiveComments":false,"ignoreInlineComments":false,"ignorePattern":""}]
 class-methods-use-this: error [{"enforceForClassFields":true,"exceptMethods":[],"ignoreOverrideMethods":false}]
 complexity: error [{"max":20,"variant":"classic"}]
 consistent-return: off [{"treatUndefinedAsUnspecified":false}]
@@ -38,35 +38,50 @@ default-case: error [{}]
 default-case-last: error
 default-param-last: error
 dot-notation: error [{"allowKeywords":true,"allowPattern":""}]
-eqeqeq: error ["always"]
-express-security/no-cors-credentials-wildcard: error
-express-security/no-exposed-debug-endpoints: off
-express-security/no-express-unsafe-regex-route: error
-express-security/no-graphql-introspection-production: error
-express-security/no-insecure-cookie-options: error
-express-security/no-permissive-cors: error
-express-security/require-csrf-protection: error
-express-security/require-express-body-parser-limits: error
-express-security/require-helmet: error
-express-security/require-rate-limiting: error
+eqeqeq: error ["always",{"null":"always"}]
+express-security/no-client-controlled-authorization: off [{"extraProperties":[]}]
+express-security/no-cors-credentials-wildcard: error [{"allowInTests":false}]
+express-security/no-disabled-helmet-protections: off [{"allowDisabled":[]}]
+express-security/no-error-details-in-response: off [{"allowInDev":false,"allowMessage":true}]
+express-security/no-exposed-debug-endpoints: off [{"endpoints":["/debug","/__debug__","/admin","/_admin","/test","/health"],"ignoreFiles":[]}]
+express-security/no-express-unsafe-regex-route: error [{"allowInTests":false}]
+express-security/no-graphql-introspection-production: error [{"allowInDevelopment":true,"allowInTests":true}]
+express-security/no-host-header-in-links: off [{"allowedHosts":[],"checkMailCallees":["sendMail","send"]}]
+express-security/no-idor-resource-access: off [{"lookupMethods":["findById","findByPk","findOne","findUnique","findFirst","findByIdAndUpdate","findByIdAndDelete","findByIdAndRemove","getById","deleteOne","deleteById","updateOne","replaceOne"]}]
+express-security/no-insecure-cookie-options: error [{"acceptableSameSiteValues":["strict","lax"],"allowInTests":false,"requireHttpOnly":true,"requireSameSite":true,"requireSecure":true}]
+express-security/no-permissive-cors: error [{"allowInTests":false,"allowOriginTrue":false,"allowedOrigins":[]}]
+express-security/no-permissive-trust-proxy: off [{"appReceiverNames":["app","server","router","express","api","apiRouter","routes"],"hopCount":1}]
+express-security/no-sensitive-data-in-query: off [{"allowedParams":[],"extraPatterns":[],"sensitiveParams":[]}]
+express-security/no-static-root-exposure: off [{"allowedRoots":[]}]
+express-security/no-unsafe-csp-directives: off [{"checkStyleSrc":true}]
+express-security/no-user-controlled-redirect: off [{"requestObjects":[],"responseObjects":[]}]
+express-security/no-user-controlled-render-locals: off [{"allowSanitizers":[]}]
+express-security/require-case-insensitive-path-guard: off [{"checkAllPaths":false,"protectedPaths":["admin","api","dashboard","internal","private"]}]
+express-security/require-csrf-protection: error [{"allowInTests":false,"ignorePatterns":[],"protectedMethods":["post","put","patch","delete"]}]
+express-security/require-express-body-parser-limits: error [{"allowInTests":false,"excessiveLimits":["10mb","50mb","100mb","500mb","1gb","1GB","10MB","50MB","100MB","500MB"],"maxLimit":5242880}]
+express-security/require-helmet: error [{"allowInTests":false,"alternativeMiddleware":[],"assumeHelmetMiddleware":false}]
+express-security/require-query-type-guard: off [{"coercers":["String"],"validators":["parse","safeParse"]}]
+express-security/require-rate-limiting: error [{"allowInTests":false,"alternativeMiddleware":[],"appReceiverNames":["app","server","router","express","api","apiRouter","routes"],"assumeRateLimiting":false}]
+express-security/require-route-authentication: off [{"appReceiverNames":["app","server","router","express","api","apiRouter","routes"],"authMiddleware":[],"criticalPaths":["password","credential","secret","apikey","api-key","user","account","profile","role","permission","grant","payment","billing","invoice","charge","refund","transfer","withdraw","order","config","setting","export","import","mfa","2fa","otp","deploy","migrate","backup","restore","internal","private"],"publicPaths":["login","signin","sign-in","logout","signup","sign-up","register","forgot","reset","confirm","verify","recover","recovery","unlock","challenge","enroll","enrol","enrollment","activate","activation","resend","consent","webhook","hook","health","healthz","readyz","livez","ping","status","public","static","assets","favicon","robots","callback","oauth","sso","docs","swagger","openapi"]}]
+express-security/require-strict-transport-security: off [{"minMaxAge":15552000,"requireSubDomains":true}]
 for-direction: error
 func-name-matching: error ["always",{"considerPropertyDescriptor":true,"includeCommonJSModuleExports":false}]
 func-names: error ["never",{"generators":"never"}]
 func-style: off ["expression",{"allowArrowFunctions":false,"allowTypeAnnotation":false,"overrides":{}}]
 functional/functional-parameters: off
 functional/immutable-data: off
-functional/no-class-inheritance: error
-functional/no-classes: error
+functional/no-class-inheritance: error [{}]
+functional/no-classes: error [{}]
 functional/no-conditional-statements: off
 functional/no-expression-statements: off
-functional/no-let: error [{"allowInForLoopInit":true}]
+functional/no-let: error [{"allowInForLoopInit":true,"allowInFunctions":false}]
 functional/no-loop-statements: error
 functional/no-mixed-types: off
 functional/no-promise-reject: error
 functional/no-return-void: off
 functional/no-this-expressions: off
 functional/no-throw-statements: off
-functional/no-try-statements: off
+functional/no-try-statements: off [{"allowCatch":false,"allowFinally":false}]
 functional/prefer-immutable-types: off
 functional/prefer-property-signatures: off
 functional/prefer-tacit: off
@@ -85,48 +100,48 @@ max-depth: error [{"max":4}]
 max-lines: error [{"max":1500,"skipBlankLines":true,"skipComments":true}]
 max-lines-per-function: off [{"IIFEs":false,"max":50,"skipBlankLines":true,"skipComments":true}]
 max-nested-callbacks: error [4]
-max-params: error [{"max":4}]
-max-statements: off [10]
-n/callback-return: error
-n/exports-style: off
-n/file-extension-in-import: error
+max-params: error [{"countThis":"except-void","max":4}]
+max-statements: off [10,{"ignoreTopLevelFunctions":false}]
+n/callback-return: error [["callback","cb","next"]]
+n/exports-style: off ["module.exports",{"allowBatchAssign":false}]
+n/file-extension-in-import: error ["always",{}]
 n/global-require: off
-n/handle-callback-err: error
-n/hashbang: error [{"executableMap":{".js":"node",".mjs":"node"},"ignoreUnpublished":true}]
+n/handle-callback-err: error ["err"]
+n/hashbang: error [{"additionalExecutables":[],"executableMap":{".js":"node",".mjs":"node"},"ignoreUnpublished":true}]
 n/no-callback-literal: error
-n/no-deprecated-api: error [{"ignoreIndirectDependencies":true}]
+n/no-deprecated-api: error [{"ignoreGlobalItems":[],"ignoreIndirectDependencies":true,"ignoreModuleItems":[]}]
 n/no-exports-assign: off
-n/no-extraneous-import: error
-n/no-extraneous-require: off
-n/no-missing-import: error
-n/no-missing-require: off
-n/no-mixed-requires: off
+n/no-extraneous-import: error [{}]
+n/no-extraneous-require: off [{}]
+n/no-missing-import: error [{"ignoreTypeImport":false}]
+n/no-missing-require: off [{}]
+n/no-mixed-requires: off [{"allowCall":false,"grouping":false}]
 n/no-new-require: off
 n/no-path-concat: error
 n/no-process-env: warn [{"allowedVariables":["NODE_ENV"]}]
 n/no-process-exit: error
-n/no-restricted-import: off
-n/no-restricted-require: off
+n/no-restricted-import: off [[]]
+n/no-restricted-require: off [[]]
 n/no-sync: error [{"allowAtRootLevel":true,"ignores":[]}]
-n/no-top-level-await: off
-n/no-unpublished-bin: error
-n/no-unpublished-import: error
-n/no-unpublished-require: off
-n/no-unsupported-features/es-builtins: error
-n/no-unsupported-features/es-syntax: error
-n/no-unsupported-features/node-builtins: error
-n/prefer-global/buffer: off
-n/prefer-global/console: error
+n/no-top-level-await: off [{"ignoreBin":false}]
+n/no-unpublished-bin: error [{}]
+n/no-unpublished-import: error [{"ignorePrivate":true,"ignoreTypeImport":false}]
+n/no-unpublished-require: off [{"ignorePrivate":true}]
+n/no-unsupported-features/es-builtins: error [{"ignores":[]}]
+n/no-unsupported-features/es-syntax: error [{"ignores":[]}]
+n/no-unsupported-features/node-builtins: error [{"allowExperimental":false,"ignores":[]}]
+n/prefer-global/buffer: off ["always"]
+n/prefer-global/console: error ["always"]
 n/prefer-global/crypto: error ["never"]
 n/prefer-global/process: error ["never"]
-n/prefer-global/text-decoder: error
-n/prefer-global/text-encoder: error
-n/prefer-global/timers: error
-n/prefer-global/url: error
-n/prefer-global/url-search-params: error
+n/prefer-global/text-decoder: error ["always"]
+n/prefer-global/text-encoder: error ["always"]
+n/prefer-global/timers: error ["always"]
+n/prefer-global/url: error ["always"]
+n/prefer-global/url-search-params: error ["always"]
 n/prefer-import/assert-strict: error
-n/prefer-node-protocol: error
-n/prefer-process-get-builtin-module: error
+n/prefer-node-protocol: error [{}]
+n/prefer-process-get-builtin-module: error [{}]
 n/prefer-promises/dns: error
 n/prefer-promises/fs: error
 n/process-exit-as-throw: error
@@ -168,7 +183,7 @@ no-eval: error [{"allowIndirect":false}]
 no-ex-assign: error
 no-extend-native: error [{"exceptions":[]}]
 no-extra-bind: error
-no-extra-boolean-cast: error [{}]
+no-extra-boolean-cast: error [{"enforceForInnerExpressions":false}]
 no-extra-label: error
 no-fallthrough: error [{"allowEmptyCase":false,"reportUnusedFallthroughComment":false}]
 no-func-assign: error
@@ -177,7 +192,7 @@ no-implicit-coercion: error [{"allow":[],"boolean":true,"disallowTemplateShortha
 no-implicit-globals: error [{"lexicalBindings":false}]
 no-implied-eval: error
 no-import-assign: error
-no-inline-comments: off [{}]
+no-inline-comments: off [{"ignorePattern":""}]
 no-inner-declarations: error ["functions",{"blockScopedFunctions":"allow"}]
 no-invalid-regexp: error [{}]
 no-invalid-this: off [{"capIsConstructor":true}]
@@ -278,40 +293,52 @@ prefer-rest-params: error
 prefer-spread: error
 prefer-template: error
 preserve-caught-error: error [{"errorClassNames":[],"requireCatchParameter":false}]
-promise/always-return: error
+promise/always-return: error [{"ignoreAssignmentVariable":["globalThis"],"ignoreLastCallback":false}]
 promise/avoid-new: error
-promise/catch-or-return: error [{"allowFinally":true,"terminationMethod":"catch"}]
-promise/no-callback-in-promise: error
+promise/catch-or-return: error [{"allowFinally":true,"allowThen":false,"allowThenStrict":false,"terminationMethod":"catch"}]
+promise/no-callback-in-promise: error [{"exceptions":[],"timeoutsErr":false}]
 promise/no-multiple-resolved: error
 promise/no-native: off
 promise/no-nesting: error
 promise/no-new-statics: error
-promise/no-promise-in-callback: error
+promise/no-promise-in-callback: error [{"exemptDeclarations":false}]
 promise/no-return-in-finally: error
-promise/no-return-wrap: error
-promise/param-names: error
+promise/no-return-wrap: error [{"allowReject":false}]
+promise/param-names: error [{"rejectPattern":"^_?reject$","resolvePattern":"^_?resolve$"}]
 promise/prefer-await-to-callbacks: error
-promise/prefer-await-to-then: error
+promise/prefer-await-to-then: error [{"strict":false}]
 promise/prefer-catch: error
-promise/spec-only: error
-promise/valid-params: error
-radix: error
-react-hooks/config: error
-react-hooks/error-boundaries: error
-react-hooks/exhaustive-deps: error
-react-hooks/gating: error
-react-hooks/globals: error
-react-hooks/immutability: error
-react-hooks/incompatible-library: error
-react-hooks/preserve-manual-memoization: error
-react-hooks/purity: error
-react-hooks/refs: error
-react-hooks/rules-of-hooks: error
-react-hooks/set-state-in-effect: error
-react-hooks/set-state-in-render: error
-react-hooks/static-components: error
-react-hooks/unsupported-syntax: error
-react-hooks/use-memo: error
+promise/spec-only: error [{"allowedMethods":[]}]
+promise/valid-params: error [{"exclude":[]}]
+radix: error ["always"]
+react-hooks/capitalized-calls: off [{}]
+react-hooks/config: error [{}]
+react-hooks/error-boundaries: error [{}]
+react-hooks/exhaustive-deps: error [{"additionalHooks":"","enableDangerousAutofixThisMayCauseInfiniteLoops":false,"experimental_autoDependenciesHooks":[],"requireExplicitEffectDeps":false}]
+react-hooks/exhaustive-effect-dependencies: off [{}]
+react-hooks/fbt: off [{}]
+react-hooks/gating: error [{}]
+react-hooks/globals: error [{}]
+react-hooks/hooks: off [{}]
+react-hooks/immutability: error [{}]
+react-hooks/incompatible-library: error [{}]
+react-hooks/invariant: off [{}]
+react-hooks/memo-dependencies: off [{}]
+react-hooks/memoized-effect-dependencies: off [{}]
+react-hooks/no-deriving-state-in-effects: off [{}]
+react-hooks/preserve-manual-memoization: error [{}]
+react-hooks/purity: error [{}]
+react-hooks/refs: error [{}]
+react-hooks/rule-suppression: off [{}]
+react-hooks/rules-of-hooks: error [{}]
+react-hooks/set-state-in-effect: error [{}]
+react-hooks/set-state-in-render: error [{}]
+react-hooks/static-components: error [{}]
+react-hooks/syntax: off [{}]
+react-hooks/todo: off [{}]
+react-hooks/unsupported-syntax: error [{}]
+react-hooks/use-memo: error [{}]
+react-hooks/void-use-memo: off [{}]
 require-atomic-updates: off [{"allowProperties":false}]
 require-await: error
 require-unicode-regexp: off [{}]
