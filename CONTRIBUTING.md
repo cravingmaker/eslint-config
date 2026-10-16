@@ -236,14 +236,56 @@ Three tools show what ESLint resolves:
   ESLint resolves for one path, as JSON. The file need not exist. It
   prints `undefined` when ESLint ignores the path or no block matches
   it.
-- **`npm run inspect`** builds the package and opens
-  `@eslint/config-inspector` at <http://localhost:7777>, which lists
-  every block with its files and rules. Its "Test matching with
-  filepath" field shows the blocks that match a path.
+- **`npm run inspect`** builds the package and starts
+  [ESLint Config Inspector](https://github.com/eslint/config-inspector),
+  which lists every block with its files and rules. Its "Test matching
+  with filepath" field shows the blocks that match a path.
 
 The last two load `eslint.config.js`, which imports `dist/index.mjs`.
 `npm run inspect` builds first, but `--print-config` shows the previous
 build until you run `npm run build`.
+
+### Interactive Config Inspector
+
+Start the inspector from the repository root:
+
+```bash
+npm run inspect
+```
+
+Open the URL printed in the terminal, normally <http://localhost:7777/>.
+The command keeps running until you press Ctrl+C. It does not open a
+browser automatically; use `npm run inspect -- --open` to do so, or
+`npm run inspect -- --port=7778` to choose another port.
+
+Try paths such as `src/factory.ts`, `eslint.config.js`, and `package.json`
+to see which named blocks apply and how their rules combine. The Rules
+view also shows rule metadata and links to the upstream documentation.
+
+Config Inspector 3.5.0 omits this package's `*-type-aware` blocks from
+file matches when their `files` contain nested negated globs. Clear the
+filepath field to see those blocks, and confirm their final rules with
+`npx eslint --print-config src/factory.ts`. For example, ESLint enables
+`@typescript-eslint/no-floating-promises` there even when the inspector's
+merged view shows it off. This limitation also affects static snapshots.
+
+The inspector reloads edits to `eslint.config.js`. After editing `src/`,
+restart `npm run inspect` so it rebuilds `dist/index.mjs` before loading
+the config; the command builds only once at startup.
+
+To save a static snapshot of the current configuration:
+
+```bash
+npm run inspect:build
+```
+
+This builds the package and writes a standalone inspector to
+`node_modules/.cache/eslint-config-inspector/`. Serve that directory with
+a static HTTP server to browse it. The snapshot stays outside the
+published `dist/` directory, is ignored by Git and the repository checks,
+and is removed by `npm ci`. Run the command again after config changes.
+Inspector options can be forwarded with `--`, for example
+`npm run inspect:build -- --base /eslint-config/` for hosting at a subpath.
 
 ### This repository's options are not the defaults
 
