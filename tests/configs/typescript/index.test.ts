@@ -3,7 +3,7 @@ import type { Context } from "../../../src/types.js";
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
-import { typescript } from "../../../src/configs/typescript/index.js";
+import { typescript } from "../../../src/configs/plugins/typescript/index.js";
 import { defaultContext } from "../../../src/context.js";
 
 type EffectiveConfig = {

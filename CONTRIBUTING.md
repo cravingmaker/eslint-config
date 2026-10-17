@@ -108,12 +108,18 @@ public types from `src/types.ts`. Everything else is internal.
    Svelte components, the tsconfig directory, and the type-aware scope.
    The blocks come in a fixed order: the global ignores, `javascript`
    and the code-quality features, `typescript`, the frameworks, and the
-   file formats. A feature that is a folder, such as `typescript`, has
-   its builder in `index.ts` and its rule maps in modules of their own,
-   such as `rules.ts`.
+   file formats. Plugin features live in `src/configs/plugins/`, beside
+   `src/configs/core/`. Global ignores and file-role exceptions have their
+   own folders directly under `src/configs/`; shared options also stay there.
+   Every feature has its builder in `index.ts` and its rule maps in modules
+   of their own. Upstream categories have named modules, as in
+   `core/possible-problems.ts`;
+   features without official categories keep their policy in `rules.ts`.
+   When a feature has several category modules, its `rules.ts` composes
+   their maps. The core builder composes its maps directly in `index.ts`.
 4. Each feature declares disabled alternatives in its own rule map, with a
    `Handled by` comment naming the winning rule. There are no dynamic overlap
-   blocks. `src/configs/exceptions.ts` adds file-role exceptions.
+   blocks. `src/configs/exceptions/index.ts` adds file-role exceptions.
 5. The user configs follow, in the order given.
 
 Every block is named `@cravingmaker/eslint-config/<feature>/<part>`, and
@@ -144,29 +150,34 @@ temporary consumers. Many of them load the build, so build first, as
 ### Where a rule is declared
 
 The prefix of a rule ID names its plugin, and each plugin belongs to
-one feature. The rule map of that feature is the policy for its rules:
+one feature. The rule map of that feature is the policy for its rules.
+Category modules follow the installed plugin's official categories and
+separate recommended rules from other rules where both are present.
+The package-json feature follows the upstream README's Require Properties
+and Valid Properties categories; its remaining rules are in `other-rules.ts`.
+The table lists each feature's policy entry points:
 
-| Rule ID prefix                                          | Feature         | Rule map                                                                                                                                              |
-| ------------------------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| None: ESLint's core rules                               | `javascript`    | `src/configs/core/possible-problems.ts` and `suggestions.ts`, and for TypeScript files and Svelte components `src/configs/typescript/replacements.ts` |
-| `@typescript-eslint/`                                   | `typescript`    | `src/configs/typescript/rules.ts`, `rules-type-aware.ts`, and `replacements.ts`                                                                       |
-| `@eslint-community/eslint-comments/`                    | `comments`      | `src/configs/comments.ts`                                                                                                                             |
-| `n/`                                                    | `node`          | `src/configs/node.ts`                                                                                                                                 |
-| `security/`                                             | `security`      | `src/configs/security.ts`                                                                                                                             |
-| `import-x/`                                             | `imports`       | `src/configs/imports/rules.ts`                                                                                                                        |
-| `unused-imports/`                                       | `unusedImports` | `src/configs/unused-imports.ts`                                                                                                                       |
-| `promise/`                                              | `promise`       | `src/configs/promise.ts`                                                                                                                              |
-| `regexp/`                                               | `regexp`        | `src/configs/regexp.ts`                                                                                                                               |
-| `unicorn/`                                              | `unicorn`       | `src/configs/unicorn/rules.ts`                                                                                                                        |
-| `functional/`                                           | `functional`    | `src/configs/functional.ts`                                                                                                                           |
-| `perfectionist/`                                        | `perfectionist` | `src/configs/perfectionist/rules.ts`                                                                                                                  |
-| `@html-eslint/react/`, `react-hooks/`, `react-refresh/` | `react`         | `src/configs/react.ts`                                                                                                                                |
-| `@html-eslint/svelte/`                                  | `svelte`        | `src/configs/svelte.ts`                                                                                                                               |
-| `express-security/`                                     | `express`       | `src/configs/express.ts`                                                                                                                              |
-| `@html-eslint/`                                         | `html`          | `src/configs/html/rules.ts`                                                                                                                           |
-| `json/`                                                 | `json`          | `src/configs/json.ts`                                                                                                                                 |
-| `package-json/`, `enforce-package-type/`                | `packageJson`   | `src/configs/package-json.ts`                                                                                                                         |
-| `markdown/`                                             | `markdown`      | `src/configs/markdown.ts`                                                                                                                             |
+| Rule ID prefix                                          | Feature         | Policy modules                                                                                                  |
+| ------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------- |
+| None: ESLint core rules                                 | `javascript`    | `src/configs/core/possible-problems.ts`, `suggestions.ts`, and `src/configs/plugins/typescript/replacements.ts` |
+| `@typescript-eslint/`                                   | `typescript`    | `src/configs/plugins/typescript/rules.ts`, `rules-type-aware.ts`, and `replacements.ts`                         |
+| `@eslint-community/eslint-comments/`                    | `comments`      | `src/configs/plugins/comments/rules.ts`                                                                         |
+| `n/`                                                    | `node`          | `src/configs/plugins/node/rules.ts`                                                                             |
+| `security/`                                             | `security`      | `src/configs/plugins/security/rules.ts`                                                                         |
+| `import-x/`                                             | `imports`       | `src/configs/plugins/imports/rules.ts`                                                                          |
+| `unused-imports/`                                       | `unusedImports` | `src/configs/plugins/unused-imports/rules.ts`                                                                   |
+| `promise/`                                              | `promise`       | `src/configs/plugins/promise/rules.ts`                                                                          |
+| `regexp/`                                               | `regexp`        | `src/configs/plugins/regexp/rules.ts`                                                                           |
+| `unicorn/`                                              | `unicorn`       | `src/configs/plugins/unicorn/rules.ts`                                                                          |
+| `functional/`                                           | `functional`    | `src/configs/plugins/functional/rules.ts` and `rules-type-aware.ts`                                             |
+| `perfectionist/`                                        | `perfectionist` | `src/configs/plugins/perfectionist/rules.ts`                                                                    |
+| `@html-eslint/react/`, `react-hooks/`, `react-refresh/` | `react`         | `src/configs/plugins/react/rules.ts`                                                                            |
+| `@html-eslint/svelte/`                                  | `svelte`        | `src/configs/plugins/svelte/rules.ts`                                                                           |
+| `express-security/`                                     | `express`       | `src/configs/plugins/express/rules.ts`                                                                          |
+| `@html-eslint/`                                         | `html`          | `src/configs/plugins/html/rules.ts`                                                                             |
+| `json/`                                                 | `json`          | `src/configs/plugins/json/rules.ts`                                                                             |
+| `package-json/`, `enforce-package-type/`                | `packageJson`   | `src/configs/plugins/package-json/rules.ts`                                                                     |
+| `markdown/`                                             | `markdown`      | `src/configs/plugins/markdown/rules.ts`                                                                         |
 
 Every current non-deprecated core and plugin rule has an explicit setting
 in its owning rule map, including the rules that are off. The maps declare
@@ -418,11 +429,11 @@ pull request, run the full [validation](#validation) as well.
      even when its winner is disabled or excludes a file. Add a `Handled by`
      comment naming the winning rule when changing an overlap.
    - In TypeScript files and Svelte components,
-     `src/configs/typescript/replacements.ts` turns off the core rules
+     `src/configs/plugins/typescript/replacements.ts` turns off the core rules
      that the compiler checks or that an extension rule replaces. When
      a rule and its replacement share options, those options are in
      `src/configs/shared-options.ts`, so that they change together.
-   - `src/configs/exceptions.ts` turns some rules off in the files of a
+   - `src/configs/exceptions/index.ts` turns some rules off in the files of a
      role; see [Change a file exception](#change-a-file-exception).
    - A rule that needs type information is on only where typed linting
      is; see [Parsing and type information](#parsing-and-type-information).
@@ -595,7 +606,7 @@ Finish dependency changes with the required [validation](#validation).
 
 ### Change a file exception
 
-1. **Find the role.** `fileRoles()` in `src/configs/exceptions.ts` lists
+1. **Find the role.** `fileRoles()` in `src/configs/exceptions/rules.ts` lists
    each role with its files and its rules, by the feature that holds
    each rule, and the comment above a role says why its files break
    those rules. `configFiles` and `testFiles` in `src/globs.ts` are the
@@ -721,7 +732,7 @@ The reference that the recipes link to, grouped by topic.
   lints every file that a block's `files` matches, unless the pattern is
   `*` or ends in `/*` or `/**`. A block for files selected by name, such
   as `**/*.config.*`, therefore needs an AND pattern with an extension
-  glob, as `configs/exceptions.ts` does. Without it, `eslint .` parses
+  glob, as `configs/exceptions/index.ts` does. Without it, `eslint .` parses
   the `.txt` snapshots as JavaScript and fails. ESLint's own default
   config also matches `**/*.js`, `**/*.mjs`, and `**/*.cjs`, so such a
   file is linted even when no block of this config matches it, with only

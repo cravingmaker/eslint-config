@@ -3,16 +3,16 @@ import type { Context } from "../../src/types.js";
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
-import { comments } from "../../src/configs/comments.js";
-import { functional } from "../../src/configs/functional.js";
-import { imports } from "../../src/configs/imports/index.js";
-import { node } from "../../src/configs/node.js";
-import { perfectionist } from "../../src/configs/perfectionist/index.js";
-import { promise } from "../../src/configs/promise.js";
-import { regexp } from "../../src/configs/regexp.js";
-import { security } from "../../src/configs/security.js";
-import { unicorn } from "../../src/configs/unicorn.js";
-import { unusedImports } from "../../src/configs/unused-imports.js";
+import { comments } from "../../src/configs/plugins/comments/index.js";
+import { functional } from "../../src/configs/plugins/functional/index.js";
+import { imports } from "../../src/configs/plugins/imports/index.js";
+import { node } from "../../src/configs/plugins/node/index.js";
+import { perfectionist } from "../../src/configs/plugins/perfectionist/index.js";
+import { promise } from "../../src/configs/plugins/promise/index.js";
+import { regexp } from "../../src/configs/plugins/regexp/index.js";
+import { security } from "../../src/configs/plugins/security/index.js";
+import { unicorn } from "../../src/configs/plugins/unicorn/index.js";
+import { unusedImports } from "../../src/configs/plugins/unused-imports/index.js";
 import { defaultContext } from "../../src/context.js";
 
 type RuleEntries = Readonly<Record<string, readonly unknown[]>>;

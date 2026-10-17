@@ -1,7 +1,7 @@
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
-import { express } from "../../src/configs/express.js";
+import { express } from "../../src/configs/plugins/express/index.js";
 
 type EffectiveConfig = {
   readonly rules?: Readonly<Record<string, readonly [number, ...unknown[]]>>;

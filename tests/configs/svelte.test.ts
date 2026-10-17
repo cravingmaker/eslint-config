@@ -1,7 +1,7 @@
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
-import { svelte } from "../../src/configs/svelte.js";
+import { svelte } from "../../src/configs/plugins/svelte/index.js";
 import { expectLintError } from "../utilities.js";
 
 type EffectiveConfig = {

@@ -2,7 +2,7 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { describeFile } from "./describe-file.js";
-import { packageJson } from "../../src/configs/package-json.js";
+import { packageJson } from "../../src/configs/plugins/package-json/index.js";
 
 describe("package-json feature", () => {
   it("registers eslint-plugin-package-json everywhere and lints package.json files", async () => {
