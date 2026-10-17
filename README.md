@@ -2,7 +2,9 @@
 
 Craving Maker's opinionated ESLint configuration. One call, `createConfig()`, returns a flat config that lints the JavaScript, TypeScript, React, Svelte, Express, HTML, JSON, `package.json`, and Markdown files of an ES module project.
 
-The policy is strict. For most plugins, every rule that is not deprecated is on, apart from the rules that the policy turns off for a stated reason. Formatting is left to Prettier. Each part of the config is a feature that you can turn off, limit to some files, or adjust with rule overrides.
+The policy is strict. Every current non-deprecated rule has an explicit enabled or disabled setting, with its options declared in the owning rule map. New upstream rules stay unconfigured until the policy is reviewed. Formatting is left to Prettier. Each part of the config is a feature that you can turn off, limit to some files, or adjust with rule overrides.
+
+The [coding principles](https://github.com/cravingmaker/eslint-config/blob/main/CODING_PRINCIPLES.md) define the priorities for code style, architecture, and decisions about linting, formatting, and scripts.
 
 ## Contents
 
@@ -35,7 +37,7 @@ The policy is strict. For most plugins, every rule that is not deprecated is on,
 npm install --save-dev --save-exact eslint @cravingmaker/eslint-config
 ```
 
-Most features turn on every rule of their plugin, so a release that updates a plugin can report new problems in code that passed before. Pin the exact version, as `--save-exact` does, and update on purpose.
+Rule settings and fixed option defaults are declared locally rather than inherited from plugin presets. A release can still change lint results through a reviewed policy change or an upstream bug fix. Pin the exact version, as `--save-exact` does, and update on purpose.
 
 React, Svelte, and Express need plugins of their own; see [Peer dependencies](#peer-dependencies).
 
@@ -169,7 +171,7 @@ Nothing else is linted: not CommonJS files (see [CommonJS](#commonjs)), not the 
 
 ### Peer dependencies
 
-The plugins of each framework are optional peer dependencies. Install the ones for the frameworks that you use:
+The plugins of each framework are optional peer dependencies. The explicit policy uses the rules and option fields supported by the installed peer version. Install the ones for the frameworks that you use:
 
 ```bash
 # React
@@ -330,22 +332,36 @@ export default createConfig({
 });
 ```
 
+The core policy also requires braces around branches, block bodies for arrows,
+and expanded assignments (`value = value + amount` and
+`value = value || fallback`). Prettier preserves those syntax choices; it
+continues to decide indentation, spacing, quotes, and line breaks.
+
 ## Rules that replace other rules
 
-Some plugins check what another plugin's rule also checks. For each such pair, one feature owns the check: while the owner is on, the rule it replaces is off in the files that both features lint. Where the owner does not lint, a replaced rule comes back only if it makes the same check as the owner's rule, so that turning the owner off does not change which code passes. A style rule asks for something else, such as another order of the imports, and is always off.
+Each overlapping check has a fixed owner. The winning rule is enabled in its
+own rule map, and its alternatives are explicitly `"off"`, with a `Handled by`
+comment naming the winner. There are no dynamic overlap or fallback blocks.
 
-| Owner           | Replaced checks                                                                                       | Replaced style rules                                                                                                                                     |
-| --------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import` |                                                                                                                                                          |
-| `perfectionist` |                                                                                                       | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/adjacent-overload-signatures`, `@typescript-eslint/member-ordering` |
-| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                           |                                                                                                                                                          |
-| `unicorn`       | `no-negated-condition`, `n/no-process-exit`, `n/prefer-node-protocol`                                 | `no-warning-comments`                                                                                                                                    |
-| `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                 |                                                                                                                                                          |
+| Winning feature | Rules left off in other features                                                                                                                                                                                                                         |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import`                                                                                                                                                    |
+| `perfectionist` | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/adjacent-overload-signatures`, `@typescript-eslint/member-ordering`                                                                                                 |
+| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                                                                                                                                                                              |
+| `unicorn`       | `no-negated-condition`, `no-warning-comments`, `n/no-process-exit`, `n/prefer-node-protocol`                                                                                                                                                             |
+| `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                                                                                                                                                                    |
+| `javascript`    | `perfectionist/sort-variable-declarations`, `regexp/prefer-named-capture-group`, `unicorn/consistent-arrow-return-style`, `unicorn/logical-assignment-operators`, `unicorn/no-typeof-undefined`, `unicorn/operator-assignment`, `unicorn/try-complexity` |
 
-- Turning the owner off turns the checks it replaces back on. The style rules stay off: without `perfectionist`, nothing checks the order of imports or object keys, and without `unicorn`, nothing reports a to-do comment.
-- Limiting the owner with `files` or `ignores` turns the checks back on outside the owner's files. The style rules stay off there too.
-- `n/no-missing-import` comes back in JavaScript files only. It does not resolve imports as TypeScript does, so it is off in TypeScript files and Svelte components, where the compiler reports a missing module.
-- Setting a replaced rule in the overrides of the feature that holds it turns it on, also where its owner lints, as `node: { overrides: { "n/no-process-exit": "error" } }` does. For `n/no-missing-import`, that includes TypeScript files and Svelte components. For `typescript`, that includes `overridesTypeAware` in the files that [typed linting](#typed-linting) covers. Outside them, a rule that only `overridesTypeAware` sets is still replaced.
+Disabling a winning feature, or limiting it with `files` or `ignores`, leaves
+its alternatives off. The check is absent in those files unless a consumer
+explicitly enables another rule through the owning feature's overrides or a
+user config. Disabled rules do not need options; provide the desired options
+when enabling one. Type-aware overrides still apply only in the typed scope.
+
+TypeScript compiler checks and extension rules keep their language-specific
+ownership in the TypeScript rule maps. These entries apply only in TypeScript
+files and Svelte scripts, and typed replacements only where type information
+is available.
 
 ## File-role exceptions
 
@@ -538,6 +554,14 @@ export default createConfig({
 - **Block names.** The config is made of more blocks than before, named `@cravingmaker/eslint-config/<feature>/<part>`. Code that finds blocks in the returned array by name needs the new names.
 
 A disable comment for a rule that is now off, such as `// eslint-disable-next-line import-x/no-default-export` in a config file or any rule in a `.cjs` file, becomes an "Unused eslint-disable directive" warning, which ESLint reports by default. With `--max-warnings 0`, the run fails. `eslint --fix` removes such comments, but can leave a line with only spaces, which Prettier then removes.
+
+## Contributing and security
+
+See [CONTRIBUTING.md](https://github.com/cravingmaker/eslint-config/blob/main/CONTRIBUTING.md)
+for contribution and pull request guidance, and follow the
+[Code of Conduct](https://github.com/cravingmaker/eslint-config/blob/main/CODE_OF_CONDUCT.md)
+when participating in the project. Report vulnerabilities privately
+as described in [SECURITY.md](https://github.com/cravingmaker/eslint-config/blob/main/SECURITY.md).
 
 ## License
 

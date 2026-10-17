@@ -24,19 +24,19 @@ const allFeatures = {
 // Files of a feature that name the CommonJS extensions next to those of ES modules.
 const withCommonJs = { files: ["**/*.{js,cjs,ts,cts}"] } as const;
 
-async function createEslint(options: Options): Promise<ESLint> {
+const createEslint = async (options: Options): Promise<ESLint> => {
   return new ESLint({
     overrideConfig: await createConfig(options),
     overrideConfigFile: true,
   });
-}
+};
 // What `select` reads from the configuration for each of `filePaths`, by path. The
 // configuration is `undefined` for a file that no block's `files` matches.
-async function describeByPath<Value>(
+const describeByPath = async <Value>(
   eslint: ESLint,
   filePaths: readonly string[],
   select: (config: EffectiveConfig | undefined) => Value,
-): Promise<Readonly<Record<string, Value>>> {
+): Promise<Readonly<Record<string, Value>>> => {
   return Object.fromEntries(
     await Promise.all(
       filePaths.map(async (filePath): Promise<readonly [string, Value]> => {
@@ -47,7 +47,7 @@ async function describeByPath<Value>(
       }),
     ),
   );
-}
+};
 
 describe("CommonJS files", () => {
   it("get no rules from any feature", async () => {
@@ -63,11 +63,9 @@ describe("CommonJS files", () => {
     };
 
     expect(
-      await describeByPath(
-        eslint,
-        Object.keys(expected),
-        (config) => Object.keys(config?.rules ?? {}).length,
-      ),
+      await describeByPath(eslint, Object.keys(expected), (config) => {
+        return Object.keys(config?.rules ?? {}).length;
+      }),
     ).toEqual(expected);
   });
 
@@ -101,11 +99,9 @@ describe("CommonJS files", () => {
     };
 
     expect(
-      await describeByPath(
-        eslint,
-        Object.keys(expected),
-        (config) => Object.keys(config?.rules ?? {}).length > 0,
-      ),
+      await describeByPath(eslint, Object.keys(expected), (config) => {
+        return Object.keys(config?.rules ?? {}).length > 0;
+      }),
     ).toEqual(expected);
   });
 
@@ -123,11 +119,9 @@ describe("CommonJS files", () => {
     };
 
     expect(
-      await describeByPath(
-        eslint,
-        Object.keys(expected),
-        (config) => config?.languageOptions?.sourceType,
-      ),
+      await describeByPath(eslint, Object.keys(expected), (config) => {
+        return config?.languageOptions?.sourceType;
+      }),
     ).toEqual(expected);
   });
 });

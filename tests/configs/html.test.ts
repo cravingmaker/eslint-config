@@ -2,7 +2,7 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { describeFile } from "./describe-file.js";
-import { html } from "../../src/configs/html.js";
+import { html } from "../../src/configs/html/index.js";
 import { expectLintError, expectNoLintError } from "../utilities.js";
 
 const htmlOptions = { filePath: "index.html" } as const;
@@ -16,9 +16,11 @@ describe("html feature", () => {
       overrideConfigFile: true,
     });
 
-    expect(configs.map((config) => config.name)).toEqual([
-      "@cravingmaker/eslint-config/html/rules",
-    ]);
+    expect(
+      configs.map((config) => {
+        return config.name;
+      }),
+    ).toEqual(["@cravingmaker/eslint-config/html/rules"]);
     expect(
       await Promise.all([
         describeFile(eslint, "index.html", "@html-eslint/indent"),

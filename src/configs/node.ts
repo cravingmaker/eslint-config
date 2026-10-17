@@ -9,12 +9,52 @@ import {
   typescriptFiles,
   withSvelteComponents,
 } from "../globs.js";
-import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles, typeAwareConfig } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
+import { typeAwareConfig } from "../utilities/type-aware.js";
 
-// Policy for eslint-plugin-n.
+// Policy for eslint-plugin-n. Unset version and resolution options keep the
+// consumer's settings, package engines, and tsconfig inference.
 const nodeRules: Rules = {
-  ...enableAllRules("n", pluginNode.rules ?? {}),
+  "n/callback-return": ["error", ["callback", "cb", "next"]],
+  "n/handle-callback-err": ["error", "err"],
+  "n/no-callback-literal": "error",
+  "n/no-path-concat": "error",
+  "n/no-unpublished-bin": ["error", { convertPath: undefined }],
+  "n/no-unpublished-import": [
+    "error",
+    {
+      allowModules: undefined,
+      convertPath: undefined,
+      ignorePrivate: true,
+      ignoreTypeImport: false,
+      resolvePaths: undefined,
+      resolverConfig: undefined,
+      tryExtensions: undefined,
+    },
+  ],
+  "n/no-unsupported-features/es-builtins": [
+    "error",
+    { ignores: [], version: undefined },
+  ],
+  "n/no-unsupported-features/es-syntax": [
+    "error",
+    { ignores: [], version: undefined },
+  ],
+  "n/no-unsupported-features/node-builtins": [
+    "error",
+    { allowExperimental: false, ignores: [], version: undefined },
+  ],
+  "n/prefer-global/console": ["error", "always"],
+  "n/prefer-global/text-decoder": ["error", "always"],
+  "n/prefer-global/text-encoder": ["error", "always"],
+  "n/prefer-global/timers": ["error", "always"],
+  "n/prefer-global/url": ["error", "always"],
+  "n/prefer-global/url-search-params": ["error", "always"],
+  "n/prefer-import/assert-strict": "error",
+  "n/prefer-process-get-builtin-module": ["error", { version: undefined }],
+  "n/prefer-promises/dns": "error",
+  "n/prefer-promises/fs": "error",
+  "n/process-exit-as-throw": "error",
 
   "n/prefer-global/buffer": "off", // Buffer globals and imports are restricted in favor of Uint8Array
   "n/prefer-global/crypto": ["error", "never"],
@@ -23,6 +63,10 @@ const nodeRules: Rules = {
   "n/hashbang": [
     "error",
     {
+      convertPath: undefined,
+
+      additionalExecutables: [],
+
       executableMap: {
         ".js": "node",
         ".mjs": "node",
@@ -30,19 +74,27 @@ const nodeRules: Rules = {
       ignoreUnpublished: true,
     },
   ],
-  "n/no-deprecated-api": ["error", { ignoreIndirectDependencies: true }],
-  "n/no-sync": ["error", { allowAtRootLevel: true }], // Needs type information in TypeScript files
+  "n/no-deprecated-api": [
+    "error",
+    {
+      version: undefined,
+
+      ignoreGlobalItems: [],
+      ignoreIndirectDependencies: true,
+      ignoreModuleItems: [],
+    },
+  ],
+  "n/no-sync": ["error", { allowAtRootLevel: true, ignores: [] }], // Needs type information in TypeScript files
 
   "n/no-process-env": ["warn", { allowedVariables: ["NODE_ENV"] }],
 
   "n/no-restricted-import": "off", // Project specific
 
-  // Off while their replacements are on, see src/overlaps.ts
-  "n/file-extension-in-import": "error",
-  "n/no-extraneous-import": "error",
-  "n/no-missing-import": "error", // Off in TypeScript files and Svelte components, see `node`
-  "n/no-process-exit": "error",
-  "n/prefer-node-protocol": "error",
+  "n/file-extension-in-import": "off", // Handled by `import-x/extensions`.
+  "n/no-extraneous-import": "off", // Handled by `import-x/no-extraneous-dependencies`.
+  "n/no-missing-import": "off", // Handled by `import-x/no-unresolved`.
+  "n/no-process-exit": "off", // Handled by `unicorn/no-process-exit`.
+  "n/prefer-node-protocol": "off", // Handled by `unicorn/prefer-node-protocol`.
 
   "n/exports-style": "off", // Irrelevant for ESM-only project
   "n/global-require": "off", // Irrelevant for ESM-only project
@@ -61,14 +113,12 @@ const typeAwareRules: Rules = { "n/no-sync": nodeRules["n/no-sync"] };
 // Builds the flat config for eslint-plugin-n. In TypeScript files and Svelte components,
 // `n/no-sync` is off unless they are in the type-aware scope, also when an override turns it on.
 // The rules block applies the overrides to every file of the feature, so the block that turns
-// the rule off takes none. `n/no-missing-import` is off in those files as well, unless an
-// override sets it. It does not resolve imports as TypeScript does: in a TypeScript file it
-// reports `./date.js` when `date.js` has a declaration file, and in a component also when the
-// module is `date.ts`. The compiler reports a module that is missing there.
-function node(
+// the rule off takes none. Import resolution belongs to import-x in every language;
+// `n/no-missing-import` stays off unless a consumer explicitly overrides it.
+const node = (
   options: FeatureOptions = {},
   { svelteComponents, typeAware }: Context = defaultContext,
-): Linter.Config[] {
+): Linter.Config[] => {
   const { files, ignores = [], overrides = {} } = options;
 
   return [
@@ -94,12 +144,9 @@ function node(
       name: "@cravingmaker/eslint-config/node/rules-typescript",
       rules: {
         "n/no-sync": "off",
-        ...(!Object.hasOwn(overrides, "n/no-missing-import") && {
-          "n/no-missing-import": "off",
-        }),
       },
     },
-    ...(typeAware === undefined
+    ...(typeof typeAware === "undefined"
       ? []
       : [
           typeAwareConfig("node", typeAware, options, {
@@ -108,6 +155,6 @@ function node(
           }),
         ]),
   ];
-}
+};
 
 export { node };

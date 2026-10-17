@@ -46,25 +46,37 @@ migration notes. `line` is the line of a block's first line of code.
 */
 const codeBlocks: readonly CodeBlock[] = markdown.processors.markdown
   .preprocess(readme, "README.md")
-  .map(({ filename, text }, index) => ({
-    index,
-    language: path.extname(filename).slice(1),
-    line: readme.slice(0, readme.indexOf(text)).split("\n").length,
-    text,
-  }));
+  .map(({ filename, text }, index) => {
+    return {
+      index,
+      language: path.extname(filename).slice(1),
+      line: readme.slice(0, readme.indexOf(text)).split("\n").length,
+      text,
+    };
+  });
 // Each JavaScript block is a complete `eslint.config.js`.
-const examples = codeBlocks.filter(({ language }) => language === "js");
+const examples = codeBlocks.filter(({ language }) => {
+  return language === "js";
+});
 // The packages that the `npm install` commands of the README name.
 const installedPackages = codeBlocks
-  .filter(({ language }) => language === "bash")
-  .flatMap(({ text }) => text.split("\n"))
-  .filter((command) => command.startsWith("npm install "))
-  .flatMap((command) =>
-    command
+  .filter(({ language }) => {
+    return language === "bash";
+  })
+  .flatMap(({ text }) => {
+    return text.split("\n");
+  })
+  .filter((command) => {
+    return command.startsWith("npm install ");
+  })
+  .flatMap((command) => {
+    return command
       .split(" ")
       .slice(2)
-      .filter((word) => !word.startsWith("-")),
-  );
+      .filter((word) => {
+        return !word.startsWith("-");
+      });
+  });
 // The frameworks, which a project that uses one depends on already.
 const frameworks: ReadonlySet<string> = new Set(["react", "svelte"]);
 /*
@@ -92,18 +104,18 @@ afterAll(async () => {
   await rm(temporaryDirectory, { force: true, recursive: true });
 });
 
-function compareText(left: string, right: string): number {
+const compareText = (left: string, right: string): number => {
   return left.localeCompare(right);
-}
+};
 /*
 Writes `example` as the `eslint.config.js` of a project in the consumer in `consumer`, next to a
 copy of the fixtures, and returns its directory. The project declares what the consumer declares,
 so the frameworks are detected as in the consumer.
 */
-async function createExampleProject(
+const createExampleProject = async (
   consumer: string,
   { index, text }: CodeBlock,
-): Promise<string> {
+): Promise<string> => {
   const directory = path.join(consumer, "examples", String(index));
   await mkdir(directory, { recursive: true });
   await cp(
@@ -119,33 +131,38 @@ async function createExampleProject(
   );
   await writeFile(path.join(directory, "eslint.config.js"), text);
   return directory;
-}
+};
 // The fatal messages of `results`, such as parsing errors, with their file and, if any, position.
-function getFatalMessages(
+const getFatalMessages = (
   directory: string,
   results: readonly LintResult[],
-): readonly string[] {
-  return results.flatMap(({ filePath, messages }) =>
-    messages
-      .filter(({ fatal }) => fatal === true)
-      .map(({ column, line, message }) =>
-        [
+): readonly string[] => {
+  return results.flatMap(({ filePath, messages }) => {
+    return messages
+      .filter(({ fatal }) => {
+        return fatal === true;
+      })
+      .map(({ column, line, message }) => {
+        return [
           path.relative(directory, filePath),
-          ...(line === undefined ? [] : [String(line), String(column ?? 0)]),
+          ...(typeof line === "undefined"
+            ? []
+            : [String(line), String(column ?? 0)]),
           ` ${message}`,
-        ].join(":"),
-      ),
-  );
-}
+        ].join(":");
+      });
+  });
+};
 
 const tarball = await createTarball(temporaryDirectory);
 // A consumer that installs what the commands of the README name, and the frameworks. The Node.js
 // types are for `import.meta.dirname`.
 const consumer = await createConsumer(temporaryDirectory, "readme", tarball, [
-  ...installedPackages.filter(
-    (packageName) =>
-      packageName !== "@cravingmaker/eslint-config" && packageName !== "eslint",
-  ),
+  ...installedPackages.filter((packageName) => {
+    return (
+      packageName !== "@cravingmaker/eslint-config" && packageName !== "eslint"
+    );
+  }),
   ...frameworks,
   "@types/node",
 ]);
@@ -156,8 +173,12 @@ describe("the README", () => {
     expect(installedPackages).not.toHaveLength(0);
     expect(
       codeBlocks
-        .filter(({ language }) => !["bash", "js", "text"].includes(language))
-        .map(({ language, line }) => `${language} at line ${String(line)}`),
+        .filter(({ language }) => {
+          return !["bash", "js", "text"].includes(language);
+        })
+        .map(({ language, line }) => {
+          return `${language} at line ${String(line)}`;
+        }),
     ).toEqual([]);
   });
 
@@ -165,9 +186,9 @@ describe("the README", () => {
     expect(installedPackages.toSorted(compareText)).toEqual(
       [
         "@cravingmaker/eslint-config",
-        ...Object.keys(manifest.peerDependencies).filter(
-          (packageName) => !frameworks.has(packageName),
-        ),
+        ...Object.keys(manifest.peerDependencies).filter((packageName) => {
+          return !frameworks.has(packageName);
+        }),
       ].toSorted(compareText),
     );
   });

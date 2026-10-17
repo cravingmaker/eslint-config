@@ -4,7 +4,7 @@ import type { Context } from "../../src/types.js";
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
-import { imports } from "../../src/configs/imports.js";
+import { imports } from "../../src/configs/imports/index.js";
 import { defaultContext } from "../../src/context.js";
 import { expectLintError } from "../utilities.js";
 
@@ -13,15 +13,15 @@ const svelteContext: Context = {
   svelteComponents: [["**/*.svelte", "!**/generated/**"]],
 };
 
-async function getSettings(
+const getSettings = async (
   eslint: ESLint,
   filePath: string,
-): Promise<Linter.Config["settings"]> {
+): Promise<Linter.Config["settings"]> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     Pick<Linter.Config, "settings"> | undefined;
   return config?.settings;
-}
+};
 
 describe("imports feature", () => {
   it("resolves imports in TypeScript files through the TypeScript resolver", async () => {

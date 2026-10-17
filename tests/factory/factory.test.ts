@@ -25,13 +25,15 @@ const temporaryDirectory = await mkdtemp(
 );
 
 // A project root whose manifest declares `dependencies`.
-async function createProject(
+const createProject = async (
   name: string,
   dependencies: readonly string[],
-): Promise<string> {
+): Promise<string> => {
   const directory = path.join(temporaryDirectory, name);
   const devDependencies = Object.fromEntries(
-    dependencies.map((dependency) => [dependency, "1.0.0"]),
+    dependencies.map((dependency) => {
+      return [dependency, "1.0.0"];
+    }),
   );
   await mkdir(directory);
   await writeFile(
@@ -40,33 +42,37 @@ async function createProject(
     "utf8",
   );
   return directory;
-}
+};
 // The block with `name` after the package prefix.
-function findBlock(
+const findBlock = (
   configs: readonly Linter.Config[],
   name: string,
-): Linter.Config | undefined {
-  return configs.find((config) => config.name === `${prefix}${name}`);
-}
+): Linter.Config | undefined => {
+  return configs.find((config) => {
+    return config.name === `${prefix}${name}`;
+  });
+};
 // The feature segment of each block name, without repeats.
-async function getFeatureOrder(
+const getFeatureOrder = async (
   options: Parameters<typeof createConfig>[0] = {},
-): Promise<readonly string[]> {
+): Promise<readonly string[]> => {
   const configs = await createConfig(options);
-  const features = configs.map(
-    (config) => (config.name ?? "").slice(prefix.length).split("/", 1)[0],
-  );
-  return features.filter(
-    (feature, index) => features.indexOf(feature) === index,
-  );
-}
+  const features = configs.map((config) => {
+    return (config.name ?? "").slice(prefix.length).split("/", 1)[0];
+  });
+  return features.filter((feature, index) => {
+    return features.indexOf(feature) === index;
+  });
+};
 // The framework features among the blocks, in order.
-async function getFrameworks(
+const getFrameworks = async (
   options: Parameters<typeof createConfig>[0] = {},
-): Promise<readonly string[]> {
+): Promise<readonly string[]> => {
   const order = await getFeatureOrder(options);
-  return order.filter((feature) => frameworks.has(feature));
-}
+  return order.filter((feature) => {
+    return frameworks.has(feature);
+  });
+};
 
 describe("createConfig", () => {
   afterAll(async () => {
@@ -102,18 +108,130 @@ describe("createConfig", () => {
       "json",
       "package-json",
       "markdown",
-      "overlaps",
       "exceptions",
     ]);
   });
 
   it("names every block once, under the package prefix", async () => {
     const configs = await createConfig(baseOptions);
-    const names = configs.map((config) => config.name);
+    const names = configs.map((config) => {
+      return config.name;
+    });
     const uniqueNames = new Set(names);
 
-    expect(names.every((name) => name?.startsWith(prefix) === true)).toBe(true);
+    expect(
+      names.every((name) => {
+        return name?.startsWith(prefix) === true;
+      }),
+    ).toBe(true);
     expect(uniqueNames.size).toBe(names.length);
+  });
+
+  // Users look a block up by its name, as an example in the README does. The project declares no
+  // framework, so its defaults leave out the blocks that a framework, typed linting, an owner with
+  // files of its own, or a replaced rule in `overridesTypeAware` adds.
+  it("names the blocks in a fixed order", async () => {
+    const projectRootDirectory = await createProject("block-names", []);
+    const [defaults, every] = await Promise.all([
+      createConfig({ ...baseOptions, projectRootDirectory }),
+      createConfig({
+        ...baseOptions,
+        express: true,
+        projectRootDirectory,
+        react: { refresh: "vite" },
+        regexp: { files: ["src/**"] },
+        svelte: true,
+        typescript: {
+          ...baseOptions.typescript,
+          overridesTypeAware: { "@typescript-eslint/no-unused-vars": "error" },
+          typeChecked: true,
+        },
+      }),
+    ]);
+    const everyName = [
+      "ignores",
+      "javascript/rules",
+      "javascript/jsx",
+      "comments/setup",
+      "comments/rules",
+      "node/setup",
+      "node/rules",
+      "node/rules-typescript",
+      "node/rules-type-aware",
+      "security/setup",
+      "security/rules",
+      "imports/setup",
+      "imports/rules",
+      "imports/resolver",
+      "unused-imports/setup",
+      "unused-imports/rules",
+      "promise/setup",
+      "promise/rules",
+      "regexp/setup",
+      "regexp/rules",
+      "unicorn/setup",
+      "unicorn/rules",
+      "functional/setup",
+      "functional/rules",
+      "functional/rules-type-aware",
+      "perfectionist/setup",
+      "perfectionist/rules",
+      "typescript/parser",
+      "typescript/parser-type-aware",
+      "typescript/rules",
+      "typescript/rules-type-aware",
+      "react/html",
+      "react/hooks",
+      "react/refresh",
+      "svelte/rules",
+      "express/rules",
+      "html/rules",
+      "json/rules",
+      "json/rules-jsonc",
+      "json/rules-json5",
+      "package-json/setup",
+      "package-json/rules",
+      "markdown/setup",
+      "markdown/rules",
+      "exceptions/config-files",
+      "exceptions/svelte-components",
+      "exceptions/test-files",
+    ];
+    const optionalNames: ReadonlySet<string> = new Set([
+      "exceptions/svelte-components",
+      "express/rules",
+      "functional/rules-type-aware",
+      "node/rules-type-aware",
+      "react/hooks",
+      "react/html",
+      "react/refresh",
+      "svelte/rules",
+      "typescript/parser-type-aware",
+      "typescript/rules-type-aware",
+    ]);
+
+    expect(
+      every.map((config) => {
+        return config.name;
+      }),
+    ).toEqual(
+      everyName.map((name) => {
+        return `${prefix}${name}`;
+      }),
+    );
+    expect(
+      defaults.map((config) => {
+        return config.name;
+      }),
+    ).toEqual(
+      everyName
+        .filter((name) => {
+          return !optionalNames.has(name);
+        })
+        .map((name) => {
+          return `${prefix}${name}`;
+        }),
+    );
   });
 
   it("leaves out a feature that is off and keeps the others", async () => {
@@ -175,8 +293,14 @@ describe("createConfig", () => {
       ]);
 
       expect(findBlock(detected, "react/hooks")).toBeDefined();
-      expect(detected.map((config) => config.name)).toEqual(
-        explicit.map((config) => config.name),
+      expect(
+        detected.map((config) => {
+          return config.name;
+        }),
+      ).toEqual(
+        explicit.map((config) => {
+          return config.name;
+        }),
       );
       expect(findBlock(detected, "react/refresh")?.rules).toEqual(
         findBlock(explicit, "react/refresh")?.rules,
@@ -238,19 +362,24 @@ describe("createConfig", () => {
         overrideConfigFile: true,
       });
       return [
-        configs.map((config) => config.name),
+        configs.map((config) => {
+          return config.name;
+        }),
         ...(await Promise.all(
-          filePaths.map(
-            async (filePath) =>
-              await describeEffectiveConfig(eslint, filePath, process.cwd()),
-          ),
+          filePaths.map(async (filePath) => {
+            return await describeEffectiveConfig(
+              eslint,
+              filePath,
+              process.cwd(),
+            );
+          }),
         )),
       ];
     };
     const [first, second, fromReversed] = await Promise.all(
-      [options, options, reversed].map(
-        async (value) => await describeOutput(await createConfig(value)),
-      ),
+      [options, options, reversed].map(async (value) => {
+        return await describeOutput(await createConfig(value));
+      }),
     );
 
     expect(second).toEqual(first);
@@ -304,13 +433,15 @@ describe("createConfig", () => {
     ]);
 
     expect(
-      [notes, babelrc].map((result) =>
-        result.messages.map(({ message, ruleId }) => ruleId ?? message),
-      ),
+      [notes, babelrc].map((result) => {
+        return result.messages.map(({ message, ruleId }) => {
+          return ruleId ?? message;
+        });
+      }),
     ).toEqual([["markdown/no-bare-urls"], ["json/no-duplicate-keys"]]);
   });
 
-  // typescript-eslint takes an absolute `tsconfigRootDir` only, and reports any other as a parsing
+  // Typescript-eslint takes an absolute `tsconfigRootDir` only, and reports any other as a parsing
   // error in every file of the type-aware scope. The tests run in this repository, so `.` is its
   // root, and the fixture is a TypeScript file that a tsconfig includes.
   it.each([
@@ -339,8 +470,12 @@ describe("createConfig", () => {
       // A message without a rule is a parsing error, or says that ESLint did not lint the file.
       expect(
         result.messages
-          .filter(({ ruleId }) => typeof ruleId !== "string")
-          .map(({ message }) => message),
+          .filter(({ ruleId }) => {
+            return typeof ruleId !== "string";
+          })
+          .map(({ message }) => {
+            return message;
+          }),
       ).toEqual([]);
       expect(config?.languageOptions?.parserOptions).toEqual({
         projectService: true,

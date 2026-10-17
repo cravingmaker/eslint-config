@@ -1,6 +1,6 @@
 import type { Rules } from "../../types.js";
 
-// typescript-eslint's recommended rules that work without type information.
+// Typescript-eslint's recommended rules that work without type information.
 const recommendedRules: Rules = {
   "@typescript-eslint/no-duplicate-enum-values": "error",
   "@typescript-eslint/no-explicit-any": [
@@ -106,7 +106,7 @@ const strictRules: Rules = {
   ],
 } as const;
 
-// typescript-eslint's stylistic rules that work without type information.
+// Typescript-eslint's stylistic rules that work without type information.
 const stylisticRules: Rules = {
   "@typescript-eslint/ban-tslint-comment": "error",
   "@typescript-eslint/class-literal-property-style": ["error", "fields"],
@@ -127,7 +127,10 @@ const stylisticRules: Rules = {
   "@typescript-eslint/prefer-function-type": "error",
 
   // Rules with overridden options
-  "@typescript-eslint/array-type": ["error", { default: "array-simple" }],
+  "@typescript-eslint/array-type": [
+    "error",
+    { default: "array-simple", readonly: undefined },
+  ],
   "@typescript-eslint/consistent-type-assertions": [
     "error",
     {
@@ -138,7 +141,7 @@ const stylisticRules: Rules = {
   ],
   "@typescript-eslint/consistent-type-definitions": ["error", "type"],
 
-  "@typescript-eslint/adjacent-overload-signatures": "off", // Covered by `perfectionist/sort-interfaces` and `perfectionist/sort-object-types`, see src/overlaps.ts
+  "@typescript-eslint/adjacent-overload-signatures": "off", // Handled by `perfectionist/sort-interfaces` and `perfectionist/sort-object-types`.
 } as const;
 
 // The other typescript-eslint rules that work without type information.
@@ -162,6 +165,8 @@ const otherRules: Rules = {
   "@typescript-eslint/explicit-member-accessibility": [
     "error",
     {
+      ignoredMethodNames: [],
+
       accessibility: "no-public",
       overrides: {
         constructors: "off",
@@ -170,129 +175,10 @@ const otherRules: Rules = {
     },
   ],
 
-  "@typescript-eslint/member-ordering": [
-    "off", // Covered by `perfectionist/sort-classes`, see src/overlaps.ts
-    {
-      default: {
-        memberTypes: [
-          // Static state (shared across instances — most "global", declared first)
-          "public-static-field",
-          "protected-static-field",
-          "private-static-field",
-          "#private-static-field",
+  "@typescript-eslint/member-ordering": "off", // Handled by `perfectionist/sort-classes`.
 
-          // Static initialization blocks
-          "static-initialization",
-
-          // Instance state (decorated fields first — they carry metadata worth seeing early)
-          "public-decorated-field",
-          "protected-decorated-field",
-          "private-decorated-field",
-          "public-instance-field",
-          "protected-instance-field",
-          "private-instance-field",
-          "#private-instance-field",
-
-          // Abstract fields
-          "public-abstract-field",
-          "protected-abstract-field",
-
-          // Type-level signatures (structural, not runtime)
-          "signature",
-          "call-signature",
-
-          // Construction (how instances come to life)
-          "public-constructor",
-          "protected-constructor",
-          "private-constructor",
-
-          // Static accessors & methods
-          "public-static-accessor",
-          "protected-static-accessor",
-          "private-static-accessor",
-          "#private-static-accessor",
-          "public-static-get",
-          "protected-static-get",
-          "private-static-get",
-          "#private-static-get",
-          "public-static-set",
-          "protected-static-set",
-          "private-static-set",
-          "#private-static-set",
-          "public-static-method",
-          "protected-static-method",
-          "private-static-method",
-          "#private-static-method",
-
-          // Instance accessors (getters/setters sit near their backing fields)
-          "public-decorated-accessor",
-          "protected-decorated-accessor",
-          "private-decorated-accessor",
-          "public-instance-accessor",
-          "protected-instance-accessor",
-          "private-instance-accessor",
-          "#private-instance-accessor",
-          "public-abstract-accessor",
-          "protected-abstract-accessor",
-          "public-decorated-get",
-          "protected-decorated-get",
-          "private-decorated-get",
-          "public-instance-get",
-          "protected-instance-get",
-          "private-instance-get",
-          "#private-instance-get",
-          "public-abstract-get",
-          "protected-abstract-get",
-          "public-decorated-set",
-          "protected-decorated-set",
-          "private-decorated-set",
-          "public-instance-set",
-          "protected-instance-set",
-          "private-instance-set",
-          "#private-instance-set",
-          "public-abstract-set",
-          "protected-abstract-set",
-
-          // Instance methods (public API surface first, internals last)
-          "public-decorated-method",
-          "protected-decorated-method",
-          "private-decorated-method",
-          "public-instance-method",
-          "protected-instance-method",
-          "private-instance-method",
-          "#private-instance-method",
-          "public-abstract-method",
-          "protected-abstract-method",
-        ],
-        order: "alphabetically-case-insensitive",
-      },
-    },
-  ],
-
-  "@typescript-eslint/explicit-function-return-type": [
-    "off",
-    {
-      allowConciseArrowFunctionExpressionsStartingWithVoid: false,
-      allowDirectConstAssertionInArrowFunctions: true,
-      allowedNames: [],
-      allowExpressions: false,
-      allowFunctionsWithoutTypeParameters: false,
-      allowHigherOrderFunctions: true,
-      allowIIFEs: false,
-      allowTypedFunctionExpressions: true,
-    },
-  ],
-  "@typescript-eslint/explicit-module-boundary-types": [
-    "off",
-    {
-      allowArgumentsExplicitlyTypedAsAny: false,
-      allowDirectConstAssertionInArrowFunctions: true,
-      allowedNames: [],
-      allowHigherOrderFunctions: true,
-      allowOverloadFunctions: false,
-      allowTypedFunctionExpressions: true,
-    },
-  ],
+  "@typescript-eslint/explicit-function-return-type": "off",
+  "@typescript-eslint/explicit-module-boundary-types": "off",
   "@typescript-eslint/no-restricted-types": [
     "error",
     {

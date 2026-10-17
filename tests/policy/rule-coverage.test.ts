@@ -20,7 +20,9 @@ type RulePlugin = {
 };
 
 // The configuration that ESLint resolves for `filePath` with typed linting on.
-async function getEffectiveConfig(filePath: string): Promise<EffectiveConfig> {
+const getEffectiveConfig = async (
+  filePath: string,
+): Promise<EffectiveConfig> => {
   const eslint = new ESLint({
     overrideConfig: await createConfig({
       typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
@@ -31,42 +33,72 @@ async function getEffectiveConfig(filePath: string): Promise<EffectiveConfig> {
   const config = (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
   return config ?? {};
-}
-function isDeprecated(rule: RuleDefinition | undefined): boolean {
-  return rule?.meta?.deprecated !== undefined && rule.meta.deprecated !== false;
-}
+};
+const isDeprecated = (rule: RuleDefinition | undefined): boolean => {
+  return (
+    typeof rule?.meta?.deprecated !== "undefined" &&
+    rule.meta.deprecated !== false
+  );
+};
 
 describe("rule coverage", () => {
   it("classifies every current non-deprecated ESLint core rule", async () => {
     const { rules = {} } = await getEffectiveConfig("src/example.js");
     // eslint-disable-next-line @typescript-eslint/no-deprecated -- Coverage audit intentionally inspects ESLint's current builtin rule registry
     const unclassified = Iterator.from(builtinRules)
-      .filter(
-        ([ruleName, rule]) =>
-          !isDeprecated(rule) && !Object.hasOwn(rules, ruleName),
-      )
-      .map(([ruleName]) => ruleName)
+      .filter(([ruleName, rule]) => {
+        return !isDeprecated(rule) && !Object.hasOwn(rules, ruleName);
+      })
+      .map(([ruleName]) => {
+        return ruleName;
+      })
       .toArray()
-      .toSorted((left, right) => left.localeCompare(right));
+      .toSorted((left, right) => {
+        return left.localeCompare(right);
+      });
 
     expect(unclassified).toEqual([]);
   });
 
-  it("classifies every current non-deprecated typescript-eslint rule", async () => {
-    const { plugins = {}, rules = {} } =
-      await getEffectiveConfig("src/example.ts");
-    const plugin = plugins["@typescript-eslint"];
-    expect(plugin).toBeDefined();
+  it("classifies every current non-deprecated rule of every plugin", async () => {
+    const config = await createConfig({
+      express: true,
+      react: { refresh: "generic" },
+      svelte: true,
+      typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
+    });
+    const plugins = new Map(
+      config.flatMap((entry) => {
+        return Object.entries(entry.plugins ?? {});
+      }),
+    );
+    const declaredRuleIds = new Set(
+      config
+        .filter((entry) => {
+          return !(entry.name ?? "").includes("/exceptions/");
+        })
+        .flatMap((entry) => {
+          return Object.keys(entry.rules ?? {});
+        }),
+    );
+    const unclassified = [...plugins]
+      .flatMap(([pluginName, plugin]) => {
+        return Object.entries(plugin.rules ?? {})
+          .filter(([ruleName, rule]) => {
+            return (
+              !isDeprecated(rule) &&
+              !declaredRuleIds.has(`${pluginName}/${ruleName}`)
+            );
+          })
+          .map(([ruleName]) => {
+            return `${pluginName}/${ruleName}`;
+          });
+      })
+      .toSorted((left, right) => {
+        return left.localeCompare(right);
+      });
 
-    const unclassified = Object.entries(plugin?.rules ?? {})
-      .filter(
-        ([ruleName, rule]) =>
-          !isDeprecated(rule) &&
-          !Object.hasOwn(rules, `@typescript-eslint/${ruleName}`),
-      )
-      .map(([ruleName]) => ruleName)
-      .toSorted((left, right) => left.localeCompare(right));
-
+    expect(plugins.size).toBe(21);
     expect(unclassified).toEqual([]);
   });
 });

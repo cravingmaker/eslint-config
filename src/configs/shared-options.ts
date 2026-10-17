@@ -8,7 +8,9 @@ const classMethodsUseThisOptions = {
 
 const consistentReturnOptions = { treatUndefinedAsUnspecified: false } as const;
 
-const dotNotationOptions = { allowKeywords: true } as const;
+const dotNotationOptions = {
+  allowKeywords: true,
+} satisfies RuleOptionOf<"dot-notation">;
 
 // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `max-params` rule name
 const maxParamsOptions = { max: 4 } as const;
@@ -50,9 +52,9 @@ const noShadowOptions = {
 } satisfies RuleOptionOf<"no-shadow">;
 
 const noUnusedExpressionsOptions = {
-  allowShortCircuit: true,
-  allowTaggedTemplates: true,
-  allowTernary: true,
+  allowShortCircuit: false,
+  allowTaggedTemplates: false,
+  allowTernary: false,
   enforceForJSX: true,
   ignoreDirectives: false,
 } as const;

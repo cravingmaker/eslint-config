@@ -9,14 +9,18 @@ import {
   replacementRules,
   typeAwareReplacementRules,
 } from "./replacements.js";
-import { typescriptTypeAwareRules } from "./rules-type-aware.js";
-import { typescriptRules } from "./rules.js";
-import { disableConfigRules } from "../../utilities/all-rules.js";
 import {
-  narrowFiles,
+  typescriptTypeAwareRules,
+  typescriptTypeAwareRulesOff,
+} from "./rules-type-aware.js";
+import { typescriptRules } from "./rules.js";
+import { narrowFiles } from "../../utilities/file-scope.js";
+import {
   overridesWithoutTypeInformation,
   typeAwareConfig,
 } from "../../utilities/type-aware.js";
+
+const typeAwareRuleIds = Object.keys(typescriptTypeAwareRulesOff);
 
 /**
 Builds the flat config for TypeScript files and Svelte components, whose scripts
@@ -26,28 +30,17 @@ rules. The rules that need type information are off. With typed linting on, the 
 information in the type-aware scope, which leaves out Svelte components, and those rules are on
 there in a separate block. An override that turns such a rule on applies in that block only.
 */
-async function typescript(
+const typescript = async (
   options: TypeScriptOptions = {},
   context: Context = defaultContext,
-): Promise<Linter.Config[]> {
+): Promise<Linter.Config[]> => {
   const {
     files,
     ignores = [],
     overrides = {},
     overridesTypeAware = {},
   } = options;
-  const [parserConfigs, { configs, plugin }] = await Promise.all([
-    typescriptParser(options, context),
-    import("typescript-eslint"),
-  ]);
-  // Off as in typescript-eslint's `disableTypeChecked` config. The plugin's type omits its rules.
-  const typeAwareRulesOff = disableConfigRules(
-    "@typescript-eslint",
-    "rules" in plugin ? plugin.rules : {},
-    configs.disableTypeChecked.rules,
-  );
-  // Every rule of that config, also a deprecated one, which `typeAwareRulesOff` leaves out.
-  const typeAwareRuleIds = Object.keys(configs.disableTypeChecked.rules ?? {});
+  const parserConfigs = await typescriptParser(options, context);
 
   return [
     ...parserConfigs,
@@ -62,11 +55,11 @@ async function typescript(
         ...compilerCheckedRules,
         ...replacementRules,
         ...typescriptRules,
-        ...typeAwareRulesOff,
+        ...typescriptTypeAwareRulesOff,
         ...overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
       },
     },
-    ...(context.typeAware === undefined
+    ...(typeof context.typeAware === "undefined"
       ? []
       : [
           // The scope stays within the feature's files and ignores, so they are not applied again.
@@ -83,6 +76,6 @@ async function typescript(
           ),
         ]),
   ];
-}
+};
 
 export { typescript };

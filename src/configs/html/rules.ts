@@ -1,20 +1,64 @@
-import type { Linter } from "eslint";
-import type { FeatureOptions, Rules } from "../types.js";
-
-import pluginHtml from "@html-eslint/eslint-plugin";
-import htmlParser from "@html-eslint/parser";
-
-import { htmlFiles } from "../globs.js";
-import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import type { Rules } from "../../types.js";
 
 // Policy for @html-eslint/eslint-plugin.
 const htmlRules: Rules = {
-  ...enableAllRules("@html-eslint", pluginHtml.rules),
+  "@html-eslint/css-no-empty-blocks": "error",
+  "@html-eslint/head-order": ["error", { ignores: [] }],
+  "@html-eslint/lowercase": "error",
+  "@html-eslint/no-abstract-roles": "error",
+  "@html-eslint/no-accesskey-attrs": "error",
+  "@html-eslint/no-aria-hidden-body": "error",
+  "@html-eslint/no-aria-hidden-on-focusable": "error",
+  "@html-eslint/no-duplicate-attrs": "error",
+  "@html-eslint/no-duplicate-class": "error",
+  "@html-eslint/no-duplicate-id": "error",
+  "@html-eslint/no-duplicate-in-head": "error",
+  "@html-eslint/no-empty-headings": "error",
+  "@html-eslint/no-heading-inside-button": "error",
+  "@html-eslint/no-ineffective-attrs": "error",
+  "@html-eslint/no-invalid-attr-value": ["error", { allow: [] }],
+  "@html-eslint/no-invalid-entity": "error",
+  "@html-eslint/no-invalid-role": "error",
+  "@html-eslint/no-multiple-h1": "error",
+  "@html-eslint/no-nested-interactive": "error",
+  "@html-eslint/no-non-scalable-viewport": "error",
+  "@html-eslint/no-obsolete-attrs": "error",
+  "@html-eslint/no-obsolete-tags": "error",
+  "@html-eslint/no-positive-tabindex": "error",
+  "@html-eslint/no-redundant-role": "error",
+  "@html-eslint/no-script-style-type": "error",
+  "@html-eslint/no-skip-heading-levels": "error",
+  "@html-eslint/no-target-blank": "error",
+  "@html-eslint/no-whitespace-only-children": ["error", { tagPatterns: [] }],
+  "@html-eslint/prefer-https": "error",
+  "@html-eslint/require-button-type": "error",
+  "@html-eslint/require-content": "error",
+  "@html-eslint/require-details-summary": "error",
+  "@html-eslint/require-doctype": "error",
+  "@html-eslint/require-explicit-size": [
+    "error",
+    { allowClass: [], allowId: [] },
+  ],
+  "@html-eslint/require-form-method": "error",
+  "@html-eslint/require-frame-title": "error",
+  "@html-eslint/require-img-alt": ["error", { substitute: [] }],
+  "@html-eslint/require-input-label": "error",
+  "@html-eslint/require-lang": "error",
+  "@html-eslint/require-li-container": "error",
+  "@html-eslint/require-meta-charset": "error",
+  "@html-eslint/require-meta-description": "error",
+  "@html-eslint/require-meta-viewport": "error",
+  "@html-eslint/require-title": "error",
+  "@html-eslint/svg-require-viewbox": "error",
+  "@html-eslint/use-baseline": ["error", { available: "widely" }],
 
-  "@html-eslint/id-naming-convention": ["error", "kebab-case"],
+  "@html-eslint/id-naming-convention": [
+    "error",
+    "kebab-case",
+    { flags: undefined, pattern: undefined },
+  ],
   "@html-eslint/max-element-depth": ["error", { max: 6 }],
-  "@html-eslint/no-inline-styles": "warn",
+  "@html-eslint/no-inline-styles": ["warn", { allowExpressions: false }],
   "@html-eslint/no-restricted-attr-values": [
     "error",
     {
@@ -158,22 +202,4 @@ const htmlRules: Rules = {
   "@html-eslint/quotes": "off", // Covered by `prettier`
 } as const;
 
-// Builds the flat config for HTML files.
-function html({
-  files,
-  ignores = [],
-  overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
-  return [
-    {
-      files: narrowFiles(htmlFiles, files),
-      ignores: [...ignores],
-      languageOptions: { parser: htmlParser },
-      name: "@cravingmaker/eslint-config/html/rules",
-      plugins: { "@html-eslint": pluginHtml },
-      rules: { ...htmlRules, ...overrides },
-    },
-  ];
-}
-
-export { html };
+export { htmlRules };

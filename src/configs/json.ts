@@ -4,17 +4,22 @@ import type { JsonOptions, Rules } from "../types.js";
 import pluginJson from "@eslint/json";
 
 import { json5Files, jsoncFiles, jsonFiles, jsonIgnores } from "../globs.js";
-import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 // Policy for @eslint/json, shared by JSON, JSONC, and JSON5 files.
 const jsonRules: Rules = {
-  ...enableAllRules("json", pluginJson.rules),
+  "json/no-duplicate-keys": "error",
+  "json/no-empty-keys": "error",
+  "json/no-unnormalized-keys": ["error", { form: "NFC" }],
+  "json/no-unsafe-values": "error",
+  "json/top-level-interop": "error",
 
   "json/sort-keys": [
     "error",
     "asc",
     {
+      minKeys: 2,
+
       allowLineSeparatedGroups: true,
       caseSensitive: false,
       natural: true,
@@ -29,13 +34,13 @@ const jsonRules: Rules = {
 // block gave them. The patterns that the JSON block leaves out by itself come after `ignores`:
 // ESLint reads an ignore list in order, so a negated pattern brings back only what the patterns
 // before it left out.
-function json({
+const json = ({
   files,
   ignores = [],
   overrides = {},
   overridesJson5 = {},
   overridesJsonc = {},
-}: JsonOptions = {}): Linter.Config[] {
+}: JsonOptions = {}): Linter.Config[] => {
   return [
     {
       files: narrowFiles(jsonFiles, files),
@@ -62,6 +67,6 @@ function json({
       rules: { ...jsonRules, ...overridesJson5 },
     },
   ];
-}
+};
 
 export { json };

@@ -5,36 +5,44 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   createContext,
   defaultContext,
   detectFeatures,
   detectReactRefreshVariant,
+  prepareConfig,
 } from "../../src/context.js";
+import { createConfig } from "../../src/factory.js";
 import { typescriptFiles } from "../../src/globs.js";
 
 const temporaryDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-context-"),
 );
 
-async function createDirectory(name: string): Promise<string> {
+const createDirectory = async (name: string): Promise<string> => {
   const directory = path.join(temporaryDirectory, name);
   await mkdir(directory);
   return directory;
-}
-async function createProject(name: string, manifest: string): Promise<string> {
+};
+const createProject = async (
+  name: string,
+  manifest: string,
+): Promise<string> => {
   const directory = await createDirectory(name);
   await writeFile(path.join(directory, "package.json"), manifest, "utf8");
   return directory;
-}
+};
+
+afterAll(async () => {
+  await rm(temporaryDirectory, { force: true, recursive: true });
+});
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("createContext", () => {
-  afterAll(async () => {
-    await rm(temporaryDirectory, { force: true, recursive: true });
-  });
-
   it("reads the dependencies declared in the manifest at the project root", async () => {
     const projectRootDirectory = await createProject(
       "declared",
@@ -48,7 +56,9 @@ describe("createContext", () => {
     const { dependencies } = await createContext({ projectRootDirectory });
 
     expect(
-      [...dependencies].toSorted((left, right) => left.localeCompare(right)),
+      [...dependencies].toSorted((left, right) => {
+        return left.localeCompare(right);
+      }),
     ).toEqual(["eslint", "react", "vite"]);
   });
 
@@ -110,12 +120,11 @@ describe("createContext", () => {
       createContext({ projectRootDirectory: undeclared, svelte: true }),
     ]);
 
-    expect(contexts.map(({ svelteComponents }) => svelteComponents)).toEqual([
-      ["**/*.svelte"],
-      [],
-      [],
-      ["**/*.svelte"],
-    ]);
+    expect(
+      contexts.map(({ svelteComponents }) => {
+        return svelteComponents;
+      }),
+    ).toEqual([["**/*.svelte"], [], [], ["**/*.svelte"]]);
   });
 
   it("uses the working directory as the default project root", async () => {
@@ -124,6 +133,70 @@ describe("createContext", () => {
     expect(context.projectRootDirectory).toBe(process.cwd());
     expect(context.tsconfigRootDir).toBe(process.cwd());
     expect(context.typeAware).toBeUndefined();
+  });
+});
+
+describe("prepareConfig", () => {
+  it("derives context from the same completed options that the factory receives", async () => {
+    const projectRootDirectory = await createProject(
+      "prepared",
+      JSON.stringify({
+        dependencies: { react: "19.0.0", svelte: "5.0.0" },
+        devDependencies: { next: "1.0.0", vite: "1.0.0" },
+      }),
+    );
+    const { context, resolved } = await prepareConfig({
+      environments: ["browser"],
+      globals: { window: "off" },
+      projectRootDirectory: path.relative(process.cwd(), projectRootDirectory),
+      svelte: { files: ["app/**"], ignores: ["app/legacy/**"] },
+      typescript: {
+        filesTypeAware: ["app/**"],
+        tsconfigRootDir: "packages/app",
+        typeChecked: true,
+      },
+    });
+
+    expect(context.dependencies).toEqual(
+      new Set(["next", "react", "svelte", "vite"]),
+    );
+    expect(resolved.react?.refresh).toBe("next");
+    expect(resolved.projectRootDirectory).toBe(projectRootDirectory);
+    expect(context.projectRootDirectory).toBe(resolved.projectRootDirectory);
+    expect(context.globals).toBe(resolved.globals);
+    expect(context.svelteComponents).toBe(resolved.svelteComponents);
+    expect(context.svelteComponents).toEqual([
+      ["**/*.svelte", "app/**", "!app/legacy/**"],
+    ]);
+    expect(context.typeAware).toBe(resolved.typeAware);
+    expect(context.typeAware).toEqual([
+      [...typescriptFiles, "!**/*.svelte", "app/**"],
+    ]);
+    expect(context.tsconfigRootDir).toBe(resolved.typescript?.tsconfigRootDir);
+    expect(context.tsconfigRootDir).toBe(
+      path.join(process.cwd(), "packages", "app"),
+    );
+  });
+
+  it("resolves options once per public factory call", async () => {
+    const projectRootDirectory = await createProject(
+      "single-resolution",
+      JSON.stringify({ devDependencies: { svelte: "5.0.0" } }),
+    );
+    // The module's no-dependency fallback has already been initialized before this spy.
+    const optionResolution = await import("../../src/options.js");
+    const resolve = vi.spyOn(optionResolution, "resolveOptions");
+
+    await createConfig({ projectRootDirectory });
+    expect(resolve).toHaveBeenCalledTimes(1);
+
+    resolve.mockClear();
+    await createConfig({
+      projectRootDirectory,
+      svelte: false,
+      typescript: false,
+    });
+    expect(resolve).toHaveBeenCalledTimes(1);
   });
 });
 

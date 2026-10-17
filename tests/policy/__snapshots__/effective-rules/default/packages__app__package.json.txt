@@ -21,10 +21,10 @@ package-json/no-local-dependencies: error [{"ignorePrivate":true}]
 package-json/no-redundant-files: error
 package-json/no-redundant-publishConfig: error
 package-json/order-properties: error [{"order":"sort-package-json"}]
-package-json/prefer-rolling-workspace-spec: error [{}]
+package-json/prefer-rolling-workspace-spec: error [{"ignoreDependencies":[],"ignorePatterns":[]}]
 package-json/repository-shorthand: error [{"form":"object"}]
 package-json/require-attribution: error [{"ignorePrivate":true,"preferContributorsOnly":false}]
-package-json/require-author: error
+package-json/require-author: error [{"ignorePrivate":false}]
 package-json/require-bin: off
 package-json/require-browser: off
 package-json/require-bugs: error [{"ignorePrivate":true}]
@@ -33,11 +33,11 @@ package-json/require-config: off
 package-json/require-contributors: off
 package-json/require-cpu: off
 package-json/require-dependencies: off
-package-json/require-description: error
-package-json/require-devDependencies: error
-package-json/require-devEngines: error
+package-json/require-description: error [{"ignorePrivate":false}]
+package-json/require-devDependencies: error [{"ignorePrivate":false}]
+package-json/require-devEngines: error [{"ignorePrivate":false}]
 package-json/require-directories: off
-package-json/require-engines: error
+package-json/require-engines: error [{"ignorePrivate":false}]
 package-json/require-exports: error [{"ignorePrivate":true}]
 package-json/require-files: error [{"ignorePrivate":true}]
 package-json/require-funding: off
@@ -49,25 +49,25 @@ package-json/require-license: error [{"ignorePrivate":true}]
 package-json/require-main: off
 package-json/require-man: off
 package-json/require-module: off
-package-json/require-name: error
+package-json/require-name: error [{"ignorePrivate":true}]
 package-json/require-optionalDependencies: off
 package-json/require-os: off
 package-json/require-packageManager: off
 package-json/require-peerDependencies: off
-package-json/require-peerDependenciesMeta: error
+package-json/require-peerDependenciesMeta: error [{"ignorePrivate":false}]
 package-json/require-private: error
 package-json/require-publishConfig: off
 package-json/require-repository: error [{"ignorePrivate":true}]
-package-json/require-scripts: error
+package-json/require-scripts: error [{"ignorePrivate":false}]
 package-json/require-sideEffects: error [{"ignorePrivate":true}]
-package-json/require-type: error
+package-json/require-type: error [{"ignorePrivate":false}]
 package-json/require-types: error [{"ignorePrivate":true}]
-package-json/require-version: error
+package-json/require-version: error [{"ignorePrivate":true}]
 package-json/restrict-dependency-ranges: error [{"forDependencyTypes":["dependencies","devDependencies"],"rangeType":"pin"}]
 package-json/restrict-dist-tags: error [{"allowed":["latest","dev","next","alpha","beta","canary","rc"]}]
 package-json/restrict-private-properties: error [{"blockedProperties":["files","publishConfig"]}]
 package-json/restrict-top-level-properties: off [{"ban":[]}]
-package-json/scripts-name-casing: error [{}]
+package-json/scripts-name-casing: error [{"ignoreNames":[],"ignorePatterns":[]}]
 package-json/sort-collections: error [["config","dependencies","devDependencies","exports","optionalDependencies","overrides","peerDependencies","peerDependenciesMeta","scripts"]]
 package-json/specify-peers-locally: error
 package-json/unique-dependencies: error

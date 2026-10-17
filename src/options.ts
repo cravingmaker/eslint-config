@@ -17,7 +17,7 @@ import process from "node:process";
 import globalVariables from "globals";
 
 import { svelteComponentFiles, typescriptFiles } from "./globs.js";
-import { narrowFiles, withoutIgnores } from "./utilities/type-aware.js";
+import { narrowFiles, withoutIgnores } from "./utilities/file-scope.js";
 
 /**
 What the project uses, for the options whose default is `"auto"`.
@@ -36,7 +36,7 @@ type ResolvedOptions = {
   readonly express: FeatureOptions | undefined;
   readonly functional: FeatureOptions | undefined;
   /**
-  The built-in globals, then those of `environments`, then `globals`.
+    The built-in globals, then those of `environments`, then `globals`.
   */
   readonly globals: Readonly<Linter.Globals>;
   readonly html: FeatureOptions | undefined;
@@ -55,7 +55,7 @@ type ResolvedOptions = {
   readonly security: FeatureOptions | undefined;
   readonly svelte: FeatureOptions | undefined;
   /**
-  The Svelte components whose scripts the features for JavaScript and TypeScript sources lint.
+    The Svelte components whose scripts the features for JavaScript and TypeScript sources lint.
   */
   readonly svelteComponents: ReadonlyArray<string | readonly string[]>;
   readonly typeAware: TypeAwareScope | undefined;
@@ -73,56 +73,152 @@ type ResolvedTypeScriptOptions = Omit<
   readonly tsconfigRootDir: string;
   readonly typeChecked: boolean;
 };
-
 const undetected: Detection = {
   express: false,
   react: false,
   reactRefresh: false,
   svelte: false,
 };
-
-function resolveDetectedFeature(
+const resolveFeature = <Settings extends FeatureOptions>(
+  value: Feature<Settings> = true,
+): Partial<Settings> | undefined => {
+  if (value === false) {
+    return;
+  }
+  return value === true ? {} : value;
+};
+const resolveDetectedFeature = (
   isDetected: boolean,
   value: Feature | "auto" = "auto",
-): FeatureOptions | undefined {
+): FeatureOptions | undefined => {
   return resolveFeature(value === "auto" ? isDetected : value);
-}
-function resolveFeature<Settings extends FeatureOptions>(
-  value: Feature<Settings> = true,
-): Partial<Settings> | undefined {
-  if (value === false) return undefined;
-  return value === true ? {} : value;
-}
-function resolveGlobals(
+};
+const resolveGlobals = (
   environments: readonly GlobalEnvironment[],
   globals: Readonly<Linter.Globals> = {},
-): Readonly<Linter.Globals> {
+): Readonly<Linter.Globals> => {
   return {
     ...globalVariables.builtin,
     ...Object.fromEntries(
-      environments.flatMap((environment) =>
-        // eslint-disable-next-line security/detect-object-injection -- Environments are keys of the globals package.
-        Object.entries(globalVariables[environment]),
-      ),
+      environments.flatMap((environment) => {
+        // eslint-disable-next-line security/detect-object-injection -- Environment names are limited to the keys of globals by the public type.
+        return Object.entries(globalVariables[environment]);
+      }),
     ),
     ...globals,
   };
-}
+};
+/**
+Resolves the manifest directory without applying any feature defaults.
+*/
+const resolveProjectRootDirectory = (projectRootDirectory?: string): string => {
+  return path.resolve(projectRootDirectory ?? process.cwd());
+};
+const resolveReact = (
+  detection: Detection,
+  value: Feature<ReactOptions> | "auto" = "auto",
+): ResolvedReactOptions | undefined => {
+  const react = resolveFeature(value === "auto" ? detection.react : value);
+  if (typeof react === "undefined") {
+    return;
+  }
+  const { refresh = "auto" } = react;
+  return {
+    ...react,
+    refresh: refresh === "auto" ? detection.reactRefresh : refresh,
+  };
+};
+/**
+Resolves the Svelte components whose scripts the features for JavaScript and TypeScript sources
+lint: the components among the Svelte feature's files, without its ignores, because only
+svelte-eslint-parser reads them. None while the Svelte feature is off.
+*/
+const resolveSvelteComponents = (
+  svelte: FeatureOptions | undefined,
+): ReadonlyArray<string | readonly string[]> => {
+  if (typeof svelte === "undefined") {
+    return [];
+  }
+  const { files, ignores = [] } = svelte;
+  // A file matches a negated pattern when it does not match the pattern. An ignore that starts
+  // with `!` unignores files, which an AND pattern cannot express, so it is left out, and the
+  // files that it unignores keep only the Svelte rules.
+  const excluded = ignores
+    .filter((pattern) => {
+      return !pattern.startsWith("!");
+    })
+    .map((pattern) => {
+      return `!${pattern}`;
+    });
+  return narrowFiles(svelteComponentFiles, files).map((entry) => {
+    return excluded.length === 0
+      ? entry
+      : [...(typeof entry === "string" ? [entry] : entry), ...excluded];
+  });
+};
+/**
+Resolves the files that the parser reads with type information and that get type-aware rules:
+`filesTypeAware` without `ignoresTypeAware`, within the TypeScript sources that the TypeScript
+feature parses, because type information needs its parser, and without Svelte components, whose
+parser reads none, whatever `files` names. Each list of ignores is applied on its own, so a
+negated pattern brings back only what its own list left out.
+*/
+const resolveTypeAwareScope = (
+  value: Feature<TypeScriptOptions> = true,
+): TypeAwareScope | undefined => {
+  const typescript = resolveFeature(value);
+  if (typescript?.typeChecked !== true) {
+    return;
+  }
+  const {
+    files,
+    filesTypeAware,
+    ignores = [],
+    ignoresTypeAware = [],
+  } = typescript;
+  // The files that typescript-eslint parses itself: the TypeScript sources among the files of
+  // the feature, without components.
+  const parsed = withoutIgnores(
+    withoutIgnores(narrowFiles(typescriptFiles, files), svelteComponentFiles),
+    ignores,
+  );
+  return withoutIgnores(narrowFiles(parsed, filesTypeAware), ignoresTypeAware);
+};
+/**
+Applies the defaults to the options of the TypeScript feature. typescript-eslint takes an
+absolute `tsconfigRootDir` only, so the tsconfig directory becomes an absolute path: a relative
+one is resolved from the working directory, as the project root is, and not from that root.
+*/
+const resolveTypeScript = (
+  projectRootDirectory: string,
+  value: Feature<TypeScriptOptions> = true,
+): ResolvedTypeScriptOptions | undefined => {
+  const typescript = resolveFeature(value);
+  if (typeof typescript === "undefined") {
+    return;
+  }
+  return {
+    ...typescript,
+    tsconfigRootDir: path.resolve(
+      typescript.tsconfigRootDir ?? projectRootDirectory,
+    ),
+    typeChecked: typescript.typeChecked ?? false,
+  };
+};
 /**
 Applies the defaults to the options of `createConfig`. Every feature is on unless it is
 `false`, except `react`, `svelte`, and `express`, whose `"auto"` default follows `detection`.
 The project root becomes an absolute path: a relative one is resolved from the working
-directory, which is also its default.
+directory, which is also its default. Preparation passes the root it used to read the manifest.
 */
-function resolveOptions(
+const resolveOptions = (
   options: Options = {},
   detection: Detection = undetected,
-): ResolvedOptions {
-  const projectRootDirectory = path.resolve(
-    options.projectRootDirectory ?? process.cwd(),
-  );
+  projectRootDirectory: string = resolveProjectRootDirectory(
+    options.projectRootDirectory,
+  ),
+): ResolvedOptions => {
   const svelte = resolveDetectedFeature(detection.svelte, options.svelte);
-
   return {
     comments: resolveFeature(options.comments),
     express: resolveDetectedFeature(detection.express, options.express),
@@ -149,92 +245,8 @@ function resolveOptions(
     unicorn: resolveFeature(options.unicorn),
     unusedImports: resolveFeature(options.unusedImports),
   };
-}
-function resolveReact(
-  detection: Detection,
-  value: Feature<ReactOptions> | "auto" = "auto",
-): ResolvedReactOptions | undefined {
-  const react = resolveFeature(value === "auto" ? detection.react : value);
-  if (react === undefined) return undefined;
-
-  const { refresh = "auto" } = react;
-  return {
-    ...react,
-    refresh: refresh === "auto" ? detection.reactRefresh : refresh,
-  };
-}
-/**
-Resolves the Svelte components whose scripts the features for JavaScript and TypeScript sources
-lint: the components among the Svelte feature's files, without its ignores, because only
-svelte-eslint-parser reads them. None while the Svelte feature is off.
-*/
-function resolveSvelteComponents(
-  svelte: FeatureOptions | undefined,
-): ReadonlyArray<string | readonly string[]> {
-  if (svelte === undefined) return [];
-
-  const { files, ignores = [] } = svelte;
-  // A file matches a negated pattern when it does not match the pattern. An ignore that starts
-  // with `!` unignores files, which an AND pattern cannot express, so it is left out, and the
-  // files that it unignores keep only the Svelte rules.
-  const excluded = ignores
-    .filter((pattern) => !pattern.startsWith("!"))
-    .map((pattern) => `!${pattern}`);
-  return narrowFiles(svelteComponentFiles, files).map((entry) =>
-    excluded.length === 0
-      ? entry
-      : [...(typeof entry === "string" ? [entry] : entry), ...excluded],
-  );
-}
-/**
-Resolves the files that the parser reads with type information and that get type-aware rules:
-`filesTypeAware` without `ignoresTypeAware`, within the TypeScript sources that the TypeScript
-feature parses, because type information needs its parser, and without Svelte components, whose
-parser reads none, whatever `files` names. Each list of ignores is applied on its own, so a
-negated pattern brings back only what its own list left out.
-*/
-function resolveTypeAwareScope(
-  value: Feature<TypeScriptOptions> = true,
-): TypeAwareScope | undefined {
-  const typescript = resolveFeature(value);
-  if (typescript?.typeChecked !== true) return undefined;
-
-  const {
-    files,
-    filesTypeAware,
-    ignores = [],
-    ignoresTypeAware = [],
-  } = typescript;
-  // The files that typescript-eslint parses itself: the TypeScript sources among the files of
-  // the feature, without components.
-  const parsed = withoutIgnores(
-    withoutIgnores(narrowFiles(typescriptFiles, files), svelteComponentFiles),
-    ignores,
-  );
-  return withoutIgnores(narrowFiles(parsed, filesTypeAware), ignoresTypeAware);
-}
-/**
-Applies the defaults to the options of the TypeScript feature. typescript-eslint takes an
-absolute `tsconfigRootDir` only, so the tsconfig directory becomes an absolute path: a relative
-one is resolved from the working directory, as the project root is, and not from that root.
-*/
-function resolveTypeScript(
-  projectRootDirectory: string,
-  value: Feature<TypeScriptOptions> = true,
-): ResolvedTypeScriptOptions | undefined {
-  const typescript = resolveFeature(value);
-  if (typescript === undefined) return undefined;
-
-  return {
-    ...typescript,
-    tsconfigRootDir: path.resolve(
-      typescript.tsconfigRootDir ?? projectRootDirectory,
-    ),
-    typeChecked: typescript.typeChecked ?? false,
-  };
-}
-
-export { resolveOptions };
+};
+export { resolveOptions, resolveProjectRootDirectory };
 export type {
   Detection,
   ResolvedOptions,

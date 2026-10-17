@@ -3,7 +3,7 @@ import type { ResolvedOptions } from "../options.js";
 
 import { configFiles, sourceFiles, testFiles } from "../globs.js";
 import { resolveOptions } from "../options.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import { narrowFiles } from "../utilities/file-scope.js";
 
 /**
 A feature that holds rules a file role turns off.
@@ -18,43 +18,14 @@ type FileRole = {
     Partial<Record<ExceptionFeature, readonly string[]>>
   >;
 };
-
-/**
-Builds one block per file role that turns its rules off, limited to the rules whose feature is
-on. The blocks come after every feature, so a user config is the way to turn a rule back on.
-*/
-function exceptions(
-  options: ResolvedOptions = resolveOptions(),
-): Linter.Config[] {
-  return Object.entries(fileRoles(options)).flatMap(
-    ([role, { files, rules }]) => {
-      const ruleIds = [
-        ...(options.functional === undefined ? [] : (rules.functional ?? [])),
-        ...(options.imports === undefined ? [] : (rules.imports ?? [])),
-        ...(options.unicorn === undefined ? [] : (rules.unicorn ?? [])),
-      ];
-      if (files.length === 0 || ruleIds.length === 0) return [];
-
-      return [
-        {
-          files,
-          name: `@cravingmaker/eslint-config/exceptions/${role}`,
-          rules: Object.fromEntries(
-            ruleIds.map((ruleId): readonly [string, "off"] => [ruleId, "off"]),
-          ),
-        },
-      ];
-    },
-  );
-}
 /**
 Rules that files with a particular role break by design, and the files of each role with
 `options`. Each exception replaces a suppression that every such file would need; add one only
 with similar evidence.
 */
-function fileRoles({
+const fileRoles = ({
   svelteComponents,
-}: ResolvedOptions): Readonly<Record<string, FileRole>> {
+}: ResolvedOptions): Readonly<Record<string, FileRole>> => {
   return {
     // Tools such as ESLint, Vite, and Vitest read their config from the default export. Only
     // JavaScript and TypeScript sources, as for test files: on its own, a pattern such as
@@ -87,6 +58,42 @@ function fileRoles({
       },
     },
   };
-}
-
+};
+/**
+Builds one block per file role that turns its rules off, limited to the rules whose feature is
+on. The blocks come after every feature, so a user config is the way to turn a rule back on.
+*/
+const exceptions = (
+  options: ResolvedOptions = resolveOptions(),
+): Linter.Config[] => {
+  return Object.entries(fileRoles(options)).flatMap(
+    ([role, { files, rules }]) => {
+      const ruleIds = [
+        ...(typeof options.functional === "undefined"
+          ? []
+          : (rules.functional ?? [])),
+        ...(typeof options.imports === "undefined"
+          ? []
+          : (rules.imports ?? [])),
+        ...(typeof options.unicorn === "undefined"
+          ? []
+          : (rules.unicorn ?? [])),
+      ];
+      if (files.length === 0 || ruleIds.length === 0) {
+        return [];
+      }
+      return [
+        {
+          files,
+          name: `@cravingmaker/eslint-config/exceptions/${role}`,
+          rules: Object.fromEntries(
+            ruleIds.map((ruleId): readonly [string, "off"] => {
+              return [ruleId, "off"];
+            }),
+          ),
+        },
+      ];
+    },
+  );
+};
 export { exceptions, fileRoles };

@@ -1,21 +1,93 @@
-import type { Linter } from "eslint";
-import type { Context, FeatureOptions, Rules } from "../types.js";
-
-import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
-import pluginImportX, { createNodeResolver } from "eslint-plugin-import-x";
-
-import { defaultContext } from "../context.js";
-import {
-  sourceFiles,
-  typescriptFiles,
-  withSvelteComponents,
-} from "../globs.js";
-import { enableAllRules } from "../utilities/all-rules.js";
-import { narrowFiles } from "../utilities/type-aware.js";
+import type { Rules } from "../../types.js";
 
 // Policy for eslint-plugin-import-x.
 const importsRules: Rules = {
-  ...enableAllRules("import-x", pluginImportX.rules),
+  "import-x/consistent-type-specifier-style": ["error", "prefer-top-level"],
+  "import-x/default": "error",
+  "import-x/export": "error",
+  "import-x/exports-last": "error",
+  "import-x/group-exports": "error",
+  "import-x/named": ["error", { commonjs: false }],
+  "import-x/namespace": ["error", { allowComputed: false }],
+  "import-x/no-absolute-path": [
+    "error",
+    { amd: false, commonjs: true, esmodule: true, ignore: undefined },
+  ],
+  "import-x/no-amd": "error",
+  "import-x/no-anonymous-default-export": [
+    "error",
+    {
+      allowAnonymousClass: false,
+      allowAnonymousFunction: false,
+      allowArray: false,
+      allowArrowFunction: false,
+      allowCallExpression: true,
+      allowLiteral: false,
+      allowNew: false,
+      allowObject: false,
+    },
+  ],
+  "import-x/no-default-export": "error",
+  "import-x/no-deprecated": "error",
+  "import-x/no-duplicates": [
+    "error",
+    { considerQueryString: false, "prefer-inline": false },
+  ],
+  "import-x/no-dynamic-require": ["error", { esmodule: false }],
+  "import-x/no-empty-named-blocks": "error",
+  "import-x/no-extraneous-dependencies": [
+    "error",
+    {
+      packageDir: undefined,
+
+      bundledDependencies: true,
+      devDependencies: true,
+      includeInternal: false,
+      includeTypes: false,
+      optionalDependencies: true,
+      peerDependencies: true,
+      whitelist: [],
+    },
+  ],
+  "import-x/no-import-module-exports": ["error", { exceptions: [] }],
+  "import-x/no-mutable-exports": "error",
+  "import-x/no-named-as-default": "error",
+  "import-x/no-named-as-default-member": "error",
+  "import-x/no-named-default": "error",
+  "import-x/no-relative-packages": [
+    "error",
+    { amd: false, commonjs: false, esmodule: true, ignore: undefined },
+  ],
+  "import-x/no-rename-default": [
+    "error",
+    { commonjs: false, preventRenamingBindings: true },
+  ],
+  "import-x/no-self-import": "error",
+  "import-x/no-unassigned-import": [
+    "error",
+    {
+      allow: [],
+      devDependencies: false,
+      optionalDependencies: false,
+      peerDependencies: false,
+    },
+  ],
+  "import-x/no-unresolved": [
+    "error",
+    {
+      amd: false,
+      caseSensitive: true,
+      caseSensitiveStrict: false,
+      commonjs: false,
+      esmodule: true,
+      ignore: undefined,
+    },
+  ],
+  "import-x/no-useless-path-segments": [
+    "error",
+    { commonjs: false, noUselessIndex: false },
+  ],
+  "import-x/unambiguous": "error",
 
   "import-x/extensions": [
     "error",
@@ -35,6 +107,8 @@ const importsRules: Rules = {
   "import-x/newline-after-import": [
     "error",
     {
+      count: 1,
+
       considerComments: true,
       exactCount: true,
     },
@@ -121,6 +195,7 @@ const importsRules: Rules = {
   "import-x/no-cycle": "off", // Prefer lightweight workflow, it's computationally expensive
   "import-x/no-named-export": "off", // Prefer named export
   "import-x/no-nodejs-modules": "off", // Prefer built-in Node.js modules
+  // Its schema requires an active export check whenever options are supplied.
   "import-x/no-unused-modules": "off", // Prefer flat config, it's only compatible with legacy configs
   "import-x/prefer-default-export": "off", // Prefer named export
   "import-x/prefer-namespace-import": "off", // Prefer named import, with default import as fallback
@@ -132,53 +207,8 @@ const importsRules: Rules = {
   "import-x/dynamic-import-chunkname": "off", // Project specific, only target Webpack
   "import-x/no-webpack-loader-syntax": "off", // Project specific, only target Webpack
 
-  // Covered by `perfectionist/sort-imports`, see src/overlaps.ts
-  "import-x/first": "off",
-  "import-x/order": "off",
+  "import-x/first": "off", // Handled by `perfectionist/sort-imports`.
+  "import-x/order": "off", // Handled by `perfectionist/sort-imports`.
 } as const;
 
-// Builds the flat config for eslint-plugin-import-x. TypeScript files and Svelte components
-// within the feature's files resolve imports through the TypeScript resolver first, with the
-// project's tsconfig.
-function imports(
-  options: FeatureOptions = {},
-  { svelteComponents, tsconfigRootDir }: Context = defaultContext,
-): Linter.Config[] {
-  const { files, ignores = [], overrides = {} } = options;
-  const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
-
-  return [
-    {
-      name: "@cravingmaker/eslint-config/imports/setup",
-      plugins: { "import-x": pluginImportX },
-    },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/imports/rules",
-      rules: { ...importsRules, ...overrides },
-    },
-    {
-      files: narrowFiles(
-        withSvelteComponents(typescriptFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/imports/resolver",
-      settings: {
-        "import-x/resolver-next": [
-          createTypeScriptImportResolver({
-            alwaysTryTypes: true,
-            ...resolverProject,
-          }),
-          createNodeResolver(),
-        ],
-      },
-    },
-  ];
-}
-
-export { imports, importsRules };
+export { importsRules };

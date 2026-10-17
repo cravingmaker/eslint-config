@@ -26,10 +26,12 @@ describe("generated rule types", () => {
     });
     const errors = ts
       .getPreEmitDiagnostics(program)
-      .filter((diagnostic) => diagnostic.file?.fileName === declarationsPath)
-      .map((diagnostic) =>
-        ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"),
-      );
+      .filter((diagnostic) => {
+        return diagnostic.file?.fileName === declarationsPath;
+      })
+      .map((diagnostic) => {
+        return ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+      });
 
     expect(errors).toEqual([]);
   });
@@ -41,9 +43,9 @@ describe("generated rule types", () => {
       "utf8",
     );
     const declaredRuleIds = new Set(
-      declarations
-        .matchAll(ruleOptionPattern)
-        .map((match) => match.groups?.ruleId),
+      declarations.matchAll(ruleOptionPattern).map((match) => {
+        return match.groups?.ruleId;
+      }),
     );
     const config = await createConfig({
       express: true,
@@ -52,13 +54,19 @@ describe("generated rule types", () => {
       typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
     });
     const configuredRuleIds = new Set(
-      config.flatMap((entry) => Object.keys(entry.rules ?? {})),
+      config.flatMap((entry) => {
+        return Object.keys(entry.rules ?? {});
+      }),
     );
     const undeclaredRuleIds = configuredRuleIds
       .values()
-      .filter((ruleId) => !declaredRuleIds.has(ruleId))
+      .filter((ruleId) => {
+        return !declaredRuleIds.has(ruleId);
+      })
       .toArray()
-      .toSorted((left, right) => left.localeCompare(right));
+      .toSorted((left, right) => {
+        return left.localeCompare(right);
+      });
 
     expect(configuredRuleIds.size).toBeGreaterThan(0);
     expect(undeclaredRuleIds).toEqual([]);

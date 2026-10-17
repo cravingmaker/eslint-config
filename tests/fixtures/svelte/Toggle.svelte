@@ -3,9 +3,9 @@
 
   let isOpen = $state(false);
 
-  function toggle() {
+  const toggle = () => {
     isOpen = !isOpen;
-  }
+  };
 </script>
 
 <button

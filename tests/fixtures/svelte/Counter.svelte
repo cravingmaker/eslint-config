@@ -6,9 +6,9 @@
   const { step }: Properties = $props();
   let count = $state(0);
 
-  function increment(): void {
-    count += step;
-  }
+  const increment = (): void => {
+    count = count + step;
+  };
 </script>
 
 <button

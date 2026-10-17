@@ -19,20 +19,24 @@ const typedContext: Context = {
   typeAware: ["**/*.ts"],
 };
 
-async function getEffectiveConfig(
+const getEffectiveConfig = async (
   eslint: ESLint,
   filePath: string,
-): Promise<EffectiveConfig | undefined> {
+): Promise<EffectiveConfig | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   return (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
-}
+};
 
 describe("typescript feature", () => {
   it("parses TypeScript files in a parser block and sets its rules in a rules block", async () => {
     const configs = await typescript();
 
-    expect(configs.map((config) => config.name)).toEqual([
+    expect(
+      configs.map((config) => {
+        return config.name;
+      }),
+    ).toEqual([
       "@cravingmaker/eslint-config/typescript/parser",
       "@cravingmaker/eslint-config/typescript/rules",
     ]);
@@ -85,12 +89,16 @@ describe("typescript feature", () => {
     });
     const configs = await Promise.all(
       ["src/example.ts", "src/legacy/example.ts", "scripts/example.ts"].map(
-        async (filePath) => await getEffectiveConfig(eslint, filePath),
+        async (filePath) => {
+          return await getEffectiveConfig(eslint, filePath);
+        },
       ),
     );
 
     expect(
-      configs.map((config) => config?.languageOptions?.parserOptions),
+      configs.map((config) => {
+        return config?.languageOptions?.parserOptions;
+      }),
     ).toEqual([{ projectService: true, tsconfigRootDir: "/project" }, {}, {}]);
   });
 
@@ -151,7 +159,9 @@ describe("typescript feature", () => {
         "app/data.json",
         "lib/example.ts",
         "lib/Component.svelte",
-      ].map(async (filePath) => await getEffectiveConfig(eslint, filePath)),
+      ].map(async (filePath) => {
+        return await getEffectiveConfig(eslint, filePath);
+      }),
     );
 
     expect(source?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(2);
@@ -180,7 +190,11 @@ describe("typescript feature", () => {
       getEffectiveConfig(eslint, "scripts/example.ts"),
     ]);
 
-    expect(configs.map((config) => config.name)).toEqual([
+    expect(
+      configs.map((config) => {
+        return config.name;
+      }),
+    ).toEqual([
       "@cravingmaker/eslint-config/typescript/parser",
       "@cravingmaker/eslint-config/typescript/parser-type-aware",
       "@cravingmaker/eslint-config/typescript/rules",
@@ -219,21 +233,20 @@ describe("typescript feature", () => {
       getEffectiveConfig(eslint, "src/Component.svelte"),
     ]);
 
-    expect(inside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual([
-      2,
-      { ignoreVoid: false },
-    ]);
-    expect(outside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual(
-      [0],
-    );
-    expect(
-      component?.rules?.["@typescript-eslint/no-floating-promises"],
-    ).toEqual([0]);
+    expect(inside).toMatchObject({
+      rules: {
+        "@typescript-eslint/no-floating-promises": [2, { ignoreVoid: false }],
+      },
+    });
     // An override of a rule that needs no type information applies in every file.
-    expect(outside?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(1);
-    expect(component?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(
-      1,
-    );
+    const untypedRules = {
+      rules: {
+        "@typescript-eslint/no-explicit-any": [1],
+        "@typescript-eslint/no-floating-promises": [0],
+      },
+    };
+    expect(outside).toMatchObject(untypedRules);
+    expect(component).toMatchObject(untypedRules);
   });
 
   it("does not apply such an override without typed linting", async () => {
