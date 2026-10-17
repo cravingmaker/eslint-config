@@ -12,7 +12,7 @@ also for Svelte components, whose parser the Svelte feature sets. With typed lin
 parser reads type information through the project service in the type-aware scope only, so a
 file outside it, such as a script that no tsconfig includes, is parsed without it.
 */
-async function typescriptParser(
+const typescriptParser = async (
   options: FeatureOptions = {},
   {
     globals,
@@ -20,7 +20,7 @@ async function typescriptParser(
     tsconfigRootDir,
     typeAware,
   }: Context = defaultContext,
-): Promise<Linter.Config[]> {
+): Promise<Linter.Config[]> => {
   const { files, ignores = [] } = options;
   const { parser, plugin } = await import("typescript-eslint");
 
@@ -35,7 +35,7 @@ async function typescriptParser(
       name: "@cravingmaker/eslint-config/typescript/parser",
       plugins: { "@typescript-eslint": plugin },
     },
-    ...(typeAware === undefined
+    ...(typeof typeAware === "undefined"
       ? []
       : [
           {
@@ -48,6 +48,6 @@ async function typescriptParser(
           },
         ]),
   ];
-}
+};
 
 export { typescriptParser };

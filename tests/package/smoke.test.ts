@@ -78,7 +78,9 @@ const createPackedPackage = async (baseDirectory: string) => {
   );
 
   const packedFiles = await fs.readdir(baseDirectory);
-  const tarballs = packedFiles.filter((file) => file.endsWith(".tgz"));
+  const tarballs = packedFiles.filter((file) => {
+    return file.endsWith(".tgz");
+  });
   expect(tarballs).toHaveLength(1);
 
   const [tarballFilename = ""] = tarballs;
@@ -177,11 +179,16 @@ const createBrokenPackage = async (
   );
 };
 
-const runConsumer = (consumerDirectory: string, script: string) =>
-  execFileSync(process.execPath, ["--input-type=module", "--eval", script], {
-    cwd: consumerDirectory,
-    encoding: "utf8",
-  });
+const runConsumer = (consumerDirectory: string, script: string) => {
+  return execFileSync(
+    process.execPath,
+    ["--input-type=module", "--eval", script],
+    {
+      cwd: consumerDirectory,
+      encoding: "utf8",
+    },
+  );
+};
 
 /*
 A consumer script that calls `createConfig` with each set of options and prints, for each, the
@@ -189,7 +196,8 @@ names of the framework blocks it returns or the message it fails with.
 */
 const createFrameworkScript = (
   cases: Readonly<Record<string, Readonly<Record<string, unknown>>>>,
-) => `
+) => {
+  return `
 				import { createConfig } from '@cravingmaker/eslint-config';
 
 				const results = {};
@@ -206,6 +214,7 @@ const createFrameworkScript = (
 
 				process.stdout.write(JSON.stringify(results));
 			`;
+};
 
 const tarball = await createPackedPackage(temporaryDirectory);
 
@@ -596,15 +605,15 @@ describe("published package", () => {
       "eslint-plugin-express-security",
     );
 
-    expect(() =>
-      runConsumer(
+    expect(() => {
+      return runConsumer(
         consumerDirectory,
         `
 					import { createConfig } from '@cravingmaker/eslint-config';
 					await createConfig();
 				`,
-      ),
-    ).toThrow(/broken optional peer/u);
+      );
+    }).toThrow(/broken optional peer/u);
   });
 
   it("fails with an install message when a framework is on without its peers", async () => {
@@ -699,12 +708,14 @@ describe("published package", () => {
     const createCase = async (
       name: string,
       developmentDependencies: Readonly<Record<string, string>>,
-    ) => ({
-      projectRootDirectory: await createProjectRoot(
-        path.join(consumerDirectory, "projects", name),
-        developmentDependencies,
-      ),
-    });
+    ) => {
+      return {
+        projectRootDirectory: await createProjectRoot(
+          path.join(consumerDirectory, "projects", name),
+          developmentDependencies,
+        ),
+      };
+    };
 
     const cases = {
       express: await createCase("express", { express: "1.0.0" }),

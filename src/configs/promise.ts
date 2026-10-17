@@ -49,10 +49,10 @@ const promiseRules: Rules = {
 } as const;
 
 // Builds the flat config for eslint-plugin-promise.
-function promise(
+const promise = (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { svelteComponents }: Context = defaultContext,
-): Linter.Config[] {
+): Linter.Config[] => {
   return [
     {
       name: "@cravingmaker/eslint-config/promise/setup",
@@ -71,6 +71,6 @@ function promise(
       rules: { ...promiseRules, ...overrides },
     },
   ];
-}
+};
 
 export { promise, promiseRules };

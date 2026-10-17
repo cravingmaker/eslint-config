@@ -12,9 +12,10 @@ import { supportedRuleOptions } from "../../utilities/plugin-policy.js";
 
 // Policy for every non-deprecated ESLint core rule, shared by JavaScript and TypeScript files.
 const coreRules: Rules = {
-  ...possibleProblemRules,
-  ...suggestionRules,
+  ...possibleProblemRules, // 59/199 rules, 0 automatically fixable, 10 manually fixable.
+  ...suggestionRules, // 140/199 rules
 };
+
 // Earlier supported ESLint versions can predate a declared option.
 const supportedCoreRules: Rules = Object.fromEntries(
   Object.entries(coreRules).map(([id, entry]) => [

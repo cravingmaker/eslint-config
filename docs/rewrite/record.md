@@ -48,7 +48,7 @@ Two lists remain. What the audits noticed and no step covers is under ["Not plan
 | `plugins`                    | Removed. Extra plugins go in `userConfigs`, where they can be scoped with `files`                                                  |
 | CommonJS                     | Not supported. `.cjs` and `.cts` files get no rules                                                                                |
 | Composition                  | `Promise<Linter.Config[]>` built from native flat configs, without a composer class                                                |
-| Rule overlap between plugins | One table, `src/overlaps.ts`: replaced checks are off only while their owner is on, replaced style rules always                    |
+| Rule overlap between plugins | Explicit ownership in rule maps: winners are enabled and alternatives stay off with `Handled by` comments                          |
 | New upstream rules           | The effective-policy snapshots are the review gate. Every current rule is classified explicitly; new upstream rules require review |
 | File-role exceptions         | A dedicated module, `configs/exceptions.ts`, added to only with evidence                                                           |
 | A feature's `files`          | Narrows the feature's default files and cannot add a file type, which takes a user config that copies a block                      |
@@ -106,3 +106,11 @@ The steps reported these in their pull requests and left them, because no step c
 - **A package behind a symbolic link.** With the defaults, `n/no-unpublished-import` reports every relative import of a package that is not private when ESLint reaches its directory through a symbolic link: `"./local.js" is not published.` By its real path, the same package has no message. The temporary directory of macOS is such a link, so a test that lints a project there creates it by its real path. Found in #90.
 - **An option that applies nowhere gives no message.** Each of these is accepted and does nothing: an override that turns on a rule that needs type information while `typeChecked` is off, `filesTypeAware` and `overridesTypeAware` while `typeChecked` is off, an override of a `react-refresh/*` rule while React Refresh is off, and a pattern of a feature's `files` that matches none of its default files. The README describes each case, and nothing reports one when ESLint runs. Found in #79, #80, #89, and #91. The plan lists the second under "Not planned".
 - **A negated pattern in `svelte.ignores`.** `resolveSvelteComponents` leaves such patterns out of the components that the other features lint. With `svelte: { ignores: ["src/legacy/**", "!src/legacy/Keep.svelte"] }`, `Keep.svelte` gets the Svelte rules and no rule for its script. Since step 2, `withoutIgnores` could express the pattern. Found in #78.
+
+## Core policy follow-up — 17 October 2026
+
+The maintainer's revised core rule maps are the policy reference. Dynamic
+overlap/fallback blocks were removed in favor of explicit disabled alternatives
+in their owning maps. Turning a winning feature off no longer revives another
+rule. Disabled rules no longer need explicit option defaults. Tests, fixtures,
+snapshots, and repository code follow the revised core policy.

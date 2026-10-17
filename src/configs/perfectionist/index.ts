@@ -9,10 +9,10 @@ import { perfectionistRules } from "./rules.js";
 import { narrowFiles } from "../../utilities/file-scope.js";
 
 // Builds the flat config for eslint-plugin-perfectionist.
-function perfectionist(
+const perfectionist = (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { svelteComponents }: Context = defaultContext,
-): Linter.Config[] {
+): Linter.Config[] => {
   return [
     {
       name: "@cravingmaker/eslint-config/perfectionist/setup",
@@ -28,6 +28,6 @@ function perfectionist(
       rules: { ...perfectionistRules, ...overrides },
     },
   ];
-}
+};
 
 export { perfectionist };

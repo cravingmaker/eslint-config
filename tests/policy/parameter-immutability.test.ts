@@ -87,10 +87,9 @@ const fixtureDirectory = await mkdtemp(
 );
 const fixtureFiles = [
   ["tsconfig.json", JSON.stringify(tsconfig)],
-  ...Object.entries(fixtures).map(([fileName, lines]) => [
-    fileName,
-    `${lines.join("\n")}\n`,
-  ]),
+  ...Object.entries(fixtures).map(([fileName, lines]) => {
+    return [fileName, `${lines.join("\n")}\n`];
+  }),
 ] as const;
 
 await Promise.all(
@@ -104,7 +103,7 @@ afterAll(async () => {
   await rm(fixtureDirectory, { force: true, recursive: true });
 });
 
-function lintInOrder(fileNames: readonly string[]): LintMessages {
+const lintInOrder = (fileNames: readonly string[]): LintMessages => {
   // eslint-disable-next-line n/no-sync -- Each run needs its own process, and the test waits for it.
   const output = execFileSync(
     process.execPath,
@@ -119,7 +118,7 @@ function lintInOrder(fileNames: readonly string[]): LintMessages {
   );
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The lint script prints this shape.
   return JSON.parse(output) as LintMessages;
-}
+};
 
 describe("functional/prefer-immutable-types", () => {
   it("reports the same parameters whatever files are linted before them", () => {

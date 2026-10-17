@@ -10,25 +10,27 @@ there is no `.js` file. The modules of this repository import each other by thei
 as the compiler expects, but Node.js, which strips the types of a `.ts` file, looks for the
 name as it is written.
 */
-function resolveTypeScriptSource(
+const resolveTypeScriptSource = (
   specifier: string,
   context: Readonly<ResolveHookContext>,
   nextResolve: (
     specifier: string,
     context?: Readonly<Partial<ResolveHookContext>>,
   ) => ResolveFnOutput,
-): ResolveFnOutput {
+): ResolveFnOutput => {
   try {
     return nextResolve(specifier, context);
   } catch (error) {
     const isTypeScriptImport =
       context.parentURL?.endsWith(".ts") === true &&
       /^\.{1,2}\/.*\.js$/u.test(specifier);
-    // eslint-disable-next-line functional/no-throw-statements -- Any other failure must stay visible.
-    if (!isTypeScriptImport) throw error;
+    if (!isTypeScriptImport) {
+      // eslint-disable-next-line functional/no-throw-statements -- Any other failure must stay visible.
+      throw error;
+    }
     return nextResolve(specifier.replace(/\.js$/u, ".ts"), context);
   }
-}
+};
 
 const hooks = registerHooks({ resolve: resolveTypeScriptSource });
 const { runPolicyDiff } = await import("./policy-diff/report.js");

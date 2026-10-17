@@ -99,18 +99,20 @@ afterAll(async () => {
   await rm(temporaryDirectory, { force: true, recursive: true });
 });
 
-function compareText(left: string, right: string): number {
+const compareText = (left: string, right: string): number => {
   return left.localeCompare(right);
-}
+};
 // A project root in the consumer in `directory` whose manifest declares `dependencies`.
-async function createProjectRoot(
+const createProjectRoot = async (
   directory: string,
   name: string,
   dependencies: readonly string[],
-): Promise<string> {
+): Promise<string> => {
   const projectRootDirectory = path.join(directory, "projects", name);
   const devDependencies = Object.fromEntries(
-    dependencies.map((dependency) => [dependency, "1.0.0"]),
+    dependencies.map((dependency) => {
+      return [dependency, "1.0.0"];
+    }),
   );
   await mkdir(projectRootDirectory, { recursive: true });
   await writeFile(
@@ -118,16 +120,16 @@ async function createProjectRoot(
     JSON.stringify({ devDependencies, private: true, type: "module" }),
   );
   return projectRootDirectory;
-}
+};
 /*
 Runs the ESLint CLI of the consumer in `directory` with `config` as `eslint.config.js` on
 `filePaths`, and returns the messages of each file by path.
 */
-async function lint(
+const lint = async (
   directory: string,
   config: string,
   filePaths: readonly string[],
-): Promise<Messages> {
+): Promise<Messages> => {
   await writeFile(path.join(directory, "eslint.config.js"), config);
   const output = await getOutput(
     process.execPath,
@@ -142,32 +144,33 @@ async function lint(
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint's JSON formatter prints this shape.
   const results = JSON.parse(output) as readonly LintResult[];
   return Object.fromEntries(
-    results.map(({ filePath, messages }) => [
-      path.relative(directory, filePath).replaceAll(path.sep, "/"),
-      messages.map(
-        ({ column, line, message, ruleId }) =>
-          `${String(line)}:${String(column)} ${ruleId ?? "fatal"}: ${message}`,
-      ),
-    ]),
+    results.map(({ filePath, messages }) => {
+      return [
+        path.relative(directory, filePath).replaceAll(path.sep, "/"),
+        messages.map(({ column, line, message, ruleId }) => {
+          return `${String(line)}:${String(column)} ${ruleId ?? "fatal"}: ${message}`;
+        }),
+      ];
+    }),
   );
-}
+};
 // Runs `script` as an ES module in the consumer in `directory` and returns what it prints.
-async function run(directory: string, script: string): Promise<string> {
+const run = async (directory: string, script: string): Promise<string> => {
   const { stdout } = await execute(
     process.execPath,
     ["--input-type=module", "--eval", script],
     { cwd: directory },
   );
   return stdout;
-}
+};
 /*
 Calls `createConfig` in the consumer in `directory` with the options of each case, and returns
 the names of the framework blocks for each, or the message that it fails with.
 */
-async function runFrameworkCases(
+const runFrameworkCases = async (
   directory: string,
   cases: Readonly<Record<string, Readonly<Record<string, unknown>>>>,
-): Promise<Readonly<Record<string, unknown>>> {
+): Promise<Readonly<Record<string, unknown>>> => {
   const output = await run(
     directory,
     `
@@ -189,11 +192,15 @@ async function runFrameworkCases(
   );
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The script prints an object.
   return JSON.parse(output) as Readonly<Record<string, unknown>>;
-}
+};
 // `filePaths` without messages, by path.
-function withoutMessages(filePaths: readonly string[]): Messages {
-  return Object.fromEntries(filePaths.map((filePath) => [filePath, []]));
-}
+const withoutMessages = (filePaths: readonly string[]): Messages => {
+  return Object.fromEntries(
+    filePaths.map((filePath) => {
+      return [filePath, []];
+    }),
+  );
+};
 
 const tarball = await createTarball(temporaryDirectory);
 // Three peer sets, installed in parallel: none, a partial set, and every optional peer.
@@ -301,7 +308,7 @@ describe("a consumer without optional peers", () => {
     ).toEqual(withoutMessages(fixturesWithoutPeers));
   }, 120_000);
 
-  // typescript-eslint takes an absolute `tsconfigRootDir` only, and reports any other as a parsing
+  // Typescript-eslint takes an absolute `tsconfigRootDir` only, and reports any other as a parsing
   // error in every file that it reads with type information.
   it.each(relativeRootConfigs)(
     "lints the TypeScript fixtures with type information when %s is a relative path",
@@ -513,7 +520,7 @@ describe("a consumer with a partial peer set", () => {
         "@cravingmaker/eslint-config/react/hooks",
       ],
     });
-    // npm installs svelte-eslint-parser with @html-eslint/eslint-plugin-svelte, whose peer it is.
+    // Npm installs svelte-eslint-parser with @html-eslint/eslint-plugin-svelte, whose peer it is.
     // The parser imports svelte, its optional peer, which is missing. Peers of peers are not
     // checked, so Node's message reaches the consumer.
     expect(svelte).toMatch(/^Cannot find package 'svelte' imported from /u);
@@ -543,7 +550,7 @@ export default createConfig({
     await mkdir(path.join(withAllPeers, "scripts"));
     await writeFile(
       path.join(withAllPeers, "scripts", "build.ts"),
-      "export function build(target: string): string {\n  return target;\n}\n",
+      "export const build = (target: string): string => {\n  return target;\n};\n",
     );
     const messages = await lint(
       withAllPeers,

@@ -332,22 +332,36 @@ export default createConfig({
 });
 ```
 
+The core policy also requires braces around branches, block bodies for arrows,
+and expanded assignments (`value = value + amount` and
+`value = value || fallback`). Prettier preserves those syntax choices; it
+continues to decide indentation, spacing, quotes, and line breaks.
+
 ## Rules that replace other rules
 
-Some plugins check what another plugin's rule also checks. For each such pair, one feature owns the check: while the owner is on, the rule it replaces is off in the files that both features lint. Where the owner does not lint, a replaced rule comes back only if it makes the same check as the owner's rule, so that turning the owner off does not change which code passes. A style rule asks for something else, such as another order of the imports, and is always off.
+Each overlapping check has a fixed owner. The winning rule is enabled in its
+own rule map, and its alternatives are explicitly `"off"`, with a `Handled by`
+comment naming the winner. There are no dynamic overlap or fallback blocks.
 
-| Owner           | Replaced checks                                                                                       | Replaced style rules                                                                                                                                     |
-| --------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import` |                                                                                                                                                          |
-| `perfectionist` |                                                                                                       | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/adjacent-overload-signatures`, `@typescript-eslint/member-ordering` |
-| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                           |                                                                                                                                                          |
-| `unicorn`       | `no-negated-condition`, `n/no-process-exit`, `n/prefer-node-protocol`                                 | `no-warning-comments`                                                                                                                                    |
-| `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                 |                                                                                                                                                          |
+| Winning feature | Rules left off in other features                                                                                                                                                                                                                         |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import`                                                                                                                                                    |
+| `perfectionist` | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/adjacent-overload-signatures`, `@typescript-eslint/member-ordering`                                                                                                 |
+| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                                                                                                                                                                              |
+| `unicorn`       | `no-negated-condition`, `no-warning-comments`, `n/no-process-exit`, `n/prefer-node-protocol`                                                                                                                                                             |
+| `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                                                                                                                                                                    |
+| `javascript`    | `perfectionist/sort-variable-declarations`, `regexp/prefer-named-capture-group`, `unicorn/consistent-arrow-return-style`, `unicorn/logical-assignment-operators`, `unicorn/no-typeof-undefined`, `unicorn/operator-assignment`, `unicorn/try-complexity` |
 
-- Turning the owner off turns the checks it replaces back on. The style rules stay off: without `perfectionist`, nothing checks the order of imports or object keys, and without `unicorn`, nothing reports a to-do comment.
-- Limiting the owner with `files` or `ignores` turns the checks back on outside the owner's files. The style rules stay off there too.
-- `n/no-missing-import` comes back in JavaScript files only. It does not resolve imports as TypeScript does, so it is off in TypeScript files and Svelte components, where the compiler reports a missing module.
-- Setting a replaced rule in the overrides of the feature that holds it turns it on, also where its owner lints, as `node: { overrides: { "n/no-process-exit": "error" } }` does. For `n/no-missing-import`, that includes TypeScript files and Svelte components. For `typescript`, that includes `overridesTypeAware` in the files that [typed linting](#typed-linting) covers. Outside them, a rule that only `overridesTypeAware` sets is still replaced.
+Disabling a winning feature, or limiting it with `files` or `ignores`, leaves
+its alternatives off. The check is absent in those files unless a consumer
+explicitly enables another rule through the owning feature's overrides or a
+user config. Disabled rules do not need options; provide the desired options
+when enabling one. Type-aware overrides still apply only in the typed scope.
+
+TypeScript compiler checks and extension rules keep their language-specific
+ownership in the TypeScript rule maps. These entries apply only in TypeScript
+files and Svelte scripts, and typed replacements only where type information
+is available.
 
 ## File-role exceptions
 

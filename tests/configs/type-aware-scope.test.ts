@@ -99,7 +99,7 @@ afterAll(async () => {
 });
 
 // ESLint for the fixture project with typed linting and `typescript`.
-async function createEslint(typescript: TypeScriptOptions): Promise<ESLint> {
+const createEslint = async (typescript: TypeScriptOptions): Promise<ESLint> => {
   return new ESLint({
     cwd: projectDirectory,
     overrideConfig: await createConfig({
@@ -112,12 +112,12 @@ async function createEslint(typescript: TypeScriptOptions): Promise<ESLint> {
     }),
     overrideConfigFile: true,
   });
-}
+};
 // How each of `filePaths` is linted, by path.
-async function describeTypeInformation(
+const describeTypeInformation = async (
   eslint: ESLint,
   filePaths: readonly string[],
-): Promise<Readonly<Record<string, TypeInformation>>> {
+): Promise<Readonly<Record<string, TypeInformation>>> => {
   return Object.fromEntries(
     await Promise.all(
       filePaths.map(
@@ -131,37 +131,45 @@ async function describeTypeInformation(
             {
               projectService:
                 config?.languageOptions?.parserOptions?.projectService === true,
-              typeAwareRules: typeAwareRuleIds.filter(
-                (ruleId) => (rules.get(ruleId)?.[0] ?? 0) !== 0,
-              ),
+              typeAwareRules: typeAwareRuleIds.filter((ruleId) => {
+                return (rules.get(ruleId)?.[0] ?? 0) !== 0;
+              }),
             },
           ];
         },
       ),
     ),
   );
-}
+};
 // The fatal errors of each of `filePaths`, and whether `ruleId` reports it, by path.
-async function lintByPath(
+const lintByPath = async (
   eslint: ESLint,
   filePaths: readonly string[],
   ruleId: string,
 ): Promise<
   Readonly<Record<string, { fatal: readonly string[]; reported: boolean }>>
-> {
+> => {
   const results = await eslint.lintFiles([...filePaths]);
   return Object.fromEntries(
-    results.map(({ filePath, messages }) => [
-      path.relative(projectDirectory, filePath).replaceAll(path.sep, "/"),
-      {
-        fatal: messages
-          .filter((message) => message.fatal === true)
-          .map((message) => message.message),
-        reported: messages.some((message) => message.ruleId === ruleId),
-      },
-    ]),
+    results.map(({ filePath, messages }) => {
+      return [
+        path.relative(projectDirectory, filePath).replaceAll(path.sep, "/"),
+        {
+          fatal: messages
+            .filter((message) => {
+              return message.fatal === true;
+            })
+            .map((message) => {
+              return message.message;
+            }),
+          reported: messages.some((message) => {
+            return message.ruleId === ruleId;
+          }),
+        },
+      ];
+    }),
   );
-}
+};
 
 describe("overridesWithoutTypeInformation", () => {
   it.each(turnedOff)(

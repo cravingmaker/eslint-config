@@ -189,10 +189,7 @@ const functionalRules: Rules = {
 
   "functional/no-this-expressions": "off", // Project specific
 
-  "functional/no-try-statements": [
-    "off",
-    { allowCatch: false, allowFinally: false },
-  ], // Prefer try statements
+  "functional/no-try-statements": "off", // Prefer try statements
 } as const;
 
 // Rules requiring type information stay off outside typed linting.
@@ -217,18 +214,18 @@ const typeAwareRuleIds = [
 ];
 // The policy for the rules that need type information.
 const typeAwareRules: Rules = Object.fromEntries(
-  Object.entries(functionalRules).filter(([ruleId]) =>
-    Object.hasOwn(typeAwareRulesOff, ruleId),
-  ),
+  Object.entries(functionalRules).filter(([ruleId]) => {
+    return Object.hasOwn(typeAwareRulesOff, ruleId);
+  }),
 );
 
 // Builds the flat config for eslint-plugin-functional. The rules that need type information
 // are off, and turned on again for the type-aware scope when typed linting is on. An override
 // that turns such a rule on applies in that scope only.
-function functional(
+const functional = (
   options: FeatureOptions = {},
   { svelteComponents, typeAware }: Context = defaultContext,
-): Linter.Config[] {
+): Linter.Config[] => {
   const { files, ignores = [], overrides = {} } = options;
 
   return [
@@ -249,7 +246,7 @@ function functional(
         ...overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
       },
     },
-    ...(typeAware === undefined
+    ...(typeof typeAware === "undefined"
       ? []
       : [
           typeAwareConfig("functional", typeAware, options, {
@@ -258,6 +255,6 @@ function functional(
           }),
         ]),
   ];
-}
+};
 
 export { functional };

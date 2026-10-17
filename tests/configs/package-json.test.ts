@@ -13,7 +13,11 @@ describe("package-json feature", () => {
     });
     const ruleId = "enforce-package-type/enforce-package-type";
 
-    expect(configs.map((config) => config.name)).toEqual([
+    expect(
+      configs.map((config) => {
+        return config.name;
+      }),
+    ).toEqual([
       "@cravingmaker/eslint-config/package-json/setup",
       "@cravingmaker/eslint-config/package-json/rules",
     ]);

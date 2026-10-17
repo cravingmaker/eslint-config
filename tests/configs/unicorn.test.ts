@@ -1,9 +1,71 @@
-import { describe, it } from "vitest";
+import { ESLint } from "eslint";
+import { describe, expect, it } from "vitest";
 
+import { createConfig } from "../../dist/index.mjs";
 import { expectLintError, expectNoLintError } from "../utilities.js";
 
 const jsOptions = { filePath: "test.js" } as const;
 const rightArrowText = String.fromCodePoint(45, 62);
+
+describe.each([
+  {
+    operators: ["&&", "||", "??"],
+    ruleId: "logical-assignment-operators",
+  },
+  {
+    operators: ["+", "-", "*", "/", "%", "**"],
+    ruleId: "operator-assignment",
+  },
+])("unicorn/$ruleId", ({ operators, ruleId }) => {
+  it.each(["test.js", "test.ts"])(
+    "leaves the selected core policy in charge and keeps fixes stable in %s",
+    async (filePath) => {
+      const overrideConfig = await createConfig();
+      const eslint = new ESLint({ overrideConfig, overrideConfigFile: true });
+      const code = [
+        "export const update = (state, fallback) => {",
+        ...operators.map((operator) => {
+          return `  state.value ${operator}= fallback;`;
+        }),
+        "  return state;",
+        "};\n",
+      ].join("\n");
+      const [original] = await eslint.lintText(code, { filePath });
+      const ruleIds = original.messages.map((message) => {
+        return message.ruleId;
+      });
+
+      expect(
+        ruleIds.filter((id) => {
+          return id === ruleId;
+        }),
+      ).toHaveLength(operators.length);
+      expect(
+        ruleIds.filter((id) => {
+          return id === `unicorn/${ruleId}`;
+        }),
+      ).toHaveLength(0);
+
+      const fixingEslint = new ESLint({
+        fix: true,
+        overrideConfig,
+        overrideConfigFile: true,
+      });
+      const expanded = [
+        "export const update = (state, fallback) => {",
+        ...operators.map((operator) => {
+          return `  state.value = state.value ${operator} fallback;`;
+        }),
+        "  return state;",
+        "};\n",
+      ].join("\n");
+      const [fixed] = await fixingEslint.lintText(expanded, { filePath });
+
+      expect(fixed.messages).toEqual([]);
+      expect(fixed.output).toBeUndefined();
+    },
+  );
+});
 
 describe("unicorn rules", () => {
   it("unicorn/filename-case: allows PascalCase filenames", async () => {

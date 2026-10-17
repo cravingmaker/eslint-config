@@ -93,7 +93,7 @@ afterAll(async () => {
 });
 
 // How `filePath` is scoped.
-async function describeScope(filePath: string): Promise<Scope> {
+const describeScope = async (filePath: string): Promise<Scope> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
@@ -101,22 +101,23 @@ async function describeScope(filePath: string): Promise<Scope> {
   return {
     projectService:
       config?.languageOptions?.parserOptions?.projectService === true,
-    rules: ruleIds.filter((ruleId) => (rules.get(ruleId)?.[0] ?? 0) !== 0),
+    rules: ruleIds.filter((ruleId) => {
+      return (rules.get(ruleId)?.[0] ?? 0) !== 0;
+    }),
   };
-}
+};
 // How each of `filePaths` is scoped, by path.
-async function describeScopes(
+const describeScopes = async (
   filePaths: readonly string[],
-): Promise<Readonly<Record<string, Scope>>> {
+): Promise<Readonly<Record<string, Scope>>> => {
   return Object.fromEntries(
     await Promise.all(
-      filePaths.map(async (filePath): Promise<readonly [string, Scope]> => [
-        filePath,
-        await describeScope(filePath),
-      ]),
+      filePaths.map(async (filePath): Promise<readonly [string, Scope]> => {
+        return [filePath, await describeScope(filePath)];
+      }),
     ),
   );
-}
+};
 
 describe("features scoped to workspaces", () => {
   it("apply in their workspace only, even where the root declares no framework", async () => {
@@ -149,18 +150,21 @@ describe("features scoped to workspaces", () => {
 
     // A message without a rule is a parsing error, or says that ESLint did not lint the file.
     expect(
-      results.flatMap(({ messages }) =>
-        messages
-          .filter(({ ruleId }) => typeof ruleId !== "string")
-          .map(({ message }) => message),
-      ),
+      results.flatMap(({ messages }) => {
+        return messages
+          .filter(({ ruleId }) => {
+            return typeof ruleId !== "string";
+          })
+          .map(({ message }) => {
+            return message;
+          });
+      }),
     ).toEqual([]);
     expect(await describeScopes(filePaths)).toEqual(
       Object.fromEntries(
-        filePaths.map((filePath) => [
-          filePath,
-          { projectService: false, rules: [] },
-        ]),
+        filePaths.map((filePath) => {
+          return [filePath, { projectService: false, rules: [] }];
+        }),
       ),
     );
   });
@@ -169,10 +173,14 @@ describe("features scoped to workspaces", () => {
     const [result] = await eslint.lintFiles(["packages/api/src/handle.ts"]);
 
     expect(
-      result.messages.map(
-        ({ fatal, ruleId }) => ruleId ?? `fatal: ${String(fatal)}`,
-      ),
+      result.messages.map(({ fatal, ruleId }) => {
+        return ruleId ?? `fatal: ${String(fatal)}`;
+      }),
     ).toContain("@typescript-eslint/no-floating-promises");
-    expect(result.messages.filter(({ fatal }) => fatal === true)).toEqual([]);
+    expect(
+      result.messages.filter(({ fatal }) => {
+        return fatal === true;
+      }),
+    ).toEqual([]);
   });
 });

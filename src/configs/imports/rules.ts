@@ -191,68 +191,24 @@ const importsRules: Rules = {
     },
   ],
 
-  "import-x/max-dependencies": ["off", { ignoreTypeImports: false, max: 10 }], // Prefer no dependency count limit
-  "import-x/no-cycle": [
-    "off",
-    {
-      allowUnsafeDynamicCyclicDependency: false,
-      amd: false,
-      commonjs: false,
-      esmodule: true,
-      ignore: undefined,
-      ignoreExternal: false,
-      maxDepth: Infinity,
-    },
-  ], // Prefer lightweight workflow, it's computationally expensive
+  "import-x/max-dependencies": "off", // Prefer no dependency count limit
+  "import-x/no-cycle": "off", // Prefer lightweight workflow, it's computationally expensive
   "import-x/no-named-export": "off", // Prefer named export
-  "import-x/no-nodejs-modules": ["off", { allow: [] }], // Prefer built-in Node.js modules
+  "import-x/no-nodejs-modules": "off", // Prefer built-in Node.js modules
   // Its schema requires an active export check whenever options are supplied.
   "import-x/no-unused-modules": "off", // Prefer flat config, it's only compatible with legacy configs
-  "import-x/prefer-default-export": ["off", { target: "single" }], // Prefer named export
-  "import-x/prefer-namespace-import": ["off", { patterns: undefined }], // Prefer named import, with default import as fallback
+  "import-x/prefer-default-export": "off", // Prefer named export
+  "import-x/prefer-namespace-import": "off", // Prefer named import, with default import as fallback
 
-  "import-x/no-internal-modules": ["off", { allow: [] }], // Project specific
-  "import-x/no-relative-parent-imports": [
-    "off",
-    { amd: false, commonjs: false, esmodule: true, ignore: undefined },
-  ], // Project specific
-  "import-x/no-restricted-paths": [
-    "off",
-    { basePath: undefined, zones: undefined },
-  ], // Project specific
+  "import-x/no-internal-modules": "off", // Project specific
+  "import-x/no-relative-parent-imports": "off", // Project specific
+  "import-x/no-restricted-paths": "off", // Project specific
 
-  "import-x/dynamic-import-chunkname": [
-    "off",
-    {
-      allowEmpty: false,
-      importFunctions: [],
-      webpackChunknameFormat: String.raw`([0-9a-zA-Z-_/.]|\[(request|index)\])+`,
-    },
-  ], // Project specific, only target Webpack
+  "import-x/dynamic-import-chunkname": "off", // Project specific, only target Webpack
   "import-x/no-webpack-loader-syntax": "off", // Project specific, only target Webpack
 
-  "import-x/first": ["off", "disable-absolute-first"], // Covered by `perfectionist/sort-imports`, see src/overlaps.ts
-  "import-x/order": [
-    "off",
-    {
-      alphabetize: {
-        caseInsensitive: false,
-        order: "ignore",
-        orderImportKind: "ignore",
-      },
-      consolidateIslands: undefined,
-      distinctGroup: true,
-      groups: ["builtin", "external", "parent", "sibling", "index"],
-      named: false,
-      "newlines-between": "ignore",
-      // The schema allows these only with type sorting or separated groups enabled.
-      "newlines-between-types": undefined,
-      pathGroups: [],
-      pathGroupsExcludedImportTypes: ["builtin", "external", "object"],
-      sortTypesGroup: false,
-      warnOnUnassignedImports: false,
-    },
-  ], // Covered by `perfectionist/sort-imports`, see src/overlaps.ts
+  "import-x/first": "off", // Handled by `perfectionist/sort-imports`.
+  "import-x/order": "off", // Handled by `perfectionist/sort-imports`.
 } as const;
 
 export { importsRules };
