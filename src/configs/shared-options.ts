@@ -59,21 +59,6 @@ const noUnusedExpressionsOptions = {
   ignoreDirectives: false,
 } as const;
 
-// eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
-const noUnusedVarsOptions = {
-  args: "after-used",
-  argsIgnorePattern: "^_",
-  caughtErrors: "all",
-  caughtErrorsIgnorePattern: "^_",
-  destructuredArrayIgnorePattern: "^_",
-  ignoreClassWithStaticInitBlock: false,
-  ignoreRestSiblings: true,
-  ignoreUsingDeclarations: false,
-  reportUsedIgnorePattern: false,
-  vars: "all",
-  varsIgnorePattern: "^_",
-} as const;
-
 const noUseBeforeDefineOptions = {
   allowNamedExports: false,
   classes: true,
@@ -112,7 +97,6 @@ export {
   noEmptyFunctionOptions,
   noShadowOptions,
   noUnusedExpressionsOptions,
-  noUnusedVarsOptions,
   noUseBeforeDefineOptions,
   preferDestructuring1stOptions,
   preferDestructuring2ndOptions,

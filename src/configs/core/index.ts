@@ -1,33 +1,11 @@
 import type { Linter } from "eslint";
-import type { Context, FeatureOptions, Rules } from "../../types.js";
-
-import { builtinRules } from "eslint/use-at-your-own-risk";
+import type { Context, FeatureOptions } from "../../types.js";
 
 import { defaultContext } from "../../context.js";
 import { jsxFiles, sourceFiles, withSvelteComponents } from "../../globs.js";
-import { possibleProblemRules } from "./possible-problems.js";
-import { suggestionRules } from "./suggestions.js";
+import { supportedCoreRules } from "./rules.js";
 import { narrowFiles } from "../../utilities/file-scope.js";
-import { supportedRuleOptions } from "../../utilities/plugin-policy.js";
 
-// Policy for every non-deprecated ESLint core rule, shared by JavaScript and TypeScript files.
-const coreRules: Rules = {
-  ...possibleProblemRules, // 59/199 rules, 0 automatically fixable, 10 manually fixable.
-  ...suggestionRules, // 140/199 rules
-};
-
-// Earlier supported ESLint versions can predate a declared option.
-const supportedCoreRules: Rules = Object.fromEntries(
-  Object.entries(coreRules).map(([id, entry]) => [
-    id,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- Read the host rule's schema to preserve the supported ESLint peer range.
-    supportedRuleOptions(entry, builtinRules.get(id)),
-  ]),
-);
-
-// Builds the flat config of the `javascript` feature: ESLint's built-in rules on JavaScript and
-// TypeScript files, which are ES modules, and on the scripts of Svelte components. JSX parses in
-// `.jsx` files without any React plugin.
 function core(
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { globals, svelteComponents }: Context = defaultContext,
@@ -55,4 +33,6 @@ function core(
   ];
 }
 
-export { core, coreRules };
+export { core };
+
+export { coreRules } from "./rules.js";

@@ -8,7 +8,6 @@ import { sourceFiles, withSvelteComponents } from "../../../globs.js";
 import { unusedImportsRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 
-// Builds the flat config for eslint-plugin-unused-imports.
 const unusedImports = (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { svelteComponents }: Context = defaultContext,

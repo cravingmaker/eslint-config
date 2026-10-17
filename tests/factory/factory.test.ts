@@ -107,6 +107,7 @@ describe("createConfig", () => {
       "html",
       "json",
       "package-json",
+      "enforce-package-type",
       "markdown",
       "exceptions",
     ]);
@@ -191,6 +192,7 @@ describe("createConfig", () => {
       "json/rules-json5",
       "package-json/setup",
       "package-json/rules",
+      "enforce-package-type/rules",
       "markdown/setup",
       "markdown/rules",
       "exceptions/config-files",

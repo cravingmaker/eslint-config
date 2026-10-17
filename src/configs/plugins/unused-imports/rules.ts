@@ -1,12 +1,7 @@
 import type { Rules } from "../../../types.js";
 
-import {
-  // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
-  noUnusedVarsOptions,
-} from "../../shared-options.js";
-
-// Policy for eslint-plugin-unused-imports.
 const unusedImportsRules: Rules = {
+  // --- Rules with default options (1/1) ------------------------------------------------------------------------------------------------------------
   "unused-imports/no-unused-imports": [
     "error",
     {
@@ -25,10 +20,24 @@ const unusedImportsRules: Rules = {
     },
   ],
 
+  // --- Rules with overridden options (1/1) ---------------------------------------------------------------------------------------------------------
   "unused-imports/no-unused-vars": [
     "error",
-    { enableAutofixRemoval: { imports: false }, ...noUnusedVarsOptions },
+    {
+      args: "after-used",
+      argsIgnorePattern: "^_",
+      caughtErrors: "all",
+      caughtErrorsIgnorePattern: "^_",
+      destructuredArrayIgnorePattern: "^_",
+      enableAutofixRemoval: { imports: false },
+      ignoreClassWithStaticInitBlock: false,
+      ignoreRestSiblings: true,
+      ignoreUsingDeclarations: false,
+      reportUsedIgnorePattern: false,
+      vars: "all",
+      varsIgnorePattern: "^_",
+    },
   ],
 };
 
-export { unusedImportsRules };
+export { unusedImportsRules }; // 2 rules, 2 automatically fixable, 0 editor suggestions fixable.

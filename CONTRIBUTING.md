@@ -113,10 +113,13 @@ public types from `src/types.ts`. Everything else is internal.
    own folders directly under `src/configs/`; shared options also stay there.
    Every feature has its builder in `index.ts` and its rule maps in modules
    of their own. Upstream categories have named modules, as in
-   `core/possible-problems.ts`;
+   `core/rules/possible-problems.ts`;
    features without official categories keep their policy in `rules.ts`.
    When a feature has several category modules, its `rules.ts` composes
-   their maps. The core builder composes its maps directly in `index.ts`.
+   their maps, including the core feature's `rules.ts`. The package-json
+   feature also groups its category modules under `rules/`.
+   The `packageJson` option composes two plugin builders, in separate
+   `package-json/` and `enforce-package-type/` folders.
 4. Each feature declares disabled alternatives in its own rule map, with a
    `Handled by` comment naming the winning rule. There are no dynamic overlap
    blocks. `src/configs/exceptions/index.ts` adds file-role exceptions.
@@ -157,27 +160,28 @@ The package-json feature follows the upstream README's Require Properties
 and Valid Properties categories; its remaining rules are in `other-rules.ts`.
 The table lists each feature's policy entry points:
 
-| Rule ID prefix                                          | Feature         | Policy modules                                                                                                  |
-| ------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------- |
-| None: ESLint core rules                                 | `javascript`    | `src/configs/core/possible-problems.ts`, `suggestions.ts`, and `src/configs/plugins/typescript/replacements.ts` |
-| `@typescript-eslint/`                                   | `typescript`    | `src/configs/plugins/typescript/rules.ts`, `rules-type-aware.ts`, and `replacements.ts`                         |
-| `@eslint-community/eslint-comments/`                    | `comments`      | `src/configs/plugins/comments/rules.ts`                                                                         |
-| `n/`                                                    | `node`          | `src/configs/plugins/node/rules.ts`                                                                             |
-| `security/`                                             | `security`      | `src/configs/plugins/security/rules.ts`                                                                         |
-| `import-x/`                                             | `imports`       | `src/configs/plugins/imports/rules.ts`                                                                          |
-| `unused-imports/`                                       | `unusedImports` | `src/configs/plugins/unused-imports/rules.ts`                                                                   |
-| `promise/`                                              | `promise`       | `src/configs/plugins/promise/rules.ts`                                                                          |
-| `regexp/`                                               | `regexp`        | `src/configs/plugins/regexp/rules.ts`                                                                           |
-| `unicorn/`                                              | `unicorn`       | `src/configs/plugins/unicorn/rules.ts`                                                                          |
-| `functional/`                                           | `functional`    | `src/configs/plugins/functional/rules.ts` and `rules-type-aware.ts`                                             |
-| `perfectionist/`                                        | `perfectionist` | `src/configs/plugins/perfectionist/rules.ts`                                                                    |
-| `@html-eslint/react/`, `react-hooks/`, `react-refresh/` | `react`         | `src/configs/plugins/react/rules.ts`                                                                            |
-| `@html-eslint/svelte/`                                  | `svelte`        | `src/configs/plugins/svelte/rules.ts`                                                                           |
-| `express-security/`                                     | `express`       | `src/configs/plugins/express/rules.ts`                                                                          |
-| `@html-eslint/`                                         | `html`          | `src/configs/plugins/html/rules.ts`                                                                             |
-| `json/`                                                 | `json`          | `src/configs/plugins/json/rules.ts`                                                                             |
-| `package-json/`, `enforce-package-type/`                | `packageJson`   | `src/configs/plugins/package-json/rules.ts`                                                                     |
-| `markdown/`                                             | `markdown`      | `src/configs/plugins/markdown/rules.ts`                                                                         |
+| Rule ID prefix                                          | Feature         | Policy modules                                                                                                           |
+| ------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| None: ESLint core rules                                 | `javascript`    | `src/configs/core/rules.ts`, its category modules in `core/rules/`, and `src/configs/plugins/typescript/replacements.ts` |
+| `@typescript-eslint/`                                   | `typescript`    | `src/configs/plugins/typescript/rules.ts`, `rules-type-aware.ts`, and `replacements.ts`                                  |
+| `@eslint-community/eslint-comments/`                    | `comments`      | `src/configs/plugins/comments/rules.ts`                                                                                  |
+| `n/`                                                    | `node`          | `src/configs/plugins/node/rules.ts`                                                                                      |
+| `security/`                                             | `security`      | `src/configs/plugins/security/rules.ts`                                                                                  |
+| `import-x/`                                             | `imports`       | `src/configs/plugins/import-x/rules.ts`                                                                                  |
+| `unused-imports/`                                       | `unusedImports` | `src/configs/plugins/unused-imports/rules.ts`                                                                            |
+| `promise/`                                              | `promise`       | `src/configs/plugins/promise/rules.ts`                                                                                   |
+| `regexp/`                                               | `regexp`        | `src/configs/plugins/regexp/rules.ts`                                                                                    |
+| `unicorn/`                                              | `unicorn`       | `src/configs/plugins/unicorn/rules.ts`                                                                                   |
+| `functional/`                                           | `functional`    | `src/configs/plugins/functional/rules.ts` and `rules-type-aware.ts`                                                      |
+| `perfectionist/`                                        | `perfectionist` | `src/configs/plugins/perfectionist/rules.ts`                                                                             |
+| `@html-eslint/react/`, `react-hooks/`, `react-refresh/` | `react`         | `src/configs/plugins/react/rules.ts`                                                                                     |
+| `@html-eslint/svelte/`                                  | `svelte`        | `src/configs/plugins/svelte/rules.ts`                                                                                    |
+| `express-security/`                                     | `express`       | `src/configs/plugins/express/rules.ts`                                                                                   |
+| `@html-eslint/`                                         | `html`          | `src/configs/plugins/html/rules.ts`                                                                                      |
+| `json/`                                                 | `json`          | `src/configs/plugins/json/rules.ts`                                                                                      |
+| `package-json/`                                         | `packageJson`   | `src/configs/plugins/package-json/rules.ts`                                                                              |
+| `enforce-package-type/`                                 | `packageJson`   | `src/configs/plugins/enforce-package-type/rules.ts`                                                                      |
+| `markdown/`                                             | `markdown`      | `src/configs/plugins/markdown/rules.ts`                                                                                  |
 
 Every current non-deprecated core and plugin rule has an explicit setting
 in its owning rule map, including the rules that are off. The maps declare

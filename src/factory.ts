@@ -7,10 +7,11 @@ import { core } from "./configs/core/index.js";
 import { exceptions } from "./configs/exceptions/index.js";
 import { ignores } from "./configs/ignores/index.js";
 import { comments } from "./configs/plugins/comments/index.js";
+import { enforcePackageType } from "./configs/plugins/enforce-package-type/index.js";
 import { express } from "./configs/plugins/express/index.js";
 import { functional } from "./configs/plugins/functional/index.js";
 import { html } from "./configs/plugins/html/index.js";
-import { imports } from "./configs/plugins/imports/index.js";
+import { imports } from "./configs/plugins/import-x/index.js";
 import { json } from "./configs/plugins/json/index.js";
 import { markdown } from "./configs/plugins/markdown/index.js";
 import { node } from "./configs/plugins/node/index.js";
@@ -77,6 +78,7 @@ const createConfig = async (
     ...buildFeature(resolved.html, html, context),
     ...buildFeature(resolved.json, json, context),
     ...buildFeature(resolved.packageJson, packageJson, context),
+    ...buildFeature(resolved.packageJson, enforcePackageType, context),
     ...buildFeature(resolved.markdown, markdown, context),
     ...exceptions(resolved),
     ...userConfigs,

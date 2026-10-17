@@ -260,6 +260,18 @@ describe("the packed package", () => {
       exported: ["createConfig"],
     });
   });
+
+  it("exports its package.json from the installed package", async () => {
+    const output = await run(
+      withoutPeers,
+      `
+        import manifest from "@cravingmaker/eslint-config/package.json" with { type: "json" };
+        process.stdout.write(manifest.name);
+      `,
+    );
+
+    expect(output).toBe("@cravingmaker/eslint-config");
+  });
 });
 
 describe("a consumer without optional peers", () => {

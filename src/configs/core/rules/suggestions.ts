@@ -1,4 +1,4 @@
-import type { Rules } from "../../types.js";
+import type { Rules } from "../../../types.js";
 
 import {
   classMethodsUseThisOptions,
@@ -11,7 +11,7 @@ import {
   preferDestructuring1stOptions,
   preferDestructuring2ndOptions,
   preferPromiseRejectErrorsOptions,
-} from "../shared-options.js";
+} from "../../shared-options.js";
 
 const recommendedRules: Rules = {
   // --- Rules with default options (17/17) ----------------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (68/123) ---------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (67/122) ---------------------------------------------------------------------------------------------------------
   "accessor-pairs": [
     "error",
     {
@@ -66,12 +66,12 @@ const otherRules: Rules = {
       ...classMethodsUseThisOptions,
     },
   ],
-  curly: "error", // Override `eslint-config-prettier`
+  curly: "error", // Override `eslint-config-prettier`. Automatically fixable by the --fix command.
   "default-case": ["error", { commentPattern: undefined }],
   "default-case-last": "error",
   "default-param-last": "error",
-  "dot-notation": ["error", { allowPattern: "", ...dotNotationOptions }],
-  eqeqeq: ["error", "always", { null: "always" }],
+  "dot-notation": ["error", { allowPattern: "", ...dotNotationOptions }], // Automatically fixable by the --fix command.
+  eqeqeq: ["error", "always", { null: "always" }], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "func-names": ["error", "always", { generators: "always" }],
   "func-style": [
     "error",
@@ -84,7 +84,7 @@ const otherRules: Rules = {
   ],
   "guard-for-in": "error",
   "no-alert": "error",
-  "no-array-constructor": "error",
+  "no-array-constructor": "error", // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "no-bitwise": [
     "error",
     {
@@ -93,12 +93,12 @@ const otherRules: Rules = {
     },
   ],
   "no-caller": "error",
-  "no-empty-function": ["error", { ...noEmptyFunctionOptions }],
+  "no-empty-function": ["error", { ...noEmptyFunctionOptions }], // Manually fixable by editor suggestions.
   "no-eq-null": "error",
   "no-eval": ["error", { allowIndirect: false }],
   "no-extend-native": ["error", { exceptions: [] }],
-  "no-extra-bind": "error",
-  "no-extra-label": "error",
+  "no-extra-bind": "error", // Automatically fixable by the --fix command.
+  "no-extra-label": "error", // Automatically fixable by the --fix command.
   "no-implicit-coercion": [
     "error",
     {
@@ -108,7 +108,7 @@ const otherRules: Rules = {
       number: true,
       string: true,
     },
-  ],
+  ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "no-implicit-globals": ["error", { lexicalBindings: false }],
   "no-implied-eval": "error",
   "no-iterator": "error",
@@ -121,7 +121,7 @@ const otherRules: Rules = {
     },
   ],
   "no-lone-blocks": "error",
-  "no-lonely-if": "error",
+  "no-lonely-if": "error", // Automatically fixable by the --fix command.
   "no-loop-func": "error",
   "no-multi-assign": ["error", { ignoreNonDeclaration: false }],
   "no-multi-str": "error",
@@ -129,18 +129,18 @@ const otherRules: Rules = {
   "no-new": "error",
   "no-new-func": "error",
   "no-new-wrappers": "error",
-  "no-object-constructor": "error",
+  "no-object-constructor": "error", // Manually fixable by editor suggestions.
   "no-octal-escape": "error",
   "no-proto": "error",
   "no-script-url": "error",
   "no-throw-literal": "error",
-  "no-undef-init": "error",
+  "no-undef-init": "error", // Automatically fixable by the --fix command.
   "no-undefined": "error",
-  "no-unneeded-ternary": ["error", { defaultAssignment: true }],
+  "no-unneeded-ternary": ["error", { defaultAssignment: true }], // Automatically fixable by the --fix command.
   "no-useless-call": "error",
-  "no-useless-computed-key": ["error", { enforceForClassMembers: true }],
+  "no-useless-computed-key": ["error", { enforceForClassMembers: true }], // Automatically fixable by the --fix command.
   "no-useless-concat": "error",
-  "no-useless-constructor": "error",
+  "no-useless-constructor": "error", // Manually fixable by editor suggestions.
   "no-useless-rename": [
     "error",
     {
@@ -148,32 +148,31 @@ const otherRules: Rules = {
       ignoreExport: false,
       ignoreImport: false,
     },
-  ],
-  "no-useless-return": "error",
-  "no-var": "error",
+  ], // Automatically fixable by the --fix command.
+  "no-useless-return": "error", // Automatically fixable by the --fix command.
+  "no-var": "error", // Automatically fixable by the --fix command.
   "prefer-arrow-callback": [
     "error",
     {
       allowNamedFunctions: false,
       allowUnboundThis: true,
     },
-  ],
-  "prefer-exponentiation-operator": "error",
-  "prefer-named-capture-group": "error",
-  "prefer-numeric-literals": "error",
-  "prefer-object-has-own": "error",
-  "prefer-object-spread": "error",
+  ], // Automatically fixable by the --fix command.
+  "prefer-exponentiation-operator": "error", // Automatically fixable by the --fix command.
+  "prefer-named-capture-group": "error", // Manually fixable by editor suggestions.
+  "prefer-numeric-literals": "error", // Automatically fixable by the --fix command.
+  "prefer-object-has-own": "error", // Automatically fixable by the --fix command.
+  "prefer-object-spread": "error", // Automatically fixable by the --fix command.
   "prefer-promise-reject-errors": [
     "error",
     { ...preferPromiseRejectErrorsOptions },
   ],
   "prefer-rest-params": "error",
   "prefer-spread": "error",
-  "prefer-template": "error",
-  radix: "error",
-  "require-await": "error",
+  "prefer-template": "error", // Automatically fixable by the --fix command.
+  radix: "error", // Manually fixable by editor suggestions.
+  "require-await": "error", // Manually fixable by editor suggestions.
   "symbol-description": "error",
-  "unicode-bom": ["error", "never"],
   yoda: [
     "error",
     "never",
@@ -181,10 +180,10 @@ const otherRules: Rules = {
       exceptRange: false,
       onlyEquality: false,
     },
-  ],
+  ], // Automatically fixable by the --fix command.
 
-  // --- Rules with overridden options (27/123) ------------------------------------------------------------------------------------------------------
-  "arrow-body-style": ["error", "always"],
+  // --- Rules with overridden options (27/122) ------------------------------------------------------------------------------------------------------
+  "arrow-body-style": ["error", "always"], // Automatically fixable by the --fix command.
   "capitalized-comments": [
     "error",
     "always",
@@ -193,7 +192,7 @@ const otherRules: Rules = {
       ignoreInlineComments: true,
       ignorePattern: "",
     },
-  ],
+  ], // Automatically fixable by the --fix command.
   complexity: [
     "error",
     {
@@ -214,7 +213,7 @@ const otherRules: Rules = {
     "getBeforeSet",
     { enforceForTSTypes: true },
   ],
-  "logical-assignment-operators": ["error", "never"],
+  "logical-assignment-operators": ["error", "never"], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "max-params": [
     "error",
     {
@@ -222,7 +221,7 @@ const otherRules: Rules = {
       ...maxParamsOptions,
     },
   ],
-  "no-else-return": ["error", { allowElseIf: false }],
+  "no-else-return": ["error", { allowElseIf: false }], // Automatically fixable by the --fix command.
   "no-param-reassign": ["error", { props: false }],
   "no-restricted-globals": [
     "error",
@@ -251,23 +250,23 @@ const otherRules: Rules = {
       ignoreConstructors: true,
       methodsIgnorePattern: undefined,
     },
-  ],
-  "one-var": ["error", "never"],
-  "operator-assignment": ["error", "never"],
+  ], // Automatically fixable by the --fix command.
+  "one-var": ["error", "never"], // Automatically fixable by the --fix command.
+  "operator-assignment": ["error", "never"], // Automatically fixable by the --fix command.
   "prefer-const": [
     "error",
     {
       destructuring: "all",
       ignoreReadBeforeAssign: false,
     },
-  ],
+  ], // Automatically fixable by the --fix command.
   "prefer-destructuring": [
     "error",
     { ...preferDestructuring1stOptions },
     { ...preferDestructuring2ndOptions },
-  ],
-  "prefer-regex-literals": ["error", { disallowRedundantWrapping: true }],
-  "require-unicode-regexp": ["error", { requireFlag: undefined }], // Adding either flag can change matching behavior, so review existing patterns.
+  ], // Automatically fixable by the --fix command.
+  "prefer-regex-literals": ["error", { disallowRedundantWrapping: true }], // Manually fixable by editor suggestions.
+  "require-unicode-regexp": ["error", { requireFlag: undefined }], // Adding either flag can change matching behavior, so review existing patterns. Manually fixable by editor suggestions.
 
   "max-depth": ["warn", { max: 3 }],
   "max-lines": [
@@ -296,10 +295,10 @@ const otherRules: Rules = {
     },
   ],
 
-  // --- Turned off rules (28/123) -------------------------------------------------------------------------------------------------------------------
+  // --- Turned off rules (28/122) -------------------------------------------------------------------------------------------------------------------
   "no-negated-condition": "off", // Handled by `unicorn/no-negated-condition`.
   "no-warning-comments": "off", // Handled by `unicorn/expiring-todo-comments`.
-  "sort-imports": "off", // Handled by `perfectionist/sort-imports`.
+  "sort-imports": "off", // Handled by `perfectionist/sort-imports`. Automatically fixable by the --fix command.
   "sort-keys": "off", // Handled by `perfectionist/sort-objects`.
 
   "vars-on-top": "off", // Unnecessary, see `no-var`.
@@ -313,9 +312,9 @@ const otherRules: Rules = {
   "max-classes-per-file": "off", // Prefer cohesive class organization over arbitrary per-file limits.
   "max-statements": "off", // Prefer meaningful complexity checks over arbitrary statement limits.
   "new-cap": "off", // Prefer explicit constructor semantics over capitalization-based assumptions.
-  "no-console": "off", // Prefer to allow console output in scripts and CLIs; apply logging restrictions where needed.
+  "no-console": "off", // Prefer to allow console output in scripts and CLIs; apply logging restrictions where needed. Manually fixable by editor suggestions.
   "no-continue": "off", // Prefer early iteration skipping when it reduces unnecessary nesting.
-  "no-div-regex": "off", // Prefer natural regex syntax over unnecessary character classes.
+  "no-div-regex": "off", // Prefer natural regex syntax over unnecessary character classes. Automatically fixable by the --fix command.
   "no-inline-comments": "off", // Prefer to allow concise inline comments when they clarify adjacent code.
   "no-invalid-this": "off", // Prefer TypeScript's strict/noImplicitThis checks where available.
   "no-magic-numbers": "off", // Prefer named constants for meaningful domain values without unnecessarily restricting literals.
@@ -325,13 +324,13 @@ const otherRules: Rules = {
   "no-restricted-syntax": "off", // Prefer targeted rules; broad syntax restrictions need a concrete justification.
   "no-ternary": "off", // Prefer conditional expressions to avoid unnecessary branching statements.
   "no-underscore-dangle": "off", // Prefer to allow underscores for naming conventions, unused bindings, and external API compatibility.
-  "sort-vars": "off", // Prefer declaration order based on dependencies and readability.
-  strict: "off", // Prefer to configure strictness separately for scripts; ES modules are implicitly strict.
+  "sort-vars": "off", // Prefer declaration order based on dependencies and readability. Automatically fixable by the --fix command.
+  strict: "off", // Prefer to configure strictness separately for scripts; ES modules are implicitly strict. Automatically fixable by the --fix command.
 };
 
 const suggestionRules: Rules = {
-  ...recommendedRules, // 17/140 rules, 2/17 automatically fixable, 6/17 manually fixable.
-  ...otherRules, // 123/140 rules, -/123 automatically fixable, -/123 manually fixable.
+  ...recommendedRules, // 17/139 rules, 3 automatically fixable, 6 editor suggestions fixable.
+  ...otherRules, // 122/139 rules, 34 automatically fixable, 13 editor suggestions fixable.
 } as const;
 
 export { suggestionRules };
