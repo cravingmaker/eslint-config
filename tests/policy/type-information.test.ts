@@ -1,5 +1,4 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- The project is written to a temporary directory. */
-
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -23,7 +22,9 @@ type Plugin = {
       string,
       | {
           readonly meta?: {
-            readonly docs?: { readonly requiresTypeChecking?: boolean };
+            readonly docs?: {
+              readonly requiresTypeChecking?: boolean;
+            };
           };
         }
       | undefined
@@ -40,7 +41,6 @@ type Shape = readonly [
   typed: readonly string[],
   overridden?: Readonly<Record<string, readonly unknown[]>>,
 ];
-
 /*
 A module with what the rules of `functional` and `node` ask for type information about, which
 they do only when they find it: an expression statement, a constant without a type annotation, a
@@ -88,9 +88,9 @@ const typedSources = [
   "src/types.d.ts",
   "src/view.tsx",
 ];
-const writtenSources = typedSources.filter(
-  (filePath) => !filePath.startsWith("src/generated/"),
-);
+const writtenSources = typedSources.filter((filePath) => {
+  return !filePath.startsWith("src/generated/");
+});
 // Typed linting that leaves out the script, which no tsconfig includes.
 const withoutScripts = {
   ignoresTypeAware: ["scripts/**"],
@@ -289,7 +289,6 @@ be the TypeScript files and the Svelte components.
 const undeclaredRules = new Map([
   ["n/no-sync", [".mts", ".svelte", ".ts", ".tsx"]],
 ]);
-
 const projectDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-type-information-"),
 );
@@ -313,13 +312,11 @@ await Promise.all(
     await writeFile(filePath, content, "utf8");
   }),
 );
-
 afterAll(async () => {
   await rm(projectDirectory, { force: true, recursive: true });
 });
-
 // ESLint for the project with every framework on, so that their rules are checked as well.
-async function createEslint(options: ConfigOptions): Promise<ESLint> {
+const createEslint = async (options: ConfigOptions): Promise<ESLint> => {
   return new ESLint({
     cwd: projectDirectory,
     overrideConfig: await createConfig({
@@ -331,47 +328,20 @@ async function createEslint(options: ConfigOptions): Promise<ESLint> {
     }),
     overrideConfigFile: true,
   });
-}
-// How ESLint resolves `filePath`: whether the parser reads type information, and the rules that
-// need it there and are on, apart from those that check for it themselves.
-async function describeTypeInformation(
+};
+const getEffectiveConfig = async (
   eslint: ESLint,
   filePath: string,
-): Promise<{
-  readonly projectService: boolean;
-  readonly typeAwareRules: readonly string[];
-}> {
-  const config = await getEffectiveConfig(eslint, filePath);
-  const plugins = new Map(Object.entries(config?.plugins ?? {}));
-  return {
-    projectService:
-      config?.languageOptions?.parserOptions?.projectService === true,
-    typeAwareRules: Object.entries(config?.rules ?? {})
-      .filter(
-        ([ruleId, [severity]]) =>
-          severity !== 0 &&
-          !selfCheckingRules.has(ruleId) &&
-          (requiresTypeInformation(plugins, ruleId) ||
-            (undeclaredRules.get(ruleId) ?? []).some((extension) =>
-              filePath.endsWith(extension),
-            )),
-      )
-      .map(([ruleId]) => ruleId),
-  };
-}
-async function getEffectiveConfig(
-  eslint: ESLint,
-  filePath: string,
-): Promise<EffectiveConfig | undefined> {
+): Promise<EffectiveConfig | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   return (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
-}
+};
 // Whether the rule declares that it needs type information.
-function requiresTypeInformation(
+const requiresTypeInformation = (
   plugins: ReadonlyMap<string, Plugin | undefined>,
   ruleId: string,
-): boolean {
+): boolean => {
   const slash = ruleId.lastIndexOf("/");
   const plugin = plugins.get(ruleId.slice(0, slash));
   const rules = new Map(Object.entries(plugin?.rules ?? {}));
@@ -379,43 +349,68 @@ function requiresTypeInformation(
     rules.get(ruleId.slice(slash + 1))?.meta?.docs?.requiresTypeChecking ===
     true
   );
-}
-
+};
+// How ESLint resolves `filePath`: whether the parser reads type information, and the rules that
+// need it there and are on, apart from those that check for it themselves.
+const describeTypeInformation = async (
+  eslint: ESLint,
+  filePath: string,
+): Promise<{
+  readonly projectService: boolean;
+  readonly typeAwareRules: readonly string[];
+}> => {
+  const config = await getEffectiveConfig(eslint, filePath);
+  const plugins = new Map(Object.entries(config?.plugins ?? {}));
+  return {
+    projectService:
+      config?.languageOptions?.parserOptions?.projectService === true,
+    typeAwareRules: Object.entries(config?.rules ?? {})
+      .filter(([ruleId, [severity]]) => {
+        return (
+          severity !== 0 &&
+          !selfCheckingRules.has(ruleId) &&
+          (requiresTypeInformation(plugins, ruleId) ||
+            (undeclaredRules.get(ruleId) ?? []).some((extension) => {
+              return filePath.endsWith(extension);
+            }))
+        );
+      })
+      .map(([ruleId]) => {
+        return ruleId;
+      }),
+  };
+};
 // Vitest takes rows of one length, so a shape without an override gets no settings.
 const rows = shapes.map(
-  ([description, options, typed, overridden = {}]): Required<Shape> => [
-    description,
-    options,
-    typed,
-    overridden,
-  ],
+  ([description, options, typed, overridden = {}]): Required<Shape> => {
+    return [description, options, typed, overridden];
+  },
 );
-
 describe.each(rows)(
   "rules that need type information, with %s",
   (_description, options, typed, overridden) => {
     const eslint = createEslint(options);
-
     // A rule that needs type information throws in a file without it, which stops ESLint for
     // every file. A resolved configuration does not show that, so the files are linted. A
     // message without a rule is a parsing error, or says that ESLint did not lint the file.
     it.each(filePaths)("do not stop ESLint in %s", async (filePath) => {
       const linter = await eslint;
       const [result] = await linter.lintFiles([filePath]);
-
       expect(
         result.messages
-          .filter(({ ruleId }) => typeof ruleId !== "string")
-          .map(({ message }) => message),
+          .filter(({ ruleId }) => {
+            return typeof ruleId !== "string";
+          })
+          .map(({ message }) => {
+            return message;
+          }),
       ).toEqual([]);
     });
-
     it.each(typed)(
       "are on in %s, where the parser reads type information",
       async (filePath) => {
         const { projectService, typeAwareRules } =
           await describeTypeInformation(await eslint, filePath);
-
         expect(projectService).toBe(true);
         // The rules of typescript-eslint cover the whole type-aware scope.
         expect(typeAwareRules).toContain(
@@ -423,29 +418,26 @@ describe.each(rows)(
         );
       },
     );
-
-    it.each(filePaths.filter((filePath) => !typed.includes(filePath)))(
-      "are off in %s, where the parser reads none",
-      async (filePath) => {
-        expect(await describeTypeInformation(await eslint, filePath)).toEqual({
-          projectService: false,
-          typeAwareRules: [],
-        });
-      },
-    );
-
+    it.each(
+      filePaths.filter((filePath) => {
+        return !typed.includes(filePath);
+      }),
+    )("are off in %s, where the parser reads none", async (filePath) => {
+      expect(await describeTypeInformation(await eslint, filePath)).toEqual({
+        projectService: false,
+        typeAwareRules: [],
+      });
+    });
     // ESLint adds the defaults of a rule's options, so the settings may have more than these.
     it.each(Object.keys(overridden).length === 0 ? [] : typed)(
       "have the settings of the override in %s",
       async (filePath) => {
         const config = await getEffectiveConfig(await eslint, filePath);
-
         expect(config?.rules).toMatchObject(overridden);
       },
     );
   },
 );
-
 describe("rules that need type information", () => {
   it.each([...selfCheckingRules])(
     "may stay on outside the type-aware scope only for %s, because %s",
@@ -455,17 +447,14 @@ describe("rules that need type information", () => {
         "src/example.ts",
       );
       const plugins = new Map(Object.entries(config?.plugins ?? {}));
-
       expect(requiresTypeInformation(plugins, ruleId)).toBe(true);
     },
   );
-
   it("leave a component among the files of typescript with the rules that need none", async () => {
     const config = await getEffectiveConfig(
       await createEslint({ typescript: withComponents }),
       "src/Component.svelte",
     );
-
     expect(config?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(2);
   });
 });

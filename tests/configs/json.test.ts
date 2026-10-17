@@ -13,17 +13,17 @@ type SerializableConfig = {
 
 // The language that ESLint resolves for a file, and the settings of `ruleId` there: the severity
 // as a number, then the options.
-async function describeRule(
+const describeRule = async (
   eslint: ESLint,
   filePath: string,
   ruleId: string,
-): Promise<unknown> {
+): Promise<unknown> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     (EffectiveConfig & SerializableConfig) | undefined;
   const rules = new Map(Object.entries(config?.rules ?? {}));
   return { entry: rules.get(ruleId), language: config?.toJSON().language };
-}
+};
 
 describe("json feature", () => {
   it("keeps each override in its own JSON language", async () => {
@@ -39,8 +39,9 @@ describe("json feature", () => {
     expect(
       await Promise.all(
         ["data.json", "data.jsonc", "data.json5", "package.json"].map(
-          async (filePath) =>
-            await describeFile(eslint, filePath, "json/no-empty-keys"),
+          async (filePath) => {
+            return await describeFile(eslint, filePath, "json/no-empty-keys");
+          },
         ),
       ),
     ).toEqual([
@@ -62,7 +63,15 @@ describe("json feature", () => {
       overrideConfig: [
         {
           plugins: {
-            local: { rules: { "no-content": { create: (_context) => ({}) } } },
+            local: {
+              rules: {
+                "no-content": {
+                  create: (_context) => {
+                    return {};
+                  },
+                },
+              },
+            },
           },
         },
         ...json({ overrides: { [ruleId]: "warn" } }),
@@ -79,7 +88,9 @@ describe("json feature", () => {
           "tsconfig.json",
           ".vscode/settings.json",
           ".devcontainer/devcontainer.json",
-        ].map(async (filePath) => await describeRule(eslint, filePath, ruleId)),
+        ].map(async (filePath) => {
+          return await describeRule(eslint, filePath, ruleId);
+        }),
       ),
     ).toEqual([
       { entry: [1], language: "json/json" },
@@ -110,10 +121,9 @@ describe("json feature", () => {
           "data.jsonc",
           "data.json5",
           "tsconfig.json",
-        ].map(
-          async (filePath) =>
-            await describeFile(eslint, filePath, "json/no-duplicate-keys"),
-        ),
+        ].map(async (filePath) => {
+          return await describeFile(eslint, filePath, "json/no-duplicate-keys");
+        }),
       ),
     ).toEqual([
       { language: "json/json", plugins, severity: 2 },
@@ -137,8 +147,13 @@ describe("json feature", () => {
     expect(
       await Promise.all(
         ["data.json", "tsconfig.json", "data.jsonc", "data.json5"].map(
-          async (filePath) =>
-            await describeRule(eslint, filePath, "json/no-duplicate-keys"),
+          async (filePath) => {
+            return await describeRule(
+              eslint,
+              filePath,
+              "json/no-duplicate-keys",
+            );
+          },
         ),
       ),
     ).toEqual([
@@ -170,7 +185,9 @@ describe("json feature", () => {
           "config/tsconfig.base.json",
           "config/.vscode/settings.json",
           "config/.devcontainer/devcontainer.json",
-        ].map(async (filePath) => await describeRule(eslint, filePath, ruleId)),
+        ].map(async (filePath) => {
+          return await describeRule(eslint, filePath, ruleId);
+        }),
       ),
     ).toEqual([
       { entry: [2, { form: "NFD" }], language: "json/json" },

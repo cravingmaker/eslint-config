@@ -83,10 +83,10 @@ const projectFiles = {
     "  let count = $state(0);",
     "  let button: HTMLButtonElement | undefined = $state();",
     "",
-    "  function increment(): void {",
-    "    count += step;",
+    "  const increment = (): void => {",
+    "    count = count + step;",
     "    button?.focus();",
-    "  }",
+    "  };",
     "</script>",
     "",
     '<button bind:this={button} type="button" onclick={increment}>{count}</button>',
@@ -108,9 +108,9 @@ const projectFiles = {
     "<script>",
     "  let open = $state(false);",
     "",
-    "  function toggle() {",
+    "  const toggle = () => {",
     "    open = !open;",
-    "  }",
+    "  };",
     "</script>",
     "",
     '<button type="button" onclick={toggle}>{open ? "Close" : "Open"}</button>',
@@ -155,16 +155,16 @@ afterAll(async () => {
   await rm(projectDirectory, { force: true, recursive: true });
 });
 
-async function createEslint(options: Options): Promise<ESLint> {
+const createEslint = async (options: Options): Promise<ESLint> => {
   return new ESLint({
     overrideConfig: await createConfig(options),
     overrideConfigFile: true,
   });
-}
+};
 // The messages of each of `filePaths` in the fixture project as `line:column rule`, by path.
-async function describeMessages(
+const describeMessages = async (
   filePaths: readonly string[],
-): Promise<Readonly<Record<string, readonly string[]>>> {
+): Promise<Readonly<Record<string, readonly string[]>>> => {
   const eslint = new ESLint({
     cwd: projectDirectory,
     overrideConfig: await createConfig({
@@ -175,46 +175,53 @@ async function describeMessages(
   });
   const results = await eslint.lintFiles([...filePaths]);
   return Object.fromEntries(
-    results.map(({ filePath, messages }) => [
-      path.relative(projectDirectory, filePath),
-      messages.map(
-        ({ column, line, ruleId }) =>
-          `${String(line)}:${String(column)} ${ruleId ?? "fatal"}`,
-      ),
-    ]),
+    results.map(({ filePath, messages }) => {
+      return [
+        path.relative(projectDirectory, filePath),
+        messages.map(({ column, line, ruleId }) => {
+          return `${String(line)}:${String(column)} ${ruleId ?? "fatal"}`;
+        }),
+      ];
+    }),
   );
-}
-async function getEffectiveConfig(
+};
+const getEffectiveConfig = async (
   eslint: ESLint,
   filePath: string,
-): Promise<EffectiveConfig | undefined> {
+): Promise<EffectiveConfig | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   return (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
-}
+};
 // The severity of each of `ruleIds` in `rules`, or `undefined` for a rule that they do not set.
-function getSeverities(
+const getSeverities = (
   rules: RuleEntries | undefined,
   ruleIds: readonly string[],
-): ReadonlyArray<Linter.Severity | undefined> {
+): ReadonlyArray<Linter.Severity | undefined> => {
   const entries = new Map(Object.entries(rules ?? {}));
-  return ruleIds.map((ruleId) => entries.get(ruleId)?.[0]);
-}
+  return ruleIds.map((ruleId) => {
+    return entries.get(ruleId)?.[0];
+  });
+};
 // The rules of the Svelte feature's own plugin in `rules`.
-function getSvelteRuleIds(rules: RuleEntries | undefined): readonly string[] {
-  return Object.keys(rules ?? {}).filter((ruleId) =>
-    ruleId.startsWith("@html-eslint/svelte/"),
-  );
-}
+const getSvelteRuleIds = (
+  rules: RuleEntries | undefined,
+): readonly string[] => {
+  return Object.keys(rules ?? {}).filter((ruleId) => {
+    return ruleId.startsWith("@html-eslint/svelte/");
+  });
+};
 // `rules` without `ruleIds`.
-function withoutRules(
+const withoutRules = (
   rules: RuleEntries | undefined,
   ruleIds: readonly string[],
-): RuleEntries {
+): RuleEntries => {
   return Object.fromEntries(
-    Object.entries(rules ?? {}).filter(([ruleId]) => !ruleIds.includes(ruleId)),
+    Object.entries(rules ?? {}).filter(([ruleId]) => {
+      return !ruleIds.includes(ruleId);
+    }),
   );
-}
+};
 
 describe("svelte scripts", () => {
   it("get the rules of TypeScript sources, apart from the rules that components break", async () => {
@@ -231,12 +238,16 @@ describe("svelte scripts", () => {
       ]),
     ).toEqual(withoutRules(source?.rules, componentExceptions));
     expect(
-      [component, source].map((config) =>
-        getSeverities(config?.rules, componentExceptions),
-      ),
+      [component, source].map((config) => {
+        return getSeverities(config?.rules, componentExceptions);
+      }),
     ).toEqual([
-      componentExceptions.map(() => 0),
-      componentExceptions.map(() => 2),
+      componentExceptions.map(() => {
+        return 0;
+      }),
+      componentExceptions.map(() => {
+        return 2;
+      }),
     ]);
   });
 
@@ -251,7 +262,9 @@ describe("svelte scripts", () => {
     });
     const [component, typedSource, untypedSource] = await Promise.all(
       ["src/Component.svelte", "src/example.ts", "scripts/example.ts"].map(
-        async (filePath) => await getEffectiveConfig(eslint, filePath),
+        async (filePath) => {
+          return await getEffectiveConfig(eslint, filePath);
+        },
       ),
     );
 
@@ -299,11 +312,11 @@ describe("svelte scripts", () => {
     ]);
 
     expect(
-      [javascript, typescript].map(({ messages }) =>
-        messages.map(
-          ({ line, ruleId }) => `${String(line)} ${ruleId ?? "fatal"}`,
-        ),
-      ),
+      [javascript, typescript].map(({ messages }) => {
+        return messages.map(({ line, ruleId }) => {
+          return `${String(line)} ${ruleId ?? "fatal"}`;
+        });
+      }),
     ).toEqual([
       expect.arrayContaining(["3 no-debugger", "6 eqeqeq"]),
       expect.arrayContaining(["2 @typescript-eslint/no-explicit-any"]),
@@ -340,7 +353,11 @@ describe("svelte scripts", () => {
     ];
 
     expect(await describeMessages(filePaths)).toEqual(
-      Object.fromEntries(filePaths.map((filePath) => [filePath, []])),
+      Object.fromEntries(
+        filePaths.map((filePath) => {
+          return [filePath, []];
+        }),
+      ),
     );
   });
 

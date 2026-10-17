@@ -9,11 +9,11 @@ import { htmlRules } from "./rules.js";
 import { narrowFiles } from "../../utilities/file-scope.js";
 
 // Builds the flat config for HTML files.
-function html({
+const html = ({
   files,
   ignores = [],
   overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+}: FeatureOptions = {}): Linter.Config[] => {
   return [
     {
       files: narrowFiles(htmlFiles, files),
@@ -24,6 +24,6 @@ function html({
       rules: { ...htmlRules, ...overrides },
     },
   ];
-}
+};
 
 export { html };

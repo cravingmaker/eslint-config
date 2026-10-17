@@ -2,7 +2,6 @@ import type { Rules } from "../../types.js";
 
 import {
   classMethodsUseThisOptions,
-  consistentReturnOptions,
   dotNotationOptions,
   // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `max-params` rule name
   maxParamsOptions,
@@ -14,33 +13,32 @@ import {
   preferPromiseRejectErrorsOptions,
 } from "../shared-options.js";
 
-const recommendedSuggestionRules: Rules = {
-  "no-case-declarations": "error",
+const recommendedRules: Rules = {
+  // --- Rules with default options (17/17) ----------------------------------------------------------------------------------------------------------
+  "no-case-declarations": "error", // Manually fixable by editor suggestions.
   "no-delete-var": "error",
-  "no-empty-static-block": "error",
-  "no-extra-boolean-cast": ["error", { enforceForInnerExpressions: false }],
+  "no-empty": ["error", { allowEmptyCatch: false }], // Manually fixable by editor suggestions.
+  "no-empty-static-block": "error", // Manually fixable by editor suggestions.
+  "no-extra-boolean-cast": ["error", { enforceForInnerExpressions: false }], // Automatically fixable by the --fix command.
   "no-global-assign": ["error", { exceptions: [] }],
-  "no-nonoctal-decimal-escape": "error",
+  "no-nonoctal-decimal-escape": "error", // Manually fixable by editor suggestions.
   "no-octal": "error",
   "no-redeclare": ["error", { builtinGlobals: true }],
+  "no-regex-spaces": "error", // Automatically fixable by the --fix command.
   "no-shadow-restricted-names": ["error", { reportGlobalThis: true }],
-  "no-unused-labels": "error",
+  "no-unused-labels": "error", // Automatically fixable by the --fix command.
   "no-useless-catch": "error",
-  "no-useless-escape": ["error", { allowRegexCharacters: [] }],
+  "no-useless-escape": ["error", { allowRegexCharacters: [] }], // Manually fixable by editor suggestions.
   "no-with": "error",
   "preserve-caught-error": [
     "error",
     { errorClassNames: [], requireCatchParameter: false },
-  ],
+  ], // Manually fixable by editor suggestions.
   "require-yield": "error",
-
-  // Rules with overridden options
-  "no-empty": ["error", { allowEmptyCatch: true }],
 } as const;
 
-const suggestionRules: Rules = {
-  ...recommendedSuggestionRules,
-
+const otherRules: Rules = {
+  // --- Rules with default options (68/123) ---------------------------------------------------------------------------------------------------------
   "accessor-pairs": [
     "error",
     {
@@ -49,11 +47,6 @@ const suggestionRules: Rules = {
       getWithoutSet: false,
       setWithoutGet: true,
     },
-  ],
-  "arrow-body-style": [
-    "error",
-    "as-needed",
-    { requireReturnForObjectLiteral: false },
   ],
   "block-scoped-var": "error",
   camelcase: [
@@ -68,35 +61,35 @@ const suggestionRules: Rules = {
   ],
   "class-methods-use-this": [
     "error",
-    { ignoreClassesWithImplements: undefined, ...classMethodsUseThisOptions },
-  ],
-  complexity: [
-    "error",
     {
-      maximum: undefined,
-
-      max: 20,
-      variant: "classic",
+      ignoreClassesWithImplements: undefined,
+      ...classMethodsUseThisOptions,
     },
   ],
+  curly: "error", // Override `eslint-config-prettier`
   "default-case": ["error", { commentPattern: undefined }],
   "default-case-last": "error",
   "default-param-last": "error",
   "dot-notation": ["error", { allowPattern: "", ...dotNotationOptions }],
   eqeqeq: ["error", "always", { null: "always" }],
-  "logical-assignment-operators": [
+  "func-names": ["error", "always", { generators: "always" }],
+  "func-style": [
     "error",
-    "always",
-    { enforceForIfStatements: false },
+    "expression",
+    {
+      allowArrowFunctions: false,
+      allowTypeAnnotation: false,
+      overrides: undefined,
+    },
   ],
-  "max-depth": ["error", { max: 4, maximum: undefined }],
+  "guard-for-in": "error",
   "no-alert": "error",
   "no-array-constructor": "error",
   "no-bitwise": [
     "error",
     {
       allow: [],
-      int32Hint: false,
+      int32Hint: undefined,
     },
   ],
   "no-caller": "error",
@@ -132,6 +125,7 @@ const suggestionRules: Rules = {
   "no-loop-func": "error",
   "no-multi-assign": ["error", { ignoreNonDeclaration: false }],
   "no-multi-str": "error",
+  "no-nested-ternary": "error",
   "no-new": "error",
   "no-new-func": "error",
   "no-new-wrappers": "error",
@@ -141,6 +135,7 @@ const suggestionRules: Rules = {
   "no-script-url": "error",
   "no-throw-literal": "error",
   "no-undef-init": "error",
+  "no-undefined": "error",
   "no-unneeded-ternary": ["error", { defaultAssignment: true }],
   "no-useless-call": "error",
   "no-useless-computed-key": ["error", { enforceForClassMembers: true }],
@@ -155,7 +150,7 @@ const suggestionRules: Rules = {
     },
   ],
   "no-useless-return": "error",
-  "operator-assignment": ["error", "always"],
+  "no-var": "error",
   "prefer-arrow-callback": [
     "error",
     {
@@ -164,6 +159,7 @@ const suggestionRules: Rules = {
     },
   ],
   "prefer-exponentiation-operator": "error",
+  "prefer-named-capture-group": "error",
   "prefer-numeric-literals": "error",
   "prefer-object-has-own": "error",
   "prefer-object-spread": "error",
@@ -174,8 +170,10 @@ const suggestionRules: Rules = {
   "prefer-rest-params": "error",
   "prefer-spread": "error",
   "prefer-template": "error",
-  radix: ["error", "always"],
+  radix: "error",
   "require-await": "error",
+  "symbol-description": "error",
+  "unicode-bom": ["error", "never"],
   yoda: [
     "error",
     "never",
@@ -185,13 +183,24 @@ const suggestionRules: Rules = {
     },
   ],
 
-  // Rules with overridden options
-  "func-style": [
-    "off",
-    "expression",
-    { allowArrowFunctions: false, allowTypeAnnotation: false, overrides: {} },
-  ], // Prefer allowing declarations and expressions based on local readability
-
+  // --- Rules with overridden options (27/123) ------------------------------------------------------------------------------------------------------
+  "arrow-body-style": ["error", "always"],
+  "capitalized-comments": [
+    "error",
+    "always",
+    {
+      ignoreConsecutiveComments: true,
+      ignoreInlineComments: true,
+      ignorePattern: "",
+    },
+  ],
+  complexity: [
+    "error",
+    {
+      max: 10,
+      variant: "classic",
+    },
+  ],
   "func-name-matching": [
     "error",
     "always",
@@ -200,232 +209,129 @@ const suggestionRules: Rules = {
       includeCommonJSModuleExports: false,
     },
   ],
-  "func-names": ["error", "never", { generators: "never" }],
   "grouped-accessor-pairs": [
     "error",
     "getBeforeSet",
-    {
-      enforceForTSTypes: false,
-    },
+    { enforceForTSTypes: true },
   ],
-  "max-lines": [
-    "error",
-    {
-      max: 1500,
-      skipBlankLines: true,
-      skipComments: true,
-    },
-  ],
-  "max-nested-callbacks": ["error", 4],
+  "logical-assignment-operators": ["error", "never"],
   "max-params": [
     "error",
     {
-      countThis: "except-void",
-      countVoidThis: undefined,
-      maximum: undefined,
+      countThis: "never",
       ...maxParamsOptions,
     },
   ],
   "no-else-return": ["error", { allowElseIf: false }],
-  "no-return-assign": ["error", "always"],
-  "no-sequences": ["error", { allowInParentheses: false }],
-  "no-shadow": ["error", { ...noShadowOptions }],
-  "no-unused-expressions": ["error", { ...noUnusedExpressionsOptions }],
-  "no-void": ["error", { allowAsStatement: false }],
-  "object-shorthand": [
-    "error",
-    "always",
-    {
-      avoidExplicitReturnArrows: true,
-      avoidQuotes: false,
-      ignoreConstructors: false,
-      methodsIgnorePattern: undefined,
-    },
-  ],
-  "one-var": ["error", "never"],
-
-  "prefer-destructuring": [
-    "error",
-    { ...preferDestructuring1stOptions },
-    { ...preferDestructuring2ndOptions },
-  ],
-  "prefer-regex-literals": ["error", { disallowRedundantWrapping: true }], // Compatibility with `eslint-plugin-regexp`
-
-  "capitalized-comments": [
-    "off",
-    "always",
-    {
-      ignorePattern: "",
-
-      ignoreConsecutiveComments: false,
-      ignoreInlineComments: false,
-    },
-  ],
-  "consistent-return": ["off", { ...consistentReturnOptions }],
-  "consistent-this": ["off", "that"],
-  "guard-for-in": "off",
-  "id-denylist": "off",
-  "id-length": [
-    "off",
-    {
-      exceptionPatterns: [],
-      exceptions: [],
-      max: Infinity,
-      min: 2,
-      properties: "always",
-    },
-  ],
-  "id-match": [
-    "off",
-    "^.+$",
-    {
-      classFields: false,
-      ignoreDestructuring: false,
-      onlyDeclarations: false,
-      properties: false,
-    },
-  ],
-  "init-declarations": ["off", "always"],
-  "max-classes-per-file": [
-    "off",
-    {
-      ignoreExpressions: false,
-      max: 1,
-    },
-  ],
-  "max-lines-per-function": [
-    "off",
-    {
-      // eslint-disable-next-line @typescript-eslint/naming-convention -- ESLint rule options use PascalCase for AST node names
-      IIFEs: false,
-      max: 50,
-      skipBlankLines: true,
-      skipComments: true,
-    },
-  ],
-  "max-statements": ["off", 10, { ignoreTopLevelFunctions: false }],
-  "new-cap": [
-    "off",
-    {
-      capIsNewExceptionPattern: undefined,
-      newIsCapExceptionPattern: undefined,
-
-      capIsNew: true,
-      capIsNewExceptions: [],
-      newIsCap: true,
-      newIsCapExceptions: [],
-      properties: true,
-    },
-  ],
-  "no-console": ["off", { allow: undefined }],
-  "no-continue": "off",
-  "no-div-regex": "off",
-  "no-inline-comments": ["off", { ignorePattern: "" }],
-  "no-invalid-this": ["off", { capIsConstructor: true }],
-  "no-magic-numbers": [
-    "off",
-    {
-      ignoreEnums: false,
-      ignoreNumericLiteralTypes: false,
-      ignoreReadonlyClassProperties: false,
-      ignoreTypeIndexes: false,
-
-      detectObjects: false,
-      enforceConst: false,
-      ignore: [],
-      ignoreArrayIndexes: false,
-      ignoreClassFieldInitialValues: false,
-      ignoreDefaultValues: false,
-    },
-  ],
-
-  "no-plusplus": ["off", { allowForLoopAfterthoughts: false }],
-  "no-restricted-exports": [
-    "off",
-    {
-      restrictedNamedExports: undefined,
-      restrictedNamedExportsPattern: undefined,
-    },
-  ],
+  "no-param-reassign": ["error", { props: false }],
   "no-restricted-globals": [
     "error",
-    { message: "Use Uint8Array instead.", name: "Buffer" },
+    {
+      checkGlobalObject: true,
+      globalObjects: ["global"],
+      globals: [{ message: "Use Uint8Array instead.", name: "Buffer" }],
+    },
   ],
   "no-restricted-imports": [
     "error",
     { message: "Use Uint8Array instead.", name: "buffer" },
     { message: "Use Uint8Array instead.", name: "node:buffer" },
   ],
-  "no-restricted-properties": "off",
-  "no-restricted-syntax": "off",
-  "no-ternary": "off",
-  "no-undefined": "off",
-  "no-underscore-dangle": [
-    "off",
+  "no-return-assign": ["error", "always"],
+  "no-sequences": ["error", { allowInParentheses: false }],
+  "no-shadow": ["error", { ...noShadowOptions }],
+  "no-unused-expressions": ["error", { ...noUnusedExpressionsOptions }],
+  "no-void": ["error", { allowAsStatement: true }],
+  "object-shorthand": [
+    "error",
+    "always",
     {
-      allow: [],
-      allowAfterSuper: false,
-      allowAfterThis: false,
-      allowAfterThisConstructor: false,
-      allowFunctionParams: true,
-      allowInArrayDestructuring: true,
-      allowInObjectDestructuring: true,
-      enforceInClassFields: false,
-      enforceInMethodNames: false,
+      avoidExplicitReturnArrows: false,
+      avoidQuotes: false,
+      ignoreConstructors: true,
+      methodsIgnorePattern: undefined,
     },
   ],
-  "prefer-named-capture-group": "off",
-  "require-unicode-regexp": ["off", { requireFlag: undefined }],
-  "sort-imports": [
-    "off", // Covered by `perfectionist/sort-imports`, see src/overlaps.ts
-    {
-      allowSeparatedGroups: false,
-      ignoreCase: false,
-      ignoreDeclarationSort: false,
-      ignoreMemberSort: false,
-      memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
-    },
-  ],
-  "sort-keys": [
-    "off", // Covered by `perfectionist/sort-objects`, see src/overlaps.ts
-    "asc",
-    {
-      allowLineSeparatedGroups: false,
-      caseSensitive: true,
-      ignoreComputedKeys: false,
-      minKeys: 2,
-      natural: false,
-    },
-  ],
-  "sort-vars": ["off", { ignoreCase: false }],
-  strict: ["off", "safe"],
-  "symbol-description": "error",
-  "unicode-bom": ["error", "never"],
-  "vars-on-top": "off",
-
-  "no-param-reassign": ["error", { props: false }], // Compatibility with `eslint-plugin-functional`
-  "no-regex-spaces": "error", // Compatibility with `eslint-plugin-regexp`
-  "no-var": "error", // Compatibility with `eslint-plugin-functional`
+  "one-var": ["error", "never"],
+  "operator-assignment": ["error", "never"],
   "prefer-const": [
-    "error", // Compatibility with `eslint-plugin-functional`
+    "error",
     {
       destructuring: "all",
       ignoreReadBeforeAssign: false,
     },
   ],
+  "prefer-destructuring": [
+    "error",
+    { ...preferDestructuring1stOptions },
+    { ...preferDestructuring2ndOptions },
+  ],
+  "prefer-regex-literals": ["error", { disallowRedundantWrapping: true }],
+  "require-unicode-regexp": ["error", { requireFlag: undefined }], // Adding either flag can change matching behavior, so review existing patterns.
 
-  curly: ["off", "all"], // Covered by `prettier`
-  "no-nested-ternary": "error", // Instead of `unicorn/no-nested-ternary`, whose parentheses Prettier removes
-
-  "no-negated-condition": "error", // Off while unicorn is on, see src/overlaps.ts
-  "no-warning-comments": [
-    "off",
+  "max-depth": ["warn", { max: 3 }],
+  "max-lines": [
+    "warn",
     {
-      decoration: undefined,
-      location: "start",
-      terms: ["todo", "fixme", "xxx"],
+      max: 600,
+      skipBlankLines: true,
+      skipComments: true,
     },
-  ], // Covered by `unicorn/expiring-todo-comments`, see src/overlaps.ts
+  ],
+  "max-lines-per-function": [
+    "warn",
+    {
+      // eslint-disable-next-line @typescript-eslint/naming-convention -- ESLint rule options use PascalCase for AST node names.
+      IIFEs: true,
+      max: 60,
+      skipBlankLines: true,
+      skipComments: true,
+    },
+  ],
+  "max-nested-callbacks": [
+    "warn",
+    {
+      checkConstructorCallCallbacks: true,
+      max: 3,
+    },
+  ],
+
+  // --- Turned off rules (28/123) -------------------------------------------------------------------------------------------------------------------
+  "no-negated-condition": "off", // Handled by `unicorn/no-negated-condition`.
+  "no-warning-comments": "off", // Handled by `unicorn/expiring-todo-comments`.
+  "sort-imports": "off", // Handled by `perfectionist/sort-imports`.
+  "sort-keys": "off", // Handled by `perfectionist/sort-objects`.
+
+  "vars-on-top": "off", // Unnecessary, see `no-var`.
+
+  "consistent-return": "off", // Prefer type-aware return analysis over syntax-only consistency checks.
+  "consistent-this": "off", // Prefer lexical this through arrow functions over introducing aliases.
+  "id-denylist": "off", // Prefer to restrict identifier names only when explicit naming conventions require it.
+  "id-length": "off", // Prefer descriptive names while allowing conventional short identifiers where appropriate.
+  "id-match": "off", // Prefer context-aware naming conventions over a single restrictive regex.
+  "init-declarations": "off", // Prefer initialization where values become available over unnecessary placeholder assignments.
+  "max-classes-per-file": "off", // Prefer cohesive class organization over arbitrary per-file limits.
+  "max-statements": "off", // Prefer meaningful complexity checks over arbitrary statement limits.
+  "new-cap": "off", // Prefer explicit constructor semantics over capitalization-based assumptions.
+  "no-console": "off", // Prefer to allow console output in scripts and CLIs; apply logging restrictions where needed.
+  "no-continue": "off", // Prefer early iteration skipping when it reduces unnecessary nesting.
+  "no-div-regex": "off", // Prefer natural regex syntax over unnecessary character classes.
+  "no-inline-comments": "off", // Prefer to allow concise inline comments when they clarify adjacent code.
+  "no-invalid-this": "off", // Prefer TypeScript's strict/noImplicitThis checks where available.
+  "no-magic-numbers": "off", // Prefer named constants for meaningful domain values without unnecessarily restricting literals.
+  "no-plusplus": "off", // Prefer increment and decrement operators for counters while assessing side effects separately.
+  "no-restricted-exports": "off", // Prefer to restrict export names only when explicit public API conventions require it.
+  "no-restricted-properties": "off", // Prefer to add restrictions only for specific APIs with documented alternatives.
+  "no-restricted-syntax": "off", // Prefer targeted rules; broad syntax restrictions need a concrete justification.
+  "no-ternary": "off", // Prefer conditional expressions to avoid unnecessary branching statements.
+  "no-underscore-dangle": "off", // Prefer to allow underscores for naming conventions, unused bindings, and external API compatibility.
+  "sort-vars": "off", // Prefer declaration order based on dependencies and readability.
+  strict: "off", // Prefer to configure strictness separately for scripts; ES modules are implicitly strict.
+};
+
+const suggestionRules: Rules = {
+  ...recommendedRules, // 17/140 rules, 2/17 automatically fixable, 6/17 manually fixable.
+  ...otherRules, // 123/140 rules, -/123 automatically fixable, -/123 manually fixable.
 } as const;
 
 export { suggestionRules };

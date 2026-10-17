@@ -1,4 +1,3 @@
-import type { Owner } from "../../src/overlaps.js";
 import type { Options } from "../../src/types.js";
 
 import { readdir } from "node:fs/promises";
@@ -53,11 +52,11 @@ const withoutOwner = {
   regexp: { regexp: false },
   unicorn: { unicorn: false },
   unusedImports: { unusedImports: false },
-} as const satisfies Readonly<Record<Owner, Options>>;
+} as const satisfies Readonly<Record<string, Options>>;
 
-function compareText(left: string, right: string): number {
+const compareText = (left: string, right: string): number => {
   return left.localeCompare(right);
-}
+};
 /*
 Lints every fixture with every feature and framework on, apart from the features that `options`
 turn off, and returns the messages of each by path. React Refresh uses its strictest variant,
@@ -66,10 +65,10 @@ of typed linting. React ships no type declarations, so every value from React wo
 type, which the type-aware rules report; and with them, typed linting reports the components
 themselves, one of the known issues in the README.
 */
-async function lintFixtures(
+const lintFixtures = async (
   isTypeChecked: boolean,
   options: Options = {},
-): Promise<ReadonlyMap<string, readonly string[]>> {
+): Promise<ReadonlyMap<string, readonly string[]>> => {
   const eslint = new ESLint({
     cwd: fixturesDirectory,
     overrideConfig: await createConfig({
@@ -87,18 +86,21 @@ async function lintFixtures(
     overrideConfigFile: true,
   });
   const results = await eslint.lintFiles(
-    fixtures.map((fixture) => fixture.path),
+    fixtures.map((fixture) => {
+      return fixture.path;
+    }),
   );
   return new Map(
-    results.map(({ filePath, messages }) => [
-      path.relative(fixturesDirectory, filePath).replaceAll(path.sep, "/"),
-      messages.map(
-        ({ column, line, message, ruleId }) =>
-          `${String(line)}:${String(column)} ${ruleId ?? "fatal"}: ${message}`,
-      ),
-    ]),
+    results.map(({ filePath, messages }) => {
+      return [
+        path.relative(fixturesDirectory, filePath).replaceAll(path.sep, "/"),
+        messages.map(({ column, line, message, ruleId }) => {
+          return `${String(line)}:${String(column)} ${ruleId ?? "fatal"}: ${message}`;
+        }),
+      ];
+    }),
   );
-}
+};
 
 describe("fixtures", () => {
   it("are one file of each type, and nothing else", async () => {
@@ -108,22 +110,30 @@ describe("fixtures", () => {
       withFileTypes: true,
     });
     const filePaths = entries
-      .filter((entry) => entry.isFile())
-      .map((entry) =>
-        path
+      .filter((entry) => {
+        return entry.isFile();
+      })
+      .map((entry) => {
+        return path
           .relative(fixturesDirectory, path.join(entry.parentPath, entry.name))
-          .replaceAll(path.sep, "/"),
-      );
+          .replaceAll(path.sep, "/");
+      });
 
     expect(filePaths.toSorted(compareText)).toEqual(
-      fixtures.map((fixture) => fixture.path).toSorted(compareText),
+      fixtures
+        .map((fixture) => {
+          return fixture.path;
+        })
+        .toSorted(compareText),
     );
   });
 
   it("type-check, so that typed linting reads no error types", () => {
     const configFile = ts.readConfigFile(
       path.join(fixturesDirectory, "tsconfig.json"),
-      (fileName) => ts.sys.readFile(fileName),
+      (fileName) => {
+        return ts.sys.readFile(fileName);
+      },
     );
     const { fileNames, options } = ts.parseJsonConfigFileContent(
       configFile.config,
@@ -132,9 +142,9 @@ describe("fixtures", () => {
     );
     const diagnostics = ts
       .getPreEmitDiagnostics(ts.createProgram(fileNames, options))
-      .map((diagnostic) =>
-        ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"),
-      );
+      .map((diagnostic) => {
+        return ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+      });
 
     expect(fileNames).not.toEqual([]);
     expect(diagnostics).toEqual([]);
@@ -154,8 +164,8 @@ describe("fixtures", () => {
   });
 
   /*
-  While such a feature is off, the checks that it replaces come back, and the style rules that it
-  replaces stay off. So code that passes with the feature on still passes.
+  A disabled feature leaves its replacement checks off. Passing code stays valid without
+  activating a different core or plugin policy.
   */
   describe.each(Object.entries(withoutOwner))(
     "with typed linting and %s off",

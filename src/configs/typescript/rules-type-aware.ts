@@ -1,8 +1,6 @@
 import type { Rules } from "../../types.js";
 
-import { consistentReturnOptions } from "../shared-options.js";
-
-// typescript-eslint's recommended rules that need type information.
+// Typescript-eslint's recommended rules that need type information.
 const recommendedTypeAwareRules: Rules = {
   "@typescript-eslint/await-thenable": "error",
   "@typescript-eslint/no-array-delete": "error",
@@ -141,7 +139,7 @@ const strictTypeAwareRules: Rules = {
   "@typescript-eslint/use-unknown-in-catch-callback-variable": "error",
 } as const;
 
-// typescript-eslint's stylistic rules that need type information.
+// Typescript-eslint's stylistic rules that need type information.
 const stylisticTypeAwareRules: Rules = {
   "@typescript-eslint/non-nullable-type-assertion-style": "error",
   "@typescript-eslint/prefer-find": "error",
@@ -238,21 +236,10 @@ const otherTypeAwareRules: Rules = {
     },
   ],
 
-  "@typescript-eslint/prefer-readonly-parameter-types": [
-    "off",
-    {
-      allow: [],
-      checkParameterProperties: true,
-      ignoreInferredTypes: false,
-      treatMethodsAsReadonly: false,
-    },
-  ],
+  "@typescript-eslint/prefer-readonly-parameter-types": "off",
 
   // 'consistent-return': 'off',  // Uncomment this if @typescript-eslint/consistent-return is enabled
-  "@typescript-eslint/consistent-return": [
-    "off",
-    { ...consistentReturnOptions },
-  ], // It's recommended to use tsconfig's noImplicitReturns option rather than this rule
+  "@typescript-eslint/consistent-return": "off", // It's recommended to use tsconfig's noImplicitReturns option rather than this rule
 } as const;
 
 // Every typescript-eslint rule that needs type information.

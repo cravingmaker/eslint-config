@@ -10,22 +10,22 @@ type SerializableConfig = {
 };
 
 // The language, the plugin names, and the severity of `ruleId` that ESLint resolves for a file.
-async function describeFile(
+const describeFile = async (
   eslint: ESLint,
   filePath: string,
   ruleId: string,
-): Promise<unknown> {
+): Promise<unknown> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     (EffectiveConfig & SerializableConfig) | undefined;
   const rules = new Map(Object.entries(config?.rules ?? {}));
   return {
     language: config?.toJSON().language,
-    plugins: Object.keys(config?.plugins ?? {}).toSorted((left, right) =>
-      left.localeCompare(right),
-    ),
+    plugins: Object.keys(config?.plugins ?? {}).toSorted((left, right) => {
+      return left.localeCompare(right);
+    }),
     severity: rules.get(ruleId)?.[0],
   };
-}
+};
 
 export { describeFile };

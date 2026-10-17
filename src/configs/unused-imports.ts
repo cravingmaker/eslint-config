@@ -38,10 +38,10 @@ const unusedImportsRules: Rules = {
 };
 
 // Builds the flat config for eslint-plugin-unused-imports.
-function unusedImports(
+const unusedImports = (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { svelteComponents }: Context = defaultContext,
-): Linter.Config[] {
+): Linter.Config[] => {
   return [
     {
       name: "@cravingmaker/eslint-config/unused-imports/setup",
@@ -57,6 +57,6 @@ function unusedImports(
       rules: { ...unusedImportsRules, ...overrides },
     },
   ];
-}
+};
 
 export { unusedImports, unusedImportsRules };

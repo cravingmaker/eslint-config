@@ -130,7 +130,7 @@ ESLint with every feature and framework on. The fixtures are linted with typed l
 the React fixtures, as in `fixtures.test.ts`; the unfixed files exist only in memory, where the
 project service cannot find them, so they are linted without it.
 */
-async function createEslint(isTypeChecked: boolean): Promise<ESLint> {
+const createEslint = async (isTypeChecked: boolean): Promise<ESLint> => {
   return new ESLint({
     cwd: fixturesDirectory,
     fix: true,
@@ -147,37 +147,39 @@ async function createEslint(isTypeChecked: boolean): Promise<ESLint> {
     }),
     overrideConfigFile: true,
   });
-}
+};
 /*
 Runs eslint --fix on `code` as `filePath`, and returns the fixed code and the messages that remain,
 marking those that ESLint could still fix.
 */
-async function fix(
+const fix = async (
   eslint: ESLint,
   code: string,
   filePath: string,
-): Promise<{ readonly messages: readonly string[]; readonly output: string }> {
+): Promise<{
+  readonly messages: readonly string[];
+  readonly output: string;
+}> => {
   const [result] = await eslint.lintText(code, {
     filePath: path.join(fixturesDirectory, filePath),
   });
   return {
-    messages: result.messages.map(
-      ({ fix: messageFix, line, ruleId }) =>
-        `${String(line)} ${ruleId ?? "fatal"}${messageFix === undefined ? "" : " (fixable)"}`,
-    ),
+    messages: result.messages.map(({ fix: messageFix, line, ruleId }) => {
+      return `${String(line)} ${ruleId ?? "fatal"}${typeof messageFix === "undefined" ? "" : " (fixable)"}`;
+    }),
     output: result.output ?? code,
   };
-}
-async function format(
+};
+const format = async (
   code: string,
   filePath: string,
   options: Readonly<PrettierOptions>,
-): Promise<string> {
+): Promise<string> => {
   return await formatWithPrettier(code, {
     ...options,
     filepath: path.join(fixturesDirectory, filePath),
   });
-}
+};
 
 describe.each([...prettierConfigs])("Prettier with %s", (_name, options) => {
   const typedEslint = createEslint(true);
@@ -214,7 +216,9 @@ describe.each([...prettierConfigs])("Prettier with %s", (_name, options) => {
 
       expect(refixed.output).toBe(formatted);
       expect(
-        refixed.messages.filter((message) => message.endsWith("(fixable)")),
+        refixed.messages.filter((message) => {
+          return message.endsWith("(fixable)");
+        }),
       ).toEqual([]);
       expect(await format(formatted, filePath, options)).toBe(formatted);
     },
@@ -231,7 +235,9 @@ describe("eslint --fix", () => {
 
       expect(fixed.output).not.toBe(code);
       expect(
-        fixed.messages.filter((message) => message.endsWith("(fixable)")),
+        fixed.messages.filter((message) => {
+          return message.endsWith("(fixable)");
+        }),
       ).toEqual([]);
       expect(await fix(await eslint, fixed.output, filePath)).toEqual(fixed);
     },

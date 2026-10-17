@@ -21,13 +21,18 @@ describe("typescript-eslint rules", () => {
       const results = await eslint.lintText(code, {
         filePath: tsOptions.filePath,
       });
-      const messages = results.flatMap((result) => result.messages);
-      const restrictedType = messages.find(
-        (message) =>
-          message.ruleId === "@typescript-eslint/no-restricted-types",
-      );
+      const messages = results.flatMap((result) => {
+        return result.messages;
+      });
+      const restrictedType = messages.find((message) => {
+        return message.ruleId === "@typescript-eslint/no-restricted-types";
+      });
 
-      expect(messages.some((message) => message.fatal === true)).toBe(false);
+      expect(
+        messages.some((message) => {
+          return message.fatal === true;
+        }),
+      ).toBe(false);
       expect(restrictedType?.message).toContain("Use Uint8Array instead.");
       expect(restrictedType).toMatchObject({
         severity: 2,
@@ -38,7 +43,7 @@ describe("typescript-eslint rules", () => {
       const suggestion = restrictedType?.suggestions?.[0]?.fix;
       expect(suggestion).toBeDefined();
       const suggestedCode =
-        suggestion === undefined
+        typeof suggestion === "undefined"
           ? code
           : code.slice(0, suggestion.range[0]) +
             suggestion.text +
@@ -49,7 +54,9 @@ describe("typescript-eslint rules", () => {
         filePath: tsOptions.filePath,
       });
       expect(
-        suggestedResults.flatMap((result) => result.messages),
+        suggestedResults.flatMap((result) => {
+          return result.messages;
+        }),
       ).not.toContainEqual(
         expect.objectContaining({
           ruleId: "@typescript-eslint/no-restricted-types",

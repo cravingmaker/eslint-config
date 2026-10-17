@@ -33,7 +33,9 @@ describe("perfectionist rules", () => {
     ].join("\n");
     // Only the fixes of this rule, so that the output shows its order alone.
     const eslint = new ESLint({
-      fix: (message) => message.ruleId === "perfectionist/sort-imports",
+      fix: (message) => {
+        return message.ruleId === "perfectionist/sort-imports";
+      },
       overrideConfig: await createConfig(),
       overrideConfigFile: true,
     });
@@ -60,9 +62,11 @@ describe("perfectionist rules", () => {
         "",
       ].join("\n"),
     );
-    expect(result.messages.map(({ ruleId }) => ruleId)).not.toContain(
-      "perfectionist/sort-imports",
-    );
+    expect(
+      result.messages.map(({ ruleId }) => {
+        return ruleId;
+      }),
+    ).not.toContain("perfectionist/sort-imports");
   });
 
   it("perfectionist/sort-intersection-types: sorts intersection members by configured type groups", async () => {

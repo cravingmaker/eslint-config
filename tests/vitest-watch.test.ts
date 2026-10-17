@@ -66,11 +66,11 @@ describe("Vitest watch dependencies", () => {
         path.join(os.tmpdir(), "eslint-config-watch-"),
       );
       const workspace = await fs.realpath(temporaryDirectory);
-      const selectedTests = testFiles.filter((filename) =>
-        scenario === "package"
+      const selectedTests = testFiles.filter((filename) => {
+        return scenario === "package"
           ? filename.startsWith("tests/package/")
-          : !filename.startsWith("tests/package/"),
-      );
+          : !filename.startsWith("tests/package/");
+      });
       const reports = new EventTarget();
       // Exercise the actual UI filters; the build prefix is unnecessary for these stub tests.
       const command = packageJson.scripts[
@@ -120,9 +120,9 @@ describe("Vitest watch dependencies", () => {
             {
               onTestRunEnd(modules, errors, reason) {
                 const files = new Set(
-                  modules.map((module) =>
-                    path.relative(workspace, module.moduleId),
-                  ),
+                  modules.map((module) => {
+                    return path.relative(workspace, module.moduleId);
+                  }),
                 );
                 reports.dispatchEvent(
                   new CustomEvent("complete", {
@@ -157,10 +157,12 @@ describe("Vitest watch dependencies", () => {
 
           /* eslint-disable functional/no-loop-statements, no-await-in-loop -- Each filesystem edit must finish its watcher run before the next input changes. */
           for (const change of changes) {
-            const expected = change.tests.filter((filename) =>
-              selectedTests.includes(filename),
-            );
-            if (expected.length === 0) continue;
+            const expected = change.tests.filter((filename) => {
+              return selectedTests.includes(filename);
+            });
+            if (expected.length === 0) {
+              continue;
+            }
 
             const completed = once(reports, "complete", {
               signal: AbortSignal.timeout(10_000),

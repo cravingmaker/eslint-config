@@ -20,7 +20,9 @@ type RulePlugin = {
 };
 
 // The configuration that ESLint resolves for `filePath` with typed linting on.
-async function getEffectiveConfig(filePath: string): Promise<EffectiveConfig> {
+const getEffectiveConfig = async (
+  filePath: string,
+): Promise<EffectiveConfig> => {
   const eslint = new ESLint({
     overrideConfig: await createConfig({
       typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
@@ -31,23 +33,29 @@ async function getEffectiveConfig(filePath: string): Promise<EffectiveConfig> {
   const config = (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
   return config ?? {};
-}
-function isDeprecated(rule: RuleDefinition | undefined): boolean {
-  return rule?.meta?.deprecated !== undefined && rule.meta.deprecated !== false;
-}
+};
+const isDeprecated = (rule: RuleDefinition | undefined): boolean => {
+  return (
+    typeof rule?.meta?.deprecated !== "undefined" &&
+    rule.meta.deprecated !== false
+  );
+};
 
 describe("rule coverage", () => {
   it("classifies every current non-deprecated ESLint core rule", async () => {
     const { rules = {} } = await getEffectiveConfig("src/example.js");
     // eslint-disable-next-line @typescript-eslint/no-deprecated -- Coverage audit intentionally inspects ESLint's current builtin rule registry
     const unclassified = Iterator.from(builtinRules)
-      .filter(
-        ([ruleName, rule]) =>
-          !isDeprecated(rule) && !Object.hasOwn(rules, ruleName),
-      )
-      .map(([ruleName]) => ruleName)
+      .filter(([ruleName, rule]) => {
+        return !isDeprecated(rule) && !Object.hasOwn(rules, ruleName);
+      })
+      .map(([ruleName]) => {
+        return ruleName;
+      })
       .toArray()
-      .toSorted((left, right) => left.localeCompare(right));
+      .toSorted((left, right) => {
+        return left.localeCompare(right);
+      });
 
     expect(unclassified).toEqual([]);
   });
@@ -60,26 +68,35 @@ describe("rule coverage", () => {
       typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
     });
     const plugins = new Map(
-      config.flatMap((entry) => Object.entries(entry.plugins ?? {})),
+      config.flatMap((entry) => {
+        return Object.entries(entry.plugins ?? {});
+      }),
     );
     const declaredRuleIds = new Set(
       config
-        .filter(
-          (entry) => !/\/(?:exceptions|overlaps)\//u.test(entry.name ?? ""),
-        )
-        .flatMap((entry) => Object.keys(entry.rules ?? {})),
+        .filter((entry) => {
+          return !(entry.name ?? "").includes("/exceptions/");
+        })
+        .flatMap((entry) => {
+          return Object.keys(entry.rules ?? {});
+        }),
     );
     const unclassified = [...plugins]
-      .flatMap(([pluginName, plugin]) =>
-        Object.entries(plugin.rules ?? {})
-          .filter(
-            ([ruleName, rule]) =>
+      .flatMap(([pluginName, plugin]) => {
+        return Object.entries(plugin.rules ?? {})
+          .filter(([ruleName, rule]) => {
+            return (
               !isDeprecated(rule) &&
-              !declaredRuleIds.has(`${pluginName}/${ruleName}`),
-          )
-          .map(([ruleName]) => `${pluginName}/${ruleName}`),
-      )
-      .toSorted((left, right) => left.localeCompare(right));
+              !declaredRuleIds.has(`${pluginName}/${ruleName}`)
+            );
+          })
+          .map(([ruleName]) => {
+            return `${pluginName}/${ruleName}`;
+          });
+      })
+      .toSorted((left, right) => {
+        return left.localeCompare(right);
+      });
 
     expect(plugins.size).toBe(21);
     expect(unclassified).toEqual([]);

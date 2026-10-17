@@ -40,54 +40,61 @@ const otherJsonLanguages = [
 // form of `json/no-unnormalized-keys`, and not as NFD.
 const precomposedKey = '{"\u{E9}":1}';
 
-async function createEslint(
+const createEslint = async (
   options: Parameters<typeof createConfig>[0],
-): Promise<ESLint> {
+): Promise<ESLint> => {
   return new ESLint({
     overrideConfig: await createConfig(options),
     overrideConfigFile: true,
   });
-}
+};
 // The language that ESLint resolves for `filePath`, such as "json/jsonc".
-async function getLanguage(eslint: ESLint, filePath: string): Promise<unknown> {
+const getLanguage = async (
+  eslint: ESLint,
+  filePath: string,
+): Promise<unknown> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     { readonly toJSON: () => { readonly language?: unknown } } | undefined;
   return config?.toJSON().language;
-}
+};
 // The plugin of each rule in `rules`, or "core" for ESLint's own rules, without repeats.
-function getRulePlugins(rules: RuleEntries): readonly string[] {
+const getRulePlugins = (rules: RuleEntries): readonly string[] => {
   return [
     ...new Set(
-      Object.keys(rules).map((ruleId) =>
-        ruleId.includes("/")
+      Object.keys(rules).map((ruleId) => {
+        return ruleId.includes("/")
           ? ruleId.slice(0, ruleId.lastIndexOf("/"))
-          : "core",
-      ),
+          : "core";
+      }),
     ),
-  ].toSorted((left, right) => left.localeCompare(right));
-}
+  ].toSorted((left, right) => {
+    return left.localeCompare(right);
+  });
+};
 // The rules that ESLint resolves for `filePath`.
-async function getRules(
+const getRules = async (
   eslint: ESLint,
   filePath: string,
-): Promise<RuleEntries> {
+): Promise<RuleEntries> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     { readonly rules?: RuleEntries } | undefined;
   return config?.rules ?? {};
-}
+};
 // The ID of the rule behind each message that ESLint reports for `code`, linted as `filePath`.
-async function lintRuleIds(
+const lintRuleIds = async (
   eslint: ESLint,
   filePath: string,
   code: string,
-): Promise<ReadonlyArray<string | null>> {
+): Promise<ReadonlyArray<string | null>> => {
   const results = await eslint.lintText(code, { filePath });
-  return results.flatMap((result) =>
-    result.messages.map((message) => message.ruleId),
-  );
-}
+  return results.flatMap((result) => {
+    return result.messages.map((message) => {
+      return message.ruleId;
+    });
+  });
+};
 
 describe.each([false, true])(
   "languages with typed linting %s",
@@ -136,7 +143,9 @@ describe("the overrides of each JSON language", () => {
           const rules = new Map(
             Object.entries(await getRules(eslint, filePath)),
           );
-          return ruleIds.map((ruleId) => rules.get(ruleId)?.[0]);
+          return ruleIds.map((ruleId) => {
+            return rules.get(ruleId)?.[0];
+          });
         },
       ),
     );
@@ -185,26 +194,29 @@ describe("the options that json.overrides give a rule", () => {
   );
 
   it("change what ESLint reports in a JSON file only", async () => {
-    const otherFilePaths = otherJsonLanguages.map(({ filePath }) => filePath);
+    const otherFilePaths = otherJsonLanguages.map(({ filePath }) => {
+      return filePath;
+    });
     const unreported = Object.fromEntries(
-      otherFilePaths.map((filePath): readonly [string, readonly string[]] => [
-        filePath,
-        [],
-      ]),
+      otherFilePaths.map((filePath): readonly [string, readonly string[]] => {
+        return [filePath, []];
+      }),
     );
     const [withDefaults, withOverrides] = await Promise.all(
-      [await defaults, await overridden].map(async (eslint) =>
-        Object.fromEntries(
+      [await defaults, await overridden].map(async (eslint) => {
+        return Object.fromEntries(
           await Promise.all(
             ["data.json", ...otherFilePaths].map(
-              async (filePath): Promise<readonly [string, unknown]> => [
-                filePath,
-                await lintRuleIds(eslint, filePath, precomposedKey),
-              ],
+              async (filePath): Promise<readonly [string, unknown]> => {
+                return [
+                  filePath,
+                  await lintRuleIds(eslint, filePath, precomposedKey),
+                ];
+              },
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
 
     expect(withDefaults).toEqual({ ...unreported, "data.json": [] });
@@ -233,7 +245,9 @@ describe("a negated pattern in json.ignores", () => {
     expect(
       await Promise.all(
         ["vendor/ours/data.json", "vendor/theirs/data.json"].map(
-          async (filePath) => await getLanguage(eslint, filePath),
+          async (filePath) => {
+            return await getLanguage(eslint, filePath);
+          },
         ),
       ),
     ).toEqual(["json/json", undefined]);

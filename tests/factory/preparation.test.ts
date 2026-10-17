@@ -18,33 +18,40 @@ const temporaryDirectory = await mkdtemp(
   path.join(temporaryRoot, "eslint-config-preparation-"),
 );
 
-async function createProject(manifest?: string): Promise<string> {
+const createProject = async (manifest?: string): Promise<string> => {
   const directory = await mkdtemp(path.join(temporaryDirectory, "project-"));
-  if (manifest === undefined) return directory;
+  if (typeof manifest === "undefined") {
+    return directory;
+  }
   await writeFile(path.join(directory, "package.json"), manifest, "utf8");
   return directory;
-}
-async function describeSources(
+};
+const describeSources = async (
   configs: readonly Linter.Config[],
-): Promise<readonly string[]> {
+): Promise<readonly string[]> => {
   const eslint = new ESLint({
     overrideConfig: [...configs],
     overrideConfigFile: true,
   });
   return await Promise.all(
-    ["src/example.js", "src/example.ts"].map(
-      async (filePath) =>
-        await describeEffectiveConfig(eslint, filePath, process.cwd()),
-    ),
+    ["src/example.js", "src/example.ts"].map(async (filePath) => {
+      return await describeEffectiveConfig(eslint, filePath, process.cwd());
+    }),
   );
-}
-function frameworkBlocks(configs: readonly Linter.Config[]): readonly string[] {
+};
+const frameworkBlocks = (
+  configs: readonly Linter.Config[],
+): readonly string[] => {
   return configs
-    .map(({ name }) => name ?? "")
-    .filter((name) =>
-      /^@cravingmaker\/eslint-config\/(?:express|react|svelte)\//u.test(name),
-    );
-}
+    .map(({ name }) => {
+      return name ?? "";
+    })
+    .filter((name) => {
+      return /^@cravingmaker\/eslint-config\/(?:express|react|svelte)\//u.test(
+        name,
+      );
+    });
+};
 
 afterAll(async () => {
   await rm(temporaryDirectory, { force: true, recursive: true });
@@ -118,9 +125,9 @@ describe("configuration preparation through the built package", () => {
           projectRootDirectory,
         ),
       });
-      const block = configs.find(
-        ({ name }) => name === `@cravingmaker/eslint-config/${blockName}`,
-      );
+      const block = configs.find(({ name }) => {
+        return name === `@cravingmaker/eslint-config/${blockName}`;
+      });
 
       expect(block?.languageOptions?.globals).toMatchObject({
         document: false,
@@ -163,8 +170,14 @@ describe("configuration preparation through the built package", () => {
         projectRootDirectory,
       });
 
-      expect(actual.map(({ name }) => name)).toEqual(
-        equivalent.map(({ name }) => name),
+      expect(
+        actual.map(({ name }) => {
+          return name;
+        }),
+      ).toEqual(
+        equivalent.map(({ name }) => {
+          return name;
+        }),
       );
       expect(await describeSources(actual)).toEqual(
         await describeSources(equivalent),

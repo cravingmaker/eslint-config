@@ -25,10 +25,10 @@ const svelteRules: Rules = {
 // the typescript-eslint parser, and the features for JavaScript and TypeScript sources lint the
 // scripts of the components that this block parses. A missing @html-eslint/eslint-plugin-svelte
 // or svelte-eslint-parser fails with a message that names it.
-async function svelte(
+const svelte = async (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { globals }: Context = defaultContext,
-): Promise<Linter.Config[]> {
+): Promise<Linter.Config[]> => {
   const [plugin, parser] = await Promise.all([
     importPeer<{ readonly default: Readonly<Record<string, unknown>> }>(
       "@html-eslint/eslint-plugin-svelte",
@@ -61,13 +61,13 @@ async function svelte(
         ...overrides,
       },
       settings: {
-        // import-x parses an imported module with the parser of the importing file, and
+        // Import-x parses an imported module with the parser of the importing file, and
         // svelte-eslint-parser reads every file but a rune module as a component. The modules
         // that import-x reads by default are parsed with espree instead, as from JavaScript files.
         "import-x/parsers": { espree: [".js", ".mjs", ".cjs"] },
       },
     },
   ];
-}
+};
 
 export { svelte };
