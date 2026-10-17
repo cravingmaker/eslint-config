@@ -1,9 +1,8 @@
-import type { Rules } from "../../../types.js";
+import type { Rules } from "../../../../types.js";
 
-// Valid Properties: https://github.com/michaelfaith/eslint-plugin-package-json#supported-rules
 const validPropertiesRules: Rules = {
-  // Enabled rules.
-  "package-json/valid-author": "error",
+  // --- Rules with default options (41/41) ----------------------------------------------------------------------------------------------------------
+  "package-json/valid-author": "error", // Automatically fixable by the --fix command.
   "package-json/valid-bin": "error",
   "package-json/valid-browser": "error",
   "package-json/valid-bugs": "error",
@@ -34,11 +33,11 @@ const validPropertiesRules: Rules = {
   "package-json/valid-packageManager": "error",
   "package-json/valid-peerDependencies": "error",
   "package-json/valid-peerDependenciesMeta": "error",
-  "package-json/valid-peerDependenciesMeta-relationship": "error",
+  "package-json/valid-peerDependenciesMeta-relationship": "error", // Manually fixable by editor suggestions.
   "package-json/valid-private": "error",
   "package-json/valid-publishConfig": "error",
   "package-json/valid-repository": "error",
-  "package-json/valid-repository-directory": "error",
+  "package-json/valid-repository-directory": "error", // Manually fixable by editor suggestions.
   "package-json/valid-scripts": "error",
   "package-json/valid-sideEffects": "error",
   "package-json/valid-type": "error",
@@ -46,4 +45,4 @@ const validPropertiesRules: Rules = {
   "package-json/valid-workspaces": "error",
 } as const;
 
-export { validPropertiesRules };
+export { validPropertiesRules }; // 41 rules, 1 automatically fixable, 2 editor suggestions fixable.

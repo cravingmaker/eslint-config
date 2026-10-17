@@ -1,6 +1,6 @@
-import type { Rules } from "../../types.js";
+import type { Rules } from "../../../types.js";
 
-import { noUseBeforeDefineOptions } from "../shared-options.js";
+import { noUseBeforeDefineOptions } from "../../shared-options.js";
 
 const recommendedRules: Rules = {
   // --- Rules with default options (38/47) ----------------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ const recommendedRules: Rules = {
   "no-empty-character-class": "off", // Handled by `regexp/no-empty-character-class`.
   "no-invalid-regexp": "off", // Handled by `regexp/no-invalid-regexp`.
   "no-unexpected-multiline": "off", // Handled by `prettier`.
-  "no-unused-vars": ["off"], // Handled by `unused-imports/no-unused-vars`.
+  "no-unused-vars": ["off"], // Handled by `unused-imports/no-unused-vars`. Manually fixable by editor suggestions.
   "no-useless-backreference": "off", // Handled by `regexp/no-useless-backreference`.
 } as const;
 
@@ -125,8 +125,8 @@ const otherRules: Rules = {
 };
 
 const possibleProblemRules: Rules = {
-  ...recommendedRules,
-  ...otherRules,
+  ...recommendedRules, // 47/59 rules, 0 automatically fixable, 8 editor suggestions fixable.
+  ...otherRules, // 12/59 rules, 0 automatically fixable, 2 editor suggestions fixable.
 } as const;
 
 export { possibleProblemRules };

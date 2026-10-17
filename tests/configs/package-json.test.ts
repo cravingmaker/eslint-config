@@ -11,7 +11,7 @@ describe("package-json feature", () => {
       overrideConfig: configs,
       overrideConfigFile: true,
     });
-    const ruleId = "enforce-package-type/enforce-package-type";
+    const ruleId = "package-json/require-package-json-export";
 
     expect(
       configs.map((config) => {
@@ -29,7 +29,7 @@ describe("package-json feature", () => {
     ).toEqual([
       {
         language: "@/js",
-        plugins: ["@", "enforce-package-type", "package-json"],
+        plugins: ["@", "package-json"],
         severity: 2,
       },
       { language: "@/js", plugins: ["@", "package-json"], severity: undefined },

@@ -11,7 +11,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 99 (error 79, off 20, warn 0)
+rules: 100 (error 80, off 20, warn 0)
 
 enforce-package-type/enforce-package-type: error [{"enforceType":"module"}]
 package-json/bin-name-casing: error
@@ -52,6 +52,7 @@ package-json/require-module: off
 package-json/require-name: error [{"ignorePrivate":true}]
 package-json/require-optionalDependencies: off
 package-json/require-os: off
+package-json/require-package-json-export: error
 package-json/require-packageManager: off
 package-json/require-peerDependencies: off
 package-json/require-peerDependenciesMeta: error [{"ignorePrivate":false}]

@@ -16,16 +16,14 @@ type PackageManifest = {
     };
   };
   readonly engines: StringRecord;
-  readonly exports: Readonly<
-    Record<
-      string,
-      {
-        readonly default?: string;
-        readonly import?: string;
-        readonly types?: string;
-      }
-    >
-  >;
+  readonly exports: {
+    readonly ".": {
+      readonly default?: string;
+      readonly import?: string;
+      readonly types?: string;
+    };
+    readonly "./package.json": string;
+  };
   readonly files: readonly string[];
   readonly main: string;
   readonly peerDependencies: StringRecord;
@@ -102,6 +100,7 @@ describe("package contract", () => {
     expect(packageManifest.exports["."]?.types).toBe("./dist/index.d.mts");
     expect(packageManifest.exports["."]?.import).toBe("./dist/index.mjs");
     expect(packageManifest.exports["."]?.default).toBe("./dist/index.mjs");
+    expect(packageManifest.exports["./package.json"]).toBe("./package.json");
 
     expect(packageManifest.engines).toEqual({ node: ">=24.15.0" });
     expect(packageManifest.devEngines).toEqual({

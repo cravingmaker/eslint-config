@@ -106,6 +106,13 @@ const features = [
     feature: "packageJson",
     fileNames: ["package.json"],
     files: ["app/**/package.json"],
+    name: "enforce-package-type",
+    ruleId: "enforce-package-type/enforce-package-type",
+  },
+  {
+    feature: "packageJson",
+    fileNames: ["package.json"],
+    files: ["app/**/package.json"],
     name: "package-json",
     ruleId: "package-json/no-empty-fields",
   },

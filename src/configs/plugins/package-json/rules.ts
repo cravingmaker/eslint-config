@@ -1,14 +1,13 @@
 import type { Rules } from "../../../types.js";
 
-import { otherRules } from "./other-rules.js";
-import { requirePropertiesRules } from "./require-properties.js";
-import { validPropertiesRules } from "./valid-properties.js";
+import { otherRules } from "./rules/other-rules.js";
+import { requirePropertiesRules } from "./rules/require-properties.js";
+import { validPropertiesRules } from "./rules/valid-properties.js";
 
-// Explicit policy grouped by the upstream rule categories.
 const packageJsonRules: Rules = {
-  ...otherRules,
-  ...requirePropertiesRules,
-  ...validPropertiesRules,
+  ...otherRules, // 17/99 rules, 5 automatically fixable, 11 editor suggestions fixable.
+  ...requirePropertiesRules, // 41/99 rules, 3 automatically fixable, 2 editor suggestions fixable.
+  ...validPropertiesRules, // 41/99 rules, 1 automatically fixable, 2 editor suggestions fixable.
 } as const;
 
 export { packageJsonRules };
