@@ -7,7 +7,7 @@ import path from "node:path";
 import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
 
-import { react } from "../../src/configs/react.js";
+import { react } from "../../src/configs/plugins/react/index.js";
 import { createConfig } from "../../src/factory.js";
 import { expectLintError, expectNoLintError } from "../utilities.js";
 

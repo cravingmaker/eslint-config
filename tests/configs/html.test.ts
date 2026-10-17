@@ -2,7 +2,7 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { describeFile } from "./describe-file.js";
-import { html } from "../../src/configs/html/index.js";
+import { html } from "../../src/configs/plugins/html/index.js";
 import { expectLintError, expectNoLintError } from "../utilities.js";
 
 const htmlOptions = { filePath: "index.html" } as const;

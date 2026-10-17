@@ -3,27 +3,27 @@ import type { Context, Options } from "./types.js";
 
 import { defineConfig } from "eslint/config";
 
-import { comments } from "./configs/comments.js";
 import { core } from "./configs/core/index.js";
-import { exceptions } from "./configs/exceptions.js";
-import { express } from "./configs/express.js";
-import { functional } from "./configs/functional.js";
-import { html } from "./configs/html/index.js";
-import { ignores } from "./configs/ignores.js";
-import { imports } from "./configs/imports/index.js";
-import { json } from "./configs/json.js";
-import { markdown } from "./configs/markdown.js";
-import { node } from "./configs/node.js";
-import { packageJson } from "./configs/package-json.js";
-import { perfectionist } from "./configs/perfectionist/index.js";
-import { promise } from "./configs/promise.js";
-import { react } from "./configs/react.js";
-import { regexp } from "./configs/regexp.js";
-import { security } from "./configs/security.js";
-import { svelte } from "./configs/svelte.js";
-import { typescript } from "./configs/typescript/index.js";
-import { unicorn } from "./configs/unicorn.js";
-import { unusedImports } from "./configs/unused-imports.js";
+import { exceptions } from "./configs/exceptions/index.js";
+import { ignores } from "./configs/ignores/index.js";
+import { comments } from "./configs/plugins/comments/index.js";
+import { express } from "./configs/plugins/express/index.js";
+import { functional } from "./configs/plugins/functional/index.js";
+import { html } from "./configs/plugins/html/index.js";
+import { imports } from "./configs/plugins/imports/index.js";
+import { json } from "./configs/plugins/json/index.js";
+import { markdown } from "./configs/plugins/markdown/index.js";
+import { node } from "./configs/plugins/node/index.js";
+import { packageJson } from "./configs/plugins/package-json/index.js";
+import { perfectionist } from "./configs/plugins/perfectionist/index.js";
+import { promise } from "./configs/plugins/promise/index.js";
+import { react } from "./configs/plugins/react/index.js";
+import { regexp } from "./configs/plugins/regexp/index.js";
+import { security } from "./configs/plugins/security/index.js";
+import { svelte } from "./configs/plugins/svelte/index.js";
+import { typescript } from "./configs/plugins/typescript/index.js";
+import { unicorn } from "./configs/plugins/unicorn/index.js";
+import { unusedImports } from "./configs/plugins/unused-imports/index.js";
 import { prepareConfig } from "./context.js";
 
 // A disabled feature contributes no blocks; rule ownership stays in the owning maps.

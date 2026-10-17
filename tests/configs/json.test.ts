@@ -2,7 +2,7 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { describeFile } from "./describe-file.js";
-import { json } from "../../src/configs/json.js";
+import { json } from "../../src/configs/plugins/json/index.js";
 
 type EffectiveConfig = {
   readonly rules?: Readonly<Record<string, readonly unknown[]>>;

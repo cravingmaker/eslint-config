@@ -3,7 +3,7 @@ import type { Context } from "../../src/types.js";
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
-import { functional } from "../../src/configs/functional.js";
+import { functional } from "../../src/configs/plugins/functional/index.js";
 import { defaultContext } from "../../src/context.js";
 import { typescriptFiles } from "../../src/globs.js";
 import { expectLintError } from "../utilities.js";

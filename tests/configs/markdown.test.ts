@@ -2,7 +2,7 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { describeFile } from "./describe-file.js";
-import { markdown } from "../../src/configs/markdown.js";
+import { markdown } from "../../src/configs/plugins/markdown/index.js";
 import { expectNoLintError } from "../utilities.js";
 
 const mdOptions = { filePath: "test.md" } as const;
