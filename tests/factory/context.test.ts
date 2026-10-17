@@ -21,16 +21,19 @@ const temporaryDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-context-"),
 );
 
-async function createDirectory(name: string): Promise<string> {
+const createDirectory = async (name: string): Promise<string> => {
   const directory = path.join(temporaryDirectory, name);
   await mkdir(directory);
   return directory;
-}
-async function createProject(name: string, manifest: string): Promise<string> {
+};
+const createProject = async (
+  name: string,
+  manifest: string,
+): Promise<string> => {
   const directory = await createDirectory(name);
   await writeFile(path.join(directory, "package.json"), manifest, "utf8");
   return directory;
-}
+};
 
 afterAll(async () => {
   await rm(temporaryDirectory, { force: true, recursive: true });
@@ -53,7 +56,9 @@ describe("createContext", () => {
     const { dependencies } = await createContext({ projectRootDirectory });
 
     expect(
-      [...dependencies].toSorted((left, right) => left.localeCompare(right)),
+      [...dependencies].toSorted((left, right) => {
+        return left.localeCompare(right);
+      }),
     ).toEqual(["eslint", "react", "vite"]);
   });
 
@@ -115,12 +120,11 @@ describe("createContext", () => {
       createContext({ projectRootDirectory: undeclared, svelte: true }),
     ]);
 
-    expect(contexts.map(({ svelteComponents }) => svelteComponents)).toEqual([
-      ["**/*.svelte"],
-      [],
-      [],
-      ["**/*.svelte"],
-    ]);
+    expect(
+      contexts.map(({ svelteComponents }) => {
+        return svelteComponents;
+      }),
+    ).toEqual([["**/*.svelte"], [], [], ["**/*.svelte"]]);
   });
 
   it("uses the working directory as the default project root", async () => {

@@ -191,49 +191,15 @@ const htmlRules: Rules = {
   ],
 
   // Layout: whitespace, line breaks, indentation, and attribute quotes
-  "@html-eslint/attrs-newline": [
-    "off",
-    {
-      closeStyle: "newline",
-      ifAttrsMoreThan: 2,
-      inline: [],
-      maxLen: undefined,
-      skip: [],
-    },
-  ], // Covered by `prettier`
+  "@html-eslint/attrs-newline": "off", // Covered by `prettier`
   "@html-eslint/class-spacing": "off", // Covered by `prettier`
-  "@html-eslint/element-newline": [
-    "off",
-    { inline: [], skip: ["pre", "code"] },
-  ], // Covered by `prettier`
-  "@html-eslint/indent": [
-    "off",
-    4,
-    {
-      // eslint-disable-next-line @typescript-eslint/naming-convention -- The rule schema names AST nodes in PascalCase.
-      Attribute: 1,
-      ignoreComment: false,
-      tagChildrenIndent: {},
-      templateIndentBase: "templateTag",
-    },
-  ], // Covered by `prettier`
-  "@html-eslint/no-extra-spacing-tags": [
-    "off",
-    {
-      disallowInAssignment: false,
-      disallowMissing: false,
-      disallowTabs: false,
-      enforceBeforeSelfClose: false,
-    },
-  ], // Covered by `prettier`
-  "@html-eslint/no-extra-spacing-text": ["off", { skip: [] }], // Covered by `prettier`
-  "@html-eslint/no-multiple-empty-lines": ["off", { max: 2 }], // Covered by `prettier`
+  "@html-eslint/element-newline": "off", // Covered by `prettier`
+  "@html-eslint/indent": "off", // Covered by `prettier`
+  "@html-eslint/no-extra-spacing-tags": "off", // Covered by `prettier`
+  "@html-eslint/no-extra-spacing-text": "off", // Covered by `prettier`
+  "@html-eslint/no-multiple-empty-lines": "off", // Covered by `prettier`
   "@html-eslint/no-trailing-spaces": "off", // Covered by `prettier`
-  "@html-eslint/quotes": [
-    "off",
-    "double",
-    { enforceTemplatedAttrValue: false },
-  ], // Covered by `prettier`
+  "@html-eslint/quotes": "off", // Covered by `prettier`
 } as const;
 
 export { htmlRules };

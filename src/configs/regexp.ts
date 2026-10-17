@@ -121,7 +121,7 @@ const regexpRules: Rules = {
     { lookbehind: true, strictTypes: true },
   ],
   "regexp/prefer-named-backreference": "error",
-  "regexp/prefer-named-capture-group": "error",
+  "regexp/prefer-named-capture-group": "off", // Handled by `prefer-named-capture-group`.
   "regexp/prefer-named-replacement": ["error", { strictTypes: true }],
   "regexp/prefer-plus-quantifier": "error",
   "regexp/prefer-predefined-assertion": "error",
@@ -178,10 +178,10 @@ const regexpRules: Rules = {
 } as const;
 
 // Builds the flat config for eslint-plugin-regexp.
-function regexp(
+const regexp = (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { svelteComponents }: Context = defaultContext,
-): Linter.Config[] {
+): Linter.Config[] => {
   return [
     {
       name: "@cravingmaker/eslint-config/regexp/setup",
@@ -197,6 +197,6 @@ function regexp(
       rules: { ...regexpRules, ...overrides },
     },
   ];
-}
+};
 
 export { regexp, regexpRules };

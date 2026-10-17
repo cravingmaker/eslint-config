@@ -139,53 +139,61 @@ Every scenario of the effective-rules snapshots, in the order that the snapshot 
 policy difference report present them.
 */
 const effectiveScenarios: readonly EffectiveScenario[] = [
-  ...suites.map(({ filePaths, name, options }) => ({
-    name,
-    options,
-    snapshots: filePaths.map((filePath) => ({
-      filePath,
-      path: `${name}/${filePath.replaceAll("/", "__")}.txt`,
-    })),
-  })),
-  ...reactRefreshVariants.map((variant) => ({
-    name: `react-refresh-${variant}`,
-    options: { ...baseOptions, react: { refresh: variant } },
-    snapshots: [
-      {
-        filePath: "src/example.tsx",
-        path: `react-refresh/${variant}.tsx.txt`,
-        ruleIdPrefix: "react-refresh/",
-      },
-    ],
-  })),
+  ...suites.map(({ filePaths, name, options }) => {
+    return {
+      name,
+      options,
+      snapshots: filePaths.map((filePath) => {
+        return {
+          filePath,
+          path: `${name}/${filePath.replaceAll("/", "__")}.txt`,
+        };
+      }),
+    };
+  }),
+  ...reactRefreshVariants.map((variant) => {
+    return {
+      name: `react-refresh-${variant}`,
+      options: { ...baseOptions, react: { refresh: variant } },
+      snapshots: [
+        {
+          filePath: "src/example.tsx",
+          path: `react-refresh/${variant}.tsx.txt`,
+          ruleIdPrefix: "react-refresh/",
+        },
+      ],
+    };
+  }),
 ];
 
-async function createEslint(options: ConfigOptions): Promise<ESLint> {
+const createEslint = async (options: ConfigOptions): Promise<ESLint> => {
   return new ESLint({
     overrideConfig: await createConfig(options),
     overrideConfigFile: true,
   });
-}
+};
 /**
 Describes the configuration that `eslint` resolves for the file of `snapshot`, as its snapshot
 stores it.
 */
-async function describeSnapshot(
+const describeSnapshot = async (
   eslint: ESLint,
   { filePath, ruleIdPrefix }: EffectiveSnapshot,
-): Promise<string> {
+): Promise<string> => {
   const description = await describeEffectiveConfig(
     eslint,
     filePath,
     rootDirectory,
   );
-  if (ruleIdPrefix === undefined) return description;
+  if (typeof ruleIdPrefix === "undefined") {
+    return description;
+  }
 
-  const rules = description
-    .split("\n")
-    .filter((line) => line.startsWith(ruleIdPrefix));
+  const rules = description.split("\n").filter((line) => {
+    return line.startsWith(ruleIdPrefix);
+  });
   return `${rules.join("\n")}\n`;
-}
+};
 
 export type { EffectiveScenario, EffectiveSnapshot };
 export { createEslint, describeSnapshot, effectiveScenarios };

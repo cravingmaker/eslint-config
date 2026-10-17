@@ -1,5 +1,4 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- The repositories and packages are written to temporary directories. */
-
 import {
   access,
   mkdir,
@@ -52,40 +51,12 @@ const snapshots = {
 const exampleProject = await createTemporaryDirectory(
   "eslint-config-policy-diff-",
 );
-
-/*
-A Git repository with three commits, each tagged: one without snapshots, one with snapshots and
-without a lockfile, and one with both.
-*/
-await git(["init", "--quiet", "--initial-branch=main"]);
-await writeFile(path.join(exampleProject, "README.md"), "# Example\n");
-await commit("without-snapshots");
-await Promise.all(
-  Object.entries(snapshots).map(async ([file, text]) => {
-    const snapshotPath = path.join(exampleProject, snapshotDirectory, file);
-    await mkdir(path.dirname(snapshotPath), { recursive: true });
-    await writeFile(snapshotPath, text);
-  }),
-);
-await commit("without-lockfile");
-await writeFile(path.join(exampleProject, "package-lock.json"), lockfile);
-await commit("complete");
-
-afterAll(async () => {
-  await rm(exampleProject, { force: true, recursive: true });
-});
-
-async function commit(tag: string): Promise<void> {
-  await git(["add", "--all"]);
-  await git(["commit", "--quiet", "--message", tag]);
-  await git(["tag", tag]);
-}
 /**
 Runs Git in the example project, without the variables of a Git hook, which would point it to
 this repository while the pre-push hook runs the tests, and without the hooks and signing that
 the user's configuration may set.
 */
-async function git(gitArguments: readonly string[]): Promise<string> {
+const git = async (gitArguments: readonly string[]): Promise<string> => {
   const { stdout } = await execute(
     "git",
     [
@@ -105,8 +76,32 @@ async function git(gitArguments: readonly string[]): Promise<string> {
     { cwd: exampleProject, env: withoutGitVariables(process.env) },
   );
   return stdout.trim();
-}
-
+};
+/*
+A Git repository with three commits, each tagged: one without snapshots, one with snapshots and
+without a lockfile, and one with both.
+*/
+await git(["init", "--quiet", "--initial-branch=main"]);
+await writeFile(path.join(exampleProject, "README.md"), "# Example\n");
+const commit = async (tag: string): Promise<void> => {
+  await git(["add", "--all"]);
+  await git(["commit", "--quiet", "--message", tag]);
+  await git(["tag", tag]);
+};
+await commit("without-snapshots");
+await Promise.all(
+  Object.entries(snapshots).map(async ([file, text]) => {
+    const snapshotPath = path.join(exampleProject, snapshotDirectory, file);
+    await mkdir(path.dirname(snapshotPath), { recursive: true });
+    await writeFile(snapshotPath, text);
+  }),
+);
+await commit("without-lockfile");
+await writeFile(path.join(exampleProject, "package-lock.json"), lockfile);
+await commit("complete");
+afterAll(async () => {
+  await rm(exampleProject, { force: true, recursive: true });
+});
 describe("resolveCommit", () => {
   it("resolves a revision to the commit that it names", async () => {
     await expect(resolveCommit("complete", exampleProject)).resolves.toBe(
@@ -116,7 +111,6 @@ describe("resolveCommit", () => {
       await git(["rev-parse", "without-snapshots^{commit}"]),
     );
   });
-
   it.each(["missing", "complete^{tree}", ""])(
     "rejects %j, which names no commit",
     async (revision) => {
@@ -125,22 +119,18 @@ describe("resolveCommit", () => {
       );
     },
   );
-
   it("reads a revision that starts with a dash as a revision, not an option", async () => {
     const output = path.join(exampleProject, "output.txt");
-
     await expect(
       resolveCommit(`--output=${output}`, exampleProject),
     ).rejects.toThrow("The base is not a commit of this project");
     await expect(access(output)).rejects.toThrow("ENOENT");
   });
 });
-
 describe("readBaseline", () => {
   it("reads the snapshots and the lockfile of a commit", async () => {
     const commitId = await git(["rev-parse", "complete^{commit}"]);
     const baseline = await readBaseline(commitId, exampleProject);
-
     expect(baseline).toEqual({
       commit: commitId,
       lockfile,
@@ -149,26 +139,21 @@ describe("readBaseline", () => {
       tree: await git(["rev-parse", `complete:${snapshotDirectory}`]),
     });
   });
-
   it("reads a commit without a lockfile", async () => {
     const baseline = await readBaseline(
       await git(["rev-parse", "without-lockfile^{commit}"]),
       exampleProject,
     );
-
     expect(baseline.lockfile).toBeUndefined();
     expect(baseline.snapshots.size).toBe(2);
   });
-
   it("rejects a commit without snapshots", async () => {
     const commitId = await git(["rev-parse", "without-snapshots^{commit}"]);
-
     await expect(readBaseline(commitId, exampleProject)).rejects.toThrow(
       `The baseline ${commitId} has no snapshots in ${snapshotDirectory}/.`,
     );
   });
 });
-
 describe("dependencies", () => {
   it("lists the packages whose locked version changed, without the project", () => {
     const before = readLockedPackages(
@@ -191,7 +176,6 @@ describe("dependencies", () => {
         },
       }),
     );
-
     expect(compareLockedPackages(before, before)).toEqual([]);
     expect(compareLockedPackages(before, after)).toEqual([
       "~ a: 1.0.0 → 1.1.0",
@@ -199,7 +183,6 @@ describe("dependencies", () => {
       "+ d: 3.0.0",
     ]);
   });
-
   it("finds the packages that are not installed with their locked version", async () => {
     const project = await createTemporaryDirectory("eslint-config-installed-");
     const install = async (name: string, version: string): Promise<void> => {
@@ -212,7 +195,6 @@ describe("dependencies", () => {
     };
     await install("same", "1.0.0");
     await install("other", "0.9.0");
-
     const mismatches = await findInstallMismatches(
       readLockedPackages(
         JSON.stringify({
@@ -227,14 +209,12 @@ describe("dependencies", () => {
       project,
     );
     await rm(project, { force: true, recursive: true });
-
     expect(mismatches).toEqual([
       "node_modules/missing: 2.0.0 is not installed",
       "node_modules/other: 0.9.0 is installed, the lockfile has 1.0.0",
     ]);
   });
 });
-
 describe("formatResults", () => {
   it("says that the policy is unchanged only when every snapshot is", () => {
     expect(
@@ -252,7 +232,6 @@ describe("formatResults", () => {
       ]),
     ).toEqual(["Unchanged: all 2 snapshots match the baseline."]);
   });
-
   it("lists the snapshots by outcome, and counts them", () => {
     expect(
       formatResults([
@@ -312,7 +291,6 @@ describe("formatResults", () => {
     ]);
   });
 });
-
 describe("withoutGitVariables", () => {
   it("leaves out the variables whose names start with GIT_", () => {
     const environment = Object.fromEntries([
@@ -321,7 +299,6 @@ describe("withoutGitVariables", () => {
       ["HOME", "/home/user"],
       ["PATH", "/usr/bin"],
     ]);
-
     expect(withoutGitVariables(environment)).toEqual(
       Object.fromEntries([
         ["HOME", "/home/user"],
@@ -330,7 +307,6 @@ describe("withoutGitVariables", () => {
     );
   });
 });
-
 describe("the current scenarios", () => {
   it("describe every snapshot of the working tree, which compares as unchanged", async () => {
     const directory = fileURLToPath(
@@ -340,11 +316,15 @@ describe("the current scenarios", () => {
     const workingTree = new Map(
       await Promise.all(
         files
-          .filter((file) => file.endsWith(".txt"))
-          .map(async (file): Promise<readonly [string, string]> => [
-            file.split(path.sep).join("/"),
-            await readFile(path.join(directory, file), "utf8"),
-          ]),
+          .filter((file) => {
+            return file.endsWith(".txt");
+          })
+          .map(async (file): Promise<readonly [string, string]> => {
+            return [
+              file.split(path.sep).join("/"),
+              await readFile(path.join(directory, file), "utf8"),
+            ];
+          }),
       ),
     );
     const results = compareSnapshots(
@@ -354,14 +334,17 @@ describe("the current scenarios", () => {
         describeSnapshot,
       }),
     );
-
     expect(
       results
-        .map(({ path: snapshotPath }) => snapshotPath)
+        .map(({ path: snapshotPath }) => {
+          return snapshotPath;
+        })
         .toSorted(compareText),
     ).toEqual(workingTree.keys().toArray().toSorted(compareText));
     expect(
-      results.filter(({ outcome }) => outcome.status !== "unchanged"),
+      results.filter(({ outcome }) => {
+        return outcome.status !== "unchanged";
+      }),
     ).toEqual([]);
   });
 });

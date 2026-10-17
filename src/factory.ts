@@ -1,5 +1,5 @@
 import type { Linter } from "eslint";
-import type { Options } from "./types.js";
+import type { Context, Options } from "./types.js";
 
 import { defineConfig } from "eslint/config";
 
@@ -25,84 +25,62 @@ import { typescript } from "./configs/typescript/index.js";
 import { unicorn } from "./configs/unicorn.js";
 import { unusedImports } from "./configs/unused-imports.js";
 import { prepareConfig } from "./context.js";
-import { overlapConfigs } from "./overlaps.js";
+
+// A disabled feature contributes no blocks; rule ownership stays in the owning maps.
+const buildFeature = <
+  Settings,
+  Result extends Linter.Config[] | Promise<Linter.Config[]>,
+>(
+  settings: Settings | undefined,
+  build: (settings: Settings, context: Context) => Result,
+  context: Context,
+): Result | [] => {
+  return typeof settings === "undefined" ? [] : build(settings, context);
+};
 
 /**
-Builds the ESLint flat config. Every feature is on unless it is `false`, except `react`,
-`svelte`, and `express`, which are on when the project declares them. Their plugins are optional
-peer dependencies: when one of these features is on and a peer it needs is not installed, the
-returned promise rejects with a message that names the package. It also rejects, before
-anything else, when `options` or the options object of a feature has a key that is not an
-option, with a message that lists every such key. The blocks come in a fixed order: global
-ignores, JavaScript and the code-quality plugins, TypeScript, frameworks, file formats, the
-rules that other features replace, and the rules that test and config files turn off, followed
-by `userConfigs` in the order given.
+Builds the ESLint flat config. Frameworks are detected from the project manifest, and all other
+features are on unless explicitly disabled. Rule ownership is declared in each feature's map.
+File-role exceptions follow the features, then user configs apply in the order supplied.
 */
-async function createConfig(
+const createConfig = async (
   options: Options = {},
   // eslint-disable-next-line functional/functional-parameters, functional/prefer-immutable-types -- The public signature takes user configs as rest arguments of ESLint's mutable config type.
   ...userConfigs: Linter.Config[]
-): Promise<Linter.Config[]> {
+): Promise<Linter.Config[]> => {
   const { context, resolved } = await prepareConfig(options);
   const [typescriptConfigs, reactConfigs, svelteConfigs, expressConfigs] =
     await Promise.all([
-      resolved.typescript === undefined
-        ? []
-        : typescript(resolved.typescript, context),
-      resolved.react === undefined ? [] : react(resolved.react),
-      resolved.svelte === undefined ? [] : svelte(resolved.svelte, context),
-      resolved.express === undefined ? [] : express(resolved.express),
+      buildFeature(resolved.typescript, typescript, context),
+      buildFeature(resolved.react, react, context),
+      buildFeature(resolved.svelte, svelte, context),
+      buildFeature(resolved.express, express, context),
     ]);
 
   return defineConfig([
     ...ignores(resolved.ignores),
-
     ...core(resolved.javascript, context),
-    ...(resolved.comments === undefined
-      ? []
-      : comments(resolved.comments, context)),
-    ...(resolved.node === undefined ? [] : node(resolved.node, context)),
-    ...(resolved.security === undefined
-      ? []
-      : security(resolved.security, context)),
-    ...(resolved.imports === undefined
-      ? []
-      : imports(resolved.imports, context)),
-    ...(resolved.unusedImports === undefined
-      ? []
-      : unusedImports(resolved.unusedImports, context)),
-    ...(resolved.promise === undefined
-      ? []
-      : promise(resolved.promise, context)),
-    ...(resolved.regexp === undefined ? [] : regexp(resolved.regexp, context)),
-    ...(resolved.unicorn === undefined
-      ? []
-      : unicorn(resolved.unicorn, context)),
-    ...(resolved.functional === undefined
-      ? []
-      : functional(resolved.functional, context)),
-    ...(resolved.perfectionist === undefined
-      ? []
-      : perfectionist(resolved.perfectionist, context)),
-
+    ...buildFeature(resolved.comments, comments, context),
+    ...buildFeature(resolved.node, node, context),
+    ...buildFeature(resolved.security, security, context),
+    ...buildFeature(resolved.imports, imports, context),
+    ...buildFeature(resolved.unusedImports, unusedImports, context),
+    ...buildFeature(resolved.promise, promise, context),
+    ...buildFeature(resolved.regexp, regexp, context),
+    ...buildFeature(resolved.unicorn, unicorn, context),
+    ...buildFeature(resolved.functional, functional, context),
+    ...buildFeature(resolved.perfectionist, perfectionist, context),
     ...typescriptConfigs,
-
     ...reactConfigs,
     ...svelteConfigs,
     ...expressConfigs,
-
-    ...(resolved.html === undefined ? [] : html(resolved.html)),
-    ...(resolved.json === undefined ? [] : json(resolved.json)),
-    ...(resolved.packageJson === undefined
-      ? []
-      : packageJson(resolved.packageJson)),
-    ...(resolved.markdown === undefined ? [] : markdown(resolved.markdown)),
-
-    ...overlapConfigs(resolved),
+    ...buildFeature(resolved.html, html, context),
+    ...buildFeature(resolved.json, json, context),
+    ...buildFeature(resolved.packageJson, packageJson, context),
+    ...buildFeature(resolved.markdown, markdown, context),
     ...exceptions(resolved),
-
     ...userConfigs,
   ]);
-}
+};
 
 export { createConfig };

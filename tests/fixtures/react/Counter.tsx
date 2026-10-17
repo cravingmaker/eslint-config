@@ -3,7 +3,11 @@ import { useState } from "react";
 /**
 A button that counts its clicks.
 */
-export function Counter({ initialCount }: { readonly initialCount: number }) {
+export const Counter = ({
+  initialCount,
+}: {
+  readonly initialCount: number;
+}) => {
   const [count, setCount] = useState(initialCount);
   return (
     <button
@@ -15,4 +19,4 @@ export function Counter({ initialCount }: { readonly initialCount: number }) {
       Clicked {count} times
     </button>
   );
-}
+};

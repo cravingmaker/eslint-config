@@ -627,27 +627,7 @@ const perfectionistRules: Rules = {
     },
   ],
 
-  "perfectionist/sort-variable-declarations": [
-    "off",
-    {
-      alphabet: "",
-      customGroups: [],
-      fallbackSort: { type: "unsorted" },
-      groups: [],
-      ignoreCallbackDependenciesPatterns: [],
-      ignoreCase: true,
-      locales: "en-US",
-      newlinesBetween: "ignore",
-      newlinesInside: "newlinesBetween",
-      order: "asc",
-      partitionByComment: false,
-      partitionByNewLine: false,
-      specialCharacters: "keep",
-      type: "alphabetical",
-      useConfigurationIf: {},
-      useExperimentalDependencyDetection: true,
-    },
-  ], // Covered by `one-var`, which allows one declarator per declaration
+  "perfectionist/sort-variable-declarations": "off", // Handled by `one-var`, which allows one declarator per declaration.
 } as const;
 
 export { perfectionistRules };

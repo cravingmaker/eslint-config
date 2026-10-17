@@ -18,26 +18,26 @@ const svelteContext: Context = {
   svelteComponents: [["**/*.svelte", "!**/generated/**"]],
 };
 
-async function getRules(
+const getRules = async (
   eslint: ESLint,
   filePath: string,
-): Promise<RuleEntries | undefined> {
+): Promise<RuleEntries | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     { readonly rules?: RuleEntries } | undefined;
   return config?.rules;
-}
+};
 // The severity of a rule in the configuration for a file, or `undefined` when it is not set.
-async function getSeverity(
+const getSeverity = async (
   eslint: ESLint,
   filePath: string,
   ruleId: string,
-): Promise<unknown> {
+): Promise<unknown> => {
   const rules = new Map(
     Object.entries((await getRules(eslint, filePath)) ?? {}),
   );
   return rules.get(ruleId)?.[0];
-}
+};
 
 describe("node feature", () => {
   it("turns n/no-sync off in TypeScript files without type information", async () => {
@@ -128,7 +128,7 @@ describe("node feature", () => {
     expect(severities).toEqual([2, 0, 0]);
   });
 
-  it("turns n/no-missing-import off in TypeScript files and Svelte components, whose imports it does not resolve as TypeScript does", async () => {
+  it("leaves import resolution to import-x in every language", async () => {
     const eslint = new ESLint({
       overrideConfig: node({}, svelteContext),
       overrideConfigFile: true,
@@ -141,13 +141,12 @@ describe("node feature", () => {
         "src/example.d.ts",
         "src/state.svelte.ts",
         "src/Component.svelte",
-      ].map(
-        async (filePath) =>
-          await getSeverity(eslint, filePath, "n/no-missing-import"),
-      ),
+      ].map(async (filePath) => {
+        return await getSeverity(eslint, filePath, "n/no-missing-import");
+      }),
     );
 
-    expect(severities).toEqual([2, 2, 0, 0, 0, 0]);
+    expect(severities).toEqual([0, 0, 0, 0, 0, 0]);
   });
 
   it("applies an override of n/no-missing-import in every file", async () => {
@@ -168,11 +167,19 @@ describe("node feature", () => {
         "src/example.ts",
         "src/example.d.ts",
         "src/Component.svelte",
-      ].map(async (filePath) => await getRules(eslint, filePath)),
+      ].map(async (filePath) => {
+        return await getRules(eslint, filePath);
+      }),
     );
 
-    expect(rules.map((entries) => entries?.["n/no-missing-import"])).toEqual(
-      rules.map(() => [1, { ignoreTypeImport: true }]),
+    expect(
+      rules.map((entries) => {
+        return entries?.["n/no-missing-import"];
+      }),
+    ).toEqual(
+      rules.map(() => {
+        return [1, { ignoreTypeImport: true }];
+      }),
     );
   });
 
@@ -187,10 +194,10 @@ describe("node feature", () => {
       getRules(eslint, "src/example.d.ts"),
     ]);
 
-    expect(rules.map((entries) => entries?.["n/no-sync"])).toEqual([
-      [0],
-      [0],
-      [0],
-    ]);
+    expect(
+      rules.map((entries) => {
+        return entries?.["n/no-sync"];
+      }),
+    ).toEqual([[0], [0], [0]]);
   });
 });

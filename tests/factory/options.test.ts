@@ -122,7 +122,7 @@ describe("resolveOptions", () => {
     expect(resolved.typeAware).toBeUndefined();
   });
 
-  // typescript-eslint takes an absolute `tsconfigRootDir` only, so both directories are resolved.
+  // Typescript-eslint takes an absolute `tsconfigRootDir` only, so both directories are resolved.
   it.each(relativeDirectories)(
     "resolves the relative project root %j from the working directory",
     (relative, segments) => {

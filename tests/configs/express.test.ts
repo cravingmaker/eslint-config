@@ -7,14 +7,14 @@ type EffectiveConfig = {
   readonly rules?: Readonly<Record<string, readonly [number, ...unknown[]]>>;
 };
 
-async function getEffectiveConfig(
+const getEffectiveConfig = async (
   eslint: ESLint,
   filePath: string,
-): Promise<EffectiveConfig | undefined> {
+): Promise<EffectiveConfig | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   return (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
-}
+};
 
 describe("express feature", () => {
   it("lints ES module sources with eslint-plugin-express-security", async () => {

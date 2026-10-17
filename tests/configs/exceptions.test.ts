@@ -32,53 +32,54 @@ const svelteComponentRules = [
   "unicorn/no-top-level-assignment-in-function",
 ] as const;
 
-async function createEslint(
+const createEslint = async (
   options: Options,
   userConfigs: readonly Linter.Config[] = [],
-): Promise<ESLint> {
+): Promise<ESLint> => {
   return new ESLint({
     overrideConfig: await createConfig(options, ...userConfigs),
     overrideConfigFile: true,
   });
-}
+};
 // The names of the exception blocks in `configs`.
-function getExceptionNames(
+const getExceptionNames = (
   configs: readonly Linter.Config[],
-): readonly string[] {
-  return configs.flatMap(({ name = "" }) =>
-    name.startsWith(prefix) ? [name] : [],
-  );
-}
+): readonly string[] => {
+  return configs.flatMap(({ name = "" }) => {
+    return name.startsWith(prefix) ? [name] : [];
+  });
+};
 // The severity of each of `ruleIds` in the configuration for `filePath`, or `undefined` for a
 // rule that the configuration does not set.
-async function getSeverities(
+const getSeverities = async (
   eslint: ESLint,
   filePath: string,
   ruleIds: readonly string[],
-): Promise<Severities> {
+): Promise<Severities> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     { readonly rules?: RuleEntries } | undefined;
   const rules = new Map(Object.entries(config?.rules ?? {}));
-  return ruleIds.map((ruleId) => rules.get(ruleId)?.[0]);
-}
+  return ruleIds.map((ruleId) => {
+    return rules.get(ruleId)?.[0];
+  });
+};
 // The severities of `ruleIds` for each of `filePaths`, by path.
-async function getSeveritiesByPath(
+const getSeveritiesByPath = async (
   eslint: ESLint,
   filePaths: readonly string[],
   ruleIds: readonly string[],
-): Promise<Readonly<Record<string, Severities>>> {
+): Promise<Readonly<Record<string, Severities>>> => {
   return Object.fromEntries(
     await Promise.all(
       filePaths.map(
-        async (filePath): Promise<readonly [string, Severities]> => [
-          filePath,
-          await getSeverities(eslint, filePath, ruleIds),
-        ],
+        async (filePath): Promise<readonly [string, Severities]> => {
+          return [filePath, await getSeverities(eslint, filePath, ruleIds)];
+        },
       ),
     ),
   );
-}
+};
 
 describe("file-role exceptions", () => {
   it("turn off the side-effect rules in test files", async () => {
@@ -122,7 +123,9 @@ describe("file-role exceptions", () => {
       "vite.config.yaml",
     ];
     const ignored = await Promise.all(
-      filePaths.map(async (filePath) => await eslint.isPathIgnored(filePath)),
+      filePaths.map(async (filePath) => {
+        return await eslint.isPathIgnored(filePath);
+      }),
     );
 
     expect(ignored).toEqual([true, true, true]);
@@ -168,13 +171,17 @@ describe("file-role exceptions", () => {
     ]);
 
     expect(
-      configs.map(
-        (config) =>
-          config.find(({ name }) => name === `${prefix}svelte-components`)
-            ?.rules,
-      ),
+      configs.map((config) => {
+        return config.find(({ name }) => {
+          return name === `${prefix}svelte-components`;
+        })?.rules;
+      }),
     ).toEqual([
-      Object.fromEntries(svelteComponentRules.map((ruleId) => [ruleId, "off"])),
+      Object.fromEntries(
+        svelteComponentRules.map((ruleId) => {
+          return [ruleId, "off"];
+        }),
+      ),
       {
         "import-x/no-mutable-exports": "off",
         "import-x/unambiguous": "off",

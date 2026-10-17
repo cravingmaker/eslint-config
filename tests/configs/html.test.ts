@@ -16,9 +16,11 @@ describe("html feature", () => {
       overrideConfigFile: true,
     });
 
-    expect(configs.map((config) => config.name)).toEqual([
-      "@cravingmaker/eslint-config/html/rules",
-    ]);
+    expect(
+      configs.map((config) => {
+        return config.name;
+      }),
+    ).toEqual(["@cravingmaker/eslint-config/html/rules"]);
     expect(
       await Promise.all([
         describeFile(eslint, "index.html", "@html-eslint/indent"),

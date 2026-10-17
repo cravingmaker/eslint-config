@@ -34,13 +34,13 @@ const jsonRules: Rules = {
 // block gave them. The patterns that the JSON block leaves out by itself come after `ignores`:
 // ESLint reads an ignore list in order, so a negated pattern brings back only what the patterns
 // before it left out.
-function json({
+const json = ({
   files,
   ignores = [],
   overrides = {},
   overridesJson5 = {},
   overridesJsonc = {},
-}: JsonOptions = {}): Linter.Config[] {
+}: JsonOptions = {}): Linter.Config[] => {
   return [
     {
       files: narrowFiles(jsonFiles, files),
@@ -67,6 +67,6 @@ function json({
       rules: { ...jsonRules, ...overridesJson5 },
     },
   ];
-}
+};
 
 export { json };

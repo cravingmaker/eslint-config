@@ -66,37 +66,39 @@ afterAll(async () => {
   await rm(projectRootDirectory, { force: true, recursive: true });
 });
 
-async function getEffectiveConfig(
+const getEffectiveConfig = async (
   eslint: ESLint,
   filePath: string,
-): Promise<EffectiveConfig | undefined> {
+): Promise<EffectiveConfig | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   return (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
-}
+};
 // The settings of the eslint-plugin-react-hooks rules in `config`.
-function getHooksRules(
+const getHooksRules = (
   config: EffectiveConfig | undefined,
-): Readonly<Record<string, RuleEntry>> {
+): Readonly<Record<string, RuleEntry>> => {
   return Object.fromEntries(
-    Object.entries(config?.rules ?? {}).filter(([ruleId]) =>
-      ruleId.startsWith("react-hooks/"),
-    ),
+    Object.entries(config?.rules ?? {}).filter(([ruleId]) => {
+      return ruleId.startsWith("react-hooks/");
+    }),
   );
-}
-function getPluginNames(config: EffectiveConfig | undefined): string[] {
-  return Object.keys(config?.plugins ?? {}).toSorted((left, right) =>
-    left.localeCompare(right),
-  );
-}
+};
+const getPluginNames = (config: EffectiveConfig | undefined): string[] => {
+  return Object.keys(config?.plugins ?? {}).toSorted((left, right) => {
+    return left.localeCompare(right);
+  });
+};
 // The severity of each of `ruleIds` in `config`, or `undefined` where it does not set the rule.
-function getSeverities(
+const getSeverities = (
   config: EffectiveConfig | undefined,
   ruleIds: readonly string[],
-): Array<number | undefined> {
+): Array<number | undefined> => {
   const rules = new Map(Object.entries(config?.rules ?? {}));
-  return ruleIds.map((ruleId) => rules.get(ruleId)?.[0]);
-}
+  return ruleIds.map((ruleId) => {
+    return rules.get(ruleId)?.[0];
+  });
+};
 
 describe("react feature", () => {
   it("adds one block per React plugin, with the hooks rules in every source file", async () => {
@@ -113,7 +115,11 @@ describe("react feature", () => {
     ]);
     const hooksRules = getHooksRules(component);
 
-    expect(configs.map((config) => config.name)).toEqual([
+    expect(
+      configs.map((config) => {
+        return config.name;
+      }),
+    ).toEqual([
       "@cravingmaker/eslint-config/react/html",
       "@cravingmaker/eslint-config/react/hooks",
       "@cravingmaker/eslint-config/react/refresh",
@@ -130,10 +136,9 @@ describe("react feature", () => {
     ]);
     // Custom hooks also live in modules without JSX, which get the hooks rules and no others.
     expect(
-      [hooksModule, hooksScript].map((config) => [
-        getPluginNames(config),
-        config?.rules,
-      ]),
+      [hooksModule, hooksScript].map((config) => {
+        return [getPluginNames(config), config?.rules];
+      }),
     ).toEqual([
       [["@", "react-hooks"], hooksRules],
       [["@", "react-hooks"], hooksRules],
@@ -153,7 +158,9 @@ describe("react feature", () => {
         "app/data.json",
         "lib/Component.tsx",
         "lib/use-counter.ts",
-      ].map(async (filePath) => await getEffectiveConfig(eslint, filePath)),
+      ].map(async (filePath) => {
+        return await getEffectiveConfig(eslint, filePath);
+      }),
     );
 
     expect(getPluginNames(component)).toEqual([
@@ -212,9 +219,9 @@ describe("react feature", () => {
       component?.rules?.["react-refresh/only-export-components"],
     ).toMatchObject([1, { allowConstantExport: true }]);
     expect(
-      [component, hooksModule].map(
-        (config) => config?.rules?.["react-hooks/exhaustive-deps"],
-      ),
+      [component, hooksModule].map((config) => {
+        return config?.rules?.["react-hooks/exhaustive-deps"];
+      }),
     ).toEqual([
       [2, { additionalHooks: "useCustomEffect" }],
       [2, { additionalHooks: "useCustomEffect" }],
@@ -242,8 +249,12 @@ describe("react feature", () => {
           return [
             config.name ?? "",
             Object.entries(overrides)
-              .filter(([ruleId, entry]) => rules.get(ruleId) === entry)
-              .map(([ruleId]) => ruleId),
+              .filter(([ruleId, entry]) => {
+                return rules.get(ruleId) === entry;
+              })
+              .map(([ruleId]) => {
+                return ruleId;
+              }),
           ];
         }),
       );
@@ -291,9 +302,11 @@ describe("react feature", () => {
   it("leaves React Refresh out when it is off", async () => {
     const configs = await react({ refresh: false });
 
-    expect(configs.map((config) => config.name)).not.toContain(
-      "@cravingmaker/eslint-config/react/refresh",
-    );
+    expect(
+      configs.map((config) => {
+        return config.name;
+      }),
+    ).not.toContain("@cravingmaker/eslint-config/react/refresh");
   });
 });
 
@@ -335,7 +348,9 @@ describe("an override of the React Refresh rule", () => {
 
     // The project declares React, so the plugins of the two other parts are there in each case.
     expect(
-      getPluginNames(component).filter((name) => name.includes("react")),
+      getPluginNames(component).filter((name) => {
+        return name.includes("react");
+      }),
     ).toEqual(plugins);
     expect(component?.rules?.["react-refresh/only-export-components"]).toEqual(
       entry,
@@ -395,7 +410,7 @@ describe("react-hooks rules", () => {
     );
   });
 
-  // fbt depends on Meta's FBT library, and todo and rule-suppression serve Meta-internal tracking.
+  // Fbt depends on Meta's FBT library, and todo and rule-suppression serve Meta-internal tracking.
   // No sample triggers them without Meta's compiler settings, so the test reads the configuration.
   it("explicitly disables the React Compiler rules that are internal to Meta", async () => {
     const internalRuleIds = [
@@ -404,21 +419,23 @@ describe("react-hooks rules", () => {
       "react-hooks/todo",
     ];
     const configs = await react();
-    const hooks = configs.find(
-      (config) => config.name === "@cravingmaker/eslint-config/react/hooks",
-    );
+    const hooks = configs.find((config) => {
+      return config.name === "@cravingmaker/eslint-config/react/hooks";
+    });
     const pluginRuleIds = Object.keys(
       hooks?.plugins?.["react-hooks"]?.rules ?? {},
-    ).map((ruleName) => `react-hooks/${ruleName}`);
+    ).map((ruleName) => {
+      return `react-hooks/${ruleName}`;
+    });
 
     const declaredRules = new Map(Object.entries(hooks?.rules ?? {}));
 
     expect(pluginRuleIds).toEqual(expect.arrayContaining(internalRuleIds));
-    expect(internalRuleIds.map((ruleId) => declaredRules.get(ruleId))).toEqual([
-      ["off", {}],
-      ["off", {}],
-      ["off", {}],
-    ]);
+    expect(
+      internalRuleIds.map((ruleId) => {
+        return declaredRules.get(ruleId);
+      }),
+    ).toEqual(["off", "off", "off"]);
   });
 });
 

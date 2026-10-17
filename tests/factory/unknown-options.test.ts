@@ -72,13 +72,13 @@ const replacedOptions = [
 ] as const;
 
 // The options that every feature takes, for the files with `extensions` in `src/`.
-function scopeTo(extensions: string): Required<FeatureOptions> {
+const scopeTo = (extensions: string): Required<FeatureOptions> => {
   return {
     files: [`src/**/*.${extensions}`],
     ignores: ["src/generated/**"],
     overrides: {},
   };
-}
+};
 
 const sources = scopeTo("{js,ts}");
 const everyOption = {
@@ -119,16 +119,15 @@ The message that `createConfig` rejects with for `given`, or `undefined` when it
 options are a record, as a config file without `// @ts-check` passes them: the compiler would
 reject an unknown key in an object literal.
 */
-async function rejectionOf(
+const rejectionOf = async (
   given: Readonly<Record<string, unknown>>,
-): Promise<string | undefined> {
+): Promise<string | undefined> => {
   try {
     await createConfig(given);
-    return undefined;
   } catch (error) {
     return Error.isError(error) ? error.message : String(error);
   }
-}
+};
 
 describe("createConfig with an option that it does not know", () => {
   it("rejects the options of 0.1.0 and names what replaces each of them", async () => {
@@ -170,9 +169,9 @@ describe("createConfig with an option that it does not know", () => {
 
   it("names every option", () => {
     expect(
-      Object.keys(everyOption).filter(
-        (option) => !options.includes(`\`${option}\``),
-      ),
+      Object.keys(everyOption).filter((option) => {
+        return !options.includes(`\`${option}\``);
+      }),
     ).toEqual([]);
   });
 

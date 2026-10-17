@@ -16,10 +16,10 @@ import { narrowFiles } from "../../utilities/file-scope.js";
 // Builds the flat config for eslint-plugin-import-x. TypeScript files and Svelte components
 // within the feature's files resolve imports through the TypeScript resolver first, with the
 // project's tsconfig.
-function imports(
+const imports = (
   options: FeatureOptions = {},
   { svelteComponents, tsconfigRootDir }: Context = defaultContext,
-): Linter.Config[] {
+): Linter.Config[] => {
   const { files, ignores = [], overrides = {} } = options;
   const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
 
@@ -55,6 +55,6 @@ function imports(
       },
     },
   ];
-}
+};
 
 export { imports };

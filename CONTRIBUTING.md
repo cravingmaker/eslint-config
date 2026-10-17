@@ -76,6 +76,10 @@ Node.js 24 itself at the start of each session.
 
 ## Making changes
 
+Use the [coding principles](CODING_PRINCIPLES.md) to choose code style,
+architecture, linter rules, formatter settings, and scripts. Apply the goals in
+their stated priority order when comparing approaches.
+
 Create a branch from the latest `main` and keep each pull request focused.
 Use a conventional pull request title, such as `fix: ...`, `test: ...`, or
 `docs: ...`. Describe the problem and resulting behavior, including
@@ -107,10 +111,9 @@ public types from `src/types.ts`. Everything else is internal.
    file formats. A feature that is a folder, such as `typescript`, has
    its builder in `index.ts` and its rule maps in modules of their own,
    such as `rules.ts`.
-4. `src/overlaps.ts` adds the blocks that turn off the rules that
-   another feature replaces, where that feature lints. Then
-   `src/configs/exceptions.ts` adds the blocks that turn off the rules
-   that a file role breaks by design, such as those of test files.
+4. Each feature declares disabled alternatives in its own rule map, with a
+   `Handled by` comment naming the winning rule. There are no dynamic overlap
+   blocks. `src/configs/exceptions.ts` adds file-role exceptions.
 5. The user configs follow, in the order given.
 
 Every block is named `@cravingmaker/eslint-config/<feature>/<part>`, and
@@ -154,7 +157,7 @@ one feature. The rule map of that feature is the policy for its rules:
 | `unused-imports/`                                       | `unusedImports` | `src/configs/unused-imports.ts`                                                                                                                       |
 | `promise/`                                              | `promise`       | `src/configs/promise.ts`                                                                                                                              |
 | `regexp/`                                               | `regexp`        | `src/configs/regexp.ts`                                                                                                                               |
-| `unicorn/`                                              | `unicorn`       | `src/configs/unicorn.ts`                                                                                                                              |
+| `unicorn/`                                              | `unicorn`       | `src/configs/unicorn/rules.ts`                                                                                                                        |
 | `functional/`                                           | `functional`    | `src/configs/functional.ts`                                                                                                                           |
 | `perfectionist/`                                        | `perfectionist` | `src/configs/perfectionist/rules.ts`                                                                                                                  |
 | `@html-eslint/react/`, `react-hooks/`, `react-refresh/` | `react`         | `src/configs/react.ts`                                                                                                                                |
@@ -167,14 +170,18 @@ one feature. The rule map of that feature is the policy for its rules:
 
 Every current non-deprecated core and plugin rule has an explicit setting
 in its owning rule map, including the rules that are off. The maps declare
-fixed option defaults locally; no plugin preset or rule-registry loop
-chooses the policy. For optional peers, `supportedPluginPolicy()` applies
+fixed option defaults locally for enabled rules; disabled rules need only
+`"off"`. No plugin preset or rule-registry loop chooses the policy. For optional peers, `supportedPluginPolicy()` applies
 only declared rules and option fields that the installed version supports;
 core defaults also respect the host ESLint's option schemas. Feature
 overrides follow this compatibility step unchanged. New upstream
 rules remain unconfigured until a
 maintainer classifies them, and `tests/policy/rule-coverage.test.ts` fails
 on an unclassified rule.
+
+The authored core maps are the reference for rule policy. Enabled rules
+declare canonical options; deprecated aliases do not need duplicate entries.
+The core reference selects default forms for `curly` and `radix`.
 
 An option set to `undefined` deliberately retains inference from settings,
 the project's engines or tsconfig, or a rule's optional behavior without a
@@ -193,9 +200,8 @@ TypeScript files and to the scripts of Svelte components as well as to
 JavaScript. `src/factory.ts` shows the mapping:
 `core(resolved.javascript, context)`. What consumers see keeps the name
 `javascript`: the option, `javascript.overrides`, the messages that name
-them, and the block names that start with `javascript/` or
-`overlaps/javascript`. `src/overlaps.ts` assigns a rule without a plugin
-prefix to the feature `javascript`. There is no `core` option, and
+them, and the block names that start with `javascript/`. Core rules belong
+to this feature even when their alternatives are implemented by a plugin. There is no `core` option, and
 `createConfig()` rejects one as unknown. Names such as `javascriptFiles`
 in `src/globs.ts` mean the language, not the feature. The tests of the
 builder are in `tests/configs/core/`.
@@ -208,9 +214,8 @@ points of the order:
 - **A feature's `overrides`** go into the feature's `rules` block, after
   its rule map, and reach the feature's files only. An entry replaces
   the whole entry of the policy, so `"warn"` alone drops the options
-  that the policy gives the rule. The overrides come before the overlap
-  and exception blocks: a replaced rule that the overrides of its own
-  feature set stays on where its owner lints, but a file-role exception
+  that the policy gives the rule. Overrides can enable a disabled
+  alternative within its feature's files, but a later file-role exception
   still turns its rules off. A few features split their overrides: an
   override that turns on a rule that needs type information applies
   only where typed linting does, the blocks of the React feature divide
@@ -392,12 +397,12 @@ pull request, run the full [validation](#validation) as well.
 ### Change a rule
 
 1. **Find its rule map.** [Where a rule is declared](#where-a-rule-is-declared)
-   names the module of the rule's feature. Search the rule maps and the
-   overlap table rather than all of `src/`, because the generated
+   names the module of the rule's feature. Search the rule maps
+   rather than all of `src/`, because the generated
    `src/typegen.d.ts` names every rule:
 
    ```bash
-   grep -rn '"no-unused-vars"' src/configs src/overlaps.ts
+   rg -n '"no-unused-vars"' src/configs
    ```
 
 2. **Read its explicit setting and options.** Every current non-deprecated
@@ -408,11 +413,10 @@ pull request, run the full [validation](#validation) as well.
    inferred or optional values explicitly unset where replacing them with
    a fixed value would change consumer behavior.
 
-3. **Check the other blocks that set it.**
-   - `src/overlaps.ts` lists the rules that another feature replaces. A
-     replaced check stays on in its rule map, and a replaced style rule
-     is `"off"` there; see "A replaced rule comes back only as the same
-     check" under [Policy and snapshots](#policy-and-snapshots).
+3. **Check ownership and the other blocks that set it.**
+   - Rule ownership is explicit in the rule maps. An alternative stays off
+     even when its winner is disabled or excludes a file. Add a `Handled by`
+     comment naming the winning rule when changing an overlap.
    - In TypeScript files and Svelte components,
      `src/configs/typescript/replacements.ts` turns off the core rules
      that the compiler checks or that an extension rule replaces. When
@@ -484,8 +488,8 @@ pull request, run the full [validation](#validation) as well.
      removed rule.
    - Fixed defaults are declared locally. Review new or changed options
      against the installed schema; `tests/policy/rule-options.test.ts`
-     checks explicit options in the selected schema form and validates
-     disabled rules too.
+     checks enabled rules' explicit options in the selected schema form
+     and validates any options retained on disabled rules.
      Context-derived options and upstream implementations can still change
      behavior, so review the effective snapshots and actual lint results.
 
@@ -577,15 +581,12 @@ Finish dependency changes with the required [validation](#validation).
       rule, and then the feature's `overrides`.
    2. The later blocks that change it. `typescript/rules` turns off
       core rules in TypeScript files and Svelte components,
-      `node/rules-typescript` turns off `n/no-sync` and
-      `n/no-missing-import` there, and the `rules-type-aware` blocks
+      `node/rules-typescript` turns off `n/no-sync` there, and the `rules-type-aware` blocks
       turn on the rules that need type information where typed linting
       is.
-   3. The `overlaps/` blocks, which turn off a replaced check where its
-      owner lints.
-   4. The `exceptions/` blocks, which turn off rules in the files of a
+   3. The `exceptions/` blocks, which turn off rules in the files of a
       role.
-   5. The user configs.
+   4. The user configs.
 
 5. **Decide.** When the entry follows the policy, the comment beside
    its declaration, or the README section that describes the rule,
@@ -699,15 +700,12 @@ The reference that the recipes link to, grouped by topic.
   object spread replaces the whole entry instead. This is why moving a
   rule between blocks can change a snapshot line even when the rule stays
   off.
-- **A replaced rule comes back only as the same check.**
-  `src/overlaps.ts` lists the rules that another feature's rules replace,
-  in two parts. A rule under `checks` is on in its rule map, and the
-  factory turns it off where its owner lints, so it comes back while the
-  owner is off and in the files that the owner leaves out. It must accept
-  what the owner's rule accepts: `tests/policy/fixtures.test.ts` lints
-  the fixtures with each owner off. A rule that asks for something else,
-  such as another order of the imports, goes under `style` and is `"off"`
-  in its rule map.
+- **Rule ownership is static.** Every overlap has an enabled winner and an
+  explicitly disabled alternative in the owning rule maps. A `Handled by`
+  comment names the winner. Disabling or narrowing a feature never enables
+  an alternative. A consumer can still explicitly enable one through its
+  feature overrides or a user config. Tests in `tests/policy/overlaps.test.ts`
+  verify enabled, disabled, narrowed, ignored, Svelte, and override cases.
 - **The formatter test guards layout.** Prettier formats, so
   `tests/policy/formatter.test.ts` fails when a rule that
   `eslint-config-prettier` turns off is on, apart from its listed
@@ -852,6 +850,13 @@ The reference that the recipes link to, grouped by topic.
   the members around it, and its fix cannot remove it. A function that
   follows another function in the same group needs a doc comment without
   a paragraph break.
+
+The repository's own `eslint.config.js` preserves the authored core reference
+files and permits explicit unset values in rule-option maps. Test harnesses
+also allow explicit undefined values and exclude registration groups and
+fixture matrices from size/nesting limits. These local exceptions do not
+change the published configuration or its fixture checks. Runtime helpers
+follow the selected core syntax and complexity limits.
 
 ## Validation
 

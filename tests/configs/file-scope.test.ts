@@ -67,10 +67,12 @@ const ignoreLists: ReadonlyArray<
 The paths that each of two blocks reaches: one with `ignores` as its ignore list, which ESLint
 reads in order, and one with the files of `withoutIgnores` and no ignore list.
 */
-async function describeLeftIn(ignores: readonly string[]): Promise<{
+const describeLeftIn = async (
+  ignores: readonly string[],
+): Promise<{
   readonly byFiles: readonly string[];
   readonly byIgnores: readonly string[];
-}> {
+}> => {
   const eslint = new ESLint({
     overrideConfig: [
       {
@@ -93,15 +95,20 @@ async function describeLeftIn(ignores: readonly string[]): Promise<{
       return { filePath, ruleIds: Object.keys(config?.rules ?? {}) };
     }),
   );
-  const pathsWith = (ruleId: string): readonly string[] =>
-    reached
-      .filter(({ ruleIds }) => ruleIds.includes(ruleId))
-      .map(({ filePath }) => filePath);
+  const pathsWith = (ruleId: string): readonly string[] => {
+    return reached
+      .filter(({ ruleIds }) => {
+        return ruleIds.includes(ruleId);
+      })
+      .map(({ filePath }) => {
+        return filePath;
+      });
+  };
   return {
     byFiles: pathsWith("no-console"),
     byIgnores: pathsWith("no-debugger"),
   };
-}
+};
 
 describe("withoutIgnores", () => {
   it.each(ignoreLists)(

@@ -16,9 +16,15 @@ describe("core suggestion rules", () => {
         `export const bytes = Buffer.from('data');\n`,
         { filePath },
       );
-      const messages = results.flatMap((result) => result.messages);
+      const messages = results.flatMap((result) => {
+        return result.messages;
+      });
 
-      expect(messages.some((message) => message.fatal === true)).toBe(false);
+      expect(
+        messages.some((message) => {
+          return message.fatal === true;
+        }),
+      ).toBe(false);
       expect(messages).toContainEqual(
         expect.objectContaining({
           message: "Unexpected use of 'Buffer'. Use Uint8Array instead.",
@@ -48,9 +54,14 @@ describe("core suggestion rules", () => {
     },
   );
 
-  it("func-style: stays disabled so declarations and expressions can coexist", async () => {
-    await expectNoLintError(
+  it("func-style: requires expressions instead of declarations", async () => {
+    await expectLintError(
       `function declared() {\n\treturn 'declared';\n}\nconst expressed = () => 'expressed';\nconsole.log(declared(), expressed());\n`,
+      "func-style",
+      { filePath: "test.js" },
+    );
+    await expectNoLintError(
+      `export const expressed = () => { return 'expressed'; };\n`,
       "func-style",
       { filePath: "test.js" },
     );
