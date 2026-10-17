@@ -17,6 +17,24 @@ const arraySchemaOf = (rule: unknown): readonly unknown[] | undefined => {
     return rule.meta.schema;
   }
 };
+// Scalar/object unions can wrap the properties that an older peer supports.
+// Multiple object forms stay unchanged so ESLint can validate the selected form.
+const objectSchemasOf = (schema: unknown): readonly UnknownRecord[] => {
+  if (!isRecord(schema)) {
+    return [];
+  }
+  if (isRecord(schema.properties)) {
+    return [schema];
+  }
+  const alternatives = schema.oneOf ?? schema.anyOf;
+  if (isUnknownArray(alternatives)) {
+    // eslint-disable-next-line functional/prefer-tacit -- Keep the recursive visitor independent of flatMap's index and array arguments.
+    return alternatives.flatMap((alternative) => {
+      return objectSchemasOf(alternative);
+    });
+  }
+  return schema.type === "object" ? [schema] : [];
+};
 const supportedRuleOptions = (
   entry: Readonly<Linter.RuleEntry> | undefined,
   rule: unknown,
@@ -29,11 +47,14 @@ const supportedRuleOptions = (
     typeof schema === "undefined" ? entry : entry.slice(0, schema.length + 1);
   // eslint-disable-next-line @typescript-eslint/promise-function-async -- Rule option values are opaque synchronous configuration data.
   const values = entries.map((value, index): unknown => {
-    const optionSchema = schema?.at(index - 1);
+    if (index === 0 || !isRecord(value)) {
+      return value;
+    }
+    const forms = objectSchemasOf(schema?.at(index - 1));
+    const optionSchema = forms.at(0);
     if (
-      index === 0 ||
-      !isRecord(value) ||
-      !isRecord(optionSchema) ||
+      typeof optionSchema === "undefined" ||
+      forms.length !== 1 ||
       optionSchema.additionalProperties !== false ||
       !isRecord(optionSchema.properties)
     ) {
