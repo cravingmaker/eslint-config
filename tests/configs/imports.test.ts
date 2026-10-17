@@ -13,15 +13,15 @@ const svelteContext: Context = {
   svelteComponents: [["**/*.svelte", "!**/generated/**"]],
 };
 
-async function getSettings(
+const getSettings = async (
   eslint: ESLint,
   filePath: string,
-): Promise<Linter.Config["settings"]> {
+): Promise<Linter.Config["settings"]> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     Pick<Linter.Config, "settings"> | undefined;
   return config?.settings;
-}
+};
 
 describe("imports feature", () => {
   it("resolves imports in TypeScript files through the TypeScript resolver", async () => {

@@ -20,7 +20,6 @@ type Lines = {
   readonly rules: readonly string[];
   readonly settings: readonly string[];
 };
-
 // A description of a TypeScript file, as `describeEffectiveConfig` writes it.
 const typescriptFile = {
   rules: [
@@ -46,56 +45,54 @@ const typescriptFile = {
   ],
 } as const satisfies Lines;
 const ignoredFile = "path: src/example.ts\nignored: true\nconfig: none\n";
-
 /**
 Formats the changes from the description `before` to the description `after`.
 */
-function listChanges(before: string, after: string): readonly string[] {
+const listChanges = (before: string, after: string): readonly string[] => {
   const changes = compareDescriptions(
     parseDescription(before),
     parseDescription(after),
   );
   return formatChanges(changes);
-}
-/**
-Formats the changes from the description of the TypeScript file to the description of `lines`.
-*/
-function listChangesTo(lines: Lines): readonly string[] {
-  return listChanges(writeDescription(typescriptFile), writeDescription(lines));
-}
+};
 /**
 Replaces `line` with `replacements`, none to remove it.
 */
-function replaceLine(
+const replaceLine = (
   lines: readonly string[],
   line: string,
   replacements: readonly string[],
-): readonly string[] {
-  return lines.flatMap((current) =>
-    current === line ? replacements : [current],
-  );
-}
+): readonly string[] => {
+  return lines.flatMap((current) => {
+    return current === line ? replacements : [current];
+  });
+};
 /**
 A snapshot of the default scenario with the file and the path that `name` gives.
 */
-function snapshotOf(
+const snapshotOf = (
   name: string,
   description: CurrentSnapshot["description"],
-): CurrentSnapshot {
+): CurrentSnapshot => {
   return {
     description,
     filePath: `src/${name}.ts`,
     path: `default/${name}.txt`,
     scenario: "default",
   };
-}
+};
 /**
 Writes a description with the count of its rules between the settings and the rules, as
 `describeEffectiveConfig` does.
 */
-function writeDescription({ rules, settings }: Lines): string {
-  const count = (severity: string): string =>
-    String(rules.filter((rule) => rule.split(" ", 2)[1] === severity).length);
+const writeDescription = ({ rules, settings }: Lines): string => {
+  const count = (severity: string): string => {
+    return String(
+      rules.filter((rule) => {
+        return rule.split(" ", 2)[1] === severity;
+      }).length,
+    );
+  };
   return [
     ...settings,
     `rules: ${String(rules.length)} (error ${count("error")}, off ${count("off")}, warn ${count("warn")})`,
@@ -103,8 +100,13 @@ function writeDescription({ rules, settings }: Lines): string {
     ...rules,
     "",
   ].join("\n");
-}
-
+};
+/**
+Formats the changes from the description of the TypeScript file to the description of `lines`.
+*/
+const listChangesTo = (lines: Lines): readonly string[] => {
+  return listChanges(writeDescription(typescriptFile), writeDescription(lines));
+};
 describe("parseDescription", () => {
   it("reads what describeEffectiveConfig writes", async () => {
     const eslint = new ESLint({
@@ -115,6 +117,16 @@ describe("parseDescription", () => {
           rules: {
             "no-console": ["error", { allow: ["warn"] }],
             "no-debugger": "off",
+            "no-restricted-globals": [
+              "error",
+              {
+                checkGlobalObject: true,
+                globalObjects: ["global"],
+                globals: [
+                  { message: "Use Uint8Array instead.", name: "Buffer" },
+                ],
+              },
+            ],
           },
         },
       ],
@@ -126,7 +138,6 @@ describe("parseDescription", () => {
     const unmatched = parseDescription(
       await describeEffectiveConfig(eslint, "notes.txt", process.cwd()),
     );
-
     expect(linted.settings.get("path")).toBe("src/example.js");
     expect(linted.settings.get("ignored")).toBe("false");
     expect(linted.settings.get("languageOptions.globals")).toContain(
@@ -140,23 +151,25 @@ describe("parseDescription", () => {
       options: "",
       severity: "off",
     });
+    expect(linted.rules?.get("no-restricted-globals")).toEqual({
+      options:
+        '[{"checkGlobalObject":true,"globalObjects":["global"],"globals":[{"message":"Use Uint8Array instead.","name":"Buffer"}]}]',
+      severity: "error",
+    });
     expect(unmatched.settings.get("config")).toBe("none");
     expect(unmatched.rules).toBeUndefined();
   });
-
   it("reads a snapshot that keeps the rules of one plugin", () => {
     const description = parseDescription(
       'react-refresh/only-export-components: warn [{"checkJS":false}]\n',
       "react-refresh/",
     );
-
     expect(description.settings.size).toBe(0);
     expect(
       description.rules?.get("react-refresh/only-export-components"),
     ).toEqual({ options: '[{"checkJS":false}]', severity: "warn" });
     expect(parseDescription("\n", "react-refresh/").rules?.size).toBe(0);
   });
-
   it.each([
     {
       reason: "it does not end with a line break",
@@ -214,25 +227,21 @@ describe("parseDescription", () => {
       text: `${ignoredFile}\nno-console: error\n`,
     },
   ])("rejects a description where $reason", ({ reason, text }) => {
-    expect(() => parseDescription(text)).toThrow(
-      `Not a description of an effective configuration: ${reason}`,
-    );
+    expect(() => {
+      return parseDescription(text);
+    }).toThrow(`Not a description of an effective configuration: ${reason}`);
   });
-
   it("rejects a rule of another plugin in a snapshot that keeps the rules of one", () => {
-    expect(() =>
-      parseDescription("no-console: error\n", "react-refresh/"),
-    ).toThrow("no-console does not start with react-refresh/");
+    expect(() => {
+      return parseDescription("no-console: error\n", "react-refresh/");
+    }).toThrow("no-console does not start with react-refresh/");
   });
 });
-
 describe("compareDescriptions and formatChanges", () => {
   it("find no change between identical descriptions", () => {
     const description = parseDescription(writeDescription(typescriptFile));
-
     expect(compareDescriptions(description, description)).toEqual([]);
   });
-
   it("list added and removed rules with their entries", () => {
     expect(
       listChangesTo({
@@ -248,7 +257,6 @@ describe("compareDescriptions and formatChanges", () => {
       "- import-x/order: off",
     ]);
   });
-
   it("list a changed severity", () => {
     expect(
       listChangesTo({
@@ -262,7 +270,6 @@ describe("compareDescriptions and formatChanges", () => {
       "~ no-console: error → warn",
     ]);
   });
-
   it.each([
     {
       after:
@@ -290,7 +297,6 @@ describe("compareDescriptions and formatChanges", () => {
       }),
     ).toEqual(changes);
   });
-
   it.each([
     {
       after: "language: json/json",
@@ -343,20 +349,17 @@ describe("compareDescriptions and formatChanges", () => {
       }),
     ).toEqual(changes);
   });
-
   it("list a section that loses its settings", () => {
     const settings = replaceLine(
       replaceLine(typescriptFile.settings, "settings:", ["settings: null"]),
       '  import-x/resolver-next: [{"name":"eslint-import-resolver-typescript"}]',
       [],
     );
-
     expect(listChangesTo({ ...typescriptFile, settings })).toEqual([
       '- settings.import-x/resolver-next: [{"name":"eslint-import-resolver-typescript"}]',
       "+ settings: null",
     ]);
   });
-
   it("list the settings of a file that ESLint ignores now, without its rules", () => {
     expect(listChanges(writeDescription(typescriptFile), ignoredFile)).toEqual([
       "~ ignored: false → true",
@@ -374,7 +377,6 @@ describe("compareDescriptions and formatChanges", () => {
     ]);
   });
 });
-
 describe("compareSnapshots", () => {
   it("reports a snapshot without a valid baseline or description as anything but unchanged", () => {
     const description = writeDescription(typescriptFile);
@@ -397,9 +399,10 @@ describe("compareSnapshots", () => {
       snapshotOf("added", { text: description }),
       snapshotOf("failing", { error: "Could not find plugin" }),
     ]);
-
     expect(
-      results.map(({ label, outcome, path }) => [label, path, outcome.status]),
+      results.map(({ label, outcome, path }) => {
+        return [label, path, outcome.status];
+      }),
     ).toEqual([
       ["default: src/same.ts", "default/same.txt", "unchanged"],
       ["default: src/changed.ts", "default/changed.txt", "changed"],
@@ -409,9 +412,9 @@ describe("compareSnapshots", () => {
       ["default/old.txt", "default/old.txt", "removed"],
     ]);
     expect(
-      results.flatMap(({ outcome }) =>
-        outcome.status === "failed" ? [outcome.reason] : [],
-      ),
+      results.flatMap(({ outcome }) => {
+        return outcome.status === "failed" ? [outcome.reason] : [];
+      }),
     ).toEqual([
       "Not a description of an effective configuration: it does not end with a line break",
       "Could not find plugin",

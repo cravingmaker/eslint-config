@@ -78,8 +78,9 @@ const expectedPeerDependencies = {
   "svelte-eslint-parser": ">=1.6.0 <2",
 } as const;
 
-const readJson = async <T>(url: URL): Promise<T> =>
-  JSON.parse(await readFile(url, "utf8")) as T;
+const readJson = async <T>(url: URL): Promise<T> => {
+  return JSON.parse(await readFile(url, "utf8")) as T;
+};
 
 const packageManifest = await readJson<PackageManifest>(
   new URL("../../package.json", import.meta.url),
@@ -126,27 +127,27 @@ describe("package contract", () => {
       expectedOptionalPeerDependencies,
     );
     expect(
-      expectedOptionalPeerDependencies.filter(
-        (dependency) =>
-          packageManifest.peerDependenciesMeta[dependency]?.optional !== true,
-      ),
+      expectedOptionalPeerDependencies.filter((dependency) => {
+        return (
+          packageManifest.peerDependenciesMeta[dependency]?.optional !== true
+        );
+      }),
     ).toEqual([]);
 
     expect(
-      dependencyNames.filter((dependency) =>
-        Object.hasOwn(packageManifest.devDependencies, dependency),
-      ),
+      dependencyNames.filter((dependency) => {
+        return Object.hasOwn(packageManifest.devDependencies, dependency);
+      }),
     ).toEqual([]);
     expect(
-      dependencyNames.filter((dependency) =>
-        Object.hasOwn(packageManifest.peerDependencies, dependency),
-      ),
+      dependencyNames.filter((dependency) => {
+        return Object.hasOwn(packageManifest.peerDependencies, dependency);
+      }),
     ).toEqual([]);
     expect(
-      peerDependencyNames.filter(
-        (dependency) =>
-          !Object.hasOwn(packageManifest.devDependencies, dependency),
-      ),
+      peerDependencyNames.filter((dependency) => {
+        return !Object.hasOwn(packageManifest.devDependencies, dependency);
+      }),
     ).toEqual([]);
   });
 

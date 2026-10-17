@@ -49,17 +49,17 @@ The default files of a feature that lints JavaScript or TypeScript sources: `pat
 Svelte components whose scripts it also lints. Each nested array is a set of patterns that a file
 must all match.
 */
-function withSvelteComponents(
+const withSvelteComponents = (
   patterns: readonly string[],
   svelteComponents: ReadonlyArray<string | readonly string[]>,
-): NonNullable<Linter.Config["files"]> {
+): NonNullable<Linter.Config["files"]> => {
   return [
     ...patterns,
-    ...svelteComponents.map((entry) =>
-      typeof entry === "string" ? entry : [...entry],
-    ),
+    ...svelteComponents.map((entry) => {
+      return typeof entry === "string" ? entry : [...entry];
+    }),
   ];
-}
+};
 
 export {
   configFiles,

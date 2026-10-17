@@ -7,15 +7,15 @@ import { defaultContext } from "../../../src/context.js";
 
 type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 
-async function getRules(
+const getRules = async (
   eslint: ESLint,
   filePath: string,
-): Promise<RuleEntries | undefined> {
+): Promise<RuleEntries | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     { readonly rules?: RuleEntries } | undefined;
   return config?.rules;
-}
+};
 
 describe("core builder", () => {
   it("contains only ESLint core rules in one named block without plugins", async () => {
@@ -25,18 +25,24 @@ describe("core builder", () => {
       overrideConfigFile: true,
     });
     const rules = (await getRules(eslint, "src/example.js")) ?? {};
-    const unknownRules = Object.keys(rules).filter(
-      // eslint-disable-next-line @typescript-eslint/no-deprecated -- The feature owns ESLint's builtin rule registry
-      (ruleId) => !builtinRules.has(ruleId),
-    );
+    const unknownRules = Object.keys(rules).filter((ruleId) => {
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- Audit configured IDs against ESLint's installed core rules.
+      return !builtinRules.has(ruleId);
+    });
 
     expect(unknownRules).toEqual([]);
-    expect(configs.map((entry) => entry.name)).toEqual([
+    expect(
+      configs.map((entry) => {
+        return entry.name;
+      }),
+    ).toEqual([
       "@cravingmaker/eslint-config/javascript/rules",
       "@cravingmaker/eslint-config/javascript/jsx",
     ]);
     expect(
-      configs.flatMap((entry) => Object.keys(entry.plugins ?? {})),
+      configs.flatMap((entry) => {
+        return Object.keys(entry.plugins ?? {});
+      }),
     ).toEqual([]);
   });
 
@@ -50,13 +56,12 @@ describe("core builder", () => {
         core({}, svelteContext),
         core({ files: ["src/**"] }, svelteContext),
         core({ files: ["**/*.js"] }, svelteContext),
-      ].map(
-        async (configs) =>
-          await getRules(
-            new ESLint({ overrideConfig: configs, overrideConfigFile: true }),
-            "src/Component.svelte",
-          ),
-      ),
+      ].map(async (configs) => {
+        return await getRules(
+          new ESLint({ overrideConfig: configs, overrideConfigFile: true }),
+          "src/Component.svelte",
+        );
+      }),
     );
 
     expect(byDefault).toHaveProperty(["eqeqeq", 0], 2);
@@ -78,17 +83,18 @@ describe("core builder", () => {
         "src/data.json",
         "src/README.md",
         "lib/example.js",
-      ].map(async (filePath) => await getRules(eslint, filePath)),
+      ].map(async (filePath) => {
+        return await getRules(eslint, filePath);
+      }),
     );
 
     expect(script).toHaveProperty(["eqeqeq", 0], 2);
     expect(typescript).toHaveProperty(["eqeqeq", 0], 2);
-    expect(others.map((rules) => Object.keys(rules ?? {}))).toEqual([
-      [],
-      [],
-      [],
-      [],
-    ]);
+    expect(
+      others.map((rules) => {
+        return Object.keys(rules ?? {});
+      }),
+    ).toEqual([[], [], [], []]);
   });
 
   it("keeps files, ignores, and overrides local to the feature", async () => {

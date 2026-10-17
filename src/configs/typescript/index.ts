@@ -30,10 +30,10 @@ rules. The rules that need type information are off. With typed linting on, the 
 information in the type-aware scope, which leaves out Svelte components, and those rules are on
 there in a separate block. An override that turns such a rule on applies in that block only.
 */
-async function typescript(
+const typescript = async (
   options: TypeScriptOptions = {},
   context: Context = defaultContext,
-): Promise<Linter.Config[]> {
+): Promise<Linter.Config[]> => {
   const {
     files,
     ignores = [],
@@ -59,7 +59,7 @@ async function typescript(
         ...overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
       },
     },
-    ...(context.typeAware === undefined
+    ...(typeof context.typeAware === "undefined"
       ? []
       : [
           // The scope stays within the feature's files and ignores, so they are not applied again.
@@ -76,6 +76,6 @@ async function typescript(
           ),
         ]),
   ];
-}
+};
 
 export { typescript };

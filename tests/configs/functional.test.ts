@@ -25,26 +25,26 @@ const deepParameters = {
   parameters: { enforcement: "ReadonlyDeep" },
 } as const;
 
-async function getRules(
+const getRules = async (
   eslint: ESLint,
   filePath: string,
-): Promise<RuleEntries | undefined> {
+): Promise<RuleEntries | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     { readonly rules?: RuleEntries } | undefined;
   return config?.rules;
-}
+};
 // The severity of a rule in the configuration for a file, or `undefined` when it is not set.
-async function getSeverity(
+const getSeverity = async (
   eslint: ESLint,
   filePath: string,
   ruleId: string,
-): Promise<unknown> {
+): Promise<unknown> => {
   const rules = new Map(
     Object.entries((await getRules(eslint, filePath)) ?? {}),
   );
   return rules.get(ruleId)?.[0];
-}
+};
 
 describe("functional feature", () => {
   it("turns off the rules that need type information", async () => {
@@ -155,7 +155,9 @@ describe("functional feature", () => {
     ]);
 
     expect(
-      rules.map((entries) => entries?.["functional/prefer-immutable-types"]),
+      rules.map((entries) => {
+        return entries?.["functional/prefer-immutable-types"];
+      }),
     ).toEqual([[0], [0]]);
   });
 
@@ -174,7 +176,9 @@ describe("functional feature", () => {
     ]);
 
     expect(
-      rules.map((entries) => entries?.["functional/readonly-type"]),
+      rules.map((entries) => {
+        return entries?.["functional/readonly-type"];
+      }),
     ).toEqual([
       [0, "generic"],
       [0, "generic"],
@@ -201,7 +205,9 @@ describe("functional feature", () => {
     ]);
 
     expect(
-      rules.map((entries) => entries?.["functional/prefer-readonly-type"]),
+      rules.map((entries) => {
+        return entries?.["functional/prefer-readonly-type"];
+      }),
     ).toEqual([[2, implicit], undefined, undefined]);
   });
 });

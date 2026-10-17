@@ -65,17 +65,17 @@ const markdownRules: Rules = {
   "markdown/require-alt-text": "error",
   "markdown/table-column-count": ["error", { checkMissingCells: false }],
 
-  "markdown/fenced-code-meta": ["off", "always"],
-  "markdown/no-duplicate-headings": ["off", { checkSiblingsOnly: false }],
+  "markdown/fenced-code-meta": "off",
+  "markdown/no-duplicate-headings": "off",
 } as const;
 
 // Builds the flat config for Markdown files, with GitHub Flavored Markdown, YAML front matter,
 // and math.
-function markdown({
+const markdown = ({
   files,
   ignores = [],
   overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+}: FeatureOptions = {}): Linter.Config[] => {
   return [
     {
       name: "@cravingmaker/eslint-config/markdown/setup",
@@ -98,6 +98,6 @@ function markdown({
       rules: { ...markdownRules, ...overrides },
     },
   ];
-}
+};
 
 export { markdown };

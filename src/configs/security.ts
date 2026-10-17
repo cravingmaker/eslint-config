@@ -26,10 +26,10 @@ const securityRules: Rules = {
 } as const;
 
 // Builds the flat config for eslint-plugin-security.
-function security(
+const security = (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { svelteComponents }: Context = defaultContext,
-): Linter.Config[] {
+): Linter.Config[] => {
   return [
     {
       name: "@cravingmaker/eslint-config/security/setup",
@@ -45,6 +45,6 @@ function security(
       rules: { ...securityRules, ...overrides },
     },
   ];
-}
+};
 
 export { security, securityRules };

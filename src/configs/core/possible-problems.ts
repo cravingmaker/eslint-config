@@ -1,18 +1,14 @@
 import type { Rules } from "../../types.js";
 
-import {
-  // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `no-unused-vars` rule name
-  noUnusedVarsOptions,
-  noUseBeforeDefineOptions,
-} from "../shared-options.js";
+import { noUseBeforeDefineOptions } from "../shared-options.js";
 
-const recommendedPossibleProblemRules: Rules = {
+const recommendedRules: Rules = {
+  // --- Rules with default options (38/47) ----------------------------------------------------------------------------------------------------------
   "constructor-super": "error",
   "for-direction": "error",
-
   "no-async-promise-executor": "error",
   "no-class-assign": "error",
-  "no-compare-neg-zero": "error",
+  "no-compare-neg-zero": "error", // Manually fixable by editor suggestions.
   "no-cond-assign": ["error", "except-parens"],
   "no-const-assign": "error",
   "no-constant-binary-expression": [
@@ -20,7 +16,7 @@ const recommendedPossibleProblemRules: Rules = {
     { checkRelationalComparisons: false },
   ],
   "no-constant-condition": ["error", { checkLoops: "allExceptWhileTrue" }],
-  "no-control-regex": "error", // Compatibility with `eslint-plugin-regexp`
+  "no-control-regex": "error",
   "no-debugger": "error",
   "no-dupe-args": "error",
   "no-dupe-class-members": "error",
@@ -32,9 +28,8 @@ const recommendedPossibleProblemRules: Rules = {
   "no-fallthrough": [
     "error",
     {
-      commentPattern: undefined,
-
       allowEmptyCase: false,
+      commentPattern: undefined,
       reportUnusedFallthroughComment: false,
     },
   ],
@@ -51,10 +46,10 @@ const recommendedPossibleProblemRules: Rules = {
     },
   ],
   "no-loss-of-precision": "error",
-  "no-misleading-character-class": ["error", { allowEscape: false }], // Compatibility with `eslint-plugin-regexp`
+  "no-misleading-character-class": ["error", { allowEscape: false }], // Manually fixable by editor suggestions.
   "no-new-native-nonconstructor": "error",
   "no-obj-calls": "error",
-  "no-prototype-builtins": "error",
+  "no-prototype-builtins": "error", // Manually fixable by editor suggestions.
   "no-self-assign": ["error", { props: true }],
   "no-setter-return": "error",
   "no-sparse-arrays": "error",
@@ -62,45 +57,41 @@ const recommendedPossibleProblemRules: Rules = {
   "no-unassigned-vars": "error",
   "no-unreachable": "error",
   "no-unsafe-finally": "error",
-  "no-unused-private-class-members": "error",
+  "no-unused-private-class-members": "error", // Manually fixable by editor suggestions.
+  "no-useless-assignment": "error",
   "use-isnan": [
     "error",
     {
       enforceForIndexOf: false,
       enforceForSwitchCase: true,
     },
-  ],
-  "valid-typeof": ["error", { requireStringLiterals: false }],
+  ], // Manually fixable by editor suggestions.
+  "valid-typeof": ["error", { requireStringLiterals: false }], // Manually fixable by editor suggestions.
 
-  // Rules with overridden options
+  // --- Rules with overridden options (4/47) --------------------------------------------------------------------------------------------------------
+  "getter-return": [
+    "error",
+    {
+      allowImplicit: true, // See `unicorn/no-useless-undefined`.
+    },
+  ],
   "no-undef": ["error", { typeof: true }],
-  "no-unsafe-negation": ["error", { enforceForOrderingRelations: true }],
+  "no-unsafe-negation": ["error", { enforceForOrderingRelations: true }], // Manually fixable by editor suggestions.
   "no-unsafe-optional-chaining": [
     "error",
     { disallowArithmeticOperators: true },
   ],
 
-  "no-useless-assignment": "off", // Often produces noise in control flow and refactoring patterns
-
-  "getter-return": [
-    "error",
-    {
-      allowImplicit: true, // Compatibility with `unicorn/no-useless-undefined` rule
-    },
-  ],
-
-  "no-unexpected-multiline": "off", // Covered by `prettier`
-
-  // Off while their replacements are on, see src/overlaps.ts
-  "no-empty-character-class": "error",
-  "no-invalid-regexp": ["error", { allowConstructorFlags: undefined }],
-  "no-unused-vars": ["error", { ...noUnusedVarsOptions }],
-  "no-useless-backreference": "error",
+  // --- Turned off rules (5/47) ---------------------------------------------------------------------------------------------------------------------
+  "no-empty-character-class": "off", // Handled by `regexp/no-empty-character-class`.
+  "no-invalid-regexp": "off", // Handled by `regexp/no-invalid-regexp`.
+  "no-unexpected-multiline": "off", // Handled by `prettier`.
+  "no-unused-vars": ["off"], // Handled by `unused-imports/no-unused-vars`.
+  "no-useless-backreference": "off", // Handled by `regexp/no-useless-backreference`.
 } as const;
 
-const possibleProblemRules: Rules = {
-  ...recommendedPossibleProblemRules,
-
+const otherRules: Rules = {
+  // --- Rules with default options (10/12) ----------------------------------------------------------------------------------------------------------
   "no-await-in-loop": "error",
   "no-constructor-return": "error",
   "no-inner-declarations": [
@@ -108,7 +99,7 @@ const possibleProblemRules: Rules = {
     "functions",
     { blockScopedFunctions: "allow" },
   ],
-  "no-promise-executor-return": ["error", { allowVoid: false }],
+  "no-promise-executor-return": ["error", { allowVoid: false }], // Manually fixable by editor suggestions.
   "no-self-compare": "error",
   "no-template-curly-in-string": "error",
   "no-unmodified-loop-condition": [
@@ -117,25 +108,25 @@ const possibleProblemRules: Rules = {
   ],
   "no-unreachable-loop": ["error", { ignore: [] }],
   "no-use-before-define": ["error", { ...noUseBeforeDefineOptions }],
+  "require-atomic-updates": ["error", { allowProperties: false }],
 
-  "no-duplicate-imports": [
-    "error", // Off while import-x is on, see src/overlaps.ts
-    {
-      allowSeparateTypeImports: true, // As `import-x/no-duplicates`, which takes a type import next to a value import
-      includeExports: false,
-    },
-  ],
-  "require-atomic-updates": ["off", { allowProperties: false }],
-
-  // Rules with overridden options
+  // --- Rules with overridden options (1/12) --------------------------------------------------------------------------------------------------------
   "array-callback-return": [
     "error",
     {
-      allowImplicit: true, // Compatibility with `unicorn/no-useless-undefined` rule
+      allowImplicit: true, // See `unicorn/no-useless-undefined`.
       allowVoid: false,
       checkForEach: false,
     },
-  ],
+  ], // Manually fixable by editor suggestions.
+
+  // --- Turned off rules (1/12) ---------------------------------------------------------------------------------------------------------------------
+  "no-duplicate-imports": "off", // Handled by `import-x/no-duplicates`.
+};
+
+const possibleProblemRules: Rules = {
+  ...recommendedRules,
+  ...otherRules,
 } as const;
 
 export { possibleProblemRules };

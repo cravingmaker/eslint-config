@@ -34,10 +34,10 @@ const commentsRules: Rules = {
 } as const;
 
 // Builds the flat config for ESLint directive comments.
-function comments(
+const comments = (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { svelteComponents }: Context = defaultContext,
-): Linter.Config[] {
+): Linter.Config[] => {
   return [
     {
       name: "@cravingmaker/eslint-config/comments/setup",
@@ -53,6 +53,6 @@ function comments(
       rules: { ...commentsRules, ...overrides },
     },
   ];
-}
+};
 
 export { comments, commentsRules };

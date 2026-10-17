@@ -25,38 +25,38 @@ package-json/prefer-rolling-workspace-spec: error [{"ignoreDependencies":[],"ign
 package-json/repository-shorthand: error [{"form":"object"}]
 package-json/require-attribution: error [{"ignorePrivate":true,"preferContributorsOnly":false}]
 package-json/require-author: error [{"ignorePrivate":false}]
-package-json/require-bin: off [{"ignorePrivate":false}]
-package-json/require-browser: off [{"ignorePrivate":false}]
+package-json/require-bin: off
+package-json/require-browser: off
 package-json/require-bugs: error [{"ignorePrivate":true}]
-package-json/require-bundleDependencies: off [{"ignorePrivate":false}]
-package-json/require-config: off [{"ignorePrivate":false}]
-package-json/require-contributors: off [{"ignorePrivate":false}]
-package-json/require-cpu: off [{"ignorePrivate":false}]
-package-json/require-dependencies: off [{"ignorePrivate":false}]
+package-json/require-bundleDependencies: off
+package-json/require-config: off
+package-json/require-contributors: off
+package-json/require-cpu: off
+package-json/require-dependencies: off
 package-json/require-description: error [{"ignorePrivate":false}]
 package-json/require-devDependencies: error [{"ignorePrivate":false}]
 package-json/require-devEngines: error [{"ignorePrivate":false}]
-package-json/require-directories: off [{"ignorePrivate":false}]
+package-json/require-directories: off
 package-json/require-engines: error [{"ignorePrivate":false}]
 package-json/require-exports: error [{"ignorePrivate":true}]
 package-json/require-files: error [{"ignorePrivate":true}]
-package-json/require-funding: off [{"ignorePrivate":false}]
-package-json/require-gypfile: off [{"ignorePrivate":false}]
+package-json/require-funding: off
+package-json/require-gypfile: off
 package-json/require-homepage: error [{"ignorePrivate":true}]
 package-json/require-keywords: error [{"ignorePrivate":true}]
-package-json/require-libc: off [{"ignorePrivate":false}]
+package-json/require-libc: off
 package-json/require-license: error [{"ignorePrivate":true}]
-package-json/require-main: off [{"ignorePrivate":false}]
-package-json/require-man: off [{"ignorePrivate":false}]
-package-json/require-module: off [{"ignorePrivate":false}]
+package-json/require-main: off
+package-json/require-man: off
+package-json/require-module: off
 package-json/require-name: error [{"ignorePrivate":true}]
-package-json/require-optionalDependencies: off [{"ignorePrivate":false}]
-package-json/require-os: off [{"ignorePrivate":false}]
-package-json/require-packageManager: off [{"ignorePrivate":false}]
-package-json/require-peerDependencies: off [{"ignorePrivate":false}]
+package-json/require-optionalDependencies: off
+package-json/require-os: off
+package-json/require-packageManager: off
+package-json/require-peerDependencies: off
 package-json/require-peerDependenciesMeta: error [{"ignorePrivate":false}]
 package-json/require-private: error
-package-json/require-publishConfig: off [{"ignorePrivate":true}]
+package-json/require-publishConfig: off
 package-json/require-repository: error [{"ignorePrivate":true}]
 package-json/require-scripts: error [{"ignorePrivate":false}]
 package-json/require-sideEffects: error [{"ignorePrivate":true}]

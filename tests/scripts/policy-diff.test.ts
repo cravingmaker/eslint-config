@@ -11,15 +11,15 @@ const projectDirectory = fileURLToPath(new URL("../..", import.meta.url));
 Runs the report as `npm run policy:diff` does after its build: Node.js runs the TypeScript entry
 point, which loads the test modules that describe the scenarios.
 */
-async function runReport(
+const runReport = async (
   commandLine: readonly string[],
-): ReturnType<typeof runCommand> {
+): ReturnType<typeof runCommand> => {
   return await runCommand(
     process.execPath,
     ["scripts/policy-diff.ts", ...commandLine],
     projectDirectory,
   );
-}
+};
 
 describe("scripts/policy-diff.ts", () => {
   it("compares the working tree with HEAD by default", async () => {

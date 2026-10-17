@@ -15,14 +15,14 @@ type EffectiveConfig = {
 
 const svelteOptions = { filePath: "component.svelte" } as const;
 
-async function getEffectiveConfig(
+const getEffectiveConfig = async (
   eslint: ESLint,
   filePath: string,
-): Promise<EffectiveConfig | undefined> {
+): Promise<EffectiveConfig | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   return (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
-}
+};
 
 describe("svelte feature", () => {
   it("parses Svelte files with svelte-eslint-parser and TypeScript script blocks", async () => {
@@ -36,10 +36,12 @@ describe("svelte feature", () => {
     ]);
 
     expect(
-      configs.map((config) => [
-        config?.languageOptions?.parser?.meta?.name,
-        config?.languageOptions?.parserOptions?.parser?.meta?.name,
-      ]),
+      configs.map((config) => {
+        return [
+          config?.languageOptions?.parser?.meta?.name,
+          config?.languageOptions?.parserOptions?.parser?.meta?.name,
+        ];
+      }),
     ).toEqual([
       ["svelte-eslint-parser", "typescript-eslint/parser"],
       ["svelte-eslint-parser", "typescript-eslint/parser"],

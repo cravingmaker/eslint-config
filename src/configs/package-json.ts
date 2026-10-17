@@ -138,38 +138,35 @@ const packageJsonRules: Rules = {
     },
   ],
 
-  "package-json/restrict-top-level-properties": ["off", { ban: [] }], // Project specific
+  "package-json/restrict-top-level-properties": "off", // Project specific
 
-  "package-json/require-bin": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-browser": ["off", { ignorePrivate: false }], // Prefer optional; only relevant to browser-targeted packages
-  "package-json/require-bundleDependencies": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-config": ["off", { ignorePrivate: false }], // Prefer optional; npm config defaults are package-specific
-  "package-json/require-contributors": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-cpu": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-dependencies": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-directories": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-funding": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-gypfile": ["off", { ignorePrivate: false }], // Prefer optional; only relevant to native addon packages
-  "package-json/require-libc": ["off", { ignorePrivate: false }], // Prefer optional; only relevant to libc-specific packages
-  "package-json/require-main": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-man": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-module": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-optionalDependencies": [
-    "off",
-    { ignorePrivate: false },
-  ], // Prefer optional
-  "package-json/require-os": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-packageManager": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-peerDependencies": ["off", { ignorePrivate: false }], // Prefer optional
-  "package-json/require-publishConfig": ["off", { ignorePrivate: true }], // Prefer optional
+  "package-json/require-bin": "off", // Prefer optional
+  "package-json/require-browser": "off", // Prefer optional; only relevant to browser-targeted packages
+  "package-json/require-bundleDependencies": "off", // Prefer optional
+  "package-json/require-config": "off", // Prefer optional; npm config defaults are package-specific
+  "package-json/require-contributors": "off", // Prefer optional
+  "package-json/require-cpu": "off", // Prefer optional
+  "package-json/require-dependencies": "off", // Prefer optional
+  "package-json/require-directories": "off", // Prefer optional
+  "package-json/require-funding": "off", // Prefer optional
+  "package-json/require-gypfile": "off", // Prefer optional; only relevant to native addon packages
+  "package-json/require-libc": "off", // Prefer optional; only relevant to libc-specific packages
+  "package-json/require-main": "off", // Prefer optional
+  "package-json/require-man": "off", // Prefer optional
+  "package-json/require-module": "off", // Prefer optional
+  "package-json/require-optionalDependencies": "off", // Prefer optional
+  "package-json/require-os": "off", // Prefer optional
+  "package-json/require-packageManager": "off", // Prefer optional
+  "package-json/require-peerDependencies": "off", // Prefer optional
+  "package-json/require-publishConfig": "off", // Prefer optional
 } as const;
 
 // Builds the flat config for package.json files.
-function packageJson({
+const packageJson = ({
   files,
   ignores = [],
   overrides = {},
-}: FeatureOptions = {}): Linter.Config[] {
+}: FeatureOptions = {}): Linter.Config[] => {
   return [
     {
       name: "@cravingmaker/eslint-config/package-json/setup",
@@ -184,6 +181,6 @@ function packageJson({
       rules: { ...packageJsonRules, ...overrides },
     },
   ];
-}
+};
 
 export { packageJson };

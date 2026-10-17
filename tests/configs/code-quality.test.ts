@@ -81,26 +81,26 @@ const features = [
   },
 ] as const;
 
-async function getRules(
+const getRules = async (
   eslint: ESLint,
   filePath: string,
-): Promise<RuleEntries | undefined> {
+): Promise<RuleEntries | undefined> => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
   const config = (await eslint.calculateConfigForFile(filePath)) as
     { readonly rules?: RuleEntries } | undefined;
   return config?.rules;
-}
+};
 // The severity of a rule in the configuration for a file, or `undefined` when it is not set.
-async function getSeverity(
+const getSeverity = async (
   eslint: ESLint,
   filePath: string,
   ruleId: string,
-): Promise<unknown> {
+): Promise<unknown> => {
   const rules = new Map(
     Object.entries((await getRules(eslint, filePath)) ?? {}),
   );
   return rules.get(ruleId)?.[0];
-}
+};
 
 describe.each(features)("$name feature", ({ build, name, plugin, rule }) => {
   it("registers its plugin in a setup block without files", () => {
@@ -138,10 +138,9 @@ describe.each(features)("$name feature", ({ build, name, plugin, rule }) => {
       build({}, svelteContext),
       build({ files: ["src/**"] }, svelteContext),
       build({ files: ["src/**/*.js"] }, svelteContext),
-    ].map(
-      (configs) =>
-        new ESLint({ overrideConfig: configs, overrideConfigFile: true }),
-    );
+    ].map((configs) => {
+      return new ESLint({ overrideConfig: configs, overrideConfigFile: true });
+    });
     const severities = await Promise.all([
       getSeverity(byDefault, "src/Component.svelte", rule),
       getSeverity(byDefault, "src/generated/Component.svelte", rule),
@@ -175,7 +174,9 @@ describe.each(features)("$name feature", ({ build, name, plugin, rule }) => {
         "src/data.json",
         "src/README.md",
         "lib/example.js",
-      ].map(async (filePath) => await getSeverity(eslint, filePath, rule)),
+      ].map(async (filePath) => {
+        return await getSeverity(eslint, filePath, rule);
+      }),
     );
 
     expect(severities).toEqual([

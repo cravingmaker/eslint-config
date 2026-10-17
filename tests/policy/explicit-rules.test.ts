@@ -13,43 +13,49 @@ type PluginModule = {
 };
 
 // Simulate an upstream update before the policy modules are evaluated. These cover static imports, optional peers, and a recommended preset that used to set policy.
-// eslint-disable-next-line unicorn/consistent-function-scoping -- Vitest evaluates this factory before module imports.
-const withFutureRule = vi.hoisted(() => (module: PluginModule) => ({
-  ...module,
-  default: {
-    ...module.default,
-    configs: {
-      ...module.default.configs,
-      recommended: {
-        ...module.default.configs?.recommended,
+const withFutureRule = vi.hoisted(() => {
+  // eslint-disable-next-line unicorn/consistent-function-scoping -- The factory must be initialized before mocked modules are imported.
+  return (module: PluginModule) => {
+    return {
+      ...module,
+      default: {
+        ...module.default,
+        configs: {
+          ...module.default.configs,
+          recommended: {
+            ...module.default.configs?.recommended,
+            rules: {
+              ...module.default.configs?.recommended.rules,
+              "security/future-rule": "error",
+            },
+          },
+        },
         rules: {
-          ...module.default.configs?.recommended.rules,
-          "security/future-rule": "error",
+          ...module.default.rules,
+          "future-rule": {
+            create: (_context: unknown) => {
+              return {};
+            },
+            meta: { schema: [] },
+          },
         },
       },
-    },
-    rules: {
-      ...module.default.rules,
-      "future-rule": {
-        create: (_context: unknown) => ({}),
-        meta: { schema: [] },
-      },
-    },
-  },
-}));
+    };
+  };
+});
 
-vi.mock("eslint-plugin-promise", async (importOriginal) =>
-  withFutureRule(await importOriginal<PluginModule>()),
-);
-vi.mock("eslint-plugin-security", async (importOriginal) =>
-  withFutureRule(await importOriginal<PluginModule>()),
-);
-vi.mock("@html-eslint/eslint-plugin-react", async (importOriginal) =>
-  withFutureRule(await importOriginal<PluginModule>()),
-);
-vi.mock("@html-eslint/eslint-plugin-svelte", async (importOriginal) =>
-  withFutureRule(await importOriginal<PluginModule>()),
-);
+vi.mock("eslint-plugin-promise", async (importOriginal) => {
+  return withFutureRule(await importOriginal<PluginModule>());
+});
+vi.mock("eslint-plugin-security", async (importOriginal) => {
+  return withFutureRule(await importOriginal<PluginModule>());
+});
+vi.mock("@html-eslint/eslint-plugin-react", async (importOriginal) => {
+  return withFutureRule(await importOriginal<PluginModule>());
+});
+vi.mock("@html-eslint/eslint-plugin-svelte", async (importOriginal) => {
+  return withFutureRule(await importOriginal<PluginModule>());
+});
 
 const { createConfig } = await import("../../dist/index.mjs");
 
@@ -87,14 +93,16 @@ describe("explicit rule policy", () => {
         svelte: true,
       });
       const plugins = new Map(
-        config.flatMap((entry) => Object.entries(entry.plugins ?? {})),
+        config.flatMap((entry) => {
+          return Object.entries(entry.plugins ?? {});
+        }),
       );
 
       expect(plugins.get(prefix)?.rules).toHaveProperty("future-rule");
       expect(
-        config.some((entry) =>
-          Object.hasOwn(entry.rules ?? {}, `${prefix}/future-rule`),
-        ),
+        config.some((entry) => {
+          return Object.hasOwn(entry.rules ?? {}, `${prefix}/future-rule`);
+        }),
       ).toBe(false);
 
       const eslint = new ESLint({

@@ -8,16 +8,15 @@ type KeysOf<Settings> = Readonly<Record<keyof Settings, true>>;
 /**
 What each option of `createConfig` takes as keys. An option is a feature when it takes the
 options that every feature takes, and it then has the keys of its own options object. Any other
-option has `undefined`: it takes a list, a path, or, as `globals` does, a record whose keys are
+option has `false`: it takes a list, a path, or, as `globals` does, a record whose keys are
 the user's. The type maps the required options, because `-?` would also remove `undefined` from
 the values.
 */
 type OptionKeys = {
   [Option in keyof Required<Options>]: FeatureOptions extends Options[Option]
     ? KeysOf<Exclude<Options[Option], boolean | string | undefined>>
-    : undefined;
+    : false;
 };
-
 // The keys that every feature takes.
 const featureKeys = {
   files: true,
@@ -31,12 +30,12 @@ compile until it is listed here.
 */
 const optionKeys = {
   comments: featureKeys,
-  environments: undefined,
+  environments: false,
   express: featureKeys,
   functional: featureKeys,
-  globals: undefined,
+  globals: false,
   html: featureKeys,
-  ignores: undefined,
+  ignores: false,
   imports: featureKeys,
   javascript: featureKeys,
   json: {
@@ -50,7 +49,7 @@ const optionKeys = {
   node: featureKeys,
   packageJson: featureKeys,
   perfectionist: featureKeys,
-  projectRootDirectory: undefined,
+  projectRootDirectory: false,
   promise: featureKeys,
   react: { files: true, ignores: true, overrides: true, refresh: true },
   regexp: featureKeys,
@@ -69,16 +68,14 @@ const optionKeys = {
   unicorn: featureKeys,
   unusedImports: featureKeys,
 } as const satisfies OptionKeys;
-// The keys of each option as a list, or `undefined` for an option whose keys are not checked.
-const keysByOption: ReadonlyMap<string, readonly string[] | undefined> =
-  new Map(
-    Object.entries(optionKeys).map(
-      ([option, keys]): readonly [string, readonly string[] | undefined] => [
-        option,
-        keys === undefined ? undefined : Object.keys(keys),
-      ],
-    ),
-  );
+// The keys of each option as a list, or `false` for an option whose keys are not checked.
+const keysByOption: ReadonlyMap<string, false | readonly string[]> = new Map(
+  Object.entries(optionKeys).map(
+    ([option, keys]): readonly [string, false | readonly string[]] => {
+      return [option, keys === false ? false : Object.keys(keys)];
+    },
+  ),
+);
 // The options of 0.1.0 that are gone, with what the migration table of the README names instead.
 // The message names them and nothing reads them: the rewrite has no compatibility adapter.
 const replacedOptions = new Map<string, string>([
@@ -94,7 +91,26 @@ const replacedOptions = new Map<string, string>([
   ["tsconfigRootDir", "`typescript.tsconfigRootDir`"],
   ["tsTypeChecked", "`typescript.typeChecked`"],
 ]);
-
+/**
+The own properties of `value`, or none when it is not an object. The types do not bind a config
+file without `// @ts-check`, so an option can hold any value.
+*/
+const entriesOf = (
+  value: unknown,
+): ReadonlyArray<readonly [string, unknown]> => {
+  return typeof value === "object" && value !== null
+    ? Object.entries(value)
+    : [];
+};
+// `names` as code in a sentence, such as "`files`, `ignores`, and `overrides`".
+const list = (names: readonly string[]): string => {
+  const conjunction = new Intl.ListFormat("en", { type: "conjunction" });
+  return conjunction.format(
+    names.map((name) => {
+      return `\`${name}\``;
+    }),
+  );
+};
 /**
 Describes the keys of `options` that `createConfig` does not know, in one message, or returns
 `undefined` when it knows them all. An unknown option comes with the options that exist, an
@@ -102,13 +118,15 @@ option of 0.1.0 with what replaces it, and an unknown key in the object of a fea
 keys of that feature. The names of globals and the IDs of rules are the user's, and are not
 checked.
 */
-function describeUnknownOptions(options: Options): string | undefined {
+const describeUnknownOptions = (options: Options): string | undefined => {
   const entries = entriesOf(options);
   const unknown = entries
-    .map(([option]) => option)
-    .filter(
-      (option) => !keysByOption.has(option) && !replacedOptions.has(option),
-    );
+    .map(([option]) => {
+      return option;
+    })
+    .filter((option) => {
+      return !keysByOption.has(option) && !replacedOptions.has(option);
+    });
   const lines = [
     // One line for all of them, because they share the list of options.
     ...(unknown.length === 0
@@ -118,56 +136,59 @@ function describeUnknownOptions(options: Options): string | undefined {
         ]),
     ...entries.flatMap(([option, value]) => {
       const replacement = replacedOptions.get(option);
-      if (replacement !== undefined)
+      if (typeof replacement !== "undefined") {
         return [`\`${option}\`: an option of 0.1.0, now ${replacement}.`];
-
+      }
       // None for an unknown option, and for an option whose keys are not checked.
       const keys = keysByOption.get(option);
-      if (keys === undefined) return [];
-
+      if (typeof keys === "undefined" || keys === false) {
+        return [];
+      }
       const unknownKeys = entriesOf(value)
-        .map(([key]) => key)
-        .filter((key) => !keys.includes(key));
-      if (unknownKeys.length === 0) return [];
+        .map(([key]) => {
+          return key;
+        })
+        .filter((key) => {
+          return !keys.includes(key);
+        });
+      if (unknownKeys.length === 0) {
+        return [];
+      }
       return [
-        `${list(unknownKeys.map((key) => `${option}.${key}`))}: the options of \`${option}\` are ${list(keys)}.`,
+        `${list(
+          unknownKeys.map((key) => {
+            return `${option}.${key}`;
+          }),
+        )}: the options of \`${option}\` are ${list(keys)}.`,
       ];
     }),
   ];
-  if (lines.length === 0) return undefined;
-
+  if (lines.length === 0) {
+    return;
+  }
   return [
     "createConfig() does not know these options:",
-    ...lines.map((line) => `- ${line}`),
-    ...(entries.some(([option]) => replacedOptions.has(option))
+    ...lines.map((line) => {
+      return `- ${line}`;
+    }),
+    ...(entries.some(([option]) => {
+      return replacedOptions.has(option);
+    })
       ? ['See "Migrating from 0.1.0" in the README.']
       : []),
   ].join("\n");
-}
-/**
-The own properties of `value`, or none when it is not an object. The types do not bind a config
-file without `// @ts-check`, so an option can hold any value.
-*/
-function entriesOf(value: unknown): ReadonlyArray<readonly [string, unknown]> {
-  return typeof value === "object" && value !== null
-    ? Object.entries(value)
-    : [];
-}
-// `names` as code in a sentence, such as "`files`, `ignores`, and `overrides`".
-function list(names: readonly string[]): string {
-  const conjunction = new Intl.ListFormat("en", { type: "conjunction" });
-  return conjunction.format(names.map((name) => `\`${name}\``));
-}
+};
 /**
 Returns `options` when `createConfig` knows each of their keys, and throws otherwise, with the
 message of `describeUnknownOptions`. The factory goes on with what this returns, so it reads no
 option before the check.
 */
-function rejectUnknownOptions(options: Options): Options {
+const rejectUnknownOptions = (options: Options): Options => {
   const message = describeUnknownOptions(options);
-  // eslint-disable-next-line functional/no-throw-statements -- A key that is not read must not pass in silence: the config would not do what its file says.
-  if (message !== undefined) throw new Error(message);
+  if (typeof message !== "undefined") {
+    // eslint-disable-next-line functional/no-throw-statements -- A key that is not read must not pass in silence: the config would not do what its file says.
+    throw new Error(message);
+  }
   return options;
-}
-
+};
 export { rejectUnknownOptions };

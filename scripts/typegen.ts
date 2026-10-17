@@ -60,15 +60,16 @@ Drops repeated copies of a top-level declaration. json-schema-to-typescript can 
 definition twice, as it does for `unicorn/name-replacements`, and a repeated interface fails
 to compile when declaration files are type-checked.
 */
-function removeRepeatedDeclarations(source: string): string {
+const removeRepeatedDeclarations = (source: string): string => {
   const parts = source.split(/^(?=(?:interface|type) |\/\/ -{5} )/mu);
   return parts
-    .filter(
-      (part, index) =>
-        !/^(?:interface|type) /u.test(part) || parts.indexOf(part) === index,
-    )
+    .filter((part, index) => {
+      return (
+        !/^(?:interface|type) /u.test(part) || parts.indexOf(part) === index
+      );
+    })
     .join("");
-}
+};
 
 const declarations = await pluginsToRulesDTS(plugins, {
   includeAugmentation: false,

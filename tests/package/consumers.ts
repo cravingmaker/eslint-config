@@ -42,12 +42,12 @@ A project in `parentDirectory` that installs the packed package, ESLint, and `pe
 registry, as a consumer does, with this repository's install policy: no install scripts, and no
 version less than seven days old. The fixtures are copied into `fixtures/`.
 */
-async function createConsumer(
+const createConsumer = async (
   parentDirectory: string,
   name: string,
   tarball: string,
   peers: readonly string[],
-): Promise<string> {
+): Promise<string> => {
   const directory = path.join(parentDirectory, name);
   await mkdir(directory);
   await writeFile(
@@ -66,10 +66,9 @@ async function createConsumer(
       "--prefer-offline",
       "--save-exact",
       tarball,
-      ...["eslint", ...peers].map(
-        (packageName) =>
-          `${packageName}@${testedVersions.get(packageName) ?? "missing"}`,
-      ),
+      ...["eslint", ...peers].map((packageName) => {
+        return `${packageName}@${testedVersions.get(packageName) ?? "missing"}`;
+      }),
     ],
     { cwd: directory },
   );
@@ -77,9 +76,9 @@ async function createConsumer(
     recursive: true,
   });
   return directory;
-}
+};
 // The package as published: `npm pack` of the current build, in `destination`.
-async function createTarball(destination: string): Promise<string> {
+const createTarball = async (destination: string): Promise<string> => {
   const { stdout } = await execute(
     "npm",
     ["pack", "--ignore-scripts", "--json", "--pack-destination", destination],
@@ -90,25 +89,25 @@ async function createTarball(destination: string): Promise<string> {
     { readonly filename: string },
   ];
   return path.join(destination, filename);
-}
+};
 /*
 A new directory in the system's temporary directory, with a name that starts with `prefix`, as its
 real path. The temporary directory can be a symbolic link, as it is on macOS, and a child process
 reports its working directory, and the files that it resolves from it, by their real paths.
 */
-async function createTemporaryDirectory(prefix: string): Promise<string> {
+const createTemporaryDirectory = async (prefix: string): Promise<string> => {
   const directory = await mkdtemp(path.join(os.tmpdir(), prefix));
   return await realpath(directory);
-}
+};
 /*
 Runs a command and returns what it prints, also when it exits with an error, as ESLint does when
 it reports a problem and TypeScript does when it finds one.
 */
-async function getOutput(
+const getOutput = async (
   command: string,
   commandArguments: readonly string[],
   directory: string,
-): Promise<string> {
+): Promise<string> => {
   try {
     const { stdout } = await execute(command, [...commandArguments], {
       cwd: directory,
@@ -123,16 +122,16 @@ async function getOutput(
       ? error.stdout
       : String(error);
   }
-}
+};
 /*
 Runs a command and returns its exit code and what it prints. A command that cannot start, or
 that a signal stops, has no exit code, which reads as `NaN`.
 */
-async function runCommand(
+const runCommand = async (
   command: string,
   commandArguments: readonly string[],
   directory: string,
-): Promise<CommandResult> {
+): Promise<CommandResult> => {
   try {
     const { stderr, stdout } = await execute(command, [...commandArguments], {
       cwd: directory,
@@ -150,7 +149,7 @@ async function runCommand(
       stdout: typeof failure.stdout === "string" ? failure.stdout : "",
     };
   }
-}
+};
 
 export {
   createConsumer,
