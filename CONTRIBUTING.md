@@ -76,6 +76,10 @@ Node.js 24 itself at the start of each session.
 
 ## Making changes
 
+Use the [coding principles](CODING_PRINCIPLES.md) to choose code style,
+architecture, linter rules, formatter settings, and scripts. Apply the goals in
+their stated priority order when comparing approaches.
+
 Create a branch from the latest `main` and keep each pull request focused.
 Use a conventional pull request title, such as `fix: ...`, `test: ...`, or
 `docs: ...`. Describe the problem and resulting behavior, including

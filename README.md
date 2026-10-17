@@ -4,6 +4,8 @@ Craving Maker's opinionated ESLint configuration. One call, `createConfig()`, re
 
 The policy is strict. Every current non-deprecated rule has an explicit enabled or disabled setting, with its options declared in the owning rule map. New upstream rules stay unconfigured until the policy is reviewed. Formatting is left to Prettier. Each part of the config is a feature that you can turn off, limit to some files, or adjust with rule overrides.
 
+The [coding principles](https://github.com/cravingmaker/eslint-config/blob/main/CODING_PRINCIPLES.md) define the priorities for code style, architecture, and decisions about linting, formatting, and scripts.
+
 ## Contents
 
 - [Requirements](#requirements)
