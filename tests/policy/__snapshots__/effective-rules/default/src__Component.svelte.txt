@@ -2,7 +2,7 @@ path: src/Component.svelte
 ignored: false
 language: @/js
 processor: none
-plugins: @ @eslint-community/eslint-comments @html-eslint/svelte @stylistic @typescript-eslint functional import-x markdown n package-json perfectionist promise regexp security unicorn unused-imports
+plugins: @ @eslint-community/eslint-comments @html-eslint/svelte @stylistic @typescript-eslint functional import-x markdown n package-json perfectionist promise regexp security sonarjs unicorn unused-imports
 languageOptions:
   ecmaVersion: 2026
   globals: "AggregateError:false Array:false ArrayBuffer:false AsyncDisposableStack:false Atomics:false BigInt:false BigInt64Array:false BigUint64Array:false Boolean:false DataView:false Date:false DisposableStack:false Error:false EvalError:false FinalizationRegistry:false Float16Array:false Float32Array:false Float64Array:false Function:false Infinity:false Int16Array:false Int32Array:false Int8Array:false Intl:false Iterator:false JSON:false Map:false Math:false NaN:false Number:false Object:false Promise:false Proxy:false RangeError:false ReferenceError:false Reflect:false RegExp:false Set:false SharedArrayBuffer:false String:false SuppressedError:false Symbol:false SyntaxError:false TypeError:false URIError:false Uint16Array:false Uint32Array:false Uint8Array:false Uint8ClampedArray:false WeakMap:false WeakRef:false WeakSet:false decodeURI:false decodeURIComponent:false encodeURI:false encodeURIComponent:false escape:false eval:false globalThis:false isFinite:false isNaN:false parseFloat:false parseInt:false undefined:false unescape:false"
@@ -14,7 +14,7 @@ linterOptions:
 settings:
   import-x/parsers: {"espree":[".js",".mjs",".cjs"]}
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 1061 (error 770, off 271, warn 20)
+rules: 1356 (error 862, off 442, warn 52)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -691,6 +691,301 @@ security/detect-object-injection: warn
 security/detect-possible-timing-attacks: warn
 security/detect-pseudoRandomBytes: warn
 security/detect-unsafe-regex: warn
+sonarjs/anchor-precedence: off
+sonarjs/argument-type: off
+sonarjs/arguments-order: off
+sonarjs/arguments-usage: off
+sonarjs/array-callback-without-return: off
+sonarjs/array-constructor: off
+sonarjs/arrow-function-convention: off [{"requireBodyBraces":false,"requireParameterParentheses":false}]
+sonarjs/assertions-in-test-cases: error
+sonarjs/assertions-in-tests: off
+sonarjs/async-test-assertions: error
+sonarjs/avoid-mutating-nested-properties-of-shallow-clones: off
+sonarjs/aws-apigateway-public-api: error
+sonarjs/aws-ec2-rds-dms-public: error
+sonarjs/aws-ec2-unencrypted-ebs-volume: error
+sonarjs/aws-efs-unencrypted: error
+sonarjs/aws-iam-all-privileges: error
+sonarjs/aws-iam-all-resources-accessible: error
+sonarjs/aws-iam-privilege-escalation: error
+sonarjs/aws-iam-public-access: error
+sonarjs/aws-opensearchservice-domain: error
+sonarjs/aws-rds-unencrypted-databases: error
+sonarjs/aws-restricted-ip-admin-access: error
+sonarjs/aws-s3-bucket-granted-access: error
+sonarjs/aws-s3-bucket-insecure-http: error
+sonarjs/aws-s3-bucket-public-access: error
+sonarjs/aws-s3-bucket-versioning: error
+sonarjs/aws-sagemaker-unencrypted-notebook: error
+sonarjs/aws-sns-unencrypted-topics: error
+sonarjs/aws-sqs-unencrypted-queue: error
+sonarjs/bitwise-operators: off
+sonarjs/block-scoped-var: off
+sonarjs/bool-param-default: off
+sonarjs/call-argument-line: off
+sonarjs/chai-determinate-assertion: error
+sonarjs/class-name: off [{"format":"^\\$?[A-Z][a-zA-Z0-9]*$"}]
+sonarjs/class-prototype: off
+sonarjs/code-eval: off
+sonarjs/cognitive-complexity: warn [15]
+sonarjs/comma-or-logical-or-case: off
+sonarjs/comment-regex: off [{"flags":"","message":"The regular expression matches this comment.","regularExpression":""}]
+sonarjs/composite-assertions: error
+sonarjs/concise-regex: off
+sonarjs/conditional-indentation: off
+sonarjs/confidential-information-logging: off
+sonarjs/constructor-for-side-effects: off
+sonarjs/content-length: off [{"fileUploadSizeLimit":8000000,"standardSizeLimit":2000000}]
+sonarjs/content-security-policy: warn
+sonarjs/cookie-no-httponly: off
+sonarjs/cors: off
+sonarjs/csrf: off
+sonarjs/cyclomatic-complexity: off [{"threshold":10}]
+sonarjs/declarations-in-global-scope: off
+sonarjs/deprecation: off
+sonarjs/destructuring-assignment-syntax: off
+sonarjs/different-types-comparison: off
+sonarjs/disabled-auto-escaping: off
+sonarjs/disabled-resource-integrity: off
+sonarjs/disabled-timeout: error
+sonarjs/dompurify-unsafe-config: off
+sonarjs/duplicates-in-character-class: off
+sonarjs/dynamically-constructed-templates: error
+sonarjs/elseif-without-else: off
+sonarjs/empty-string-repetition: off
+sonarjs/encryption-secure-mode: warn
+sonarjs/existing-groups: off
+sonarjs/explicit-test-skip: error
+sonarjs/expression-complexity: warn [{"max":3}]
+sonarjs/file-header: off [{"headerFormat":"","isRegularExpression":false}]
+sonarjs/file-name-differ-from-class: off
+sonarjs/file-permissions: warn
+sonarjs/file-uploads: warn
+sonarjs/fixme-tag: off
+sonarjs/for-in: off
+sonarjs/for-loop-increment-sign: off
+sonarjs/frame-ancestors: off
+sonarjs/function-inside-loop: off
+sonarjs/function-name: off [{"format":"^[_a-z][a-zA-Z0-9]*$"}]
+sonarjs/function-return-type: off
+sonarjs/future-reserved-words: off
+sonarjs/generator-without-yield: off
+sonarjs/hardcoded-secret-signatures: warn
+sonarjs/hashing: warn
+sonarjs/hidden-files: off
+sonarjs/hooks-before-test-cases: error
+sonarjs/in-operator-type-error: off
+sonarjs/inconsistent-function-call: error
+sonarjs/index-of-compare-to-positive-number: off
+sonarjs/insecure-cookie: off
+sonarjs/insecure-jwt-token: error
+sonarjs/inverted-assertion-arguments: error
+sonarjs/jsx-no-leaked-render: off
+sonarjs/label-position: off
+sonarjs/link-with-target-blank: error
+sonarjs/max-lines: off [{"maximum":1000}]
+sonarjs/max-lines-per-function: off [{"maximum":200}]
+sonarjs/max-switch-cases: off [30]
+sonarjs/max-union-size: off [{"threshold":3}]
+sonarjs/memoize-cache-key: error
+sonarjs/misplaced-loop-counter: error
+sonarjs/nested-control-flow: off [{"maximumNestingLevel":3}]
+sonarjs/new-operator-misuse: off [{"considerJSDoc":false}]
+sonarjs/no-all-duplicated-branches: error
+sonarjs/no-alphabetical-sort: off
+sonarjs/no-angular-bypass-sanitization: error
+sonarjs/no-array-delete: off
+sonarjs/no-associative-arrays: off
+sonarjs/no-async-constructor: off
+sonarjs/no-built-in-override: off
+sonarjs/no-case-label-in-switch: off
+sonarjs/no-clear-text-protocols: off
+sonarjs/no-code-after-done: error
+sonarjs/no-collapsible-if: off
+sonarjs/no-collection-size-mischeck: off
+sonarjs/no-commented-code: warn
+sonarjs/no-control-regex: off
+sonarjs/no-dead-store: off
+sonarjs/no-debounce-throttle-in-render: error
+sonarjs/no-debug-commands-in-ui-tests: error
+sonarjs/no-default-utility-imports: error
+sonarjs/no-delete-var: off
+sonarjs/no-duplicate-in-composite: off
+sonarjs/no-duplicate-parameterized-test-case: error
+sonarjs/no-duplicate-string: off [{"ignoreStrings":"application/json","threshold":3}]
+sonarjs/no-duplicate-test-title: error
+sonarjs/no-duplicated-branches: error
+sonarjs/no-element-overwrite: error
+sonarjs/no-empty-after-reluctant: off
+sonarjs/no-empty-alternatives: off
+sonarjs/no-empty-character-class: off
+sonarjs/no-empty-collection: error
+sonarjs/no-empty-group: off
+sonarjs/no-empty-parameterized-test-dataset: error
+sonarjs/no-empty-test-file: error
+sonarjs/no-empty-test-title: error
+sonarjs/no-equals-in-for-termination: error
+sonarjs/no-exclusive-tests: error
+sonarjs/no-extra-arguments: off
+sonarjs/no-fallthrough: off
+sonarjs/no-fixed-wait-in-tests: error
+sonarjs/no-floating-point-equality: warn
+sonarjs/no-for-in-iterable: off
+sonarjs/no-forced-browser-interaction: error
+sonarjs/no-function-declaration-in-block: off
+sonarjs/no-global-this: off
+sonarjs/no-globals-shadowing: off
+sonarjs/no-gratuitous-expressions: off
+sonarjs/no-hardcoded-ip: warn
+sonarjs/no-hardcoded-passwords: warn [{"passwordWords":["password","pwd","passwd","passphrase"]}]
+sonarjs/no-hardcoded-secrets: warn [{"randomnessSensibility":5,"secretWords":"api[_.-]?key,auth,credential,secret,token"}]
+sonarjs/no-hook-setter-in-body: off
+sonarjs/no-identical-conditions: off
+sonarjs/no-identical-expressions: off
+sonarjs/no-identical-functions: warn [3]
+sonarjs/no-ignored-exceptions: off
+sonarjs/no-ignored-return: off
+sonarjs/no-implicit-dependencies: off [{"whitelist":[]}]
+sonarjs/no-implicit-global: off
+sonarjs/no-in-misuse: off
+sonarjs/no-incompatible-assertion-types: off
+sonarjs/no-incomplete-assertions: error
+sonarjs/no-inconsistent-returns: off
+sonarjs/no-incorrect-string-concat: off
+sonarjs/no-internal-api-use: error
+sonarjs/no-interpolation-in-inline-snapshots: error
+sonarjs/no-intrusive-permissions: off [{"permissions":["geolocation"]}]
+sonarjs/no-invalid-regexp: off
+sonarjs/no-invariant-returns: error
+sonarjs/no-inverted-boolean-check: off
+sonarjs/no-ip-forward: off
+sonarjs/no-labels: off
+sonarjs/no-literal-call: error
+sonarjs/no-mime-sniff: warn
+sonarjs/no-misleading-array-reverse: off
+sonarjs/no-misleading-character-class: off
+sonarjs/no-mixed-completion-style: error
+sonarjs/no-mixed-content: off
+sonarjs/no-mutate-reactive-state-in-updated-hook: error
+sonarjs/no-nested-assignment: off
+sonarjs/no-nested-conditional: off
+sonarjs/no-nested-functions: off [{"threshold":5}]
+sonarjs/no-nested-incdec: error
+sonarjs/no-nested-switch: error
+sonarjs/no-nested-template-literals: off
+sonarjs/no-networkidle-wait: error
+sonarjs/no-os-command-from-path: warn
+sonarjs/no-parameter-reassignment: off
+sonarjs/no-primitive-wrappers: off
+sonarjs/no-redundant-assignments: off
+sonarjs/no-redundant-boolean: off
+sonarjs/no-redundant-jump: off
+sonarjs/no-redundant-optional: off
+sonarjs/no-redundant-parentheses: off
+sonarjs/no-reference-error: off
+sonarjs/no-referrer-policy: warn
+sonarjs/no-regex-spaces: off
+sonarjs/no-require-or-define: off
+sonarjs/no-return-type-any: off
+sonarjs/no-same-argument-assert: error
+sonarjs/no-same-line-conditional: off
+sonarjs/no-selector-parameter: off
+sonarjs/no-session-cookies-on-static-assets: error
+sonarjs/no-skipped-tests: warn
+sonarjs/no-small-switch: off
+sonarjs/no-sonar-comments: error
+sonarjs/no-tab: off
+sonarjs/no-table-as-layout: error
+sonarjs/no-trivial-assertions: error
+sonarjs/no-try-promise: off
+sonarjs/no-undefined-argument: off
+sonarjs/no-undefined-assignment: off
+sonarjs/no-unenclosed-multiline-block: off
+sonarjs/no-uniq-key: error
+sonarjs/no-unsafe-unzip: off
+sonarjs/no-unthrown-error: error
+sonarjs/no-unused-collection: error
+sonarjs/no-unused-function-argument: off
+sonarjs/no-unused-vars: off
+sonarjs/no-use-of-empty-return-value: error
+sonarjs/no-useless-catch: off
+sonarjs/no-useless-increment: error
+sonarjs/no-useless-intersection: off
+sonarjs/no-useless-react-setstate: error
+sonarjs/no-variable-usage-before-declaration: off
+sonarjs/no-vue-class-component: error
+sonarjs/no-vue-mixins: error
+sonarjs/no-weak-cipher: warn
+sonarjs/no-weak-keys: warn
+sonarjs/no-wildcard-import: off
+sonarjs/non-existent-operator: error
+sonarjs/non-number-in-arithmetic-expression: off
+sonarjs/null-dereference: off
+sonarjs/object-alt-content: error
+sonarjs/operation-returning-nan: off
+sonarjs/os-command: off
+sonarjs/parameterized-tests: warn
+sonarjs/post-message: off
+sonarjs/prefer-cypress-should: error
+sonarjs/prefer-default-last: off
+sonarjs/prefer-immediate-return: off
+sonarjs/prefer-native-axios-alternative: error
+sonarjs/prefer-native-jquery-alternative: warn
+sonarjs/prefer-native-lodash-alternative: warn
+sonarjs/prefer-object-literal: off
+sonarjs/prefer-promise-shorthand: off
+sonarjs/prefer-read-only-props: off
+sonarjs/prefer-regexp-exec: off
+sonarjs/prefer-single-boolean-return: off
+sonarjs/prefer-specific-assertions: error
+sonarjs/prefer-type-guard: off
+sonarjs/prefer-while: off
+sonarjs/production-debug: error
+sonarjs/pseudo-random: warn
+sonarjs/public-static-readonly: error
+sonarjs/publicly-writable-directories: warn
+sonarjs/reduce-initial-value: off
+sonarjs/redundant-type-aliases: warn
+sonarjs/regex-complexity: off [{"threshold":20}]
+sonarjs/review-blockchain-mnemonic: warn
+sonarjs/session-regeneration: warn
+sonarjs/shorthand-property-grouping: off
+sonarjs/single-char-in-character-classes: off
+sonarjs/single-character-alternation: off
+sonarjs/slow-regex: off
+sonarjs/sql-queries: off
+sonarjs/stable-tests: error
+sonarjs/stateful-regex: error
+sonarjs/strict-transport-security: warn
+sonarjs/strings-comparison: off
+sonarjs/super-linear-regex: off
+sonarjs/synchronous-exception-assertions: off
+sonarjs/synchronous-suite-callback: error
+sonarjs/table-header: error
+sonarjs/table-header-reference: error
+sonarjs/test-check-exception: error
+sonarjs/testing-library-prefer-query-by-disappearance: error
+sonarjs/testing-library-query-assertion: error
+sonarjs/todo-tag: off
+sonarjs/too-many-break-or-continue-in-loop: off
+sonarjs/unicode-aware-regex: off
+sonarjs/unused-import: off
+sonarjs/unused-named-groups: off
+sonarjs/unverified-certificate: error
+sonarjs/unverified-hostname: error
+sonarjs/updated-const-var: off
+sonarjs/updated-loop-counter: error
+sonarjs/use-type-alias: warn
+sonarjs/useless-string-operation: off
+sonarjs/values-not-convertible-to-numbers: off
+sonarjs/variable-name: off [{"format":"^[_$A-Za-z][$A-Za-z0-9]*$|^[_$A-Z][_$A-Z0-9]+$"}]
+sonarjs/vitest-mock-at-module-scope: error
+sonarjs/void-use: off
+sonarjs/weak-ssl: warn
+sonarjs/web-sql-database: off
+sonarjs/x-powered-by: warn
+sonarjs/xml-parser-xxe: error
 sort-imports: off [{"allowSeparatedGroups":false,"ignoreCase":false,"ignoreDeclarationSort":false,"ignoreMemberSort":false,"memberSyntaxSortOrder":["none","all","multiple","single"]}]
 sort-keys: off ["asc",{"allowLineSeparatedGroups":false,"caseSensitive":true,"ignoreComputedKeys":false,"minKeys":2,"natural":false}]
 sort-vars: off [{"ignoreCase":false}]
@@ -775,7 +1070,7 @@ unicorn/no-constant-zero-expression: error
 unicorn/no-declarations-before-early-exit: error
 unicorn/no-document-cookie: error
 unicorn/no-double-comparison: error
-unicorn/no-duplicate-if-branches: error
+unicorn/no-duplicate-if-branches: off
 unicorn/no-duplicate-logical-operands: error
 unicorn/no-duplicate-loops: error
 unicorn/no-duplicate-set-values: error

@@ -259,6 +259,28 @@ const shapes: readonly Shape[] = [
   ],
   ["an override in node and typed linting off", { node: nodeOverride }, []],
   [
+    "an override of a disabled alternative in sonarjs",
+    {
+      sonarjs: { overrides: { "sonarjs/deprecation": "warn" } },
+      typescript: withoutScripts,
+    },
+    typedSources,
+    { "sonarjs/deprecation": [1] },
+  ],
+  [
+    "an override in sonarjs and typed linting off",
+    { sonarjs: { overrides: { "sonarjs/deprecation": "warn" } } },
+    [],
+  ],
+  [
+    "a negated pattern in the ignores of sonarjs",
+    {
+      sonarjs: { ignores: ["**/*", "!scripts/**"] },
+      typescript: withoutScripts,
+    },
+    typedSources,
+  ],
+  [
     "an override in typescript",
     { typescript: { ...withoutScripts, ...typescriptOverride } },
     typedSources,

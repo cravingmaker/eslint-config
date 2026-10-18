@@ -53,6 +53,7 @@ type ResolvedOptions = {
   readonly react: ResolvedReactOptions | undefined;
   readonly regexp: FeatureOptions | undefined;
   readonly security: FeatureOptions | undefined;
+  readonly sonarjs: FeatureOptions | undefined;
   readonly stylistic: FeatureOptions | undefined;
   readonly svelte: FeatureOptions | undefined;
   /**
@@ -236,6 +237,7 @@ const resolveOptions = (
     react: resolveReact(detection, options.react),
     regexp: resolveFeature(options.regexp),
     security: resolveFeature(options.security),
+    sonarjs: resolveFeature(options.sonarjs),
     stylistic: resolveFeature(options.stylistic),
     svelte,
     svelteComponents: resolveSvelteComponents(svelte),

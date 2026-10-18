@@ -2,7 +2,7 @@ path: README.md
 ignored: false
 language: markdown/gfm
 processor: none
-plugins: @ @eslint-community/eslint-comments @stylistic functional import-x markdown n package-json perfectionist promise regexp security unicorn unused-imports
+plugins: @ @eslint-community/eslint-comments @stylistic functional import-x markdown n package-json perfectionist promise regexp security sonarjs unicorn unused-imports
 languageOptions:
   frontmatter: "yaml"
   math: true

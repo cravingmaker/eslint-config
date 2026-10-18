@@ -114,12 +114,11 @@ const getOutput = async (
     });
     return stdout;
   } catch (error) {
-    return typeof error === "object" &&
-      error !== null &&
-      "stdout" in error &&
-      typeof error.stdout === "string"
-      ? error.stdout
-      : String(error);
+    const output =
+      typeof error === "object" && error !== null && "stdout" in error
+        ? error.stdout
+        : error;
+    return typeof output === "string" ? output : String(error);
   }
 };
 /*

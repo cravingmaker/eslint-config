@@ -29,6 +29,11 @@ const pairs = [
   ["imports", "n/no-missing-import", ["import-x/no-unresolved"]],
   ["imports", "no-duplicate-imports", ["import-x/no-duplicates"]],
   [
+    "imports",
+    "sonarjs/no-implicit-dependencies",
+    ["import-x/no-extraneous-dependencies"],
+  ],
+  [
     "perfectionist",
     "@typescript-eslint/adjacent-overload-signatures",
     ["perfectionist/sort-interfaces", "perfectionist/sort-object-types"],
@@ -45,6 +50,13 @@ const pairs = [
   ["regexp", "no-empty-character-class", ["regexp/no-empty-character-class"]],
   ["regexp", "no-invalid-regexp", ["regexp/no-invalid-regexp"]],
   ["regexp", "no-useless-backreference", ["regexp/no-useless-backreference"]],
+  ["regexp", "sonarjs/no-empty-group", ["regexp/no-empty-group"]],
+  ["regexp", "sonarjs/no-invalid-regexp", ["regexp/no-invalid-regexp"]],
+  [
+    "sonarjs",
+    "unicorn/no-duplicate-if-branches",
+    ["sonarjs/no-duplicated-branches", "sonarjs/no-all-duplicated-branches"],
+  ],
   ["unicorn", "n/no-process-exit", ["unicorn/no-process-exit"]],
   ["unicorn", "n/prefer-node-protocol", ["unicorn/prefer-node-protocol"]],
   ["unicorn", "no-negated-condition", ["unicorn/no-negated-condition"]],

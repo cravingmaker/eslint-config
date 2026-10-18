@@ -98,7 +98,7 @@ describe("rule coverage", () => {
         return left.localeCompare(right);
       });
 
-    expect(plugins.size).toBe(22);
+    expect(plugins.size).toBe(23);
     expect(unclassified).toEqual([]);
   });
 });

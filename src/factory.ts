@@ -21,6 +21,7 @@ import { promise } from "./configs/plugins/promise/index.js";
 import { react } from "./configs/plugins/react/index.js";
 import { regexp } from "./configs/plugins/regexp/index.js";
 import { security } from "./configs/plugins/security/index.js";
+import { sonarjs } from "./configs/plugins/sonarjs/index.js";
 import { stylistic } from "./configs/plugins/stylistic/index.js";
 import { svelte } from "./configs/plugins/svelte/index.js";
 import { typescript } from "./configs/plugins/typescript/index.js";
@@ -64,6 +65,7 @@ const createConfig = async (
     ...buildFeature(resolved.comments, comments, context),
     ...buildFeature(resolved.node, node, context),
     ...buildFeature(resolved.security, security, context),
+    ...buildFeature(resolved.sonarjs, sonarjs, context),
     ...buildFeature(resolved.imports, imports, context),
     ...buildFeature(resolved.unusedImports, unusedImports, context),
     ...buildFeature(resolved.promise, promise, context),

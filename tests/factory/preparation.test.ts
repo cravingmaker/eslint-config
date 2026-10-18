@@ -18,6 +18,7 @@ const temporaryDirectory = await mkdtemp(
   path.join(temporaryRoot, "eslint-config-preparation-"),
 );
 
+// eslint-disable-next-line sonarjs/no-invariant-returns -- Both paths return the fixture directory; the manifest controls only its contents.
 const createProject = async (manifest?: string): Promise<string> => {
   const directory = await mkdtemp(path.join(temporaryDirectory, "project-"));
   if (typeof manifest === "undefined") {

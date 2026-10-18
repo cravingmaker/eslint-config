@@ -11,6 +11,7 @@ import { perfectionist } from "../../src/configs/plugins/perfectionist/index.js"
 import { promise } from "../../src/configs/plugins/promise/index.js";
 import { regexp } from "../../src/configs/plugins/regexp/index.js";
 import { security } from "../../src/configs/plugins/security/index.js";
+import { sonarjs } from "../../src/configs/plugins/sonarjs/index.js";
 import { stylistic } from "../../src/configs/plugins/stylistic/index.js";
 import { unicorn } from "../../src/configs/plugins/unicorn/index.js";
 import { unusedImports } from "../../src/configs/plugins/unused-imports/index.js";
@@ -67,6 +68,12 @@ const features = [
     name: "security",
     plugin: "security",
     rule: "security/detect-eval-with-expression",
+  },
+  {
+    build: sonarjs,
+    name: "sonarjs",
+    plugin: "sonarjs",
+    rule: "sonarjs/no-all-duplicated-branches",
   },
   {
     build: stylistic,

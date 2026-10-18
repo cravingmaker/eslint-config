@@ -2,7 +2,7 @@ path: index.html
 ignored: false
 language: @/js
 processor: none
-plugins: @ @eslint-community/eslint-comments @html-eslint @stylistic functional import-x markdown n package-json perfectionist promise regexp security unicorn unused-imports
+plugins: @ @eslint-community/eslint-comments @html-eslint @stylistic functional import-x markdown n package-json perfectionist promise regexp security sonarjs unicorn unused-imports
 languageOptions:
   ecmaVersion: 2026
   parser: "[Parser @html-eslint/parser]"

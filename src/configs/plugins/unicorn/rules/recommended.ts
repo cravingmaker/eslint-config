@@ -1,7 +1,7 @@
 import type { Rules } from "../../../../types.js";
 
 const recommendedRules: Rules = {
-  // --- Rules with default options (325/338) -------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (324/338) -------------------------------------------------------------------------------------------------------.
   "unicorn/better-dom-traversing": "error", // Manually fixable by editor suggestions.
   "unicorn/catch-error-name": ["error", { ignore: [], name: "error" }], // Automatically fixable by the --fix command.
   "unicorn/class-reference-in-static-methods": [
@@ -139,7 +139,6 @@ const recommendedRules: Rules = {
   "unicorn/no-declarations-before-early-exit": "error", // Automatically fixable by the --fix command.
   "unicorn/no-document-cookie": "error",
   "unicorn/no-double-comparison": "error", // Manually fixable by editor suggestions.
-  "unicorn/no-duplicate-if-branches": "error",
   "unicorn/no-duplicate-logical-operands": "error", // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "unicorn/no-duplicate-loops": "error",
   "unicorn/no-duplicate-set-values": "error",
@@ -564,10 +563,11 @@ const recommendedRules: Rules = {
     },
   ], // Automatically fixable by the --fix command.
 
-  // --- Turned off rules (10/338) ------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (11/338) ------------------------------------------------------------------------------------------------------------------.
   "unicorn/consistent-json-file-read": "off", // Prefer explicit JSON file reading behavior. Automatically fixable by the --fix command.
   "unicorn/empty-brace-spaces": "off", // Handled by `prettier`. Automatically fixable by the --fix command.
   "unicorn/logical-assignment-operators": "off", // Handled by `logical-assignment-operators`. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  "unicorn/no-duplicate-if-branches": "off", // Handled by `sonarjs/no-duplicated-branches` and `sonarjs/no-all-duplicated-branches`, which also inspect non-adjacent and switch branches.
   "unicorn/no-empty-link-text": "off", // Markdown-only rule; preserve the existing Markdown policy.
   "unicorn/no-leading-empty-lines": "off", // Handled by `prettier`. Automatically fixable by the --fix command.
   "unicorn/no-nested-ternary": "off", // Handled by `no-nested-ternary`, prettier removes the parentheses that this rule requires. Automatically fixable by the --fix command.

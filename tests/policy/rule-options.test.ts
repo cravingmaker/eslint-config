@@ -51,11 +51,10 @@ const isObjectOptionExplicit = (
         return Object.hasOwn(properties, key);
       })) &&
     Object.keys(properties).every((key) => {
-      return (
-        (key === "maximum" && Object.hasOwn(value, "max")) ||
-        (key === "countVoidThis" && Object.hasOwn(value, "countThis")) ||
-        Object.hasOwn(value, key)
-      );
+      const hasMaximumAlias = key === "maximum" && Object.hasOwn(value, "max");
+      const hasThisAlias =
+        key === "countVoidThis" && Object.hasOwn(value, "countThis");
+      return hasMaximumAlias || hasThisAlias || Object.hasOwn(value, key);
     })
   );
 };
@@ -146,6 +145,19 @@ const optionSchemas = (schema: unknown): ReadonlyArray<readonly unknown[]> => {
   // can deliberately have no entries, such as require-attrs and no-restricted-syntax.
   return [[]];
 };
+// The second SonarJS option is the internal "silence-issues" mode, which suppresses
+// diagnostics. The numeric threshold alone is the public reporting option form.
+const hasCognitiveComplexityReportingOptions = (
+  id: string,
+  candidates: ReadonlyArray<readonly unknown[]>,
+): boolean => {
+  return (
+    id === "sonarjs/cognitive-complexity" &&
+    candidates.every((options) => {
+      return options.length === 1 && typeof options[0] === "number";
+    })
+  );
+};
 const missingOptions = (
   id: string,
   rule: unknown,
@@ -176,6 +188,9 @@ const missingOptions = (
   }
   // Its schema requires an active export check whenever options are supplied.
   if (id === "import-x/no-unused-modules") {
+    return [];
+  }
+  if (hasCognitiveComplexityReportingOptions(id, candidates)) {
     return [];
   }
   const schemas = optionSchemas(rule.meta.schema);

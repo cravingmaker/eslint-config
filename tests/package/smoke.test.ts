@@ -30,6 +30,7 @@ const runtimeDependencies: readonly string[] = [
   "eslint-plugin-promise",
   "eslint-plugin-regexp",
   "eslint-plugin-security",
+  "eslint-plugin-sonarjs",
   "eslint-plugin-unicorn",
   "eslint-plugin-unused-imports",
   "@eslint/json",
@@ -69,6 +70,7 @@ const linkDependency = async (
 
 const createPackedPackage = async (baseDirectory: string) => {
   execFileSync(
+    // eslint-disable-next-line sonarjs/no-os-command-from-path -- Fixture subprocesses resolve contributor-installed npm and tar from PATH.
     "npm",
     ["pack", "--ignore-scripts", "--pack-destination", baseDirectory],
     {
@@ -107,6 +109,7 @@ const createConsumer = async ({
   await fs.mkdir(packageDirectory, { recursive: true });
 
   execFileSync(
+    // eslint-disable-next-line sonarjs/no-os-command-from-path -- Fixture subprocesses resolve contributor-installed npm and tar from PATH.
     "tar",
     ["-xzf", tarball, "--strip-components=1", "-C", packageDirectory],
     {
@@ -292,6 +295,13 @@ describe("published package", () => {
 					throw new Error('Typed TypeScript config did not enable n/no-sync');
 				}
 
+				if (!getPluginNames(defaultConfig).has('sonarjs') || defaultTsConfig.rules?.['sonarjs/no-exclusive-tests']?.[0] !== 2) {
+					throw new Error('Default config did not enable the bundled SonarJS policy');
+				}
+				if (defaultTsConfig.rules?.['sonarjs/no-try-promise']?.[0] !== 0 || typedTsConfig.rules?.['sonarjs/no-try-promise']?.[0] !== 2) {
+					throw new Error('SonarJS type-aware rules did not follow typed linting');
+				}
+
 				const eslint = new ESLint({
 					overrideConfig: defaultConfig,
 					overrideConfigFile: true,
@@ -300,6 +310,13 @@ describe("published package", () => {
 					"import fs from 'node:fs';\nfs.readFileSync('fixture.txt', 'utf8');\n",
 					{ filePath: 'example.ts' },
 				);
+				const [sonarjsResult] = await eslint.lintText(
+					'it.only("case", () => {});',
+					{ filePath: 'example.test.js' },
+				);
+				if (!sonarjsResult.messages.some((message) => message.ruleId === 'sonarjs/no-exclusive-tests')) {
+					throw new Error('The packed package did not run SonarJS');
+				}
 				const jsxResults = await eslint.lintText(
 					"const element = <div>Hello</div>;\nconsole.log(element);\n",
 					{ filePath: 'component.jsx' },
