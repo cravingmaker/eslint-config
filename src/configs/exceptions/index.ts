@@ -27,17 +27,15 @@ const exceptions = (
         return [];
       }
 
-      return [
-        {
-          files,
-          name: `@cravingmaker/eslint-config/exceptions/${role}`,
-          rules: Object.fromEntries(
-            ruleIds.map((ruleId): readonly [string, "off"] => {
-              return [ruleId, "off"];
-            }),
-          ),
-        },
-      ];
+      return {
+        files,
+        name: `@cravingmaker/eslint-config/exceptions/${role}`,
+        rules: Object.fromEntries(
+          ruleIds.map((ruleId): readonly [string, "off"] => {
+            return [ruleId, "off"];
+          }),
+        ),
+      };
     },
   );
 };

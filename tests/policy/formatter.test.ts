@@ -76,9 +76,7 @@ const prettierTemplateComments: ReadonlySet<string> = new Set([
   "html",
 ]);
 /*
-The @html-eslint plugins are outside the coverage of eslint-config-prettier, so their style rules
-are decided by hand. These check only whitespace, line breaks, indentation, or attribute quotes,
-which Prettier decides when it formats HTML, so they are off.
+The @html-eslint plugins are outside the coverage of eslint-config-prettier, so their style rules are decided by hand. These check only whitespace, line breaks, indentation, or attribute quotes, which Prettier decides when it formats HTML, so they are off.
 */
 const htmlLayoutRules = [
   "@html-eslint/attrs-newline",

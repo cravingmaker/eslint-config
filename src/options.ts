@@ -129,9 +129,7 @@ const resolveReact = (
   };
 };
 /**
-Resolves the Svelte components whose scripts the features for JavaScript and TypeScript sources
-lint: the components among the Svelte feature's files, without its ignores, because only
-svelte-eslint-parser reads them. None while the Svelte feature is off.
+Resolves the Svelte components whose scripts the features for JavaScript and TypeScript sources lint: the components among the Svelte feature's files, without its ignores, because only svelte-eslint-parser reads them. None while the Svelte feature is off.
 */
 const resolveSvelteComponents = (
   svelte: FeatureOptions | undefined,
@@ -208,8 +206,7 @@ const resolveTypeScript = (
 /**
 Applies the defaults to the options of `createConfig`. Every feature is on unless it is
 `false`, except `react`, `svelte`, and `express`, whose `"auto"` default follows `detection`.
-The project root becomes an absolute path: a relative one is resolved from the working
-directory, which is also its default. Preparation passes the root it used to read the manifest.
+The project root becomes an absolute path: a relative one is resolved from the working directory, which is also its default. Preparation passes the root it used to read the manifest.
 */
 const resolveOptions = (
   options: Options = {},

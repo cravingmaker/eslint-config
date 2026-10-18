@@ -3,9 +3,7 @@ import { describe, expect, it } from "vitest";
 import { expectLintError, expectNoLintError } from "./utilities.js";
 
 /*
-Files that no rule can report: code that does not parse, a path in the global ignores, and a path
-that no block of the configuration matches. A negative assertion about them would pass without
-linting anything.
+Files that no rule can report: code that does not parse, a path in the global ignores, and a path that no block of the configuration matches. A negative assertion about them would pass without linting anything.
 */
 const unlintable = [
   {

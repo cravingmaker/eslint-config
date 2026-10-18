@@ -102,8 +102,8 @@ const objectSchemas = (schema: unknown): readonly UnknownRecord[] => {
   }
   const alternatives = schema.oneOf ?? schema.anyOf;
   if (isUnknownArray(alternatives)) {
-    return alternatives.flatMap((alternative) => {
-      return objectSchemas(alternative ?? false);
+    return alternatives.flatMap((alternative: unknown = false) => {
+      return objectSchemas(alternative);
     });
   }
   return schema.type === "object" || isRecord(schema.properties)
@@ -135,8 +135,8 @@ const optionSchemas = (schema: unknown): ReadonlyArray<readonly unknown[]> => {
   }
   const alternatives = schema.oneOf ?? schema.anyOf;
   if (isUnknownArray(alternatives)) {
-    return alternatives.flatMap((alternative) => {
-      return optionSchemas(alternative ?? false);
+    return alternatives.flatMap((alternative: unknown = false) => {
+      return optionSchemas(alternative);
     });
   }
   if (isUnknownArray(schema.items)) {
@@ -196,7 +196,7 @@ const missingOptions = (
         return form.flatMap((schema, index) => {
           return isOptionExplicit(schema, options, index)
             ? []
-            : [`${id} option ${String(index + 1)}`];
+            : `${id} option ${String(index + 1)}`;
         });
       });
   });
@@ -329,8 +329,7 @@ const getOffRuleIds = async (
     });
 };
 /*
-ESLint validates rule options only while a rule is enabled, and a later config
-that enables a rule with a bare severity keeps the options configured before.
+ESLint validates rule options only while a rule is enabled, and a later config that enables a rule with a bare severity keeps the options configured before.
 Options retained on an off rule must still be valid when a consumer enables it.
 Bare off entries do not need options; consumers choose options when enabling them.
 */

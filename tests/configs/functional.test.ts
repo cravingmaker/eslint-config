@@ -34,16 +34,15 @@ const getRules = async (
     { readonly rules?: RuleEntries } | undefined;
   return config?.rules;
 };
-// The severity of a rule in the configuration for a file, or `undefined` when it is not set.
-const getSeverity = async (
+// The readonly-type severity for a file, or `undefined` when it is not set.
+const getReadonlyTypeSeverity = async (
   eslint: ESLint,
   filePath: string,
-  ruleId: string,
 ): Promise<unknown> => {
   const rules = new Map(
     Object.entries((await getRules(eslint, filePath)) ?? {}),
   );
-  return rules.get(ruleId)?.[0];
+  return rules.get("functional/readonly-type")?.[0];
 };
 
 describe("functional feature", () => {
@@ -64,9 +63,9 @@ describe("functional feature", () => {
       overrideConfigFile: true,
     });
     const severities = await Promise.all([
-      getSeverity(eslint, "src/example.ts", "functional/readonly-type"),
-      getSeverity(eslint, "src/example.d.ts", "functional/readonly-type"),
-      getSeverity(eslint, "src/example.js", "functional/readonly-type"),
+      getReadonlyTypeSeverity(eslint, "src/example.ts"),
+      getReadonlyTypeSeverity(eslint, "src/example.d.ts"),
+      getReadonlyTypeSeverity(eslint, "src/example.js"),
     ]);
 
     expect(severities).toEqual([2, 0, 0]);
@@ -103,9 +102,9 @@ describe("functional feature", () => {
       overrideConfigFile: true,
     });
     const severities = await Promise.all([
-      getSeverity(eslint, "src/example.ts", "functional/readonly-type"),
-      getSeverity(eslint, "src/example.d.ts", "functional/readonly-type"),
-      getSeverity(eslint, "lib/example.ts", "functional/readonly-type"),
+      getReadonlyTypeSeverity(eslint, "src/example.ts"),
+      getReadonlyTypeSeverity(eslint, "src/example.d.ts"),
+      getReadonlyTypeSeverity(eslint, "lib/example.ts"),
     ]);
 
     expect(severities).toEqual([2, 0, undefined]);

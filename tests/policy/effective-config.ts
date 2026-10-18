@@ -128,10 +128,9 @@ const describeRule = (
     return candidate === level;
   })?.[0];
   const description = `${ruleId}: ${severity ?? String(level)}`;
-  if (options.length === 0) {
-    return description;
-  }
-  return `${description} ${stringify(options, rootDirectory)}`;
+  return options.length === 0
+    ? description
+    : `${description} ${stringify(options, rootDirectory)}`;
 };
 const describeSection = (
   title: string,
@@ -154,8 +153,7 @@ const describeSection = (
 };
 /**
 Describes the configuration ESLint resolves for `filePath` as reviewable text:
-one line per rule with its severity and options, preceded by the language
-settings that decide how the file is parsed.
+one line per rule with its severity and options, preceded by the language settings that decide how the file is parsed.
 */
 const describeEffectiveConfig = async (
   eslint: ESLint,

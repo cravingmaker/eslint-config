@@ -37,10 +37,8 @@ const isDeprecatedConfiguredRule = (
   const rule = Object.entries(plugin?.rules ?? {}).find(([name]) => {
     return name === ruleName;
   })?.[1];
-  if (!isPluginRule(rule)) {
-    return false;
-  }
   return (
+    isPluginRule(rule) &&
     typeof rule.meta?.deprecated !== "undefined" &&
     rule.meta.deprecated !== false
   );

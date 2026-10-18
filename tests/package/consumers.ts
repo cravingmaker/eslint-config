@@ -100,8 +100,7 @@ const createTemporaryDirectory = async (prefix: string): Promise<string> => {
   return await realpath(directory);
 };
 /*
-Runs a command and returns what it prints, also when it exits with an error, as ESLint does when
-it reports a problem and TypeScript does when it finds one.
+Runs a command and returns what it prints, also when it exits with an error, as ESLint does when it reports a problem and TypeScript does when it finds one.
 */
 const getOutput = async (
   command: string,

@@ -24,6 +24,12 @@ export default createConfig(
     },
   },
   {
+    // Tool entry points assemble their configuration when the module is loaded.
+    files: ["eslint.config.js", "tsdown.config.ts", "vitest.config.ts"],
+    name: "repository/tool-configuration",
+    rules: { "unicorn/no-top-level-side-effects": "off" },
+  },
+  {
     // Rule maps explicitly leave optional, inferred settings unset.
     files: ["src/configs/**/*.ts"],
     name: "repository/rule-option-data",

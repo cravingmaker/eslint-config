@@ -43,8 +43,8 @@ const frameworkBlocks = (
   configs: readonly Linter.Config[],
 ): readonly string[] => {
   return configs
-    .map(({ name }) => {
-      return name ?? "";
+    .map(({ name = "" }) => {
+      return name;
     })
     .filter((name) => {
       return /^@cravingmaker\/eslint-config\/(?:express|react|svelte)\//u.test(

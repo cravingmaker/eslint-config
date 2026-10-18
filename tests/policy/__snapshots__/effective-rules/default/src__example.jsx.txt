@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 830 (error 697, off 113, warn 20)
+rules: 867 (error 724, off 122, warn 21)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -485,6 +485,7 @@ security/detect-buffer-noassert: warn
 security/detect-child-process: warn
 security/detect-disable-mustache-escape: warn
 security/detect-eval-with-expression: warn
+security/detect-invisible-characters: warn
 security/detect-new-buffer: warn
 security/detect-no-csrf-before-method-override: warn
 security/detect-non-literal-fs-filename: warn
@@ -503,6 +504,7 @@ unicode-bom: error ["never"]
 unicorn/better-dom-traversing: error
 unicorn/catch-error-name: error [{"ignore":[],"name":"error"}]
 unicorn/class-reference-in-static-methods: error [{"preferSuper":true,"preferThis":true}]
+unicorn/comma-spacing: off
 unicorn/comment-content: off [{"checkUniformCase":true,"extendDefaultReplacements":true,"replacements":{}}]
 unicorn/consistent-arrow-return-style: off
 unicorn/consistent-assert: error
@@ -530,11 +532,13 @@ unicorn/escape-case: error ["uppercase"]
 unicorn/expiring-todo-comments: error [{"allowWarningComments":true,"checkDates":false,"checkDatesOnPullRequests":false,"ignore":[],"terms":["todo","fixme","xxx"]}]
 unicorn/explicit-length-check: error [{"non-zero":"greater-than"}]
 unicorn/explicit-timer-delay: error ["always"]
-unicorn/filename-case: error [{"cases":{"kebabCase":true,"pascalCase":true},"checkDirectories":true,"ignore":["[RegExp /^\\d+_/v]"],"multipleFileExtensions":true}]
+unicorn/filename-case: error [{"cases":{"kebabCase":true,"pascalCase":true},"checkDirectories":true,"directoryRoots":[],"ignore":["[RegExp /^\\d+_/v]"],"multipleFileExtensions":true}]
 unicorn/id-match: error ["^.+$",{"checkNamedSpecifiers":true,"classFields":false,"ignoreDestructuring":false,"onlyDeclarations":false,"properties":false}]
 unicorn/import-style: error [{"checkDynamicImport":true,"checkExportFrom":false,"checkImport":true,"checkRequire":true,"extendDefaultStyles":true,"styles":{}}]
+unicorn/indent: off [{"indent":"tab","tabWidth":4}]
 unicorn/isolated-functions: error [{"comments":["@isolated"],"functions":["makeSynchronous","workerize"],"overrideGlobals":{},"selectors":[]}]
 unicorn/iteration-fallback-style: error ["guard"]
+unicorn/key-name-casing: off [{"PascalCase":false,"SCREAMING_SNAKE_CASE":false,"camelCase":true,"ignore":[],"kebab-case":false,"snake_case":false}]
 unicorn/logical-assignment-operators: off ["always"]
 unicorn/max-nested-calls: error [{"max":3}]
 unicorn/name-replacements: error [{"allowList":{"i18n":true,"i18nKey":true,"tsconfigRootDir":true},"checkDefaultAndNamespaceImports":"internal","checkFilenames":true,"checkProperties":false,"checkShorthandImports":"internal","checkShorthandProperties":false,"checkVariables":true,"extendDefaultAllowList":true,"extendDefaultReplacements":true,"ignore":["\\.spec$","\\.test$","\\.e2e$"],"replacements":{"ctx":false,"e":{"error":true,"event":false},"fn":{"function":false},"ref":false,"req":false,"res":false}}]
@@ -555,17 +559,19 @@ unicorn/no-array-sort: error [{"allowExpressionStatement":true}]
 unicorn/no-array-sort-for-min-max: error
 unicorn/no-array-splice: error
 unicorn/no-asterisk-prefix-in-documentation-comments: error
+unicorn/no-async-iterator-callback: error
 unicorn/no-async-promise-finally: error
 unicorn/no-await-expression-member: error
 unicorn/no-await-in-promise-methods: error
 unicorn/no-barrel-files: error
 unicorn/no-blob-to-file: error
 unicorn/no-boolean-sort-comparator: error
-unicorn/no-break-in-nested-loop: error
+unicorn/no-break-in-nested-loop: error [{"checkContinue":true}]
 unicorn/no-canvas-to-image: error
 unicorn/no-chained-comparison: error
 unicorn/no-collection-bracket-access: error
 unicorn/no-computed-property-existence-check: error
+unicorn/no-conflicting-constraints: error
 unicorn/no-confusing-array-splice: error
 unicorn/no-confusing-array-with: error
 unicorn/no-console-spaces: error
@@ -578,27 +584,42 @@ unicorn/no-duplicate-logical-operands: error
 unicorn/no-duplicate-loops: error
 unicorn/no-duplicate-set-values: error
 unicorn/no-empty-file: error [{"allowComments":false}]
+unicorn/no-empty-link-text: off
 unicorn/no-error-property-assignment: error
 unicorn/no-exports-in-scripts: error
 unicorn/no-for-each: error
 unicorn/no-for-loop: error
 unicorn/no-global-object-property-assignment: error
-unicorn/no-immediate-mutation: error
+unicorn/no-immediate-mutation: error [{"checkConditionals":false}]
 unicorn/no-impossible-length-comparison: error
+unicorn/no-incomplete-accessor-override: error
 unicorn/no-incorrect-query-selector: error
 unicorn/no-incorrect-template-string-interpolation: error
+unicorn/no-ineffective-csp-directives: error
 unicorn/no-instanceof-builtins: error [{"exclude":[],"include":[],"strategy":"loose","useErrorIsError":false}]
 unicorn/no-invalid-argument-count: error [{}]
+unicorn/no-invalid-boolean-attribute-value: error
 unicorn/no-invalid-character-comparison: error
+unicorn/no-invalid-dom-token: error
 unicorn/no-invalid-fetch-options: error
 unicorn/no-invalid-file-input-accept: error
+unicorn/no-invalid-integrity: error
+unicorn/no-invalid-intl-options: error
+unicorn/no-invalid-property-descriptor: error
 unicorn/no-invalid-remove-event-listener: error
+unicorn/no-invalid-response-options: error
+unicorn/no-invalid-style-set-property: error
+unicorn/no-invalid-temporal-arithmetic: error
+unicorn/no-invalid-url-protocol-comparison: error
 unicorn/no-invalid-well-known-symbol-methods: error
+unicorn/no-javascript-url: off
 unicorn/no-keyword-prefix: off [{}]
 unicorn/no-late-current-target-access: error
 unicorn/no-late-event-control: error
+unicorn/no-leading-empty-lines: off
 unicorn/no-lonely-if: error
 unicorn/no-loop-iterable-mutation: error
+unicorn/no-loss-of-precision: off
 unicorn/no-magic-array-flat-depth: error
 unicorn/no-manually-wrapped-comments: error
 unicorn/no-mismatched-map-key: error
@@ -619,6 +640,7 @@ unicorn/no-null: error [{"checkArguments":true,"checkStrictEquality":false}]
 unicorn/no-object-as-default-parameter: error
 unicorn/no-object-methods-with-collections: error
 unicorn/no-optional-chaining-on-undeclared-variable: error
+unicorn/no-prevent-default-in-passive-listener: error
 unicorn/no-process-exit: error
 unicorn/no-redundant-comparison: error
 unicorn/no-return-array-push: error
@@ -644,6 +666,7 @@ unicorn/no-unnecessary-boolean-comparison: error
 unicorn/no-unnecessary-fetch-options: error
 unicorn/no-unnecessary-global-this: error
 unicorn/no-unnecessary-nested-ternary: error
+unicorn/no-unnecessary-parameters: error [{"minimumCallCount":2}]
 unicorn/no-unnecessary-polyfills: error [{}]
 unicorn/no-unnecessary-slice-end: error
 unicorn/no-unnecessary-splice: error
@@ -655,12 +678,15 @@ unicorn/no-unreadable-new-expression: error
 unicorn/no-unreadable-object-destructuring: error
 unicorn/no-unsafe-buffer-conversion: error
 unicorn/no-unsafe-dom-html: error
+unicorn/no-unsafe-json-serialization: error
 unicorn/no-unsafe-promise-all-settled-values: error
 unicorn/no-unsafe-property-key: error
 unicorn/no-unsafe-sqlite-interpolation: error
 unicorn/no-unsafe-string-replacement: error
-unicorn/no-unused-array-method-return: error
+unicorn/no-unused-builtin-method-return: error
+unicorn/no-unused-iterator-helper: error
 unicorn/no-unused-properties: off
+unicorn/no-url-in-search-params: error
 unicorn/no-useless-boolean-cast: error
 unicorn/no-useless-coercion: error
 unicorn/no-useless-collection-argument: error
@@ -678,10 +704,12 @@ unicorn/no-useless-override: error
 unicorn/no-useless-promise-resolve-reject: error
 unicorn/no-useless-re-export: error
 unicorn/no-useless-recursion: error
+unicorn/no-useless-set-construction: error
 unicorn/no-useless-spread: error
 unicorn/no-useless-switch-case: error
 unicorn/no-useless-template-literals: error
 unicorn/no-useless-undefined: error [{"checkArguments":true,"checkArrowFunctionBody":true}]
+unicorn/no-using-resource-escape: error
 unicorn/no-xor-as-exponentiation: error
 unicorn/no-zero-fractions: error
 unicorn/number-literal-case: off [{"hexadecimalValue":"uppercase"}]
@@ -712,7 +740,8 @@ unicorn/prefer-boolean-return: error
 unicorn/prefer-class-fields: error
 unicorn/prefer-classlist-toggle: error
 unicorn/prefer-code-point: error
-unicorn/prefer-continue: error [{"maximumStatements":1}]
+unicorn/prefer-combined-guards: error [{"checkCompoundConditions":false,"checkMultiStatementBodies":false}]
+unicorn/prefer-continue: error [{"checkShortBodies":false,"maximumStatements":1}]
 unicorn/prefer-date-now: error
 unicorn/prefer-default-parameters: error
 unicorn/prefer-direct-iteration: error
@@ -722,11 +751,11 @@ unicorn/prefer-dom-node-html-methods: error [{"checkGetHTML":true,"checkSetHTML"
 unicorn/prefer-dom-node-remove: error
 unicorn/prefer-dom-node-replace-children: error
 unicorn/prefer-dom-node-text-content: error
-unicorn/prefer-early-return: error [{"maximumStatements":1}]
+unicorn/prefer-early-return: error [{"checkShortBodies":false,"maximumStatements":1}]
 unicorn/prefer-else-if: error
 unicorn/prefer-error-is-error: error
+unicorn/prefer-escaped-irregular-whitespace: error
 unicorn/prefer-event-target: error
-unicorn/prefer-explicit-viewport-units: off [{"unit":"dvh"}]
 unicorn/prefer-export-from: error [{"checkUsedVariables":true}]
 unicorn/prefer-flat-math-min-max: error
 unicorn/prefer-get-or-insert-computed: error
@@ -745,7 +774,10 @@ unicorn/prefer-iterator-concat: error
 unicorn/prefer-iterator-helpers: error
 unicorn/prefer-iterator-to-array: error
 unicorn/prefer-iterator-to-array-at-end: error
+unicorn/prefer-iterator-zip: off
+unicorn/prefer-json-import: error
 unicorn/prefer-keyboard-event-key: error
+unicorn/prefer-literal-ascii: error
 unicorn/prefer-location-assign: error
 unicorn/prefer-logical-operator-over-ternary: error
 unicorn/prefer-map-from-entries: error
@@ -771,6 +803,7 @@ unicorn/prefer-observer-apis: error
 unicorn/prefer-optional-catch-binding: error
 unicorn/prefer-path2d: error
 unicorn/prefer-private-class-fields: error
+unicorn/prefer-promise-static-methods: error
 unicorn/prefer-promise-try: error
 unicorn/prefer-promise-with-resolvers: error
 unicorn/prefer-prototype-methods: error
@@ -785,9 +818,10 @@ unicorn/prefer-set-has: error [{"minimumItems":0}]
 unicorn/prefer-set-methods: error
 unicorn/prefer-set-size: error
 unicorn/prefer-short-arrow-method: error ["always"]
+unicorn/prefer-short-escape-sequences: error
 unicorn/prefer-simple-condition-first: error
 unicorn/prefer-simple-sort-comparator: error
-unicorn/prefer-simplified-conditions: error
+unicorn/prefer-simplified-conditions: error [{"negatedConditions":"simplify"}]
 unicorn/prefer-single-array-predicate: error
 unicorn/prefer-single-call: error [{"ignore":[]}]
 unicorn/prefer-single-object-destructuring: error
@@ -806,6 +840,7 @@ unicorn/prefer-string-trim-start-end: error
 unicorn/prefer-structured-clone: error [{"functions":[]}]
 unicorn/prefer-switch: error [{"emptyDefaultCase":"no-default-comment","minimumCases":3}]
 unicorn/prefer-temporal: error [{"checkDateNow":false,"checkMethods":false,"checkReferences":false}]
+unicorn/prefer-temporal-conversion: error
 unicorn/prefer-ternary: error ["always"]
 unicorn/prefer-then-catch: error
 unicorn/prefer-toggle-attribute: error
@@ -813,6 +848,7 @@ unicorn/prefer-top-level-await: error
 unicorn/prefer-type-error: error
 unicorn/prefer-type-literal-last: error
 unicorn/prefer-uint8array-base64: error
+unicorn/prefer-uint8array-hex: off
 unicorn/prefer-unary-minus: error
 unicorn/prefer-unicode-code-point-escapes: error
 unicorn/prefer-url-can-parse: error
@@ -823,13 +859,14 @@ unicorn/relative-url-style: error ["never"]
 unicorn/require-array-join-separator: error
 unicorn/require-array-sort-compare: error
 unicorn/require-css-escape: error [{"checkAllSelectors":false}]
-unicorn/require-frontmatter-fields: error [{"fields":[]}]
+unicorn/require-frontmatter-fields: off [{"fields":[]}]
 unicorn/require-module-attributes: error
 unicorn/require-module-specifiers: error
 unicorn/require-number-to-fixed-digits-argument: error
 unicorn/require-passive-events: error
 unicorn/require-post-message-target-origin: off
 unicorn/require-proxy-trap-boolean-return: error
+unicorn/require-text-decoder-streaming: error
 unicorn/single-line-block-comment-style: error ["multiline",{"ignore":[]}]
 unicorn/string-content: error [{"patterns":{"->":"→","<-":"←","\\.\\.\\.":"…"},"selectors":[]}]
 unicorn/switch-case-braces: error ["always"]

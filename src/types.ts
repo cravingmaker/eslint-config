@@ -19,9 +19,7 @@ type Context = {
   */
   readonly projectRootDirectory: string;
   /**
-  Svelte components whose scripts the JavaScript, code-quality, and TypeScript features lint: the
-  components that the Svelte feature parses, or none while it is off. Each nested array is a set of
-  patterns that a file must all match.
+  Svelte components whose scripts the JavaScript, code-quality, and TypeScript features lint: the components that the Svelte feature parses, or none while it is off. Each nested array is a set of patterns that a file must all match.
   */
   readonly svelteComponents: ReadonlyArray<string | readonly string[]>;
   /**
@@ -54,8 +52,7 @@ type FeatureOptions = {
   */
   readonly ignores?: readonly string[];
   /**
-  Rule settings applied after the feature's own rules. Settings that turn on a rule that needs
-  type information apply only in the files that typed linting covers.
+  Rule settings applied after the feature's own rules. Settings that turn on a rule that needs type information apply only in the files that typed linting covers.
   */
   readonly overrides?: Rules;
 };
@@ -119,8 +116,7 @@ type Options = {
   readonly regexp?: Feature;
   readonly security?: Feature;
   /**
-  Svelte components and rune modules. While it is on, the features for JavaScript and TypeScript
-  sources also lint the scripts of the components that it parses, without type information.
+  Svelte components and rune modules. While it is on, the features for JavaScript and TypeScript sources also lint the scripts of the components that it parses, without type information.
   */
   readonly svelte?: Feature | "auto";
   readonly typescript?: Feature<TypeScriptOptions>;
@@ -146,8 +142,7 @@ A React Refresh rule variant, which decides the exports that are allowed next to
 */
 type ReactRefreshVariant = "generic" | "next" | "vite";
 /**
-An option of a rule with generated types: its options object, or one entry of a rule that
-accepts a list of options objects.
+An option of a rule with generated types: its options object, or one entry of a rule that accepts a list of options objects.
 */
 type RuleOptionOf<RuleId extends keyof RuleOptions> =
   RuleOptionsOf<RuleId>[number];
@@ -159,15 +154,11 @@ type RuleOptionsOf<RuleId extends keyof RuleOptions> =
     ? OptionList
     : never;
 /**
-Rule settings by rule ID. Rules of the bundled plugins are checked against their option
-schemas; any other rule ID is accepted, for plugins added in user configs.
+Rule settings by rule ID. Rules of the bundled plugins are checked against their option schemas; any other rule ID is accepted, for plugins added in user configs.
 */
 type Rules = Record<string, Linter.RuleEntry | undefined> & RuleOptions;
 /**
-Files that the parser reads with type information and that receive type-aware rules, within the
-files that the TypeScript feature parses and without Svelte components. Each nested array is a
-set of patterns that a file must all match. The scope has no ignore list: ESLint reads one in
-order, so the ignores of a block that takes the scope could bring back a file that it leaves out.
+Files that the parser reads with type information and that receive type-aware rules, within the files that the TypeScript feature parses and without Svelte components. Each nested array is a set of patterns that a file must all match. The scope has no ignore list: ESLint reads one in order, so the ignores of a block that takes the scope could bring back a file that it leaves out.
 */
 type TypeAwareScope = ReadonlyArray<string | readonly string[]>;
 /**
@@ -181,8 +172,7 @@ type TypeScriptOptions = FeatureOptions & {
   */
   readonly filesTypeAware?: readonly string[];
   /**
-  File patterns to lint without type information and type-aware rules, such as scripts that no
-  tsconfig includes.
+  File patterns to lint without type information and type-aware rules, such as scripts that no tsconfig includes.
   */
   readonly ignoresTypeAware?: readonly string[];
   /**

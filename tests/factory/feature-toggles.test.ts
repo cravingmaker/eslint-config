@@ -37,8 +37,7 @@ const typedOptions = {
 } as const satisfies Options;
 const featureIgnores = ["**/generated/**"] as const;
 /*
-Each feature that can be off, the segment of its block names, the patterns of its files, the
-names of files that it lints by default, and one of its rules, which is on in the first of them.
+Each feature that can be off, the segment of its block names, the patterns of its files, the names of files that it lints by default, and one of its rules, which is on in the first of them.
 Its files are under `app/`, so the same names under `lib/` are outside them, and under
 `app/generated/` they are in its ignores. Features with type-aware blocks are checked with typed
 linting.
@@ -327,13 +326,10 @@ const describeFile = async (
     })
     .join("\n");
 };
-// The description of each of `filePaths`, in their order.
-const describeFiles = async (
-  eslint: ESLint,
-  filePaths: readonly string[],
-): Promise<readonly string[]> => {
+// The description of each application file, in the order of `appPaths`.
+const describeAppFiles = async (eslint: ESLint): Promise<readonly string[]> => {
   return await Promise.all(
-    filePaths.map(async (filePath) => {
+    appPaths.map(async (filePath) => {
       return await describeFile(eslint, filePath);
     }),
   );
@@ -375,8 +371,8 @@ const withFeature = (
 };
 // How ESLint resolves each file of `app/` with the defaults, without and with typed linting.
 const defaultDescriptions = {
-  typed: await describeFiles(await createScopedEslint(typedOptions), appPaths),
-  untyped: await describeFiles(await createScopedEslint(baseOptions), appPaths),
+  typed: await describeAppFiles(await createScopedEslint(typedOptions)),
+  untyped: await describeAppFiles(await createScopedEslint(baseOptions)),
 };
 describe.each(features)(
   "$feature feature",
@@ -472,7 +468,7 @@ describe.each(scopedFeatures)(
     // So a JSON or Markdown file there gets none of its rules, a Svelte component keeps those
     // that it has by default, and each file is still linted by the feature for its own type.
     it("lints the files there as with its default files, whatever their type", async () => {
-      expect(await describeFiles(await scoped, appPaths)).toEqual(
+      expect(await describeAppFiles(await scoped)).toEqual(
         isTyped ? defaultDescriptions.typed : defaultDescriptions.untyped,
       );
     });

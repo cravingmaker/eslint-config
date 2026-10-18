@@ -32,8 +32,7 @@ type Plugin = {
   >;
 };
 /*
-Options that decide where the parser reads type information, the files where it then does, and,
-for options that override a rule that needs type information, the settings of that rule there.
+Options that decide where the parser reads type information, the files where it then does, and, for options that override a rule that needs type information, the settings of that rule there.
 */
 type Shape = readonly [
   description: string,

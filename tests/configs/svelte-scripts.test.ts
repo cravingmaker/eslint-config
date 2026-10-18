@@ -178,8 +178,8 @@ const describeMessages = async (
     results.map(({ filePath, messages }) => {
       return [
         path.relative(projectDirectory, filePath),
-        messages.map(({ column, line, ruleId }) => {
-          return `${String(line)}:${String(column)} ${ruleId ?? "fatal"}`;
+        messages.map((diagnostic) => {
+          return `${String(diagnostic.line)}:${String(diagnostic.column)} ${diagnostic.ruleId ?? "fatal"}`;
         }),
       ];
     }),
@@ -313,8 +313,8 @@ describe("svelte scripts", () => {
 
     expect(
       [javascript, typescript].map(({ messages }) => {
-        return messages.map(({ line, ruleId }) => {
-          return `${String(line)} ${ruleId ?? "fatal"}`;
+        return messages.map((diagnostic) => {
+          return `${String(diagnostic.line)} ${diagnostic.ruleId ?? "fatal"}`;
         });
       }),
     ).toEqual([

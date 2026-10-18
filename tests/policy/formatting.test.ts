@@ -37,8 +37,7 @@ const fixturePaths = [
 ] as const;
 /*
 Prettier's defaults, this repository's configuration, and two layouts that other projects choose.
-Prettier formats Svelte components only with prettier-plugin-svelte, which this repository's
-configuration loads when it is installed, and the others load explicitly.
+Prettier formats Svelte components only with prettier-plugin-svelte, which this repository's configuration loads when it is installed, and the others load explicitly.
 */
 const prettierConfigs = new Map<string, PrettierOptions>([
   ["defaults", { plugins: ["prettier-plugin-svelte"] }],
@@ -59,9 +58,7 @@ const prettierConfigs = new Map<string, PrettierOptions>([
   ["the configuration of this repository", repositoryPrettierConfig],
 ]);
 /*
-Files with problems that eslint --fix fixes, in each language that the configuration lints, by
-name: unsorted imports, keys, members, and attributes, core and plugin rules with fixes, and
-layout that Prettier changes.
+Files with problems that eslint --fix fixes, in each language that the configuration lints, by name: unsorted imports, keys, members, and attributes, core and plugin rules with fixes, and layout that Prettier changes.
 */
 const unfixedFiles = new Map([
   [
@@ -164,8 +161,8 @@ const fix = async (
     filePath: path.join(fixturesDirectory, filePath),
   });
   return {
-    messages: result.messages.map(({ fix: messageFix, line, ruleId }) => {
-      return `${String(line)} ${ruleId ?? "fatal"}${typeof messageFix === "undefined" ? "" : " (fixable)"}`;
+    messages: result.messages.map((diagnostic) => {
+      return `${String(diagnostic.line)} ${diagnostic.ruleId ?? "fatal"}${typeof diagnostic.fix === "undefined" ? "" : " (fixable)"}`;
     }),
     output: result.output ?? code,
   };

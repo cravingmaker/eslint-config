@@ -52,9 +52,7 @@ const exampleProject = await createTemporaryDirectory(
   "eslint-config-policy-diff-",
 );
 /**
-Runs Git in the example project, without the variables of a Git hook, which would point it to
-this repository while the pre-push hook runs the tests, and without the hooks and signing that
-the user's configuration may set.
+Runs Git in the example project, without the variables of a Git hook, which would point it to this repository while the pre-push hook runs the tests, and without the hooks and signing that the user's configuration may set.
 */
 const git = async (gitArguments: readonly string[]): Promise<string> => {
   const { stdout } = await execute(
@@ -78,8 +76,7 @@ const git = async (gitArguments: readonly string[]): Promise<string> => {
   return stdout.trim();
 };
 /*
-A Git repository with three commits, each tagged: one without snapshots, one with snapshots and
-without a lockfile, and one with both.
+A Git repository with three commits, each tagged: one without snapshots, one with snapshots and without a lockfile, and one with both.
 */
 await git(["init", "--quiet", "--initial-branch=main"]);
 await writeFile(path.join(exampleProject, "README.md"), "# Example\n");

@@ -7,10 +7,7 @@ import { narrowFiles } from "../../../utilities/file-scope.js";
 import { narrowTypeAwareScope } from "../../../utilities/type-aware.js";
 
 /**
-Builds the blocks that parse TypeScript files with typescript-eslint and register its plugin,
-also for Svelte components, whose parser the Svelte feature sets. With typed linting on, the
-parser reads type information through the project service in the type-aware scope only, so a
-file outside it, such as a script that no tsconfig includes, is parsed without it.
+Builds the blocks that parse TypeScript files with typescript-eslint and register its plugin, also for Svelte components, whose parser the Svelte feature sets. With typed linting on, the parser reads type information through the project service in the type-aware scope only, so a file outside it, such as a script that no tsconfig includes, is parsed without it.
 */
 const typescriptParser = async (
   options: FeatureOptions = {},
