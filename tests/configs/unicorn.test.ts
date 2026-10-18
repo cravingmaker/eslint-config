@@ -7,6 +7,92 @@ import { expectLintError, expectNoLintError } from "../utilities.js";
 const jsOptions = { filePath: "test.js" } as const;
 const rightArrowText = String.fromCodePoint(45, 62);
 
+describe.each(["test.js", "test.ts"])(
+  "Unicorn upgrade contracts in %s",
+  (filePath) => {
+    it("keeps source linting compatible with the disabled frontmatter rule", async () => {
+      await expectNoLintError(
+        "export const value = 1;\n",
+        "unicorn/require-frontmatter-fields",
+        { filePath },
+      );
+    });
+
+    it("still reports continue statements in nested loops", async () => {
+      await expectLintError(
+        "export function logValues(rows) {\n  for (const row of rows) {\n    for (const value of row) {\n      if (value === 0) { continue; }\n      console.log(value);\n    }\n  }\n}\n",
+        "unicorn/no-break-in-nested-loop",
+        { filePath },
+      );
+    });
+
+    it.each([
+      {
+        code: "const values = [1, 2];\nvalues.map((value) => value * 2);\n",
+        receiver: "array",
+      },
+      {
+        code: "const values = new Set([1, 2]);\nvalues.has(1);\n",
+        receiver: "Set",
+      },
+    ])("reports discarded $receiver method results", async ({ code }) => {
+      await expectLintError(code, "unicorn/no-unused-builtin-method-return", {
+        filePath,
+      });
+    });
+
+    it("allows a consumed built-in method result", async () => {
+      await expectNoLintError(
+        "export const hasValue = new Set([1, 2]).has(1);\n",
+        "unicorn/no-unused-builtin-method-return",
+        { filePath },
+      );
+    });
+
+    it.each([
+      {
+        code: 'import { Buffer } from "node:buffer";\nexport const hexadecimal = Buffer.from([1, 2]).toString("hex");\nexport const bytes = Buffer.from("0102", "hex");\n',
+        ruleId: "unicorn/prefer-uint8array-hex",
+      },
+      {
+        code: 'const names = ["Ada"];\nconst scores = [10];\nfor (let index = 0; index < Math.min(names.length, scores.length); index += 1) {\n  console.log(names[index], scores[index]);\n}\n',
+        ruleId: "unicorn/prefer-iterator-zip",
+      },
+    ])(
+      "keeps $ruleId off while allowing an explicit override",
+      async ({ code, ruleId }) => {
+        const eslint = new ESLint({
+          overrideConfig: await createConfig(),
+          overrideConfigFile: true,
+        });
+        const [result] = await eslint.lintText(code, { filePath });
+
+        expect(result.fatalErrorCount).toBe(0);
+        expect(
+          result.messages.filter((message) => {
+            return message.ruleId === ruleId;
+          }),
+        ).toEqual([]);
+
+        const enabledEslint = new ESLint({
+          overrideConfig: await createConfig({
+            unicorn: { overrides: { [ruleId]: "error" } },
+          }),
+          overrideConfigFile: true,
+        });
+        const [enabled] = await enabledEslint.lintText(code, { filePath });
+
+        expect(enabled.fatalErrorCount).toBe(0);
+        expect(enabled.messages).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ ruleId, severity: 2 }),
+          ]),
+        );
+      },
+    );
+  },
+);
+
 describe.each([
   {
     operators: ["&&", "||", "??"],

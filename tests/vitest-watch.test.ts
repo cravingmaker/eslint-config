@@ -111,7 +111,7 @@ describe("Vitest watch dependencies", () => {
           }),
         );
 
-        const runner = await createVitest("test", {
+        const runner = await createVitest({
           ...options,
           config: path.join(workspace, "vitest.config.ts"),
           maxWorkers: 1,

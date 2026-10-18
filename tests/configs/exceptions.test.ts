@@ -46,7 +46,7 @@ const getExceptionNames = (
   configs: readonly Linter.Config[],
 ): readonly string[] => {
   return configs.flatMap(({ name = "" }) => {
-    return name.startsWith(prefix) ? [name] : [];
+    return name.startsWith(prefix) ? name : [];
   });
 };
 // The severity of each of `ruleIds` in the configuration for `filePath`, or `undefined` for a

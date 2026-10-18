@@ -147,8 +147,8 @@ const lint = async (
     results.map(({ filePath, messages }) => {
       return [
         path.relative(directory, filePath).replaceAll(path.sep, "/"),
-        messages.map(({ column, line, message, ruleId }) => {
-          return `${String(line)}:${String(column)} ${ruleId ?? "fatal"}: ${message}`;
+        messages.map((diagnostic) => {
+          return `${String(diagnostic.line)}:${String(diagnostic.column)} ${diagnostic.ruleId ?? "fatal"}: ${diagnostic.message}`;
         }),
       ];
     }),

@@ -1,8 +1,7 @@
 import { isDeepStrictEqual } from "node:util";
 
 /**
-A change between two descriptions: a setting, by its name, or a rule, by its ID. A side
-without a value has no such setting or rule.
+A change between two descriptions: a setting, by its name, or a rule, by its ID. A side without a value has no such setting or rule.
 */
 type Change = RuleChange | SettingChange;
 /**
@@ -55,8 +54,7 @@ type SettingChange = {
   readonly before?: string;
 };
 /**
-The comparison of one snapshot with the baseline. A new snapshot has no baseline, and a
-removed one has no current scenario.
+The comparison of one snapshot with the baseline. A new snapshot has no baseline, and a removed one has no current scenario.
 */
 type SnapshotResult = {
   readonly label: string;
@@ -306,7 +304,7 @@ const unionOfKeys = (
   right: ReadonlyMap<string, unknown>,
 ): readonly string[] => {
   const keys = new Set(left.keys());
-  return keys.union(new Set(right.keys())).values().toArray();
+  return keys.union(right).values().toArray();
 };
 /**
 Lists the settings and rules that differ between two descriptions, settings first in the order
@@ -386,9 +384,7 @@ const compareSnapshot = (
   }
 };
 /**
-Compares each current snapshot with the baseline snapshot at the same path, and adds the
-baseline snapshots that no scenario describes any more, by path. A snapshot that cannot be
-described or read fails, and is never reported as unchanged.
+Compares each current snapshot with the baseline snapshot at the same path, and adds the baseline snapshots that no scenario describes any more, by path. A snapshot that cannot be described or read fails, and is never reported as unchanged.
 */
 const compareSnapshots = (
   baseline: ReadonlyMap<string, string>,
@@ -421,8 +417,7 @@ const compareSnapshots = (
   ];
 };
 /**
-Lists the differences between two JSON values by path: the keys of objects, and the items of
-arrays of the same length. Any other difference shows both values.
+Lists the differences between two JSON values by path: the keys of objects, and the items of arrays of the same length. Any other difference shows both values.
 */
 const listJsonChanges = (
   path: string,
@@ -440,12 +435,11 @@ const listJsonChanges = (
       .flatMap((key) => {
         const keyPath = formatJsonPath(path, key);
         if (!next.has(key)) {
-          return [`- ${keyPath}: ${JSON.stringify(previous.get(key))}`];
+          return `- ${keyPath}: ${JSON.stringify(previous.get(key))}`;
         }
-        if (!previous.has(key)) {
-          return [`+ ${keyPath}: ${JSON.stringify(next.get(key))}`];
-        }
-        return listJsonChanges(keyPath, previous.get(key), next.get(key));
+        return previous.has(key)
+          ? listJsonChanges(keyPath, previous.get(key), next.get(key))
+          : `+ ${keyPath}: ${JSON.stringify(next.get(key))}`;
       });
   }
   if (

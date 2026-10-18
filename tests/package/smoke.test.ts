@@ -11,7 +11,6 @@ import { createTemporaryDirectory } from "./consumers.js";
 type ConsumerOptions = {
   readonly dependencies: readonly string[];
   readonly name: string;
-  readonly tarball: string;
 
   readonly manifestDevelopmentDependencies?: Readonly<Record<string, string>>;
 };
@@ -89,11 +88,12 @@ const createPackedPackage = async (baseDirectory: string) => {
   return path.join(baseDirectory, tarballFilename);
 };
 
+const tarball = await createPackedPackage(temporaryDirectory);
+
 const createConsumer = async ({
   dependencies,
   manifestDevelopmentDependencies = {},
   name,
-  tarball,
 }: ConsumerOptions) => {
   const consumerDirectory = path.join(temporaryDirectory, name);
   const nodeModulesDirectory = path.join(consumerDirectory, "node_modules");
@@ -216,8 +216,6 @@ const createFrameworkScript = (
 			`;
 };
 
-const tarball = await createPackedPackage(temporaryDirectory);
-
 describe("published package", () => {
   afterAll(async () => {
     await fs.rm(temporaryDirectory, { force: true, recursive: true });
@@ -227,7 +225,6 @@ describe("published package", () => {
     const consumerDirectory = await createConsumer({
       dependencies: ["eslint", ...runtimeDependencies],
       name: "base-consumer",
-      tarball,
     });
 
     const output = runConsumer(
@@ -332,7 +329,6 @@ describe("published package", () => {
     const consumerDirectory = await createConsumer({
       dependencies: ["eslint", ...runtimeDependencies],
       name: "type-aware-scope-consumer",
-      tarball,
     });
 
     const output = runConsumer(
@@ -394,7 +390,6 @@ describe("published package", () => {
         vite: "1.0.0",
       },
       name: "full-consumer",
-      tarball,
     });
 
     const output = runConsumer(
@@ -490,7 +485,6 @@ describe("published package", () => {
         ...optionalPeerDependencies,
       ],
       name: "monorepo-consumer",
-      tarball,
     });
     const appDirectory = path.join(consumerDirectory, "apps", "web");
     await fs.mkdir(path.join(appDirectory, "dist"), { recursive: true });
@@ -556,7 +550,6 @@ describe("published package", () => {
     const consumerDirectory = await createConsumer({
       dependencies: ["eslint", ...runtimeDependencies],
       name: "api-completeness-consumer",
-      tarball,
     });
 
     const output = runConsumer(
@@ -598,7 +591,6 @@ describe("published package", () => {
       dependencies: ["eslint", ...runtimeDependencies],
       manifestDevelopmentDependencies: { express: "1.0.0" },
       name: "broken-optional-peer-consumer",
-      tarball,
     });
     await createBrokenPackage(
       consumerDirectory,
@@ -620,7 +612,6 @@ describe("published package", () => {
     const consumerDirectory = await createConsumer({
       dependencies: ["eslint", ...runtimeDependencies],
       name: "missing-peers-consumer",
-      tarball,
     });
 
     const results: unknown = JSON.parse(
@@ -655,7 +646,6 @@ describe("published package", () => {
       ],
       manifestDevelopmentDependencies: { react: "1.0.0", vite: "1.0.0" },
       name: "partial-peers-consumer",
-      tarball,
     });
     const refreshMessage =
       'The "react" feature needs "eslint-plugin-react-refresh", which is not installed. Install it, or set `react: { refresh: false }` to turn `refresh` off.';
@@ -703,7 +693,6 @@ describe("published package", () => {
         vite: "1.0.0",
       },
       name: "detection-consumer",
-      tarball,
     });
     const createCase = async (
       name: string,

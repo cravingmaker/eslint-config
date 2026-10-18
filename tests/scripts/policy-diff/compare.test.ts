@@ -64,7 +64,7 @@ const replaceLine = (
   replacements: readonly string[],
 ): readonly string[] => {
   return lines.flatMap((current) => {
-    return current === line ? replacements : [current];
+    return current === line ? replacements : current;
   });
 };
 /**
@@ -413,7 +413,7 @@ describe("compareSnapshots", () => {
     ]);
     expect(
       results.flatMap(({ outcome }) => {
-        return outcome.status === "failed" ? [outcome.reason] : [];
+        return outcome.status === "failed" ? outcome.reason : [];
       }),
     ).toEqual([
       "Not a description of an effective configuration: it does not end with a line break",

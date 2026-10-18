@@ -94,8 +94,8 @@ const lintFixtures = async (
     results.map(({ filePath, messages }) => {
       return [
         path.relative(fixturesDirectory, filePath).replaceAll(path.sep, "/"),
-        messages.map(({ column, line, message, ruleId }) => {
-          return `${String(line)}:${String(column)} ${ruleId ?? "fatal"}: ${message}`;
+        messages.map((diagnostic) => {
+          return `${String(diagnostic.line)}:${String(diagnostic.column)} ${diagnostic.ruleId ?? "fatal"}: ${diagnostic.message}`;
         }),
       ];
     }),
@@ -164,8 +164,7 @@ describe("fixtures", () => {
   });
 
   /*
-  A disabled feature leaves its replacement checks off. Passing code stays valid without
-  activating a different core or plugin policy.
+  A disabled feature leaves its replacement checks off. Passing code stays valid without activating a different core or plugin policy.
   */
   describe.each(Object.entries(withoutOwner))(
     "with typed linting and %s off",

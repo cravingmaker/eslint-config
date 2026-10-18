@@ -24,8 +24,7 @@ import {
 } from "./compare.js";
 
 /**
-What the baseline commit holds: its snapshots by path below the snapshot directory, and its
-lockfile, which an old commit may not have.
+What the baseline commit holds: its snapshots by path below the snapshot directory, and its lockfile, which an old commit may not have.
 */
 type Baseline = {
   readonly commit: string;
@@ -87,11 +86,11 @@ const compareLockedPackages = (
         return [];
       }
       if (typeof previous === "undefined") {
-        return [`+ ${name}: ${String(next)}`];
+        return `+ ${name}: ${String(next)}`;
       }
       return typeof next === "undefined"
-        ? [`- ${name}: ${previous}`]
-        : [`~ ${name}: ${previous} → ${next}`];
+        ? `- ${name}: ${previous}`
+        : `~ ${name}: ${previous} → ${next}`;
     });
 };
 /**
@@ -169,7 +168,7 @@ const listResults = (
     const line =
       label === snapshotPath ? `  ${label}` : `  ${label} (${snapshotPath})`;
     if (outcome.status !== "failed") {
-      return [line];
+      return line;
     }
     // The lines that follow the first line of a reason stay indented below it.
     const [firstLine, ...otherLines] = outcome.reason.split("\n");
@@ -244,8 +243,7 @@ const findInstallMismatches = async (
   return mismatches.flat();
 };
 /**
-Describes the packages of the working tree's lockfile against those of the baseline. The report
-calculates the configuration with the installed packages, so they must be those of the lockfile.
+Describes the packages of the working tree's lockfile against those of the baseline. The report calculates the configuration with the installed packages, so they must be those of the lockfile.
 */
 const describeDependencies = async (
   previous?: ReadonlyMap<string, LockedPackage>,
@@ -353,8 +351,7 @@ const summarize = (results: readonly SnapshotResult[]): string => {
   return `Summary: ${count("changed")} changed, ${count("new")} new, ${count("removed")} removed, ${count("failed")} failed, ${count("unchanged")} unchanged.`;
 };
 /**
-Formats the results: the changes of each changed snapshot, the lists of new, removed, and failed
-snapshots, and a summary, which says that the policy is unchanged only when every snapshot is.
+Formats the results: the changes of each changed snapshot, the lists of new, removed, and failed snapshots, and a summary, which says that the policy is unchanged only when every snapshot is.
 */
 const formatResults = (
   results: readonly SnapshotResult[],
@@ -569,8 +566,7 @@ const createReport = async (base: string): Promise<Report> => {
   };
 };
 /**
-Runs the report for the command line, prints it, and returns the exit status: 0 for a report,
-also one with differences, and 1 when the report cannot be made or is incomplete.
+Runs the report for the command line, prints it, and returns the exit status: 0 for a report, also one with differences, and 1 when the report cannot be made or is incomplete.
 */
 const runPolicyDiff = async (
   commandLine: readonly string[],

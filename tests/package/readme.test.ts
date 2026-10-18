@@ -81,8 +81,7 @@ const installedPackages = codeBlocks
 const frameworks: ReadonlySet<string> = new Set(["react", "svelte"]);
 /*
 React ships no type declarations, so the tsconfig of the fixtures leaves the React files out.
-This one lets typed linting parse them; it reports the errors in their types, but no fatal
-message.
+This one lets typed linting parse them; it reports the errors in their types, but no fatal message.
 */
 const reactTsconfig = JSON.stringify({
   compilerOptions: {
@@ -142,12 +141,12 @@ const getFatalMessages = (
       .filter(({ fatal }) => {
         return fatal === true;
       })
-      .map(({ column, line, message }) => {
+      .map(({ column = 0, line, message }) => {
         return [
           path.relative(directory, filePath),
           ...(typeof line === "undefined"
             ? []
-            : [String(line), String(column ?? 0)]),
+            : [String(line), String(column)]),
           ` ${message}`,
         ].join(":");
       });

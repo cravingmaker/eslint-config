@@ -137,7 +137,7 @@ const describeUnknownOptions = (options: Options): string | undefined => {
     ...entries.flatMap(([option, value]) => {
       const replacement = replacedOptions.get(option);
       if (typeof replacement !== "undefined") {
-        return [`\`${option}\`: an option of 0.1.0, now ${replacement}.`];
+        return `\`${option}\`: an option of 0.1.0, now ${replacement}.`;
       }
       // None for an unknown option, and for an option whose keys are not checked.
       const keys = keysByOption.get(option);
@@ -154,13 +154,11 @@ const describeUnknownOptions = (options: Options): string | undefined => {
       if (unknownKeys.length === 0) {
         return [];
       }
-      return [
-        `${list(
-          unknownKeys.map((key) => {
-            return `${option}.${key}`;
-          }),
-        )}: the options of \`${option}\` are ${list(keys)}.`,
-      ];
+      return `${list(
+        unknownKeys.map((key) => {
+          return `${option}.${key}`;
+        }),
+      )}: the options of \`${option}\` are ${list(keys)}.`;
     }),
   ];
   if (lines.length === 0) {

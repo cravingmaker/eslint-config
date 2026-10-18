@@ -92,8 +92,7 @@ const readDependencies = async (
   }
 };
 /**
-Rejects unknown options before locating the manifest, detects the declared frameworks, and
-applies defaults once. The factory and its builders share these resolved options and context.
+Rejects unknown options before locating the manifest, detects the declared frameworks, and applies defaults once. The factory and its builders share these resolved options and context.
 */
 const prepareConfig = async (
   options: Options = {},
@@ -111,9 +110,7 @@ const prepareConfig = async (
   return { context: buildContext(resolved, dependencies), resolved };
 };
 /**
-Builds the context that every feature builder receives: the project root, the package names
-that its manifest declares, the resolved globals, the Svelte components, the tsconfig directory,
-and the type-aware scope.
+Builds the context that every feature builder receives: the project root, the package names that its manifest declares, the resolved globals, the Svelte components, the tsconfig directory, and the type-aware scope.
 */
 const createContext = async (options: Options = {}): Promise<Context> => {
   const { context } = await prepareConfig(options);

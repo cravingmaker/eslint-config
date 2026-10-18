@@ -49,8 +49,7 @@ The type-aware-scope suite limits typed linting to `src/` without
 records a file outside `filesTypeAware`, one in `ignoresTypeAware`, and one in
 `typescript.ignores`.
 
-The type-checked suite also records a Svelte component, which typed linting
-leaves out of the type-aware scope.
+The type-checked suite also records a Svelte component, which typed linting leaves out of the type-aware scope.
 
 The React Refresh scenarios record only the `react-refresh/` rules, with each
 variant.
@@ -135,8 +134,7 @@ const suites = [
 const reactRefreshVariants = ["generic", "next", "vite"] as const;
 
 /**
-Every scenario of the effective-rules snapshots, in the order that the snapshot test and the
-policy difference report present them.
+Every scenario of the effective-rules snapshots, in the order that the snapshot test and the policy difference report present them.
 */
 const effectiveScenarios: readonly EffectiveScenario[] = [
   ...suites.map(({ filePaths, name, options }) => {

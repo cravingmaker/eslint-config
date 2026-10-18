@@ -40,8 +40,7 @@ const buildFeature = <
 };
 
 /**
-Builds the ESLint flat config. Frameworks are detected from the project manifest, and all other
-features are on unless explicitly disabled. Rule ownership is declared in each feature's map.
+Builds the ESLint flat config. Frameworks are detected from the project manifest, and all other features are on unless explicitly disabled. Rule ownership is declared in each feature's map.
 File-role exceptions follow the features, then user configs apply in the order supplied.
 */
 const createConfig = async (
