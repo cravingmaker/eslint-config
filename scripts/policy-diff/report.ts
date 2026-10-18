@@ -595,7 +595,6 @@ const runPolicyDiff = async (
 };
 export {
   compareLockedPackages,
-  createReport,
   describeCurrentSnapshots,
   findInstallMismatches,
   formatResults,

@@ -42,5 +42,3 @@ const exceptions = (
   );
 };
 export { exceptions };
-
-export { fileRoles } from "./rules.js";

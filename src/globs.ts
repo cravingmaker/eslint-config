@@ -65,7 +65,6 @@ export {
   configFiles,
   expressFiles,
   htmlFiles,
-  javascriptFiles,
   json5Files,
   jsoncFiles,
   jsonFiles,

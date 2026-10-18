@@ -6,8 +6,6 @@ const classMethodsUseThisOptions = {
   ignoreOverrideMethods: false,
 } satisfies RuleOptionOf<"class-methods-use-this">;
 
-const consistentReturnOptions = { treatUndefinedAsUnspecified: false } as const;
-
 const dotNotationOptions = {
   allowKeywords: true,
 } satisfies RuleOptionOf<"dot-notation">;
@@ -90,7 +88,6 @@ const preferPromiseRejectErrorsOptions = { allowEmptyReject: false } as const;
 
 export {
   classMethodsUseThisOptions,
-  consistentReturnOptions,
   dotNotationOptions,
   maxParamsOptions,
   namingConventionOptions,
