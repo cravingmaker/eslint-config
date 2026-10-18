@@ -421,6 +421,7 @@ const json: JsonOptions = { overridesJsonc: { "json/sort-keys": "off" } };
 const markdown: FeatureOptions = { overrides: { "markdown/no-html": "off" } };
 const unicorn: Feature = { ignores: ["src/legacy/**"] };
 const rules: Rules = { eqeqeq: ["error", "smart"], "no-console": "warn" };
+const sonarjs: Feature = { overrides: { "sonarjs/cognitive-complexity": ["warn", 20] } };
 const stylistic: Feature = { overrides: { "@stylistic/spaced-comment": ["error", "always"] } };
 const typescript: TypeScriptOptions = {
   filesTypeAware: ["src/**"],
@@ -438,6 +439,7 @@ const options: Options = {
   markdown,
   projectRootDirectory: "/project",
   react,
+  sonarjs,
   stylistic,
   svelte: false,
   typescript,
@@ -455,7 +457,10 @@ const invalidRuleOptions: Rules = { eqeqeq: ["error", "sometimes"] };
 // @ts-expect-error -- Stylistic options are checked against the bundled rule schemas.
 const invalidStylisticOptions: Rules = { "@stylistic/spaced-comment": ["error", "sometimes"] };
 
-export { config, invalidAuto, invalidRuleOptions, invalidStylisticOptions, removedOption };
+// @ts-expect-error -- SonarJS thresholds are checked against the bundled rule schema.
+const invalidSonarjsOptions: Rules = { "sonarjs/cognitive-complexity": ["warn", false] };
+
+export { config, invalidAuto, invalidRuleOptions, invalidSonarjsOptions, invalidStylisticOptions, removedOption };
 `,
     );
     // Without optional peers and without ambient types, and with every declaration checked.

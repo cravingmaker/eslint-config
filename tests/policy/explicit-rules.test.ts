@@ -53,6 +53,10 @@ vi.mock("@stylistic/eslint-plugin", async (importOriginal) => {
 vi.mock("eslint-plugin-security", async (importOriginal) => {
   return withFutureRule(await importOriginal<PluginModule>());
 });
+
+vi.mock("eslint-plugin-sonarjs", async (importOriginal) => {
+  return withFutureRule(await importOriginal<PluginModule>());
+});
 vi.mock("@html-eslint/eslint-plugin-react", async (importOriginal) => {
   return withFutureRule(await importOriginal<PluginModule>());
 });
@@ -90,6 +94,7 @@ describe("explicit rule policy", () => {
   it.each([
     "promise",
     "security",
+    "sonarjs",
     "@stylistic",
     "@html-eslint/react",
     "@html-eslint/svelte",

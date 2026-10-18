@@ -157,6 +157,14 @@ const features = [
     ruleId: "security/detect-eval-with-expression",
   },
   {
+    feature: "sonarjs",
+    fileNames: ["example.js", "example.ts"],
+    files: ["app/**/*.js", "app/**/*.ts"],
+    name: "sonarjs",
+    ruleId: "sonarjs/no-all-duplicated-branches",
+    typed: true,
+  },
+  {
     feature: "stylistic",
     fileNames: ["example.js", "example.ts"],
     files: ["app/**/*.js", "app/**/*.ts"],

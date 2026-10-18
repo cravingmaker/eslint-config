@@ -15,6 +15,7 @@ import pluginReactHooks from "eslint-plugin-react-hooks";
 import { reactRefresh } from "eslint-plugin-react-refresh";
 import pluginRegexp from "eslint-plugin-regexp";
 import pluginSecurity from "eslint-plugin-security";
+import pluginSonarjs from "eslint-plugin-sonarjs";
 import pluginUnicorn from "eslint-plugin-unicorn";
 import pluginUnusedImports from "eslint-plugin-unused-imports";
 import { pluginsToRulesDTS } from "eslint-typegen/core";
@@ -51,6 +52,7 @@ const plugins: Record<string, ESLint.Plugin> = {
   "react-refresh": reactRefresh.plugin,
   regexp: pluginRegexp,
   security: pluginSecurity,
+  sonarjs: pluginSonarjs,
   "@stylistic": pluginStylistic,
   "@typescript-eslint": pluginTypeScript,
   unicorn: pluginUnicorn,

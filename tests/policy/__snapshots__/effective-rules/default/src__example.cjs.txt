@@ -2,7 +2,7 @@ path: src/example.cjs
 ignored: false
 language: @/js
 processor: none
-plugins: @ @eslint-community/eslint-comments @stylistic functional import-x markdown n package-json perfectionist promise regexp security unicorn unused-imports
+plugins: @ @eslint-community/eslint-comments @stylistic functional import-x markdown n package-json perfectionist promise regexp security sonarjs unicorn unused-imports
 languageOptions:
   ecmaVersion: 2026
   parser: "[Parser espree]"

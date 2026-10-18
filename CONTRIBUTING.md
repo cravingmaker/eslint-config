@@ -180,6 +180,7 @@ The table lists each feature's policy entry points:
 | `@eslint-community/eslint-comments/`                    | `comments`      | `src/configs/plugins/comments/rules.ts`                                                                                  |
 | `n/`                                                    | `node`          | `src/configs/plugins/node/rules.ts`                                                                                      |
 | `security/`                                             | `security`      | `src/configs/plugins/security/rules.ts`                                                                                  |
+| `sonarjs/`                                              | `sonarjs`       | `src/configs/plugins/sonarjs/rules.ts` and `rules-type-aware.ts`                                                         |
 | `import-x/`                                             | `imports`       | `src/configs/plugins/import-x/rules.ts`                                                                                  |
 | `unused-imports/`                                       | `unusedImports` | `src/configs/plugins/unused-imports/rules.ts`                                                                            |
 | `promise/`                                              | `promise`       | `src/configs/plugins/promise/rules.ts`                                                                                   |
@@ -218,6 +219,19 @@ rather than exclusive categories, so `rules.ts` groups recommended and other
 rules, as the uncategorized plugins do. Stable token spacing and structural
 checks remain on when they agree with Prettier; its disable list is not a policy
 source. Width, indentation, quote, and semicolon choices stay with Prettier.
+
+SonarJS has no exclusive upstream rule categories, so its explicit inventory stays in
+`rules.ts`, grouped into recommended and other rules. Both groups include disabled
+and deprecated rules; neither imports the upstream preset. Capability comments come
+from rule metadata. The fixed inventory in `rules-type-aware.ts` guards every rule
+that requires type information, even disabled alternatives that overrides may enable.
+SonarJS owns duplicated branches across non-adjacent conditionals and switches,
+while Unicorn's overlapping adjacent-if rule stays off. SonarJS permits short partial
+branches so simple dispatch code does not need an abstraction solely to remove a
+repeated expression. Existing rules retain other overlaps, with a `Handled by` comment on each disabled alternative. Review-oriented
+checks warn; correctness checks error. This follows the priority order in
+[the coding principles](CODING_PRINCIPLES.md), with readability ahead of forced
+abstractions or arbitrary limits on domain models.
 
 An option set to `undefined` deliberately retains inference from settings,
 the project's engines or tsconfig, or a rule's optional behavior without a

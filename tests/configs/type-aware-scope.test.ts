@@ -42,6 +42,8 @@ const projectFiles = {
   "src/index.ts": floatingPromise,
   "src/legacy/index.ts": floatingPromise,
   "src/read.generated.ts": "export function read(file) {\n  return file;\n}\n",
+  "src/try-promise.ts":
+    "export function load() {\n  try {\n    return Promise.resolve(1);\n  } catch {\n    return 0;\n  }\n}\n",
   "src/util.js": "export const triple = (value) => value * 3;\n",
   "tsconfig.json": JSON.stringify({
     compilerOptions: {
@@ -58,6 +60,7 @@ const projectFiles = {
 const typeAwareRuleIds = [
   "functional/readonly-type",
   "n/no-sync",
+  "sonarjs/no-try-promise",
   "@typescript-eslint/await-thenable",
 ] as const;
 const typed: TypeInformation = {
@@ -220,6 +223,27 @@ describe("overridesWithoutTypeInformation", () => {
 });
 
 describe("type-aware scope", () => {
+  it("runs SonarJS analysis only where the parser reads type information", async () => {
+    const [typedEslint, untypedEslint] = await Promise.all([
+      createEslint({ filesTypeAware: ["src/**"] }),
+      createEslint({ filesTypeAware: ["scripts/**"] }),
+    ]);
+    const results = await Promise.all(
+      [typedEslint, untypedEslint].map(async (eslint) => {
+        return await lintByPath(
+          eslint,
+          ["src/try-promise.ts"],
+          "sonarjs/no-try-promise",
+        );
+      }),
+    );
+
+    expect(results).toEqual([
+      { "src/try-promise.ts": { fatal: [], reported: true } },
+      { "src/try-promise.ts": { fatal: [], reported: false } },
+    ]);
+  });
+
   it("lints typed sources with type information and other TypeScript files without it", async () => {
     const eslint = await createEslint({
       filesTypeAware: ["src/**"],

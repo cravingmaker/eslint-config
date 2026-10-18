@@ -2,7 +2,7 @@ path: data.json5
 ignored: false
 language: json/json5
 processor: none
-plugins: @ @eslint-community/eslint-comments @stylistic functional import-x json markdown n package-json perfectionist promise regexp security unicorn unused-imports
+plugins: @ @eslint-community/eslint-comments @stylistic functional import-x json markdown n package-json perfectionist promise regexp security sonarjs unicorn unused-imports
 languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
