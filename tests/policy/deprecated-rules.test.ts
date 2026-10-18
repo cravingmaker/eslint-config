@@ -44,7 +44,7 @@ const isDeprecatedConfiguredRule = (
   );
 };
 describe("deprecated rule handling", () => {
-  it("does not configure deprecated plugin rules", async () => {
+  it("does not enable deprecated plugin rules", async () => {
     const config = await createConfig({
       express: true,
       react: { refresh: "generic" },
@@ -63,9 +63,20 @@ describe("deprecated rule handling", () => {
         return right.length - left.length;
       });
     const deprecatedRuleIds = config.flatMap((entry) => {
-      return Object.keys(entry.rules ?? {}).filter((ruleId) => {
-        return isDeprecatedConfiguredRule(ruleId, pluginNames, plugins);
-      });
+      return Object.entries(entry.rules ?? {})
+        .filter(([ruleId, setting]) => {
+          const severity: unknown = Array.isArray(setting)
+            ? setting[0]
+            : setting;
+          return (
+            severity !== "off" &&
+            severity !== 0 &&
+            isDeprecatedConfiguredRule(ruleId, pluginNames, plugins)
+          );
+        })
+        .map(([ruleId]) => {
+          return ruleId;
+        });
     });
     expect(
       [...new Set(deprecatedRuleIds)].toSorted((left, right) => {

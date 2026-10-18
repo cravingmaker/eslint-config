@@ -421,6 +421,7 @@ const json: JsonOptions = { overridesJsonc: { "json/sort-keys": "off" } };
 const markdown: FeatureOptions = { overrides: { "markdown/no-html": "off" } };
 const unicorn: Feature = { ignores: ["src/legacy/**"] };
 const rules: Rules = { eqeqeq: ["error", "smart"], "no-console": "warn" };
+const stylistic: Feature = { overrides: { "@stylistic/spaced-comment": ["error", "always"] } };
 const typescript: TypeScriptOptions = {
   filesTypeAware: ["src/**"],
   ignoresTypeAware: ["scripts/**"],
@@ -437,6 +438,7 @@ const options: Options = {
   markdown,
   projectRootDirectory: "/project",
   react,
+  stylistic,
   svelte: false,
   typescript,
   unicorn,
@@ -450,8 +452,10 @@ const removedOption: Options = { tsTypeChecked: true };
 const invalidAuto: Options = { unicorn: "auto" };
 // @ts-expect-error -- The options of a rule are checked against its schema.
 const invalidRuleOptions: Rules = { eqeqeq: ["error", "sometimes"] };
+// @ts-expect-error -- Stylistic options are checked against the bundled rule schemas.
+const invalidStylisticOptions: Rules = { "@stylistic/spaced-comment": ["error", "sometimes"] };
 
-export { config, invalidAuto, invalidRuleOptions, removedOption };
+export { config, invalidAuto, invalidRuleOptions, invalidStylisticOptions, removedOption };
 `,
     );
     // Without optional peers and without ambient types, and with every declaration checked.

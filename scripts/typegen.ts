@@ -24,6 +24,7 @@ import { builtinRules } from "eslint/use-at-your-own-risk";
 import pluginHtml from "@html-eslint/eslint-plugin";
 import pluginHtmlReact from "@html-eslint/eslint-plugin-react";
 import pluginHtmlSvelte from "@html-eslint/eslint-plugin-svelte";
+import pluginStylistic from "@stylistic/eslint-plugin";
 import { plugin as pluginTypeScript } from "typescript-eslint";
 
 // Keys are the plugin names that createConfig registers. The empty key holds ESLint's core rules.
@@ -50,6 +51,7 @@ const plugins: Record<string, ESLint.Plugin> = {
   "react-refresh": reactRefresh.plugin,
   regexp: pluginRegexp,
   security: pluginSecurity,
+  "@stylistic": pluginStylistic,
   "@typescript-eslint": pluginTypeScript,
   unicorn: pluginUnicorn,
   "unused-imports": pluginUnusedImports,

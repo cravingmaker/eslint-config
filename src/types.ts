@@ -115,6 +115,7 @@ type Options = {
   readonly react?: Feature<ReactOptions> | "auto";
   readonly regexp?: Feature;
   readonly security?: Feature;
+  readonly stylistic?: Feature;
   /**
   Svelte components and rune modules. While it is on, the features for JavaScript and TypeScript sources also lint the scripts of the components that it parses, without type information.
   */

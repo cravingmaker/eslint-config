@@ -47,6 +47,9 @@ const withFutureRule = vi.hoisted(() => {
 vi.mock("eslint-plugin-promise", async (importOriginal) => {
   return withFutureRule(await importOriginal<PluginModule>());
 });
+vi.mock("@stylistic/eslint-plugin", async (importOriginal) => {
+  return withFutureRule(await importOriginal<PluginModule>());
+});
 vi.mock("eslint-plugin-security", async (importOriginal) => {
   return withFutureRule(await importOriginal<PluginModule>());
 });
@@ -84,7 +87,13 @@ describe("explicit rule policy", () => {
     );
   });
 
-  it.each(["promise", "security", "@html-eslint/react", "@html-eslint/svelte"])(
+  it.each([
+    "promise",
+    "security",
+    "@stylistic",
+    "@html-eslint/react",
+    "@html-eslint/svelte",
+  ])(
     "does not configure a new %s rule added by an upstream update",
     async (prefix) => {
       const config = await createConfig({

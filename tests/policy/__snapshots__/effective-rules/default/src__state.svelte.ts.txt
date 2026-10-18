@@ -2,7 +2,7 @@ path: src/state.svelte.ts
 ignored: false
 language: @/js
 processor: none
-plugins: @ @eslint-community/eslint-comments @html-eslint/svelte @typescript-eslint express-security functional import-x markdown n package-json perfectionist promise react-hooks regexp security unicorn unused-imports
+plugins: @ @eslint-community/eslint-comments @html-eslint/svelte @stylistic @typescript-eslint express-security functional import-x markdown n package-json perfectionist promise react-hooks regexp security unicorn unused-imports
 languageOptions:
   ecmaVersion: 2026
   globals: "AggregateError:false Array:false ArrayBuffer:false AsyncDisposableStack:false Atomics:false BigInt:false BigInt64Array:false BigUint64Array:false Boolean:false DataView:false Date:false DisposableStack:false Error:false EvalError:false FinalizationRegistry:false Float16Array:false Float32Array:false Float64Array:false Function:false Infinity:false Int16Array:false Int32Array:false Int8Array:false Intl:false Iterator:false JSON:false Map:false Math:false NaN:false Number:false Object:false Promise:false Proxy:false RangeError:false ReferenceError:false Reflect:false RegExp:false Set:false SharedArrayBuffer:false String:false SuppressedError:false Symbol:false SyntaxError:false TypeError:false URIError:false Uint16Array:false Uint32Array:false Uint8Array:false Uint8ClampedArray:false WeakMap:false WeakRef:false WeakSet:false decodeURI:false decodeURIComponent:false encodeURI:false encodeURIComponent:false escape:false eval:false globalThis:false isFinite:false isNaN:false parseFloat:false parseInt:false undefined:false unescape:false"
@@ -14,7 +14,7 @@ linterOptions:
 settings:
   import-x/parsers: {"espree":[".js",".mjs",".cjs"]}
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 1017 (error 757, off 240, warn 20)
+rules: 1114 (error 799, off 295, warn 20)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -34,6 +34,103 @@ rules: 1017 (error 757, off 240, warn 20)
 @html-eslint/svelte/no-restricted-attrs: error
 @html-eslint/svelte/require-attrs: error
 @html-eslint/svelte/use-baseline: error [{"available":"widely"}]
+@stylistic/array-bracket-newline: off
+@stylistic/array-bracket-spacing: error ["never",{"arraysInArrays":false,"objectsInArrays":false,"singleValue":false}]
+@stylistic/array-element-newline: off
+@stylistic/arrow-parens: off ["always"]
+@stylistic/arrow-spacing: error [{"after":true,"before":true}]
+@stylistic/block-spacing: error ["always"]
+@stylistic/brace-style: off ["1tbs",{"allowSingleLine":false}]
+@stylistic/comma-dangle: off ["never"]
+@stylistic/comma-spacing: error [{"after":true,"before":false}]
+@stylistic/comma-style: error ["last",{"exceptions":{}}]
+@stylistic/computed-property-spacing: error ["never",{"enforceForClassMembers":true}]
+@stylistic/curly-newline: off
+@stylistic/dot-location: error ["property"]
+@stylistic/eol-last: error ["always"]
+@stylistic/exp-jsx-props-style: off [{"multiLine":{"maxItemsPerLine":1,"minItems":0},"singleLine":{"maxItems":"[Number Infinity]"}}]
+@stylistic/exp-list-style: off [{"multiLine":{"minItems":0},"overrides":{"{}":{"singleLine":{"spacing":"always"}}},"singleLine":{"maxItems":"[Number Infinity]","spacing":"never"}}]
+@stylistic/function-call-argument-newline: off ["always"]
+@stylistic/function-call-spacing: error ["never"]
+@stylistic/function-paren-newline: off ["multiline"]
+@stylistic/generator-star-spacing: error [{"after":true,"anonymous":"after","before":false,"method":"before","named":"after","shorthand":"before"}]
+@stylistic/implicit-arrow-linebreak: off ["beside"]
+@stylistic/indent: off [4,{"SwitchCase":1,"flatTernaryExpressions":false,"ignoredNodes":[]}]
+@stylistic/indent-binary-ops: off [2]
+@stylistic/jsx-child-element-spacing: off
+@stylistic/jsx-closing-bracket-location: off ["tag-aligned"]
+@stylistic/jsx-closing-tag-location: off ["tag-aligned"]
+@stylistic/jsx-curly-brace-presence: error [{"children":"never","propElementValues":"always","props":"never"}]
+@stylistic/jsx-curly-newline: off ["consistent"]
+@stylistic/jsx-curly-spacing: error [{"allowMultiline":true,"attributes":true,"children":true,"spacing":{"objectLiterals":"never"},"when":"never"},{"allowMultiline":true,"spacing":{"objectLiterals":"never"}}]
+@stylistic/jsx-equals-spacing: error ["never"]
+@stylistic/jsx-first-prop-new-line: off ["multiline-multiprop"]
+@stylistic/jsx-function-call-newline: off ["multiline"]
+@stylistic/jsx-indent: off [4]
+@stylistic/jsx-indent-props: off [4]
+@stylistic/jsx-max-props-per-line: off [{"maximum":1}]
+@stylistic/jsx-newline: off [{"allowMultilines":false,"prevent":false}]
+@stylistic/jsx-one-expression-per-line: off [{"allow":"none"}]
+@stylistic/jsx-pascal-case: error [{"allowAllCaps":false,"allowLeadingUnderscore":false,"allowNamespace":false,"ignore":[]}]
+@stylistic/jsx-props-no-multi-spaces: off
+@stylistic/jsx-quotes: off ["prefer-double"]
+@stylistic/jsx-self-closing-comp: error [{"component":true,"html":true}]
+@stylistic/jsx-sort-props: off [{"callbacksLast":false,"ignoreCase":false,"locale":"auto","multiline":"ignore","noSortAlphabetically":false,"reservedFirst":false,"reservedLast":[],"shorthandFirst":false,"shorthandLast":false}]
+@stylistic/jsx-tag-spacing: error [{"afterOpening":"never","beforeClosing":"never","beforeSelfClosing":"always","closingSlash":"never"}]
+@stylistic/jsx-wrap-multilines: off [{"arrow":"parens","assignment":"parens","condition":"ignore","declaration":"parens","logical":"ignore","prop":"ignore","propertyValue":"ignore","return":"parens"}]
+@stylistic/key-spacing: error [{"afterColon":true,"beforeColon":false,"ignoredNodes":[],"mode":"strict"}]
+@stylistic/keyword-spacing: error [{"after":true,"before":true,"overrides":{}}]
+@stylistic/line-comment-position: off ["above"]
+@stylistic/linebreak-style: off ["unix"]
+@stylistic/lines-around-comment: off [{"beforeBlockComment":true}]
+@stylistic/lines-between-class-members: error ["always",{"exceptAfterOverload":true,"exceptAfterSingleLine":false}]
+@stylistic/max-len: off [{"code":80,"tabWidth":4}]
+@stylistic/max-statements-per-line: error [{"ignoredNodes":[],"max":1}]
+@stylistic/member-delimiter-style: off [{"multiline":{"delimiter":"semi","requireLast":true},"multilineDetection":"brackets","singleline":{"delimiter":"semi","requireLast":false}}]
+@stylistic/multiline-comment-style: off ["starred-block"]
+@stylistic/multiline-ternary: off ["always"]
+@stylistic/new-parens: off ["always"]
+@stylistic/newline-per-chained-call: off [{"ignoreChainWithDepth":2}]
+@stylistic/no-confusing-arrow: off [{"allowParens":true,"onlyOneSimpleParam":false}]
+@stylistic/no-extra-parens: off ["all"]
+@stylistic/no-extra-semi: error
+@stylistic/no-floating-decimal: error
+@stylistic/no-mixed-operators: error [{"allowSamePrecedence":true,"groups":[["&","|","^","<<",">>",">>>"],["&&","||"]]}]
+@stylistic/no-mixed-spaces-and-tabs: error ["smart-tabs"]
+@stylistic/no-multi-spaces: error [{"exceptions":{"ImportAttribute":true,"Property":true},"ignoreEOLComments":true,"includeTabs":true}]
+@stylistic/no-multiple-empty-lines: off [{"max":2}]
+@stylistic/no-tabs: off [{"allowIndentationTabs":false}]
+@stylistic/no-trailing-spaces: error [{"ignoreComments":true,"skipBlankLines":false}]
+@stylistic/no-whitespace-before-property: error
+@stylistic/nonblock-statement-body-position: off ["beside"]
+@stylistic/object-curly-newline: off
+@stylistic/object-curly-spacing: off ["never"]
+@stylistic/object-property-newline: off [{"allowAllPropertiesOnSameLine":false}]
+@stylistic/one-var-declaration-per-line: off ["initializations"]
+@stylistic/operator-linebreak: off
+@stylistic/padded-blocks: off ["always",{"allowSingleLineBlocks":false}]
+@stylistic/padding-line-between-statements: off
+@stylistic/quote-props: off ["always"]
+@stylistic/quotes: off ["double",{"allowTemplateLiterals":"never","avoidEscape":false,"ignoreStringLiterals":false}]
+@stylistic/rest-spread-spacing: error ["never"]
+@stylistic/semi: off ["always"]
+@stylistic/semi-spacing: error [{"after":true,"before":false}]
+@stylistic/semi-style: off ["last"]
+@stylistic/space-before-blocks: error ["always"]
+@stylistic/space-before-function-paren: error [{"anonymous":"always","asyncArrow":"always","catch":"always","named":"never"}]
+@stylistic/space-in-parens: error ["never",{"exceptions":[]}]
+@stylistic/space-infix-ops: error [{"ignoreTypes":false,"int32Hint":false}]
+@stylistic/space-unary-ops: error [{"nonwords":false,"overrides":{},"words":true}]
+@stylistic/spaced-comment: error ["always",{"block":{"balanced":true,"exceptions":["-","="],"markers":["!","#__PURE__","@__PURE__","#__NO_SIDE_EFFECTS__","@__NO_SIDE_EFFECTS__"]},"exceptions":[],"line":{"exceptions":["-","="],"markers":["/"]},"markers":[]}]
+@stylistic/switch-colon-spacing: error [{"after":true,"before":false}]
+@stylistic/template-curly-spacing: error ["never"]
+@stylistic/template-tag-spacing: error ["never"]
+@stylistic/type-annotation-spacing: error [{"after":true,"before":false,"overrides":{"arrow":"ignore"}}]
+@stylistic/type-generic-spacing: error
+@stylistic/type-named-tuple-spacing: error
+@stylistic/wrap-iife: off ["outside",{"functionPrototypeMethods":false}]
+@stylistic/wrap-regex: off
+@stylistic/yield-star-spacing: error ["after"]
 @typescript-eslint/adjacent-overload-signatures: off
 @typescript-eslint/array-type: error [{"default":"array-simple"}]
 @typescript-eslint/await-thenable: off

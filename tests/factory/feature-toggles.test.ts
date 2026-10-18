@@ -157,6 +157,13 @@ const features = [
     ruleId: "security/detect-eval-with-expression",
   },
   {
+    feature: "stylistic",
+    fileNames: ["example.js", "example.ts"],
+    files: ["app/**/*.js", "app/**/*.ts"],
+    name: "stylistic",
+    ruleId: "@stylistic/spaced-comment",
+  },
+  {
     feature: "svelte",
     fileNames: ["Component.svelte", "state.svelte.ts"],
     files: ["app/**/*.svelte", "app/**/*.svelte.ts"],

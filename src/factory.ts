@@ -21,6 +21,7 @@ import { promise } from "./configs/plugins/promise/index.js";
 import { react } from "./configs/plugins/react/index.js";
 import { regexp } from "./configs/plugins/regexp/index.js";
 import { security } from "./configs/plugins/security/index.js";
+import { stylistic } from "./configs/plugins/stylistic/index.js";
 import { svelte } from "./configs/plugins/svelte/index.js";
 import { typescript } from "./configs/plugins/typescript/index.js";
 import { unicorn } from "./configs/plugins/unicorn/index.js";
@@ -70,6 +71,7 @@ const createConfig = async (
     ...buildFeature(resolved.unicorn, unicorn, context),
     ...buildFeature(resolved.functional, functional, context),
     ...buildFeature(resolved.perfectionist, perfectionist, context),
+    ...buildFeature(resolved.stylistic, stylistic, context),
     ...typescriptConfigs,
     ...reactConfigs,
     ...svelteConfigs,

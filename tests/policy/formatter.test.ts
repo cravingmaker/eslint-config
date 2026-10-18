@@ -46,13 +46,155 @@ const filePaths = [
   "tsconfig.json",
 ] as const;
 /*
-Prettier formats, and the configuration leaves layout to it. eslint-config-prettier turns off the
-rules that are unnecessary or might conflict with Prettier: none of them may be on, apart from
-these exceptions, each with the reason that it is safe. Its `eslint-config-prettier/prettier`
+Prettier formats, and compatible ESLint spacing and structural checks remain on. eslint-config-prettier
+lists rules that are unnecessary or might conflict: enabled entries must have an independently
+reviewed exception here, each with the reason that it is safe. Its `eslint-config-prettier/prettier`
 entry point lists rules that conflict only with eslint-plugin-prettier, which is not used here.
 */
 const exceptions = new Map([
   ["curly", "its default all form requires braces that Prettier preserves"],
+  [
+    "@stylistic/array-bracket-spacing",
+    "unspaced array brackets agree with Prettier independently of wrapping",
+  ],
+  [
+    "@stylistic/arrow-spacing",
+    "spaces around arrow tokens agree with Prettier",
+  ],
+  [
+    "@stylistic/block-spacing",
+    "spaces inside nonempty single-line blocks agree with Prettier",
+  ],
+  [
+    "@stylistic/comma-spacing",
+    "spaces after commas agree with Prettier regardless of trailing commas",
+  ],
+  [
+    "@stylistic/comma-style",
+    "trailing comma placement agrees with Prettier regardless of trailingComma",
+  ],
+  [
+    "@stylistic/computed-property-spacing",
+    "unspaced computed brackets agree with Prettier",
+  ],
+  [
+    "@stylistic/dot-location",
+    "property-side dots agree with Prettier when member access wraps",
+  ],
+  [
+    "@stylistic/eol-last",
+    "a final newline agrees with Prettier for either LF or CRLF",
+  ],
+  [
+    "@stylistic/function-call-spacing",
+    "unspaced call parentheses agree with Prettier",
+  ],
+  [
+    "@stylistic/generator-star-spacing",
+    "explicit function and method variants agree with Prettier's generator syntax",
+  ],
+  [
+    "@stylistic/jsx-curly-spacing",
+    "unspaced JSX expression braces agree with Prettier while allowing multiline expressions",
+  ],
+  [
+    "@stylistic/jsx-equals-spacing",
+    "unspaced JSX attribute equals signs agree with Prettier",
+  ],
+  [
+    "@stylistic/jsx-tag-spacing",
+    "token spacing agrees with Prettier while allowing its bracket and attribute wrapping",
+  ],
+  [
+    "@stylistic/key-spacing",
+    "unaligned colons agree with Prettier in objects and TypeScript shapes",
+  ],
+  ["@stylistic/keyword-spacing", "spaces around keywords agree with Prettier"],
+  [
+    "@stylistic/max-statements-per-line",
+    "Prettier separates statements and the rule permits compact single-statement bodies",
+  ],
+  [
+    "@stylistic/no-extra-semi",
+    "redundant semicolons can be removed while required ASI guards remain",
+  ],
+  [
+    "@stylistic/no-floating-decimal",
+    "leading and trailing decimal digits agree with Prettier",
+  ],
+  [
+    "@stylistic/no-mixed-operators",
+    "Prettier preserves logical and bitwise grouping while ordinary arithmetic remains unrestricted",
+  ],
+  [
+    "@stylistic/no-mixed-spaces-and-tabs",
+    "smart-tabs permits tab indentation followed by alignment spaces",
+  ],
+  [
+    "@stylistic/no-multi-spaces",
+    "single token gaps agree with Prettier while end-of-line comments remain untouched",
+  ],
+  [
+    "@stylistic/no-trailing-spaces",
+    "code lines agree with Prettier while comment content and template data remain untouched",
+  ],
+  [
+    "@stylistic/no-whitespace-before-property",
+    "unspaced property access agrees with Prettier",
+  ],
+  [
+    "@stylistic/rest-spread-spacing",
+    "unspaced rest and spread tokens agree with Prettier",
+  ],
+  [
+    "@stylistic/semi-spacing",
+    "semicolon token gaps agree with Prettier with either semi setting",
+  ],
+  [
+    "@stylistic/space-before-blocks",
+    "spaces before block braces agree with Prettier",
+  ],
+  [
+    "@stylistic/space-before-function-paren",
+    "explicit named, anonymous, async-arrow and catch variants agree with Prettier",
+  ],
+  ["@stylistic/space-in-parens", "unspaced parentheses agree with Prettier"],
+  [
+    "@stylistic/space-infix-ops",
+    "spaces around infix tokens agree with Prettier in expressions and types",
+  ],
+  [
+    "@stylistic/space-unary-ops",
+    "word and punctuation operator spacing agree with Prettier",
+  ],
+  [
+    "@stylistic/switch-colon-spacing",
+    "switch colon token gaps agree with Prettier",
+  ],
+  [
+    "@stylistic/template-curly-spacing",
+    "unspaced template interpolations agree with Prettier",
+  ],
+  [
+    "@stylistic/template-tag-spacing",
+    "unspaced template tags agree with Prettier",
+  ],
+  [
+    "@stylistic/type-annotation-spacing",
+    "colon and arrow variants agree with Prettier and the infix spacing rule",
+  ],
+  [
+    "@stylistic/type-generic-spacing",
+    "unspaced type generics agree with Prettier",
+  ],
+  [
+    "@stylistic/type-named-tuple-spacing",
+    "named tuple colons agree with Prettier",
+  ],
+  [
+    "@stylistic/yield-star-spacing",
+    "yield-star token spacing agrees with Prettier",
+  ],
   [
     "unicorn/template-indent",
     "its tags and comments leave out the templates whose content Prettier formats",

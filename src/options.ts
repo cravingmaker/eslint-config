@@ -53,6 +53,7 @@ type ResolvedOptions = {
   readonly react: ResolvedReactOptions | undefined;
   readonly regexp: FeatureOptions | undefined;
   readonly security: FeatureOptions | undefined;
+  readonly stylistic: FeatureOptions | undefined;
   readonly svelte: FeatureOptions | undefined;
   /**
     The Svelte components whose scripts the features for JavaScript and TypeScript sources lint.
@@ -235,6 +236,7 @@ const resolveOptions = (
     react: resolveReact(detection, options.react),
     regexp: resolveFeature(options.regexp),
     security: resolveFeature(options.security),
+    stylistic: resolveFeature(options.stylistic),
     svelte,
     svelteComponents: resolveSvelteComponents(svelte),
     typeAware: resolveTypeAwareScope(options.typescript),
