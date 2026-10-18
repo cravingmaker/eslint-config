@@ -54,6 +54,7 @@ const optionKeys = {
   react: { files: true, ignores: true, overrides: true, refresh: true },
   regexp: featureKeys,
   security: featureKeys,
+  stylistic: featureKeys,
   svelte: featureKeys,
   typescript: {
     files: true,

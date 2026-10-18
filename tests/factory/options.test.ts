@@ -20,6 +20,7 @@ const featuresOnByDefault = [
   "promise",
   "regexp",
   "security",
+  "stylistic",
   "unicorn",
   "unusedImports",
 ] as const;

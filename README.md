@@ -79,17 +79,17 @@ export default createConfig({
 
 `createConfig(options, ...userConfigs)` takes one options object, whose properties are all optional, and any number of [user configs](#user-configs). An option that it does not know is an error, at the top level and in the object of a feature: `createConfig()` rejects with a message that names every such option and the valid ones, and ESLint exits with code 2 before it lints anything.
 
-| Option                                                                                                                    | Default         | Description                                                                                                                                                                                 |
-| ------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `projectRootDirectory`                                                                                                    | `process.cwd()` | The directory whose `package.json` decides the `"auto"` features. It is also the default of `typescript.tsconfigRootDir`. A relative path is resolved from the working directory.           |
-| `ignores`                                                                                                                 | `[]`            | Patterns of files that no feature lints, in addition to `**/dist/`, `**/build/`, and `**/coverage/`.                                                                                        |
-| `environments`                                                                                                            | `[]`            | Runtimes whose globals are defined in JavaScript, TypeScript, and Svelte files, named as in the [globals](https://www.npmjs.com/package/globals) package: `"browser"`, `"node"`, and so on. |
-| `globals`                                                                                                                 | `{}`            | More globals, or changes to those of `environments`, such as `{ MY_GLOBAL: "readonly" }`.                                                                                                   |
-| `javascript`                                                                                                              | `{}`            | ESLint's core rules. Always on, so it takes only an object.                                                                                                                                 |
-| `typescript`                                                                                                              | `true`          | typescript-eslint, with the options in [TypeScript](#typescript).                                                                                                                           |
-| `comments`, `node`, `security`, `imports`, `unusedImports`, `promise`, `regexp`, `unicorn`, `functional`, `perfectionist` | `true`          | Code-quality plugins for JavaScript and TypeScript.                                                                                                                                         |
-| `html`, `json`, `packageJson`, `markdown`                                                                                 | `true`          | File formats. `json` also takes `overridesJsonc` and `overridesJson5`.                                                                                                                      |
-| `react`, `svelte`, `express`                                                                                              | `"auto"`        | Frameworks, described in [Frameworks](#frameworks).                                                                                                                                         |
+| Option                                                                                                                                 | Default         | Description                                                                                                                                                                                 |
+| -------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `projectRootDirectory`                                                                                                                 | `process.cwd()` | The directory whose `package.json` decides the `"auto"` features. It is also the default of `typescript.tsconfigRootDir`. A relative path is resolved from the working directory.           |
+| `ignores`                                                                                                                              | `[]`            | Patterns of files that no feature lints, in addition to `**/dist/`, `**/build/`, and `**/coverage/`.                                                                                        |
+| `environments`                                                                                                                         | `[]`            | Runtimes whose globals are defined in JavaScript, TypeScript, and Svelte files, named as in the [globals](https://www.npmjs.com/package/globals) package: `"browser"`, `"node"`, and so on. |
+| `globals`                                                                                                                              | `{}`            | More globals, or changes to those of `environments`, such as `{ MY_GLOBAL: "readonly" }`.                                                                                                   |
+| `javascript`                                                                                                                           | `{}`            | ESLint's core rules. Always on, so it takes only an object.                                                                                                                                 |
+| `typescript`                                                                                                                           | `true`          | typescript-eslint, with the options in [TypeScript](#typescript).                                                                                                                           |
+| `comments`, `node`, `security`, `imports`, `unusedImports`, `promise`, `regexp`, `unicorn`, `functional`, `perfectionist`, `stylistic` | `true`          | Code-quality and style plugins for JavaScript and TypeScript.                                                                                                                               |
+| `html`, `json`, `packageJson`, `markdown`                                                                                              | `true`          | File formats. `json` also takes `overridesJsonc` and `overridesJson5`.                                                                                                                      |
+| `react`, `svelte`, `express`                                                                                                           | `"auto"`        | Frameworks, described in [Frameworks](#frameworks).                                                                                                                                         |
 
 ### Feature values
 
@@ -143,6 +143,7 @@ A source is a JavaScript or TypeScript file: `**/*.{js,mjs,jsx,mjsx,ts,mts,tsx,m
 | `unicorn`       | [eslint-plugin-unicorn](https://www.npmjs.com/package/eslint-plugin-unicorn)                                                                                                                                                                                                       | Sources                                                                |
 | `functional`    | [eslint-plugin-functional](https://www.npmjs.com/package/eslint-plugin-functional)                                                                                                                                                                                                 | Sources                                                                |
 | `perfectionist` | [eslint-plugin-perfectionist](https://www.npmjs.com/package/eslint-plugin-perfectionist)                                                                                                                                                                                           | Sources                                                                |
+| `stylistic`     | [@stylistic/eslint-plugin](https://eslint.style/rules)                                                                                                                                                                                                                             | Sources                                                                |
 | `react`         | [@html-eslint/eslint-plugin-react](https://www.npmjs.com/package/@html-eslint/eslint-plugin-react), [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks), [eslint-plugin-react-refresh](https://www.npmjs.com/package/eslint-plugin-react-refresh) | The hooks rules in sources, the others in `**/*.{jsx,mjsx,tsx,mtsx}`   |
 | `svelte`        | [@html-eslint/eslint-plugin-svelte](https://www.npmjs.com/package/@html-eslint/eslint-plugin-svelte), with [svelte-eslint-parser](https://www.npmjs.com/package/svelte-eslint-parser)                                                                                              | `**/*.svelte`, and rune modules: `**/*.svelte.{js,mjs,ts,mts}`         |
 | `express`       | [eslint-plugin-express-security](https://www.npmjs.com/package/eslint-plugin-express-security)                                                                                                                                                                                     | `**/*.{js,mjs,ts,mts}`                                                 |
@@ -302,15 +303,28 @@ export default createConfig({
 
 ## Formatting with Prettier
 
-The config leaves layout to Prettier, which runs as a separate step:
+Prettier runs as a separate step. ESLint enforces compatible token spacing and
+structural conventions, while Prettier chooses wrapping, indentation, quotes,
+and semicolons:
 
 ```bash
 npx prettier --check . && npx eslint .
 ```
 
-You do not need eslint-config-prettier: no rule that it turns off is on, apart from `unicorn/template-indent`, whose options leave out the templates that Prettier formats. These rules are off because Prettier owns what they check:
+You do not need eslint-config-prettier. Its disable list does not choose this
+config's policy: `curly` stays on, and the `stylistic` feature explicitly
+classifies all 97 bundled rules. Compatible rules enforce token spacing, spaced
+comments, class member separation, PascalCase JSX components, self-closing JSX,
+and consistent JSX expression braces. Logical and bitwise mixtures require
+parentheses; ordinary arithmetic follows JavaScript precedence.
 
-- `curly` and `no-unexpected-multiline`.
+Rules with competing layout choices remain off for specific reasons documented
+in their rule maps. These include Stylistic's indentation, wrapping, quote, and
+semicolon rules, so consumers can choose Prettier options such as `useTabs`,
+`printWidth`, `singleQuote`, and `semi`. Deprecated and experimental Stylistic
+rules are explicitly off. Other disabled layout rules include:
+
+- `no-unexpected-multiline`.
 - `unicorn/empty-brace-spaces`, `unicorn/number-literal-case`, and `unicorn/no-nested-ternary`. Core `no-nested-ternary` is on instead: it reports every nested ternary, and it has no fix for Prettier to undo.
 - The layout rules of @html-eslint: `attrs-newline`, `class-spacing`, `element-newline`, `indent`, `no-extra-spacing-tags`, `no-extra-spacing-text`, `no-multiple-empty-lines`, `no-trailing-spaces`, and `quotes`.
 
@@ -337,7 +351,8 @@ export default createConfig({
 The core policy also requires braces around branches, block bodies for arrows,
 and expanded assignments (`value = value + amount` and
 `value = value || fallback`). Prettier preserves those syntax choices; it
-continues to decide indentation, spacing, quotes, and line breaks.
+continues to decide indentation, quotes, and wrapping. The formatter tests check
+that its output agrees with the enabled Stylistic rules across supported layouts.
 
 ## Rules that replace other rules
 

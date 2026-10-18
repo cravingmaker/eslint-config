@@ -25,7 +25,7 @@ const header = "createConfig() does not know these options:";
 const migration = 'See "Migrating from 0.1.0" in the README.';
 // The options of `createConfig`, as the message lists them.
 const options =
-  "`comments`, `environments`, `express`, `functional`, `globals`, `html`, `ignores`, `imports`, `javascript`, `json`, `markdown`, `node`, `packageJson`, `perfectionist`, `projectRootDirectory`, `promise`, `react`, `regexp`, `security`, `svelte`, `typescript`, `unicorn`, and `unusedImports`";
+  "`comments`, `environments`, `express`, `functional`, `globals`, `html`, `ignores`, `imports`, `javascript`, `json`, `markdown`, `node`, `packageJson`, `perfectionist`, `projectRootDirectory`, `promise`, `react`, `regexp`, `security`, `stylistic`, `svelte`, `typescript`, `unicorn`, and `unusedImports`";
 // The keys that every feature takes, and those of the features that take more.
 const featureKeys = "`files`, `ignores`, and `overrides`";
 const jsonKeys =
@@ -49,6 +49,7 @@ const keysByFeature = {
   react: reactKeys,
   regexp: featureKeys,
   security: featureKeys,
+  stylistic: featureKeys,
   svelte: featureKeys,
   typescript: typescriptKeys,
   unicorn: featureKeys,
@@ -101,6 +102,7 @@ const everyOption = {
   react: { ...scopeTo("{jsx,tsx}"), refresh: "vite" },
   regexp: sources,
   security: sources,
+  stylistic: sources,
   svelte: scopeTo("svelte"),
   typescript: {
     ...scopeTo("ts"),

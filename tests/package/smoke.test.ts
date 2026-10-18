@@ -19,6 +19,7 @@ const projectDirectory = path.resolve(__dirname, "../..");
 
 const runtimeDependencies: readonly string[] = [
   "@eslint-community/eslint-plugin-eslint-comments",
+  "@stylistic/eslint-plugin",
   "eslint-enforce-package-type",
   "eslint-import-resolver-typescript",
   "eslint-plugin-functional",
@@ -261,6 +262,9 @@ describe("published package", () => {
 				}
 
 				const defaultTsConfig = await getTypeScriptConfig(defaultConfig);
+				if (!getPluginNames(defaultConfig).has('@stylistic') || defaultTsConfig.rules?.['@stylistic/spaced-comment']?.[0] !== 2) {
+					throw new Error('Default Stylistic policy was not included in the packed package');
+				}
 				const untypedTsConfig = await getTypeScriptConfig(untyped);
 				const typedTsConfig = await getTypeScriptConfig(typed);
 

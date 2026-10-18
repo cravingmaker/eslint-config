@@ -2,7 +2,7 @@ path: data.json
 ignored: false
 language: json/json
 processor: none
-plugins: @ @eslint-community/eslint-comments functional import-x json markdown n package-json perfectionist promise regexp security unicorn unused-imports
+plugins: @ @eslint-community/eslint-comments @stylistic functional import-x json markdown n package-json perfectionist promise regexp security unicorn unused-imports
 languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1

@@ -11,6 +11,7 @@ import { perfectionist } from "../../src/configs/plugins/perfectionist/index.js"
 import { promise } from "../../src/configs/plugins/promise/index.js";
 import { regexp } from "../../src/configs/plugins/regexp/index.js";
 import { security } from "../../src/configs/plugins/security/index.js";
+import { stylistic } from "../../src/configs/plugins/stylistic/index.js";
 import { unicorn } from "../../src/configs/plugins/unicorn/index.js";
 import { unusedImports } from "../../src/configs/plugins/unused-imports/index.js";
 import { defaultContext } from "../../src/context.js";
@@ -66,6 +67,12 @@ const features = [
     name: "security",
     plugin: "security",
     rule: "security/detect-eval-with-expression",
+  },
+  {
+    build: stylistic,
+    name: "stylistic",
+    plugin: "@stylistic",
+    rule: "@stylistic/spaced-comment",
   },
   {
     build: unicorn,

@@ -55,11 +55,11 @@ const otherRules: Rules = {
       selectors: [],
 
       patterns: {
-        /*eslint-disable unicorn/string-content -- Disable to allow defining the search patterns themselves. */
+        /* eslint-disable unicorn/string-content -- Disable to allow defining the search patterns themselves. */
         "\\.\\.\\.": "…", // Ellipsis: prefer the real Unicode character.
         "<-": "←", // Left arrow: prefer Unicode.
         "->": "→", // Right arrow: prefer Unicode.
-        /*eslint-enable unicorn/string-content -- Disable to allow defining the search patterns themselves. */
+        /* eslint-enable unicorn/string-content -- Disable to allow defining the search patterns themselves. */
       },
     },
   ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.

@@ -187,6 +187,7 @@ The table lists each feature's policy entry points:
 | `unicorn/`                                              | `unicorn`       | `src/configs/plugins/unicorn/rules.ts`                                                                                   |
 | `functional/`                                           | `functional`    | `src/configs/plugins/functional/rules.ts` and `rules-type-aware.ts`                                                      |
 | `perfectionist/`                                        | `perfectionist` | `src/configs/plugins/perfectionist/rules.ts`                                                                             |
+| `@stylistic/`                                           | `stylistic`     | `src/configs/plugins/stylistic/rules.ts`                                                                                 |
 | `@html-eslint/react/`, `react-hooks/`, `react-refresh/` | `react`         | `src/configs/plugins/react/rules.ts`                                                                                     |
 | `@html-eslint/svelte/`                                  | `svelte`        | `src/configs/plugins/svelte/rules.ts`                                                                                    |
 | `express-security/`                                     | `express`       | `src/configs/plugins/express/rules.ts`                                                                                   |
@@ -210,6 +211,13 @@ on an unclassified rule.
 The authored core maps are the reference for rule policy. Enabled rules
 declare canonical options; deprecated aliases do not need duplicate entries.
 The core reference selects default forms for `curly` and `radix`.
+
+Stylistic explicitly inventories every bundled rule, including deprecated and
+experimental rules as `"off"`. Its upstream rule list has overlapping tags
+rather than exclusive categories, so `rules.ts` groups recommended and other
+rules, as the uncategorized plugins do. Stable token spacing and structural
+checks remain on when they agree with Prettier; its disable list is not a policy
+source. Width, indentation, quote, and semicolon choices stay with Prettier.
 
 An option set to `undefined` deliberately retains inference from settings,
 the project's engines or tsconfig, or a rule's optional behavior without a
@@ -454,8 +462,10 @@ pull request, run the full [validation](#validation) as well.
      role; see [Change a file exception](#change-a-file-exception).
    - A rule that needs type information is on only where typed linting
      is; see [Parsing and type information](#parsing-and-type-information).
-   - A rule that checks layout stays off, because Prettier owns layout;
-     see "The formatter test guards layout".
+   - Review a style rule against the coding principles and actual formatter
+     behavior. Compatible token spacing and structural rules can stay on;
+     competing wrapping, indentation, quote, and semicolon policies stay off
+     with a specific reason. See "The formatter test guards layout".
 
 4. **Test the policy, not the plugin.** Add a rule test to the file of
    the module in `tests/configs/`, following "A rule test checks this
@@ -753,14 +763,18 @@ The reference that the recipes link to, grouped by topic.
   an alternative. A consumer can still explicitly enable one through its
   feature overrides or a user config. Tests in `tests/policy/overlaps.test.ts`
   verify enabled, disabled, narrowed, ignored, Svelte, and override cases.
-- **The formatter test guards layout.** Prettier formats, so
+- **The formatter test guards layout.**
   `tests/policy/formatter.test.ts` fails when a rule that
   `eslint-config-prettier` turns off is on, apart from its listed
   exceptions, or when an @html-eslint plugin has a style rule that is
   neither off as layout nor kept with a reason. A dependency update can
-  bring such a rule. Turn it off in its rule map with the reason, or, if
-  it cannot conflict with Prettier, list it with that reason; check the
-  claim by formatting a sample with Prettier and linting the result.
+  bring such a rule. Decide its severity and options from the coding principles,
+  then document a compatible exception or a specific reason to turn it off.
+  A listing in eslint-config-prettier is not sufficient reason to disable it.
+  Check compatibility by formatting representative samples with Prettier and
+  linting the result, including differing quote, semicolon, indentation, and
+  wrapping options. Stylistic's tests also cover generators, comments, JSX,
+  and TypeScript syntax through repeated formatting and fixing.
 
 ### Files and blocks
 
