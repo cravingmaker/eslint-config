@@ -1,10 +1,9 @@
 import type { Rules } from "../../../types.js";
 
-import { possibleSecurityVulnerabilityRules } from "./possible-security-vulnerability.js";
+import { possibleSecurityVulnerabilityRules } from "./rules/possible-security-vulnerability.js";
 
-// Explicit policy grouped by the upstream rule categories.
 const securityRules: Rules = {
-  ...possibleSecurityVulnerabilityRules,
+  ...possibleSecurityVulnerabilityRules, // 14/14 rules, 0 automatically fixable, 0 editor suggestions fixable.
 } as const;
 
 export { securityRules };

@@ -4,19 +4,20 @@ import { functionalRules } from "./rules.js";
 
 // Rules requiring type information stay off outside typed linting.
 const typeAwareRulesOff: Rules = {
-  "functional/functional-parameters": "off",
-  "functional/immutable-data": "off",
-  "functional/no-conditional-statements": "off",
-  "functional/no-expression-statements": "off",
-  "functional/no-mixed-types": "off",
-  "functional/no-return-void": "off",
-  "functional/no-throw-statements": "off",
-  "functional/prefer-immutable-types": "off",
-  "functional/prefer-property-signatures": "off",
-  "functional/prefer-tacit": "off",
-  "functional/readonly-type": "off",
-  "functional/type-declaration-immutability": "off",
-};
+  // --- Turned off rules (12/12) -------------------------------------------------------------------------------------------------------------------.
+  "functional/functional-parameters": "off", // Requires type information; enabled only in the type-aware scope.
+  "functional/immutable-data": "off", // Requires type information; enabled only in the type-aware scope.
+  "functional/no-conditional-statements": "off", // Requires type information; enabled only in the type-aware scope.
+  "functional/no-expression-statements": "off", // Requires type information; enabled only in the type-aware scope.
+  "functional/no-mixed-types": "off", // Requires type information; enabled only in the type-aware scope.
+  "functional/no-return-void": "off", // Requires type information; enabled only in the type-aware scope.
+  "functional/no-throw-statements": "off", // Requires type information; enabled only in the type-aware scope.
+  "functional/prefer-immutable-types": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  "functional/prefer-property-signatures": "off", // Requires type information; enabled only in the type-aware scope.
+  "functional/prefer-tacit": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
+  "functional/readonly-type": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
+  "functional/type-declaration-immutability": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+} as const;
 
 const typeAwareRuleIds = [
   ...Object.keys(typeAwareRulesOff),
@@ -31,4 +32,8 @@ const typeAwareRules: Rules = Object.fromEntries(
   }),
 );
 
-export { typeAwareRuleIds, typeAwareRules, typeAwareRulesOff };
+export {
+  typeAwareRuleIds,
+  typeAwareRules,
+  typeAwareRulesOff, // 12 rules, 3 automatically fixable, 3 editor suggestions fixable.
+};

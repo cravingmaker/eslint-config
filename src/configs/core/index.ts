@@ -6,10 +6,10 @@ import { jsxFiles, sourceFiles, withSvelteComponents } from "../../globs.js";
 import { supportedCoreRules } from "./rules.js";
 import { narrowFiles } from "../../utilities/file-scope.js";
 
-function core(
+const core = (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { globals, svelteComponents }: Context = defaultContext,
-): Linter.Config[] {
+): Linter.Config[] => {
   return [
     {
       files: narrowFiles(
@@ -31,8 +31,6 @@ function core(
       name: "@cravingmaker/eslint-config/javascript/jsx",
     },
   ];
-}
+};
 
 export { core };
-
-export { coreRules } from "./rules.js";

@@ -1,7 +1,7 @@
 import type { Rules } from "../../../../types.js";
 
 const recommendedRules: Rules = {
-  // --- Rules with default options (7/7) ------------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (7/7) -----------------------------------------------------------------------------------------------------------.
   "package-json/no-empty-fields": ["error", { ignoreProperties: ["files"] }], // Manually fixable by editor suggestions.
   "package-json/no-redundant-files": "error", // Manually fixable by editor suggestions.
   "package-json/no-redundant-publishConfig": "error", // Manually fixable by editor suggestions.
@@ -25,7 +25,7 @@ const recommendedRules: Rules = {
 } as const;
 
 const additionalRules: Rules = {
-  // --- Rules with default options (7/10) -----------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (7/10) ----------------------------------------------------------------------------------------------------------.
   "package-json/bin-name-casing": "error", // Manually fixable by editor suggestions.
   "package-json/exports-subpaths-style": ["error", { prefer: "explicit" }], // Automatically fixable by the --fix command.
   "package-json/no-local-dependencies": ["error", { ignorePrivate: true }],
@@ -43,7 +43,7 @@ const additionalRules: Rules = {
     { ignoreNames: [], ignorePatterns: [] },
   ], // Manually fixable by editor suggestions.
 
-  // --- Rules with overridden options (2/10) --------------------------------------------------------------------------------------------------------
+  // --- Rules with overridden options (2/10) -------------------------------------------------------------------------------------------------------.
   "package-json/restrict-dependency-ranges": [
     "error",
     {
@@ -61,7 +61,7 @@ const additionalRules: Rules = {
     },
   ],
 
-  // --- Turned off rules (1/10) ---------------------------------------------------------------------------------------------------------------------
+  // --- Turned off rules (1/10) --------------------------------------------------------------------------------------------------------------------.
   "package-json/restrict-top-level-properties": "off", // Project specific. Manually fixable by editor suggestions.
 } as const;
 

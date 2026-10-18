@@ -120,7 +120,7 @@ const react = async ({
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/react/hooks",
       plugins: {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint-plugin-react-hooks configs.flat shape is not assignable to Linter.Plugin without assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- eslint-plugin-react-hooks configs.flat shape is not assignable to Linter.Plugin without assertion.
         "react-hooks": hooks.default as unknown as NonNullable<
           Linter.Config["plugins"]
         >[string],

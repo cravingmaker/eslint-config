@@ -3,7 +3,7 @@ import type { Rules } from "../../../types.js";
 import {
   classMethodsUseThisOptions,
   dotNotationOptions,
-  // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `max-params` rule name
+  // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `max-params` rule name.
   maxParamsOptions,
   noEmptyFunctionOptions,
   noShadowOptions,
@@ -14,7 +14,7 @@ import {
 } from "../../shared-options.js";
 
 const recommendedRules: Rules = {
-  // --- Rules with default options (17/17) ----------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (17/17) ---------------------------------------------------------------------------------------------------------.
   "no-case-declarations": "error", // Manually fixable by editor suggestions.
   "no-delete-var": "error",
   "no-empty": ["error", { allowEmptyCatch: false }], // Manually fixable by editor suggestions.
@@ -38,7 +38,7 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (67/122) ---------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (67/122) --------------------------------------------------------------------------------------------------------.
   "accessor-pairs": [
     "error",
     {
@@ -182,7 +182,7 @@ const otherRules: Rules = {
     },
   ], // Automatically fixable by the --fix command.
 
-  // --- Rules with overridden options (27/122) ------------------------------------------------------------------------------------------------------
+  // --- Rules with overridden options (27/122) -----------------------------------------------------------------------------------------------------.
   "arrow-body-style": ["error", "always"], // Automatically fixable by the --fix command.
   "capitalized-comments": [
     "error",
@@ -214,6 +214,32 @@ const otherRules: Rules = {
     { enforceForTSTypes: true },
   ],
   "logical-assignment-operators": ["error", "never"], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  "max-depth": ["warn", { max: 3 }],
+  "max-lines": [
+    "warn",
+    {
+      max: 600,
+      skipBlankLines: true,
+      skipComments: true,
+    },
+  ],
+  "max-lines-per-function": [
+    "warn",
+    {
+      // eslint-disable-next-line @typescript-eslint/naming-convention -- ESLint rule options use PascalCase for AST node names.
+      IIFEs: true,
+      max: 60,
+      skipBlankLines: true,
+      skipComments: true,
+    },
+  ],
+  "max-nested-callbacks": [
+    "warn",
+    {
+      checkConstructorCallCallbacks: true,
+      max: 3,
+    },
+  ],
   "max-params": [
     "error",
     {
@@ -268,41 +294,7 @@ const otherRules: Rules = {
   "prefer-regex-literals": ["error", { disallowRedundantWrapping: true }], // Manually fixable by editor suggestions.
   "require-unicode-regexp": ["error", { requireFlag: undefined }], // Adding either flag can change matching behavior, so review existing patterns. Manually fixable by editor suggestions.
 
-  "max-depth": ["warn", { max: 3 }],
-  "max-lines": [
-    "warn",
-    {
-      max: 600,
-      skipBlankLines: true,
-      skipComments: true,
-    },
-  ],
-  "max-lines-per-function": [
-    "warn",
-    {
-      // eslint-disable-next-line @typescript-eslint/naming-convention -- ESLint rule options use PascalCase for AST node names.
-      IIFEs: true,
-      max: 60,
-      skipBlankLines: true,
-      skipComments: true,
-    },
-  ],
-  "max-nested-callbacks": [
-    "warn",
-    {
-      checkConstructorCallCallbacks: true,
-      max: 3,
-    },
-  ],
-
-  // --- Turned off rules (28/122) -------------------------------------------------------------------------------------------------------------------
-  "no-negated-condition": "off", // Handled by `unicorn/no-negated-condition`.
-  "no-warning-comments": "off", // Handled by `unicorn/expiring-todo-comments`.
-  "sort-imports": "off", // Handled by `perfectionist/sort-imports`. Automatically fixable by the --fix command.
-  "sort-keys": "off", // Handled by `perfectionist/sort-objects`.
-
-  "vars-on-top": "off", // Unnecessary, see `no-var`.
-
+  // --- Turned off rules (28/122) ------------------------------------------------------------------------------------------------------------------.
   "consistent-return": "off", // Prefer type-aware return analysis over syntax-only consistency checks.
   "consistent-this": "off", // Prefer lexical this through arrow functions over introducing aliases.
   "id-denylist": "off", // Prefer to restrict identifier names only when explicit naming conventions require it.
@@ -318,15 +310,20 @@ const otherRules: Rules = {
   "no-inline-comments": "off", // Prefer to allow concise inline comments when they clarify adjacent code.
   "no-invalid-this": "off", // Prefer TypeScript's strict/noImplicitThis checks where available.
   "no-magic-numbers": "off", // Prefer named constants for meaningful domain values without unnecessarily restricting literals.
+  "no-negated-condition": "off", // Handled by `unicorn/no-negated-condition`.
   "no-plusplus": "off", // Prefer increment and decrement operators for counters while assessing side effects separately.
   "no-restricted-exports": "off", // Prefer to restrict export names only when explicit public API conventions require it.
   "no-restricted-properties": "off", // Prefer to add restrictions only for specific APIs with documented alternatives.
   "no-restricted-syntax": "off", // Prefer targeted rules; broad syntax restrictions need a concrete justification.
   "no-ternary": "off", // Prefer conditional expressions to avoid unnecessary branching statements.
   "no-underscore-dangle": "off", // Prefer to allow underscores for naming conventions, unused bindings, and external API compatibility.
+  "no-warning-comments": "off", // Handled by `unicorn/expiring-todo-comments`.
+  "sort-imports": "off", // Handled by `perfectionist/sort-imports`. Automatically fixable by the --fix command.
+  "sort-keys": "off", // Handled by `perfectionist/sort-objects`.
   "sort-vars": "off", // Prefer declaration order based on dependencies and readability. Automatically fixable by the --fix command.
   strict: "off", // Prefer to configure strictness separately for scripts; ES modules are implicitly strict. Automatically fixable by the --fix command.
-};
+  "vars-on-top": "off", // Unnecessary, see `no-var`.
+} as const;
 
 const suggestionRules: Rules = {
   ...recommendedRules, // 17/139 rules, 3 automatically fixable, 6 editor suggestions fixable.

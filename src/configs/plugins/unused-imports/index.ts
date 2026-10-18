@@ -30,5 +30,3 @@ const unusedImports = (
 };
 
 export { unusedImports };
-
-export { unusedImportsRules } from "./rules.js";

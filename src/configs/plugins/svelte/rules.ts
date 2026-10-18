@@ -1,12 +1,11 @@
 import type { Rules } from "../../../types.js";
 
-import { bestPracticeRules } from "./best-practice.js";
-import { stylisticIssuesRules } from "./stylistic-issues.js";
+import { bestPracticeRules } from "./rules/best-practice.js";
+import { stylisticIssuesRules } from "./rules/stylistic-issues.js";
 
-// Explicit policy grouped by the upstream rule categories.
 const svelteRules: Rules = {
-  ...stylisticIssuesRules,
-  ...bestPracticeRules,
+  ...stylisticIssuesRules, // 1/10 rules, 1 automatically fixable, 0 editor suggestions fixable.
+  ...bestPracticeRules, // 9/10 rules, 2 automatically fixable, 0 editor suggestions fixable.
 } as const;
 
 export { svelteRules };

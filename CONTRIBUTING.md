@@ -112,12 +112,12 @@ public types from `src/types.ts`. Everything else is internal.
    `src/configs/core/`. Global ignores and file-role exceptions have their
    own folders directly under `src/configs/`; shared options also stay there.
    Every feature has its builder in `index.ts` and its rule maps in modules
-   of their own. Upstream categories have named modules, as in
-   `core/rules/possible-problems.ts`;
+   of their own. Builders export the builder only; import policy from its
+   owning rule module. Upstream categories have named modules under `rules/`,
+   as in `core/rules/possible-problems.ts`;
    features without official categories keep their policy in `rules.ts`.
-   When a feature has several category modules, its `rules.ts` composes
-   their maps, including the core feature's `rules.ts`. The package-json
-   feature also groups its category modules under `rules/`.
+   A categorized feature's `rules.ts` composes its category maps. Rule maps
+   use the `Rules` type, `as const` for object literals, and named exports.
    The `packageJson` option composes two plugin builders, in separate
    `package-json/` and `enforce-package-type/` folders.
 4. Each feature declares disabled alternatives in its own rule map, with a
@@ -156,6 +156,19 @@ The prefix of a rule ID names its plugin, and each plugin belongs to
 one feature. The rule map of that feature is the policy for its rules.
 Category modules follow the installed plugin's official categories and
 separate recommended rules from other rules where both are present.
+Within each map, group rules with default options, rules with overridden
+options, and turned-off rules, omitting empty groups. Use the same dashed
+section comments as the core maps, with the number of entries in the group
+and the total in that map. ESLint fixes alphabetical ordering within groups.
+Keep fixed defaults explicit and explain disabled rules with a comment;
+use `Handled by` and the winning rule ID for overlaps, including Prettier.
+Inline fixability comments describe the installed rule's `meta.fixable` and
+`meta.hasSuggestions` capabilities, including for disabled rules. Composition
+spreads summarize each map's rule and fixability counts against the containing
+map's total; standalone maps put the summary beside their named export.
+End comment text, including headings and directive explanations, with a period.
+Review these comments when updating dependencies. Compatibility filtering,
+typed-rule suppression, and user overrides do not choose the authored groups.
 The package-json feature follows the upstream README's Require Properties
 and Valid Properties categories; its remaining rules are in `other-rules.ts`.
 The table lists each feature's policy entry points:
@@ -866,9 +879,9 @@ The reference that the recipes link to, grouped by topic.
   follows another function in the same group needs a doc comment without
   a paragraph break.
 
-The repository's own `eslint.config.js` preserves the authored core reference
-files and permits explicit unset values in rule-option maps. Test harnesses
-also allow explicit undefined values and exclude registration groups and
+The repository's own `eslint.config.js` permits explicit unset values in
+rule-option maps. Core and plugin modules follow the same lint rules. Test
+harnesses also allow explicit undefined values and exclude registration groups and
 fixture matrices from size/nesting limits. These local exceptions do not
 change the published configuration or its fixture checks. Runtime helpers
 follow the selected core syntax and complexity limits.

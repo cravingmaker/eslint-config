@@ -1,7 +1,7 @@
 import type { Rules } from "../../../types.js";
 
 const unusedImportsRules: Rules = {
-  // --- Rules with default options (1/1) ------------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (1/2) -----------------------------------------------------------------------------------------------------------.
   "unused-imports/no-unused-imports": [
     "error",
     {
@@ -18,9 +18,9 @@ const unusedImportsRules: Rules = {
       vars: "all",
       varsIgnorePattern: undefined,
     },
-  ],
+  ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
 
-  // --- Rules with overridden options (1/1) ---------------------------------------------------------------------------------------------------------
+  // --- Rules with overridden options (1/2) --------------------------------------------------------------------------------------------------------.
   "unused-imports/no-unused-vars": [
     "error",
     {
@@ -37,7 +37,7 @@ const unusedImportsRules: Rules = {
       vars: "all",
       varsIgnorePattern: "^_",
     },
-  ],
-};
+  ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+} as const;
 
-export { unusedImportsRules }; // 2 rules, 2 automatically fixable, 0 editor suggestions fixable.
+export { unusedImportsRules }; // 2 rules, 2 automatically fixable, 2 editor suggestions fixable.

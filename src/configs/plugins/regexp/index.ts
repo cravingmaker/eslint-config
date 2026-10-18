@@ -31,5 +31,3 @@ const regexp = (
 };
 
 export { regexp };
-
-export { regexpRules } from "./rules.js";

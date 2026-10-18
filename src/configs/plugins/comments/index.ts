@@ -31,5 +31,3 @@ const comments = (
 };
 
 export { comments };
-
-export { commentsRules } from "./rules.js";
