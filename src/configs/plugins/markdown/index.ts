@@ -18,7 +18,7 @@ const markdown = ({
     {
       name: "@cravingmaker/eslint-config/markdown/setup",
       plugins: {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- @eslint/markdown Plugin type is not assignable to Linter.Plugin without assertion
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- @eslint/markdown Plugin type is not assignable to Linter.Plugin without assertion.
         markdown: pluginMarkdown as unknown as NonNullable<
           Linter.Config["plugins"]
         >[string],

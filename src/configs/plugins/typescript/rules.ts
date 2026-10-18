@@ -2,6 +2,7 @@ import type { Rules } from "../../../types.js";
 
 // Typescript-eslint's recommended rules that work without type information.
 const recommendedRules: Rules = {
+  // --- Rules with default options (14/17) ---------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/no-duplicate-enum-values": "error",
   "@typescript-eslint/no-explicit-any": [
     "error",
@@ -9,8 +10,8 @@ const recommendedRules: Rules = {
       fixToUnknown: false,
       ignoreRestArgs: false,
     },
-  ],
-  "@typescript-eslint/no-extra-non-null-assertion": "error",
+  ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  "@typescript-eslint/no-extra-non-null-assertion": "error", // Automatically fixable by the --fix command.
   "@typescript-eslint/no-misused-new": "error",
   "@typescript-eslint/no-namespace": [
     "error",
@@ -19,7 +20,7 @@ const recommendedRules: Rules = {
       allowDefinitionFiles: true,
     },
   ],
-  "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
+  "@typescript-eslint/no-non-null-asserted-optional-chain": "error", // Manually fixable by editor suggestions.
   "@typescript-eslint/no-require-imports": [
     "error",
     {
@@ -34,14 +35,14 @@ const recommendedRules: Rules = {
       allowedNames: [],
     },
   ],
-  "@typescript-eslint/no-unnecessary-type-constraint": "error",
+  "@typescript-eslint/no-unnecessary-type-constraint": "error", // Manually fixable by editor suggestions.
   "@typescript-eslint/no-unsafe-declaration-merging": "error",
   "@typescript-eslint/no-unsafe-function-type": "error",
-  "@typescript-eslint/no-wrapper-object-types": "error",
-  "@typescript-eslint/prefer-as-const": "error",
-  "@typescript-eslint/prefer-namespace-keyword": "error",
+  "@typescript-eslint/no-wrapper-object-types": "error", // Automatically fixable by the --fix command.
+  "@typescript-eslint/prefer-as-const": "error", // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  "@typescript-eslint/prefer-namespace-keyword": "error", // Automatically fixable by the --fix command.
 
-  // Rules with overridden options
+  // --- Rules with overridden options (3/17) -------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/ban-ts-comment": [
     "error",
     {
@@ -51,7 +52,7 @@ const recommendedRules: Rules = {
       "ts-ignore": true,
       "ts-nocheck": true,
     },
-  ],
+  ], // Manually fixable by editor suggestions.
   "@typescript-eslint/no-empty-object-type": [
     "error",
     {
@@ -59,7 +60,7 @@ const recommendedRules: Rules = {
       allowObjectTypes: "never",
       allowWithName: "",
     },
-  ],
+  ], // Manually fixable by editor suggestions.
   "@typescript-eslint/triple-slash-reference": [
     "error",
     {
@@ -72,7 +73,26 @@ const recommendedRules: Rules = {
 
 // The rules that typescript-eslint's strict config adds.
 const strictRules: Rules = {
+  // --- Rules with default options (5/7) -----------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/no-dynamic-delete": "error",
+  "@typescript-eslint/no-invalid-void-type": [
+    "error",
+    {
+      allowAsThisParameter: false,
+      allowInGenericTypeArguments: true,
+    },
+  ],
+  "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "error", // Manually fixable by editor suggestions.
+  "@typescript-eslint/no-non-null-assertion": "error", // Manually fixable by editor suggestions.
+  "@typescript-eslint/unified-signatures": [
+    "error",
+    {
+      ignoreDifferentlyNamedParameters: false,
+      ignoreOverloadsWithDifferentJSDoc: false,
+    },
+  ],
+
+  // --- Rules with overridden options (2/7) --------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/no-extraneous-class": [
     "error",
     {
@@ -82,24 +102,6 @@ const strictRules: Rules = {
       allowWithDecorator: true,
     },
   ],
-  "@typescript-eslint/no-invalid-void-type": [
-    "error",
-    {
-      allowAsThisParameter: false,
-      allowInGenericTypeArguments: true,
-    },
-  ],
-  "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "error",
-  "@typescript-eslint/no-non-null-assertion": "error",
-  "@typescript-eslint/unified-signatures": [
-    "error",
-    {
-      ignoreDifferentlyNamedParameters: false,
-      ignoreOverloadsWithDifferentJSDoc: false,
-    },
-  ],
-
-  // Rules with overridden options
   "@typescript-eslint/prefer-literal-enum-member": [
     "error",
     { allowBitwiseExpressions: true },
@@ -108,29 +110,30 @@ const strictRules: Rules = {
 
 // Typescript-eslint's stylistic rules that work without type information.
 const stylisticRules: Rules = {
-  "@typescript-eslint/ban-tslint-comment": "error",
-  "@typescript-eslint/class-literal-property-style": ["error", "fields"],
+  // --- Rules with default options (8/12) ----------------------------------------------------------------------------------------------------------.
+  "@typescript-eslint/ban-tslint-comment": "error", // Automatically fixable by the --fix command.
+  "@typescript-eslint/class-literal-property-style": ["error", "fields"], // Manually fixable by editor suggestions.
   "@typescript-eslint/consistent-generic-constructors": [
     "error",
     "constructor",
-  ],
-  "@typescript-eslint/consistent-indexed-object-style": ["error", "record"],
-  "@typescript-eslint/no-confusing-non-null-assertion": "error",
+  ], // Automatically fixable by the --fix command.
+  "@typescript-eslint/consistent-indexed-object-style": ["error", "record"], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  "@typescript-eslint/no-confusing-non-null-assertion": "error", // Manually fixable by editor suggestions.
   "@typescript-eslint/no-inferrable-types": [
     "error",
     {
       ignoreParameters: false,
       ignoreProperties: false,
     },
-  ],
+  ], // Automatically fixable by the --fix command.
   "@typescript-eslint/prefer-for-of": "error",
-  "@typescript-eslint/prefer-function-type": "error",
+  "@typescript-eslint/prefer-function-type": "error", // Automatically fixable by the --fix command.
 
-  // Rules with overridden options
+  // --- Rules with overridden options (3/12) -------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/array-type": [
     "error",
     { default: "array-simple", readonly: undefined },
-  ],
+  ], // Automatically fixable by the --fix command.
   "@typescript-eslint/consistent-type-assertions": [
     "error",
     {
@@ -138,14 +141,16 @@ const stylisticRules: Rules = {
       assertionStyle: "as",
       objectLiteralTypeAssertions: "allow-as-parameter",
     },
-  ],
-  "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+  ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  "@typescript-eslint/consistent-type-definitions": ["error", "type"], // Automatically fixable by the --fix command.
 
+  // --- Turned off rules (1/12) --------------------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/adjacent-overload-signatures": "off", // Handled by `perfectionist/sort-interfaces` and `perfectionist/sort-object-types`.
 } as const;
 
 // The other typescript-eslint rules that work without type information.
 const otherRules: Rules = {
+  // --- Rules with default options (6/17) ----------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/consistent-type-imports": [
     "error",
     {
@@ -153,15 +158,14 @@ const otherRules: Rules = {
       fixStyle: "separate-type-imports",
       prefer: "type-imports",
     },
-  ],
-  "@typescript-eslint/method-signature-style": ["error", "property"],
-  "@typescript-eslint/no-import-type-side-effects": "error",
+  ], // Automatically fixable by the --fix command.
+  "@typescript-eslint/method-signature-style": ["error", "property"], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  "@typescript-eslint/no-import-type-side-effects": "error", // Automatically fixable by the --fix command.
   "@typescript-eslint/no-unnecessary-parameter-property-assignment": "error",
+  "@typescript-eslint/no-useless-empty-export": "error", // Automatically fixable by the --fix command.
+  "@typescript-eslint/prefer-enum-initializers": "error", // Manually fixable by editor suggestions.
 
-  "@typescript-eslint/no-useless-empty-export": "error",
-  "@typescript-eslint/prefer-enum-initializers": "error",
-
-  // Rules with overridden options
+  // --- Rules with overridden options (2/17) -------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/explicit-member-accessibility": [
     "error",
     {
@@ -173,48 +177,38 @@ const otherRules: Rules = {
         parameterProperties: "off",
       },
     },
-  ],
-
-  "@typescript-eslint/member-ordering": "off", // Handled by `perfectionist/sort-classes`.
-
-  "@typescript-eslint/explicit-function-return-type": "off",
-  "@typescript-eslint/explicit-module-boundary-types": "off",
+  ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "@typescript-eslint/no-restricted-types": [
     "error",
     {
       types: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention -- The key must match the restricted TypeScript type name
+        // eslint-disable-next-line @typescript-eslint/naming-convention -- The key must match the restricted TypeScript type name.
         Buffer: {
           message: "Use Uint8Array instead.",
           suggest: ["Uint8Array"],
         },
       },
     },
-  ],
-  "@typescript-eslint/parameter-properties": "off",
+  ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
 
-  // 'init-declarations': 'off', //Uncomment this if @typescript-eslint/init-declarations is enabled
-  "@typescript-eslint/init-declarations": "off",
-
-  // 'no-dupe-class-members': 'off', // Uncomment this if @typescript-eslint/no-dupe-class-members is enabled
-  "@typescript-eslint/no-dupe-class-members": "off", // Not recommended to enable this in new TypeScript projects
-
-  // 'no-invalid-this': 'off', // Uncomment this if @typescript-eslint/no-invalid-this is enabled
-  "@typescript-eslint/no-invalid-this": "off", // Not recommended to enable this in new TypeScript projects
-
-  // 'no-magic-numbers': 'off', // Uncomment this if @typescript-eslint/no-magic-numbers is enabled
-  "@typescript-eslint/no-magic-numbers": "off",
-
-  // 'no-redeclare': 'off', // Uncomment this if @typescript-eslint/no-redeclare is enabled
-  "@typescript-eslint/no-redeclare": "off", // Not recommended to enable this in new TypeScript projects
+  // --- Turned off rules (9/17) --------------------------------------------------------------------------------------------------------------------.
+  "@typescript-eslint/explicit-function-return-type": "off", // Prefer inferred return types for internal functions.
+  "@typescript-eslint/explicit-module-boundary-types": "off", // Prefer inferred boundary types unless the project requires explicit annotations.
+  "@typescript-eslint/init-declarations": "off", // Prefer initialization where values become available over placeholder assignments.
+  "@typescript-eslint/member-ordering": "off", // Handled by `perfectionist/sort-classes`.
+  "@typescript-eslint/no-dupe-class-members": "off", // Not recommended to enable this in new TypeScript projects.
+  "@typescript-eslint/no-invalid-this": "off", // Not recommended to enable this in new TypeScript projects.
+  "@typescript-eslint/no-magic-numbers": "off", // Prefer named constants for meaningful domain values without restricting every numeric literal.
+  "@typescript-eslint/no-redeclare": "off", // Not recommended to enable this in new TypeScript projects.
+  "@typescript-eslint/parameter-properties": "off", // Allow constructor parameter properties.
 } as const;
 
 // Every typescript-eslint rule that works without type information.
 const typescriptRules: Rules = {
-  ...recommendedRules,
-  ...strictRules,
-  ...stylisticRules,
-  ...otherRules,
+  ...recommendedRules, // 17/53 rules, 5 automatically fixable, 6 editor suggestions fixable.
+  ...strictRules, // 7/53 rules, 0 automatically fixable, 2 editor suggestions fixable.
+  ...stylisticRules, // 12/53 rules, 8 automatically fixable, 4 editor suggestions fixable.
+  ...otherRules, // 17/53 rules, 6 automatically fixable, 4 editor suggestions fixable.
 } as const;
 
 export { typescriptRules };

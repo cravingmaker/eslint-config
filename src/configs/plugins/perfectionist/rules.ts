@@ -45,8 +45,8 @@ const commonTsCompositionRuleOptions = {
   ],
 } satisfies RuleOptionOf<"perfectionist/sort-union-types">;
 
-// Policy for eslint-plugin-perfectionist.
 const perfectionistRules: Rules = {
+  // --- Rules with overridden options (22/23) ------------------------------------------------------------------------------------------------------.
   "perfectionist/sort-array-includes": [
     "error",
     {
@@ -59,8 +59,7 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonCollectionRuleOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-arrays": [
     "error",
     {
@@ -73,11 +72,10 @@ const perfectionistRules: Rules = {
 
       ...commonCollectionRuleOptions,
       useConfigurationIf: {
-        matchesAstSelector: "TSAsExpression > ArrayExpression", // Only fires on `[...] as const` — safe to sort
+        matchesAstSelector: "TSAsExpression > ArrayExpression", // Only fires on `[...] as const` — safe to sort.
       },
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-classes": [
     "error",
     {
@@ -95,61 +93,61 @@ const perfectionistRules: Rules = {
       useExperimentalDependencyDetection: true,
 
       customGroups: [
-        // #private static property
+        // #private static property.
         {
           groupName: "hash-private-static-property",
           modifiers: ["private", "static"],
           selector: "property",
         },
-        // #private instance property
+        // #private instance property.
         {
           groupName: "hash-private-property",
           modifiers: ["private"],
           selector: "property",
         },
-        // #private static auto-accessor
+        // #private static auto-accessor.
         {
           groupName: "hash-private-static-accessor",
           modifiers: ["private", "static"],
           selector: "accessor-property",
         },
-        // #private instance auto-accessor
+        // #private instance auto-accessor.
         {
           groupName: "hash-private-accessor",
           modifiers: ["private"],
           selector: "accessor-property",
         },
-        // #private static getter
+        // #private static getter.
         {
           groupName: "hash-private-static-get-method",
           modifiers: ["private", "static"],
           selector: "get-method",
         },
-        // #private instance getter
+        // #private instance getter.
         {
           groupName: "hash-private-get-method",
           modifiers: ["private"],
           selector: "get-method",
         },
-        // #private static setter
+        // #private static setter.
         {
           groupName: "hash-private-static-set-method",
           modifiers: ["private", "static"],
           selector: "set-method",
         },
-        // #private instance setter
+        // #private instance setter.
         {
           groupName: "hash-private-set-method",
           modifiers: ["private"],
           selector: "set-method",
         },
-        // #private static method
+        // #private static method.
         {
           groupName: "hash-private-static-method",
           modifiers: ["private", "static"],
           selector: "method",
         },
-        // #private instance method
+        // #private instance method.
         {
           groupName: "hash-private-method",
           modifiers: ["private"],
@@ -157,119 +155,119 @@ const perfectionistRules: Rules = {
         },
       ],
       groups: [
-        // Static properties
+        // Static properties.
         "public-static-property",
         "protected-static-property",
         "private-static-property",
         "hash-private-static-property",
 
-        // Static initialization
+        // Static initialization.
         "static-block",
 
-        // Instance decorated properties (metadata-bearing, declared first)
+        // Instance decorated properties (metadata-bearing, declared first).
         "public-decorated-property",
         "protected-decorated-property",
         "private-decorated-property",
 
-        // Instance regular properties
+        // Instance regular properties.
         "public-property",
         "protected-property",
         "private-property",
         "hash-private-property",
 
-        // Abstract properties
+        // Abstract properties.
         "public-abstract-property",
         "protected-abstract-property",
 
-        // Structural signatures
+        // Structural signatures.
         "index-signature",
 
-        // Constructors
+        // Constructors.
         "public-constructor",
         "protected-constructor",
         "private-constructor",
 
-        // Static auto-accessors (accessor keyword)
+        // Static auto-accessors (accessor keyword).
         "public-static-accessor-property",
         "protected-static-accessor-property",
         "private-static-accessor-property",
         "hash-private-static-accessor",
 
-        // Static getters
+        // Static getters.
         "public-static-get-method",
         "protected-static-get-method",
         "private-static-get-method",
         "hash-private-static-get-method",
 
-        // Static setters
+        // Static setters.
         "public-static-set-method",
         "protected-static-set-method",
         "private-static-set-method",
         "hash-private-static-set-method",
 
-        // Static methods
+        // Static methods.
         "public-static-method",
         "protected-static-method",
         "private-static-method",
         "hash-private-static-method",
 
-        // Instance decorated auto-accessors
+        // Instance decorated auto-accessors.
         "public-decorated-accessor-property",
         "protected-decorated-accessor-property",
         "private-decorated-accessor-property",
 
-        // Instance regular auto-accessors
+        // Instance regular auto-accessors.
         "public-accessor-property",
         "protected-accessor-property",
         "private-accessor-property",
         "hash-private-accessor",
 
-        // Abstract auto-accessors
+        // Abstract auto-accessors.
         "public-abstract-accessor-property",
         "protected-abstract-accessor-property",
 
-        // Instance decorated getters
+        // Instance decorated getters.
         "public-decorated-get-method",
         "protected-decorated-get-method",
         "private-decorated-get-method",
 
-        // Instance regular getters
+        // Instance regular getters.
         "public-get-method",
         "protected-get-method",
         "private-get-method",
         "hash-private-get-method",
 
-        // Abstract getters
+        // Abstract getters.
         "public-abstract-get-method",
         "protected-abstract-get-method",
 
-        // Instance decorated setters
+        // Instance decorated setters.
         "public-decorated-set-method",
         "protected-decorated-set-method",
         "private-decorated-set-method",
 
-        // Instance regular setters
+        // Instance regular setters.
         "public-set-method",
         "protected-set-method",
         "private-set-method",
         "hash-private-set-method",
 
-        // Abstract setters
+        // Abstract setters.
         "public-abstract-set-method",
         "protected-abstract-set-method",
 
-        // Instance decorated methods
+        // Instance decorated methods.
         "public-decorated-method",
         "protected-decorated-method",
         "private-decorated-method",
 
-        // Instance regular methods
+        // Instance regular methods.
         "public-method",
         "protected-method",
         "private-method",
         "hash-private-method",
 
-        // Abstract methods
+        // Abstract methods.
         "public-abstract-method",
         "protected-abstract-method",
 
@@ -279,8 +277,7 @@ const perfectionistRules: Rules = {
       order: "asc",
       type: "alphabetical",
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-decorators": [
     "error",
     {
@@ -298,8 +295,7 @@ const perfectionistRules: Rules = {
       sortOnProperties: true,
       ...commonOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-enums": [
     "error",
     {
@@ -316,8 +312,7 @@ const perfectionistRules: Rules = {
       ...commonOptions,
       partitionByNewLine: true,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-export-attributes": [
     "error",
     {
@@ -331,8 +326,7 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-exports": [
     "error",
     {
@@ -345,8 +339,7 @@ const perfectionistRules: Rules = {
       partitionByNewLine: false,
       ...commonOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-heritage-clauses": [
     "error",
     {
@@ -360,8 +353,7 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-import-attributes": [
     "error",
     {
@@ -375,8 +367,7 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-imports": [
     "error",
     {
@@ -425,8 +416,7 @@ const perfectionistRules: Rules = {
       internalPattern: ["^~/.*", "^@/.*"],
       newlinesBetween: 1,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-interfaces": [
     "error",
     {
@@ -438,8 +428,7 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonTsShapeRuleOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-intersection-types": [
     "error",
     {
@@ -453,8 +442,7 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonTsCompositionRuleOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-jsx-props": [
     "error",
     {
@@ -473,8 +461,7 @@ const perfectionistRules: Rules = {
       ],
       groups: ["multiline-prop", "prop", "shorthand-prop", "callback"],
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-maps": [
     "error",
     {
@@ -487,8 +474,7 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonCollectionRuleOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-modules": [
     "error",
     {
@@ -527,8 +513,7 @@ const perfectionistRules: Rules = {
       ],
       newlinesBetween: 1,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-named-exports": [
     "error",
     {
@@ -544,8 +529,7 @@ const perfectionistRules: Rules = {
       ...commonOptions,
       groups: ["type-export", "value-export", "unknown"],
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-named-imports": [
     "error",
     {
@@ -560,8 +544,7 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-object-types": [
     "error",
     {
@@ -573,8 +556,7 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonTsShapeRuleOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-objects": [
     "error",
     {
@@ -592,8 +574,7 @@ const perfectionistRules: Rules = {
       useExperimentalDependencyDetection: true,
       ...commonCollectionRuleOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-sets": [
     "error",
     {
@@ -606,13 +587,11 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonCollectionRuleOptions,
     },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-switch-case": [
     "error",
     { alphabet: "", ...commonOptions },
-  ],
-
+  ], // Automatically fixable by the --fix command.
   "perfectionist/sort-union-types": [
     "error",
     {
@@ -625,9 +604,10 @@ const perfectionistRules: Rules = {
       useConfigurationIf: {},
       ...commonTsCompositionRuleOptions,
     },
-  ],
+  ], // Automatically fixable by the --fix command.
 
-  "perfectionist/sort-variable-declarations": "off", // Handled by `one-var`, which allows one declarator per declaration.
+  // --- Turned off rules (1/23) --------------------------------------------------------------------------------------------------------------------.
+  "perfectionist/sort-variable-declarations": "off", // Handled by `one-var`, which allows one declarator per declaration. Automatically fixable by the --fix command.
 } as const;
 
-export { perfectionistRules };
+export { perfectionistRules }; // 23 rules, 23 automatically fixable, 0 editor suggestions fixable.

@@ -31,5 +31,3 @@ const security = (
 };
 
 export { security };
-
-export { securityRules } from "./rules.js";

@@ -1,8 +1,8 @@
-import type { Rules } from "../../../types.js";
+import type { Rules } from "../../../../types.js";
 
-// Currying: https://github.com/eslint-functional/eslint-plugin-functional#rules
+// Currying: https://github.com/eslint-functional/eslint-plugin-functional#rules.
 const curryingRules: Rules = {
-  // Enabled rules.
+  // --- Rules with overridden options (1/1) --------------------------------------------------------------------------------------------------------.
   "functional/functional-parameters": [
     "error",
     {
@@ -22,4 +22,4 @@ const curryingRules: Rules = {
   ],
 } as const;
 
-export { curryingRules };
+export { curryingRules }; // 1 rule, 0 automatically fixable, 0 editor suggestions fixable.

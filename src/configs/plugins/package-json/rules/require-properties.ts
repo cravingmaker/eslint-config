@@ -1,7 +1,7 @@
 import type { Rules } from "../../../../types.js";
 
 const recommendedRules: Rules = {
-  // --- Rules with default options (10/10) ----------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (10/10) ---------------------------------------------------------------------------------------------------------.
   "package-json/require-attribution": [
     "error",
     {
@@ -21,7 +21,7 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (12/31) ----------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (12/31) ---------------------------------------------------------------------------------------------------------.
   "package-json/require-author": ["error", { ignorePrivate: false }], // Automatically fixable by the --fix command.
   "package-json/require-bugs": ["error", { ignorePrivate: true }],
   "package-json/require-devDependencies": ["error", { ignorePrivate: false }],
@@ -38,7 +38,7 @@ const otherRules: Rules = {
   "package-json/require-scripts": ["error", { ignorePrivate: false }],
   "package-json/require-types": ["error", { ignorePrivate: true }],
 
-  // --- Turned off rules (19/31) --------------------------------------------------------------------------------------------------------------------
+  // --- Turned off rules (19/31) -------------------------------------------------------------------------------------------------------------------.
   "package-json/require-bin": "off", // Prefer to be optional.
   "package-json/require-browser": "off", // Prefer to be optional; only relevant to browser-targeted packages.
   "package-json/require-bundleDependencies": "off", // Prefer to be optional.

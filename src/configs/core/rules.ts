@@ -11,15 +11,17 @@ const coreRules: Rules = {
   ...possibleProblemRules, // 59/199 rules, 0 automatically fixable, 10 editor suggestions fixable.
   ...suggestionRules, // 139/199 rules, 37 automatically fixable, 19 editor suggestions fixable.
   ...layoutAndFormattingRules, // 1/199 rules, 1 automatically fixable, 0 editor suggestions fixable.
-};
+} as const;
 
 // Earlier supported ESLint versions can predate a declared option.
 const supportedCoreRules: Rules = Object.fromEntries(
-  Object.entries(coreRules).map(([id, entry]) => [
-    id,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- Read the host rule's schema to preserve the supported ESLint peer range.
-    supportedRuleOptions(entry, builtinRules.get(id)),
-  ]),
+  Object.entries(coreRules).map(([id, entry]) => {
+    return [
+      id,
+      // eslint-disable-next-line @typescript-eslint/no-deprecated -- Read the host rule's schema to preserve the supported ESLint peer range.
+      supportedRuleOptions(entry, builtinRules.get(id)),
+    ];
+  }),
 );
 
 export { coreRules, supportedCoreRules };

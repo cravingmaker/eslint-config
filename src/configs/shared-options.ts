@@ -12,7 +12,7 @@ const dotNotationOptions = {
   allowKeywords: true,
 } satisfies RuleOptionOf<"dot-notation">;
 
-// eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `max-params` rule name
+// eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `max-params` rule name.
 const maxParamsOptions = { max: 4 } as const;
 
 const namingConventionOptions = [
@@ -70,12 +70,12 @@ const noUseBeforeDefineOptions = {
 } as const;
 
 const preferDestructuring1stOptions = {
-  // eslint-disable-next-line @typescript-eslint/naming-convention -- ESLint rule options use PascalCase for AST node names
+  // eslint-disable-next-line @typescript-eslint/naming-convention -- ESLint rule options use PascalCase for AST node names.
   AssignmentExpression: {
     array: false,
     object: false,
   },
-  // eslint-disable-next-line @typescript-eslint/naming-convention -- ESLint rule options use PascalCase for AST node names
+  // eslint-disable-next-line @typescript-eslint/naming-convention -- ESLint rule options use PascalCase for AST node names.
   VariableDeclarator: {
     array: false,
     object: true,

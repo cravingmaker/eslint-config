@@ -1,36 +1,52 @@
-import type { Rules } from "../../../types.js";
+import type { Rules } from "../../../../types.js";
 
-// Best Practice: https://html-eslint.org/docs/rules
+// Best Practice: https://html-eslint.org/docs/rules.
 const recommendedRules: Rules = {
-  // Enabled rules.
-  "@html-eslint/no-duplicate-attrs": "error",
+  // --- Rules with default options (8/9) -----------------------------------------------------------------------------------------------------------.
+  "@html-eslint/no-duplicate-attrs": "error", // Manually fixable by editor suggestions.
   "@html-eslint/no-duplicate-id": "error",
   "@html-eslint/no-duplicate-in-head": "error",
   "@html-eslint/no-obsolete-attrs": "error",
   "@html-eslint/no-obsolete-tags": "error",
+  "@html-eslint/require-doctype": "error", // Automatically fixable by the --fix command.
+  "@html-eslint/require-li-container": "error",
+  "@html-eslint/use-baseline": ["error", { available: "widely" }],
+
+  // --- Rules with overridden options (1/9) --------------------------------------------------------------------------------------------------------.
   "@html-eslint/require-closing-tags": [
     "warn",
     {
       selfClosing: "always",
       selfClosingCustomPatterns: ["-"],
     },
-  ],
-  "@html-eslint/require-doctype": "error",
-  "@html-eslint/require-li-container": "error",
-  "@html-eslint/use-baseline": ["error", { available: "widely" }],
+  ], // Automatically fixable by the --fix command.
 } as const;
 
 const otherRules: Rules = {
-  // Enabled rules.
+  // --- Rules with default options (17/22) ---------------------------------------------------------------------------------------------------------.
   "@html-eslint/css-no-empty-blocks": "error",
-  "@html-eslint/head-order": ["error", { ignores: [] }],
-  "@html-eslint/max-element-depth": ["error", { max: 6 }],
-  "@html-eslint/no-duplicate-class": "error",
+  "@html-eslint/head-order": ["error", { ignores: [] }], // Automatically fixable by the --fix command.
+  "@html-eslint/no-duplicate-class": "error", // Automatically fixable by the --fix command.
   "@html-eslint/no-ineffective-attrs": "error",
   "@html-eslint/no-inline-styles": ["warn", { allowExpressions: false }],
   "@html-eslint/no-invalid-attr-value": ["error", { allow: [] }],
   "@html-eslint/no-invalid-entity": "error",
   "@html-eslint/no-nested-interactive": "error",
+  "@html-eslint/no-script-style-type": "error", // Automatically fixable by the --fix command.
+  "@html-eslint/no-target-blank": "error",
+  "@html-eslint/no-whitespace-only-children": ["error", { tagPatterns: [] }], // Automatically fixable by the --fix command.
+  "@html-eslint/prefer-https": "error",
+  "@html-eslint/require-button-type": "error", // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  "@html-eslint/require-details-summary": "error",
+  "@html-eslint/require-explicit-size": [
+    "error",
+    { allowClass: [], allowId: [] },
+  ],
+  "@html-eslint/require-meta-charset": "error", // Automatically fixable by the --fix command.
+  "@html-eslint/svg-require-viewbox": "error",
+
+  // --- Rules with overridden options (5/22) -------------------------------------------------------------------------------------------------------.
+  "@html-eslint/max-element-depth": ["error", { max: 6 }],
   "@html-eslint/no-restricted-attr-values": [
     "error",
     {
@@ -59,10 +75,6 @@ const otherRules: Rules = {
       tagPatterns: ["^(b|i|s|u)$"],
     },
   ],
-  "@html-eslint/no-script-style-type": "error",
-  "@html-eslint/no-target-blank": "error",
-  "@html-eslint/no-whitespace-only-children": ["error", { tagPatterns: [] }],
-  "@html-eslint/prefer-https": "error",
   "@html-eslint/require-attrs": [
     "error",
     {
@@ -107,20 +119,12 @@ const otherRules: Rules = {
         "Set the type attribute on input fields to ensure predictable user input handling and mobile keyboard behavior.",
       tag: "input",
     },
-  ],
-  "@html-eslint/require-button-type": "error",
-  "@html-eslint/require-details-summary": "error",
-  "@html-eslint/require-explicit-size": [
-    "error",
-    { allowClass: [], allowId: [] },
-  ],
-  "@html-eslint/require-meta-charset": "error",
-  "@html-eslint/svg-require-viewbox": "error",
+  ], // Automatically fixable by the --fix command.
 } as const;
 
 const bestPracticeRules: Rules = {
-  ...recommendedRules,
-  ...otherRules,
+  ...recommendedRules, // 9/31 rules, 2 automatically fixable, 1 editor suggestions fixable.
+  ...otherRules, // 22/31 rules, 7 automatically fixable, 1 editor suggestions fixable.
 } as const;
 
 export { bestPracticeRules };

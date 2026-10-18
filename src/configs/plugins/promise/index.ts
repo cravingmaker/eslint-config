@@ -17,7 +17,7 @@ const promise = (
     {
       name: "@cravingmaker/eslint-config/promise/setup",
       plugins: {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- eslint-plugin-promise does not have types
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- eslint-plugin-promise does not have types.
         promise: pluginPromise,
       },
     },
@@ -34,5 +34,3 @@ const promise = (
 };
 
 export { promise };
-
-export { promiseRules } from "./rules.js";

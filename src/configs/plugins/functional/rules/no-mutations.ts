@@ -1,8 +1,8 @@
-import type { Rules } from "../../../types.js";
+import type { Rules } from "../../../../types.js";
 
-// No Mutations: https://github.com/eslint-functional/eslint-plugin-functional#rules
+// No Mutations: https://github.com/eslint-functional/eslint-plugin-functional#rules.
 const noMutationsRules: Rules = {
-  // Enabled rules.
+  // --- Rules with default options (1/4) -----------------------------------------------------------------------------------------------------------.
   "functional/immutable-data": [
     "error",
     {
@@ -16,6 +16,8 @@ const noMutationsRules: Rules = {
       ignoreNonConstDeclarations: false,
     },
   ],
+
+  // --- Rules with overridden options (3/4) --------------------------------------------------------------------------------------------------------.
   "functional/no-let": [
     "error",
     {
@@ -68,7 +70,7 @@ const noMutationsRules: Rules = {
         enforcement: "ReadonlyShallow",
       },
     },
-  ],
+  ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "functional/type-declaration-immutability": [
     "error",
     {
@@ -120,7 +122,7 @@ const noMutationsRules: Rules = {
         },
       ],
     },
-  ],
+  ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
 } as const;
 
-export { noMutationsRules };
+export { noMutationsRules }; // 4 rules, 2 automatically fixable, 2 editor suggestions fixable.

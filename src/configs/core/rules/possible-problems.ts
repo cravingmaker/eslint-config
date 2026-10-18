@@ -3,7 +3,7 @@ import type { Rules } from "../../../types.js";
 import { noUseBeforeDefineOptions } from "../../shared-options.js";
 
 const recommendedRules: Rules = {
-  // --- Rules with default options (38/47) ----------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (38/47) ---------------------------------------------------------------------------------------------------------.
   "constructor-super": "error",
   "for-direction": "error",
   "no-async-promise-executor": "error",
@@ -68,7 +68,7 @@ const recommendedRules: Rules = {
   ], // Manually fixable by editor suggestions.
   "valid-typeof": ["error", { requireStringLiterals: false }], // Manually fixable by editor suggestions.
 
-  // --- Rules with overridden options (4/47) --------------------------------------------------------------------------------------------------------
+  // --- Rules with overridden options (4/47) -------------------------------------------------------------------------------------------------------.
   "getter-return": [
     "error",
     {
@@ -82,7 +82,7 @@ const recommendedRules: Rules = {
     { disallowArithmeticOperators: true },
   ],
 
-  // --- Turned off rules (5/47) ---------------------------------------------------------------------------------------------------------------------
+  // --- Turned off rules (5/47) --------------------------------------------------------------------------------------------------------------------.
   "no-empty-character-class": "off", // Handled by `regexp/no-empty-character-class`.
   "no-invalid-regexp": "off", // Handled by `regexp/no-invalid-regexp`.
   "no-unexpected-multiline": "off", // Handled by `prettier`.
@@ -91,7 +91,7 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (10/12) ----------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (10/12) ---------------------------------------------------------------------------------------------------------.
   "no-await-in-loop": "error",
   "no-constructor-return": "error",
   "no-inner-declarations": [
@@ -110,7 +110,7 @@ const otherRules: Rules = {
   "no-use-before-define": ["error", { ...noUseBeforeDefineOptions }],
   "require-atomic-updates": ["error", { allowProperties: false }],
 
-  // --- Rules with overridden options (1/12) --------------------------------------------------------------------------------------------------------
+  // --- Rules with overridden options (1/12) -------------------------------------------------------------------------------------------------------.
   "array-callback-return": [
     "error",
     {
@@ -120,9 +120,9 @@ const otherRules: Rules = {
     },
   ], // Manually fixable by editor suggestions.
 
-  // --- Turned off rules (1/12) ---------------------------------------------------------------------------------------------------------------------
+  // --- Turned off rules (1/12) --------------------------------------------------------------------------------------------------------------------.
   "no-duplicate-imports": "off", // Handled by `import-x/no-duplicates`.
-};
+} as const;
 
 const possibleProblemRules: Rules = {
   ...recommendedRules, // 47/59 rules, 0 automatically fixable, 8 editor suggestions fixable.

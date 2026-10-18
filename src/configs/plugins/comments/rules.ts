@@ -1,12 +1,11 @@
 import type { Rules } from "../../../types.js";
 
-import { bestPracticesRules } from "./best-practices.js";
-import { stylisticIssuesRules } from "./stylistic-issues.js";
+import { bestPracticesRules } from "./rules/best-practices.js";
+import { stylisticIssuesRules } from "./rules/stylistic-issues.js";
 
-// Explicit policy grouped by the upstream rule categories.
 const commentsRules: Rules = {
-  ...bestPracticesRules,
-  ...stylisticIssuesRules,
+  ...bestPracticesRules, // 5/8 rules, 0 automatically fixable, 0 editor suggestions fixable.
+  ...stylisticIssuesRules, // 3/8 rules, 0 automatically fixable, 0 editor suggestions fixable.
 } as const;
 
 export { commentsRules };

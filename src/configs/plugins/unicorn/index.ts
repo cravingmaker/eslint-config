@@ -31,5 +31,3 @@ const unicorn = (
 };
 
 export { unicorn };
-
-export { unicornRules } from "./rules.js";

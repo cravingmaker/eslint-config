@@ -1,7 +1,7 @@
 import type { Rules } from "../../../../types.js";
 
 const validPropertiesRules: Rules = {
-  // --- Rules with default options (41/41) ----------------------------------------------------------------------------------------------------------
+  // --- Rules with default options (41/41) ---------------------------------------------------------------------------------------------------------.
   "package-json/valid-author": "error", // Automatically fixable by the --fix command.
   "package-json/valid-bin": "error",
   "package-json/valid-browser": "error",
