@@ -1,6 +1,6 @@
 # @cravingmaker/eslint-config
 
-A shareable ESLint flat config, published to npm as an ESM-only package. The public API is `createConfig()` in `src/index.ts`.
+A TypeScript-first, shareable ESLint flat config, published to npm as an ESM-only package. By default it lints TypeScript files with type information and expects the strict tsconfig that the README names. The public API is `createConfig()` in `src/index.ts`.
 
 ## Commands
 

@@ -16,6 +16,7 @@ const arraySchemaOf = (rule: unknown): readonly unknown[] | undefined => {
   ) {
     return rule.meta.schema;
   }
+  return;
 };
 // Scalar/object unions can wrap the properties that an older peer supports.
 // Multiple object forms stay unchanged so ESLint can validate the selected form.

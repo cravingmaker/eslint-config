@@ -131,8 +131,8 @@ describe("createConfig", () => {
   });
 
   // Users look a block up by its name, as an example in the README does. The project declares no
-  // framework, so its defaults leave out the blocks that a framework, typed linting, an owner with
-  // files of its own, or a replaced rule in `overridesTypeAware` adds.
+  // framework, so its defaults leave out the blocks that a framework, an owner with files of its
+  // own, or a replaced rule in `overridesTypeAware` adds. Typed linting is on by default.
   it("names the blocks in a fixed order", async () => {
     const projectRootDirectory = await createProject("block-names", []);
     const [defaults, every] = await Promise.all([
@@ -147,7 +147,6 @@ describe("createConfig", () => {
         typescript: {
           ...baseOptions.typescript,
           overridesTypeAware: { "@typescript-eslint/no-unused-vars": "error" },
-          typeChecked: true,
         },
       }),
     ]);
@@ -209,15 +208,10 @@ describe("createConfig", () => {
     const optionalNames: ReadonlySet<string> = new Set([
       "exceptions/svelte-components",
       "express/rules",
-      "functional/rules-type-aware",
-      "node/rules-type-aware",
       "react/hooks",
       "react/html",
       "react/refresh",
-      "sonarjs/rules-type-aware",
       "svelte/rules",
-      "typescript/parser-type-aware",
-      "typescript/rules-type-aware",
     ]);
 
     expect(

@@ -132,7 +132,7 @@ describe("createContext", () => {
 
     expect(context.projectRootDirectory).toBe(process.cwd());
     expect(context.tsconfigRootDir).toBe(process.cwd());
-    expect(context.typeAware).toBeUndefined();
+    expect(context.typeAware).toEqual([[...typescriptFiles, "!**/*.svelte"]]);
   });
 });
 

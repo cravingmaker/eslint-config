@@ -13,8 +13,9 @@ const typedContext: Context = {
   ...defaultContext,
   typeAware: [[...typescriptFiles, "!**/*.d.ts"]],
 };
+const untypedContext: Context = { ...defaultContext, typeAware: undefined };
 const svelteContext: Context = {
-  ...defaultContext,
+  ...untypedContext,
   svelteComponents: [["**/*.svelte", "!**/generated/**"]],
 };
 
@@ -42,7 +43,7 @@ const getSeverity = async (
 describe("node feature", () => {
   it("turns n/no-sync off in TypeScript files without type information", async () => {
     const untyped = new ESLint({
-      overrideConfig: node(),
+      overrideConfig: node({}, untypedContext),
       overrideConfigFile: true,
     });
     const typed = new ESLint({

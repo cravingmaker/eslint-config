@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
+    "allowUnreachableCode": false,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "noImplicitReturns": true,
     "outDir": "dist",
     "skipLibCheck": true,
     "strict": true,

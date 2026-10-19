@@ -55,6 +55,8 @@ Two lists remain. What the audits noticed and no step covers is under ["Not plan
 | Rule option typing           | Generated with `eslint-typegen` into `src/typegen.d.ts`, which is not committed                                                    |
 | Formatting                   | Prettier runs separately. Layout rules are off in the rule maps, and `tests/policy/formatter.test.ts` guards them                  |
 | Scope anchoring              | No `basePath`. `projectRootDirectory` decides the manifest, the tsconfig directory, and the import resolver                        |
+| TypeScript first             | Typed linting is on by default, with typescript-eslint's strict rules. `typescript.typeChecked: false` turns it off                |
+| Compiler options             | The README asks for `strict`, `noImplicitReturns`, and `allowUnreachableCode: false`, and the compiler owns those checks           |
 
 ## Documented limits
 
@@ -83,7 +85,7 @@ The audit follow-up did not settle this, and changed two things around it. Since
 
 ### Found, not changed
 
-- **Typed linting reports every React component.** `@typescript-eslint/naming-convention` allows only camelCase for functions and variables, so a component in a `.tsx` file is reported. `functional/no-return-void` reports event handlers and effects that call a state setter, and `functional/functional-parameters` reports a handler written inline in JSX, because its `ignoreLambdaExpression` exempts only call arguments. Without React's types, which React does not ship, every value from React is an error type besides. The React fixtures are therefore linted without type information.
+- **Typed linting reports every React component.** `@typescript-eslint/naming-convention` allows only camelCase for functions and variables, so a component in a `.tsx` file is reported. `functional/no-return-void` reports event handlers and effects that call a state setter, and `functional/functional-parameters` reports a handler written inline in JSX, because its `ignoreLambdaExpression` exempts only call arguments. Without React's types, which React does not ship, every value from React is an error type besides. The React fixtures are therefore linted without type information. Since typed linting became the default on 19 October 2026, a React project with TypeScript files meets this without setting any option.
 - **No manifest without peer dependencies passes.** `package-json/require-peerDependenciesMeta` requires the field, and `package-json/no-empty-fields` reports it when it is empty, so only a package with peer dependencies can have a clean `package.json`. `require-author`, `require-devDependencies`, `require-devEngines`, and `require-scripts` apply to private packages as well. JSON has no disable comments, so an application's manifest cannot pass.
 - **A bracketed URL stops the run.** In a Markdown file, a URL or email address in square brackets, such as `[https://example.com]`, makes five rules of `@eslint/markdown` 8.0.3 throw "Custom getLoc() method must be implemented in the subclass": `no-bare-urls`, `no-invalid-label-refs`, `no-missing-label-refs`, `no-reference-like-urls`, and `no-space-in-emphasis`. ESLint stops for every file. The choices are an upstream fix or turning the five rules off.
 - **Self-closing custom elements.** `@html-eslint/require-closing-tags` has `selfClosing: "always"` and `selfClosingCustomPatterns: ["-"]`, so in an HTML file it fixes `<my-element></my-element>` to `<my-element />`. HTML ignores that slash on elements that are not void, so a browser nests the content that follows inside the custom element. `selfClosingCustomPatterns: []` keeps explicit end tags. Prettier keeps either form.
@@ -114,3 +116,20 @@ overlap/fallback blocks were removed in favor of explicit disabled alternatives
 in their owning maps. Turning a winning feature off no longer revives another
 rule. Disabled rules no longer need explicit option defaults. Tests, fixtures,
 snapshots, and repository code follow the revised core policy.
+
+## TypeScript first — 19 October 2026
+
+The config became TypeScript first. `typescript.typeChecked` defaults to `true`, so
+TypeScript files get the rules that need type information unless a project turns typed linting
+off. Apart from `no-useless-return`, below, the policy did not change: with typed linting on,
+the effective rules of each TypeScript file are those that `typeChecked: true` gave before. The
+effective-policy snapshots record the default with type information, and an `untyped` scenario
+replaces the `type-checked` one.
+
+The README now names the tsconfig that the policy expects. TypeScript 6 turns `strict` on by
+default, but earlier versions do not, so the README asks for it explicitly, with
+`noImplicitReturns` and `allowUnreachableCode: false`, which the rule maps already relied on for
+`@typescript-eslint/consistent-return`, `sonarjs/no-inconsistent-returns`, and
+`no-unreachable`. This repository's tsconfigs set the same options. `noImplicitReturns` requires
+a `return;` that `no-useless-return` removes, so the maintainer turned `no-useless-return` off in
+TypeScript files and Svelte components, where the compiler owns return statements.

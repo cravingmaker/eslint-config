@@ -242,7 +242,7 @@ const otherTypeAwareRules: Rules = {
   ], // Manually fixable by editor suggestions.
 
   // --- Turned off rules (2/11) --------------------------------------------------------------------------------------------------------------------.
-  "@typescript-eslint/consistent-return": "off", // It's recommended to use tsconfig's noImplicitReturns option rather than this rule.
+  "@typescript-eslint/consistent-return": "off", // Handled by the TypeScript compiler (`ts(7030)`) with `noImplicitReturns`.
   "@typescript-eslint/prefer-readonly-parameter-types": "off", // Handled by `functional/prefer-immutable-types`.
 } as const;
 

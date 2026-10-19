@@ -18,6 +18,7 @@ const typedContext: Context = {
   tsconfigRootDir: "/project",
   typeAware: ["**/*.ts"],
 };
+const untypedContext: Context = { ...defaultContext, typeAware: undefined };
 
 const getEffectiveConfig = async (
   eslint: ESLint,
@@ -29,7 +30,7 @@ const getEffectiveConfig = async (
 };
 
 describe("typescript feature", () => {
-  it("parses TypeScript files in a parser block and sets its rules in a rules block", async () => {
+  it("parses TypeScript files in a parser block and sets its rules in a rules block, with type information by default", async () => {
     const configs = await typescript();
 
     expect(
@@ -38,7 +39,9 @@ describe("typescript feature", () => {
       }),
     ).toEqual([
       "@cravingmaker/eslint-config/typescript/parser",
+      "@cravingmaker/eslint-config/typescript/parser-type-aware",
       "@cravingmaker/eslint-config/typescript/rules",
+      "@cravingmaker/eslint-config/typescript/rules-type-aware",
     ]);
     expect(Object.keys(configs[0]?.plugins ?? {})).toEqual([
       "@typescript-eslint",
@@ -47,7 +50,7 @@ describe("typescript feature", () => {
 
   it("turns off the rules that need type information without it", async () => {
     const eslint = new ESLint({
-      overrideConfig: await typescript(),
+      overrideConfig: await typescript({}, untypedContext),
       overrideConfigFile: true,
     });
     const config = await getEffectiveConfig(eslint, "src/example.ts");
@@ -123,11 +126,14 @@ describe("typescript feature", () => {
 
   it("keeps files, ignores, and overrides local to the feature", async () => {
     const eslint = new ESLint({
-      overrideConfig: await typescript({
-        files: ["app/**/*.ts"],
-        ignores: ["**/*.generated.ts"],
-        overrides: { "@typescript-eslint/no-explicit-any": "off" },
-      }),
+      overrideConfig: await typescript(
+        {
+          files: ["app/**/*.ts"],
+          ignores: ["**/*.generated.ts"],
+          overrides: { "@typescript-eslint/no-explicit-any": "off" },
+        },
+        untypedContext,
+      ),
       overrideConfigFile: true,
     });
     const [included, excluded, outside] = await Promise.all([
@@ -147,7 +153,7 @@ describe("typescript feature", () => {
     const eslint = new ESLint({
       overrideConfig: await typescript(
         { files: ["app/**"] },
-        { ...defaultContext, svelteComponents: ["**/*.svelte"] },
+        { ...untypedContext, svelteComponents: ["**/*.svelte"] },
       ),
       overrideConfigFile: true,
     });
@@ -251,9 +257,10 @@ describe("typescript feature", () => {
 
   it("does not apply such an override without typed linting", async () => {
     const eslint = new ESLint({
-      overrideConfig: await typescript({
-        overrides: { "@typescript-eslint/no-floating-promises": "warn" },
-      }),
+      overrideConfig: await typescript(
+        { overrides: { "@typescript-eslint/no-floating-promises": "warn" } },
+        untypedContext,
+      ),
       overrideConfigFile: true,
     });
     const config = await getEffectiveConfig(eslint, "src/example.ts");

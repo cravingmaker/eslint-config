@@ -14,6 +14,7 @@ const typedContext: Context = {
   ...defaultContext,
   typeAware: [[...typescriptFiles, "!**/*.d.ts"]],
 };
+const untypedContext: Context = { ...defaultContext, typeAware: undefined };
 const tsOptions = {
   filePath: "tests/utilities.ts",
   tsTypeChecked: true,
@@ -46,9 +47,9 @@ const getReadonlyTypeSeverity = async (
 };
 
 describe("functional feature", () => {
-  it("turns off the rules that need type information", async () => {
+  it("turns off the rules that need type information without typed linting", async () => {
     const eslint = new ESLint({
-      overrideConfig: functional(),
+      overrideConfig: functional({}, untypedContext),
       overrideConfigFile: true,
     });
     const rules = await getRules(eslint, "src/example.ts");
@@ -141,11 +142,14 @@ describe("functional feature", () => {
 
   it("does not apply such an override without typed linting", async () => {
     const eslint = new ESLint({
-      overrideConfig: functional({
-        overrides: {
-          "functional/prefer-immutable-types": ["error", deepParameters],
+      overrideConfig: functional(
+        {
+          overrides: {
+            "functional/prefer-immutable-types": ["error", deepParameters],
+          },
         },
-      }),
+        untypedContext,
+      ),
       overrideConfigFile: true,
     });
     const rules = await Promise.all([

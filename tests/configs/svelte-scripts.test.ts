@@ -224,8 +224,11 @@ const withoutRules = (
 };
 
 describe("svelte scripts", () => {
-  it("get the rules of TypeScript sources, apart from the rules that components break", async () => {
-    const eslint = await createEslint(baseOptions);
+  it("get the rules of TypeScript sources without typed linting, apart from the rules that components break", async () => {
+    const eslint = await createEslint({
+      ...baseOptions,
+      typescript: { ...baseOptions.typescript, typeChecked: false },
+    });
     const [component, source] = await Promise.all([
       getEffectiveConfig(eslint, "src/Component.svelte"),
       getEffectiveConfig(eslint, "src/example.ts"),

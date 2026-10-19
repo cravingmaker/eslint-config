@@ -23,7 +23,7 @@ import {
 const typeAwareRuleIds = Object.keys(typescriptTypeAwareRulesOff);
 
 /**
-Builds the flat config for TypeScript files and Svelte components, whose scripts svelte-eslint-parser hands to the typescript-eslint parser whatever their language: the parser, the core rules that the compiler checks or that extension rules replace, and the typescript-eslint rules. The rules that need type information are off. With typed linting on, the parser reads type information in the type-aware scope, which leaves out Svelte components, and those rules are on there in a separate block. An override that turns such a rule on applies in that block only.
+Builds the flat config for TypeScript files and Svelte components, whose scripts svelte-eslint-parser hands to the typescript-eslint parser whatever their language: the parser, the core rules that the compiler checks or that extension rules replace, and the typescript-eslint rules. The rules that need type information are off there. Typed linting is on by default: the parser then reads type information in the type-aware scope, which leaves out Svelte components, and those rules are on there in a separate block. An override that turns such a rule on applies in that block only.
 */
 const typescript = async (
   options: TypeScriptOptions = {},

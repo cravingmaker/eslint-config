@@ -1,6 +1,8 @@
 # @cravingmaker/eslint-config
 
-Craving Maker's opinionated ESLint configuration. One call, `createConfig()`, returns a flat config that lints the JavaScript, TypeScript, React, Svelte, Express, HTML, JSON, `package.json`, and Markdown files of an ES module project.
+Craving Maker's opinionated, TypeScript-first ESLint configuration. One call, `createConfig()`, returns a flat config that lints the TypeScript, JavaScript, React, Svelte, Express, HTML, JSON, `package.json`, and Markdown files of an ES module project.
+
+TypeScript first means that the defaults are made for TypeScript projects in strict mode. TypeScript files get typescript-eslint's strict and stylistic rules with type information, which typescript-eslint reads through the project's `tsconfig.json`, and the config expects that tsconfig to turn on `strict` (see [TypeScript](#typescript)).
 
 The policy is strict. Every current non-deprecated rule has an explicit enabled or disabled setting, with its options declared in the owning rule map. New upstream rules stay unconfigured until the policy is reviewed. Formatting is left to Prettier. Each part of the config is a feature that you can turn off, limit to some files, or adjust with rule overrides.
 
@@ -28,6 +30,7 @@ The [coding principles](https://github.com/cravingmaker/eslint-config/blob/main/
 
 - Node.js 24.15.0 or later.
 - ESLint 10.4.0 or later, below 11.
+- For TypeScript files, a `tsconfig.json` that includes them, with the compiler options in [tsconfig](#tsconfig).
 - TypeScript `>=4.8.4 <6.1.0`, the peer range of the installed typescript-eslint. npm installs a version in that range when the project has none. TypeScript 7 is not supported yet: npm can install it with an `ERESOLVE overriding peer dependency` warning, but ESLint then stops while loading the config, before linting any file, with `TypeError: Cannot read properties of undefined (reading 'Intrinsic')` from ts-api-utils.
 - ES modules. The package is ESM-only, so the config file must be an ES module: `eslint.config.js` in a package with `"type": "module"`, or `eslint.config.mjs`. JavaScript and TypeScript files are linted as ES modules, and CommonJS files get no rules (see [CommonJS](#commonjs)).
 
@@ -61,7 +64,7 @@ npx eslint .
 
 `createConfig()` returns a promise of a flat config array, which ESLint accepts as the default export. With `// @ts-check`, an editor checks the options against the types of this package, including the options of each rule.
 
-Every feature is on by default, apart from React, Svelte, and Express, which turn on when the `package.json` of the project declares them (see [Automatic detection](#automatic-detection)).
+Every feature is on by default, apart from React, Svelte, and Express, which turn on when the `package.json` of the project declares them (see [Automatic detection](#automatic-detection)). TypeScript files are linted with type information by default (see [Typed linting](#typed-linting)).
 
 For binary data, use `Uint8Array`. The defaults report the `Buffer` global, imports from `buffer` and `node:buffer`, and TypeScript `Buffer` types with "Use Uint8Array instead." Type annotations offer an editor suggestion to use `Uint8Array`.
 
@@ -86,7 +89,7 @@ export default createConfig({
 | `environments`                                                                                                                                    | `[]`            | Runtimes whose globals are defined in JavaScript, TypeScript, and Svelte files, named as in the [globals](https://www.npmjs.com/package/globals) package: `"browser"`, `"node"`, and so on. |
 | `globals`                                                                                                                                         | `{}`            | More globals, or changes to those of `environments`, such as `{ MY_GLOBAL: "readonly" }`.                                                                                                   |
 | `javascript`                                                                                                                                      | `{}`            | ESLint's core rules. Always on, so it takes only an object.                                                                                                                                 |
-| `typescript`                                                                                                                                      | `true`          | typescript-eslint, with the options in [TypeScript](#typescript).                                                                                                                           |
+| `typescript`                                                                                                                                      | `true`          | typescript-eslint, with type information by default and the options in [TypeScript](#typescript).                                                                                           |
 | `comments`, `node`, `security`, `sonarjs`, `imports`, `unusedImports`, `promise`, `regexp`, `unicorn`, `functional`, `perfectionist`, `stylistic` | `true`          | Code-quality and style plugins for JavaScript and TypeScript.                                                                                                                               |
 | `html`, `json`, `packageJson`, `markdown`                                                                                                         | `true`          | File formats. `json` also takes `overridesJsonc` and `overridesJson5`.                                                                                                                      |
 | `react`, `svelte`, `express`                                                                                                                      | `"auto"`        | Frameworks, described in [Frameworks](#frameworks).                                                                                                                                         |
@@ -153,7 +156,7 @@ A source is a JavaScript or TypeScript file: `**/*.{js,mjs,jsx,mjsx,ts,mts,tsx,m
 | `packageJson`   | [eslint-plugin-package-json](https://www.npmjs.com/package/eslint-plugin-package-json), [eslint-enforce-package-type](https://www.npmjs.com/package/eslint-enforce-package-type)                                                                                                   | `**/package.json`                                                      |
 | `markdown`      | [@eslint/markdown](https://www.npmjs.com/package/@eslint/markdown)                                                                                                                                                                                                                 | `**/*.md`, as GitHub Flavored Markdown with YAML front matter and math |
 
-SonarJS adds control-flow, security, accessibility, and test checks. Every exported rule has an explicit setting, including deprecated rules as `off`. Disabled overlaps name their owner in the policy. SonarJS owns duplicate-branch checks across conditionals and switches; the overlapping Unicorn rule is off. Checks that need human review, such as complexity thresholds and suspected hardcoded secrets, warn. Rules that require type information run only when `typescript.typeChecked` is on, within its scope and the SonarJS feature's own `files` and `ignores`.
+SonarJS adds control-flow, security, accessibility, and test checks. Every exported rule has an explicit setting, including deprecated rules as `off`. Disabled overlaps name their owner in the policy. SonarJS owns duplicate-branch checks across conditionals and switches; the overlapping Unicorn rule is off. Checks that need human review, such as complexity thresholds and suspected hardcoded secrets, warn. Rules that require type information run with [typed linting](#typed-linting), which is on by default, within its scope and the SonarJS feature's own `files` and `ignores`.
 
 The `packageJson` feature requires `type: "module"`. A package with `exports` or `publishConfig.exports` must also expose `"./package.json": "./package.json"`; use `packageJson.overrides` to change these rules.
 
@@ -235,7 +238,7 @@ export default createConfig({
 });
 ```
 
-The feature has no rules for JSX itself, such as those of eslint-plugin-react, and none for accessibility, such as those of eslint-plugin-jsx-a11y; add them with a [user config](#user-configs). Typed linting reports React components, as described in [Known issues](#known-issues).
+The feature has no rules for JSX itself, such as those of eslint-plugin-react, and none for accessibility, such as those of eslint-plugin-jsx-a11y; add them with a [user config](#user-configs). Typed linting, which is on by default, reports React components, as described in [Known issues](#known-issues).
 
 ### Svelte
 
@@ -263,11 +266,11 @@ The `express` feature turns on nine rules of eslint-plugin-express-security, suc
 
 ## TypeScript
 
-TypeScript files are parsed by typescript-eslint. By default, the parser reads no type information, and the rules that need it are off.
+The config is TypeScript first. typescript-eslint parses TypeScript files, and its strict and stylistic rules apply to them, including the rules that need type information: [typed linting](#typed-linting) is on by default.
 
 | Option               | Default                  | Description                                                                                                                                                                                           |
 | -------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `typeChecked`        | `false`                  | Lint with type information.                                                                                                                                                                           |
+| `typeChecked`        | `true`                   | Lint with type information. `false` turns typed linting off.                                                                                                                                          |
 | `filesTypeAware`     | The files of the feature | Files that the parser reads with type information and that get the rules that need it. They match only the TypeScript files that the feature lints, so a directory such as `src/**` is enough.        |
 | `ignoresTypeAware`   | `[]`                     | Files to lint without type information, such as scripts that no tsconfig includes.                                                                                                                    |
 | `overridesTypeAware` | `{}`                     | Rule settings for the files that typed linting covers, applied after the rules that need type information and after `overrides`.                                                                      |
@@ -275,19 +278,28 @@ TypeScript files are parsed by typescript-eslint. By default, the parser reads n
 
 `files`, `ignores`, and `overrides` work as for every feature.
 
-### Typed linting
+### tsconfig
 
-```js
-import { createConfig } from "@cravingmaker/eslint-config";
+Typed linting reads the type information of each TypeScript file through the nearest `tsconfig.json`, which must include the file. The policy expects strict mode, and it leaves some checks to the compiler. Set these compiler options in that tsconfig explicitly, next to the options of your project, whatever the defaults of your TypeScript version:
 
-export default createConfig({
-  typescript: {
-    typeChecked: true,
-  },
-});
+```json
+{
+  "compilerOptions": {
+    "allowUnreachableCode": false,
+    "noImplicitReturns": true,
+    "strict": true
+  }
+}
 ```
 
-With `typeChecked: true`, typescript-eslint's project service reads the type information of each TypeScript file through the nearest `tsconfig.json`, and the rules of the `typescript`, `functional`, `node`, and `sonarjs` features that need type information turn on in the same files. A file that no tsconfig includes then fails with a parsing error that says it "was not found by the project service". Leave such files out of typed linting with `ignoresTypeAware`, or limit typed linting to your sources with `filesTypeAware`:
+- `strict` includes `strictNullChecks`, which five rules need. Without it, `@typescript-eslint/no-unnecessary-boolean-literal-compare`, `no-unnecessary-condition`, `no-useless-default-assignment`, `prefer-nullish-coalescing`, and `strict-boolean-expressions` report "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly." in every file. TypeScript 6 turns `strict` on by default; earlier versions do not.
+- `noImplicitReturns` and `allowUnreachableCode: false` make the compiler report a missing return value and unreachable code. In TypeScript files, the config leaves these checks to the compiler: `@typescript-eslint/consistent-return`, `sonarjs/no-inconsistent-returns`, and `no-unreachable` are off there. So is `no-useless-return`, because `noImplicitReturns` requires the `return;` that it would remove.
+
+The core rules whose checks the compiler makes in any case, such as `no-undef`, are off in TypeScript files as well. ESLint does not report the errors of the compiler, so run `tsc --noEmit` too, for example in CI.
+
+### Typed linting
+
+Typed linting is on by default. typescript-eslint's project service reads the type information of each TypeScript file through the nearest `tsconfig.json`, and the rules of the `typescript`, `functional`, `node`, and `sonarjs` features that need type information turn on in the same files. A file that no tsconfig includes fails with a parsing error that says it "was not found by the project service". Leave such files out of typed linting with `ignoresTypeAware`, or limit typed linting to your sources with `filesTypeAware`:
 
 ```js
 import { createConfig } from "@cravingmaker/eslint-config";
@@ -297,12 +309,21 @@ export default createConfig({
     // Linted without type information, because no tsconfig includes them
     ignoresTypeAware: ["scripts/**"],
     tsconfigRootDir: import.meta.dirname,
-    typeChecked: true,
   },
 });
 ```
 
 `filesTypeAware` and `ignoresTypeAware` decide both where the parser reads type information and where the rules that need it apply, so no such rule runs without it. JavaScript files never get type information, and neither do Svelte components.
+
+`typeChecked: false` turns typed linting off, for a project without a tsconfig, for example. TypeScript files then get the rules that work without type information, and the rules that need it are off:
+
+```js
+import { createConfig } from "@cravingmaker/eslint-config";
+
+export default createConfig({
+  typescript: { typeChecked: false },
+});
+```
 
 ## Formatting with Prettier
 
@@ -381,7 +402,8 @@ when enabling one. Type-aware overrides still apply only in the typed scope.
 TypeScript compiler checks and extension rules keep their language-specific
 ownership in the TypeScript rule maps. These entries apply only in TypeScript
 files and Svelte scripts, and typed replacements only where type information
-is available.
+is available. The compiler makes its checks with the options in
+[tsconfig](#tsconfig).
 
 ## File-role exceptions
 
@@ -461,7 +483,6 @@ export default createConfig({
   react: { files: ["apps/web/**"] },
   typescript: {
     filesTypeAware: ["packages/api/**"],
-    typeChecked: true,
   },
 });
 ```
@@ -493,7 +514,7 @@ CommonJS is not supported, and `.cjs` and `.cts` files get no rules:
 These are open, and each needs a decision in this package or a fix upstream:
 
 - **TypeScript files that the TypeScript feature leaves out do not parse.** The JavaScript and code-quality features still lint them, but only the TypeScript feature sets a parser that reads TypeScript. With `typescript: false`, and for a file outside `typescript.files` or in `typescript.ignores`, ESLint reports `Parsing error: Unexpected token :`. Keep the TypeScript feature on for every TypeScript file that ESLint lints, and leave other TypeScript files out with the global `ignores`.
-- **Typed linting reports React components.** `@typescript-eslint/naming-convention` allows only camelCase function names, `functional/no-return-void` reports event handlers and effects that call a state setter, and `functional/functional-parameters` reports handlers written inline in JSX. Leave React files out of typed linting with `ignoresTypeAware`.
+- **Typed linting reports React components.** Typed linting is on by default, and in React code, `@typescript-eslint/naming-convention` allows only camelCase function names, `functional/no-return-void` reports event handlers and effects that call a state setter, and `functional/functional-parameters` reports handlers written inline in JSX. Leave React files out of typed linting with `ignoresTypeAware`.
 - **An application's `package.json` cannot pass.** `package-json/require-peerDependenciesMeta` requires a field that only packages with peer dependencies have, and `require-author`, `require-devDependencies`, `require-devEngines`, and `require-scripts` apply to private packages as well. JSON has no disable comments, so turn such rules off with `packageJson.overrides`.
 - **A URL in square brackets stops the run.** In a Markdown file, a URL or email address in square brackets, such as `[https://example.com]`, makes five rules of @eslint/markdown 8.0.3 throw "Custom getLoc() method must be implemented in the subclass", and ESLint stops. The rules are `no-bare-urls`, `no-invalid-label-refs`, `no-missing-label-refs`, `no-reference-like-urls`, and `no-space-in-emphasis`.
 - **Custom elements become self-closing in HTML files.** `@html-eslint/require-closing-tags` fixes `<my-element></my-element>` to `<my-element />`, which browsers read as a start tag without an end. Keep explicit end tags with `html: { overrides: { "@html-eslint/require-closing-tags": ["warn", { selfClosing: "always", selfClosingCustomPatterns: [] }] } }`.
@@ -510,7 +531,7 @@ This version changes the options of 0.1.0 and several defaults. A lint run that 
 
 | 0.1.0                                                        | Now                                                                                                        |
 | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| `tsTypeChecked`                                              | `typescript.typeChecked`                                                                                   |
+| `tsTypeChecked`                                              | `typescript.typeChecked`, which is now `true` by default                                                   |
 | `tsconfigRootDir`                                            | `typescript.tsconfigRootDir`                                                                               |
 | `reactRefreshVariant`                                        | `react.refresh`                                                                                            |
 | `rules.js`                                                   | `javascript.overrides` for core rules, and the `overrides` of each plugin's feature for the plugin's rules |
@@ -554,7 +575,6 @@ export default createConfig({
   react: { refresh: "vite" },
   typescript: {
     overrides: { "@typescript-eslint/no-explicit-any": "off" },
-    typeChecked: true,
   },
   unicorn: { overrides: { "unicorn/no-null": "off" } },
 });
@@ -562,6 +582,8 @@ export default createConfig({
 
 ### Behavior
 
+- **Typed linting.** In 0.1.0, `tsTypeChecked` was `false` by default. Now typed linting is on by default, so each TypeScript file that ESLint lints needs a tsconfig that includes it, with the compiler options in [tsconfig](#tsconfig). `typescript: { typeChecked: false }` turns it off, as in 0.1.0.
+- **Return statements.** `no-useless-return` is off in TypeScript files and Svelte components, where the compiler option `noImplicitReturns` requires the `return;` that it would remove.
 - **CommonJS.** 0.1.0 linted `.cjs` and `.cts` files as CommonJS with the full policy, although `import-x/no-commonjs` reported `require` and `module.exports` in them. Now they get no rules, as described in [CommonJS](#commonjs).
 - **Framework detection.** In 0.1.0, a framework's rules were added when its plugins were installed: each React part when its own plugin was, Svelte when both of its packages were, and Express when its plugin was. Now the `package.json` in `projectRootDirectory` must declare `react`, `svelte`, or `express`. A project that installs the plugins without declaring the framework, such as a monorepo root, sets the feature to `true`, or points `projectRootDirectory` at the package that declares it.
 - **Missing peers.** In 0.1.0, a missing React plugin left out only its own rules. Now a framework that is on fails with an install message when a package that it needs is missing: `react` needs both of its plugins, and the React Refresh plugin unless `refresh` is `false` or resolves to off.

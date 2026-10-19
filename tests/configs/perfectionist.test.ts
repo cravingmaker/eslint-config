@@ -36,7 +36,9 @@ describe("perfectionist rules", () => {
       fix: (message) => {
         return message.ruleId === "perfectionist/sort-imports";
       },
-      overrideConfig: await createConfig(),
+      overrideConfig: await createConfig({
+        typescript: { typeChecked: false },
+      }),
       overrideConfigFile: true,
     });
     const [result] = await eslint.lintText(code, {

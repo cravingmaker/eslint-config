@@ -9,7 +9,10 @@ describe("core suggestion rules", () => {
     "no-restricted-globals: directs Buffer users to Uint8Array in %s",
     async (filePath) => {
       const eslint = new ESLint({
-        overrideConfig: await createConfig({ environments: ["node"] }),
+        overrideConfig: await createConfig({
+          environments: ["node"],
+          typescript: { typeChecked: false },
+        }),
         overrideConfigFile: true,
       });
       const results = await eslint.lintText(

@@ -9,7 +9,7 @@ const characters = [
   { codePoint: 0xff_a0, escaped: String.raw`\uFFA0`, name: "U+FFA0" },
 ];
 const eslint = new ESLint({
-  overrideConfig: await createConfig(),
+  overrideConfig: await createConfig({ typescript: { typeChecked: false } }),
   overrideConfigFile: true,
 });
 

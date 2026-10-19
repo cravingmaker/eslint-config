@@ -49,7 +49,7 @@ The type-aware-scope suite limits typed linting to `src/` without
 records a file outside `filesTypeAware`, one in `ignoresTypeAware`, and one in
 `typescript.ignores`.
 
-The type-checked suite also records a Svelte component, which typed linting leaves out of the type-aware scope.
+Typed linting is on by default, so the default suite records the TypeScript files with type information, and the Svelte component that typed linting leaves out of the type-aware scope. The untyped suite turns it off.
 
 The React Refresh scenarios record only the `react-refresh/` rules, with each
 variant.
@@ -93,6 +93,7 @@ const suites = [
       "src/example.ts",
       "src/example.cts",
       "src/example.tsx",
+      "src/example.test.ts",
       "eslint.config.js",
       "src/Component.svelte",
       "src/state.svelte.js",
@@ -114,16 +115,11 @@ const suites = [
     options: baseOptions,
   },
   {
-    filePaths: [
-      "src/example.ts",
-      "src/example.tsx",
-      "src/example.test.ts",
-      "src/Component.svelte",
-    ],
-    name: "type-checked",
+    filePaths: ["src/example.ts", "src/example.tsx"],
+    name: "untyped",
     options: {
       ...baseOptions,
-      typescript: { ...baseOptions.typescript, typeChecked: true },
+      typescript: { ...baseOptions.typescript, typeChecked: false },
     },
   },
 ] as const satisfies ReadonlyArray<{

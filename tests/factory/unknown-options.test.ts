@@ -131,6 +131,7 @@ const rejectionOf = async (
   } catch (error) {
     return Error.isError(error) ? error.message : String(error);
   }
+  return;
 };
 
 describe("createConfig with an option that it does not know", () => {
