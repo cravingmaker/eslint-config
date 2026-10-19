@@ -62,7 +62,9 @@ describe.each(["test.js", "test.ts"])(
       "keeps $ruleId off while allowing an explicit override",
       async ({ code, ruleId }) => {
         const eslint = new ESLint({
-          overrideConfig: await createConfig(),
+          overrideConfig: await createConfig({
+            typescript: { typeChecked: false },
+          }),
           overrideConfigFile: true,
         });
         const [result] = await eslint.lintText(code, { filePath });
@@ -76,6 +78,7 @@ describe.each(["test.js", "test.ts"])(
 
         const enabledEslint = new ESLint({
           overrideConfig: await createConfig({
+            typescript: { typeChecked: false },
             unicorn: { overrides: { [ruleId]: "error" } },
           }),
           overrideConfigFile: true,
@@ -106,7 +109,9 @@ describe.each([
   it.each(["test.js", "test.ts"])(
     "leaves the selected core policy in charge and keeps fixes stable in %s",
     async (filePath) => {
-      const overrideConfig = await createConfig();
+      const overrideConfig = await createConfig({
+        typescript: { typeChecked: false },
+      });
       const eslint = new ESLint({ overrideConfig, overrideConfigFile: true });
       const code = [
         "export const update = (state, fallback) => {",

@@ -279,16 +279,20 @@ describe("published package", () => {
 					throw new Error('TypeScript config was not created');
 				}
 
-				if (defaultTsConfig.languageOptions?.parserOptions?.projectService !== undefined) {
-					throw new Error('Default TypeScript config unexpectedly enabled projectService');
+				if (defaultTsConfig.languageOptions?.parserOptions?.projectService !== true) {
+					throw new Error('Default TypeScript config did not enable projectService');
 				}
 
-				if (defaultTsConfig.rules?.['@typescript-eslint/no-unsafe-assignment']?.[0] !== 0) {
-					throw new Error('Default TypeScript config unexpectedly enabled type-aware rules');
+				if (defaultTsConfig.rules?.['@typescript-eslint/no-unsafe-assignment']?.[0] !== 2) {
+					throw new Error('Default TypeScript config did not enable type-aware rules');
 				}
 
-				if (defaultTsConfig.rules?.['n/no-sync']?.[0] !== 0) {
-					throw new Error('Default TypeScript config unexpectedly enabled n/no-sync without type information');
+				if (untypedTsConfig.rules?.['@typescript-eslint/no-unsafe-assignment']?.[0] !== 0) {
+					throw new Error('Untyped TypeScript config unexpectedly enabled type-aware rules');
+				}
+
+				if (untypedTsConfig.rules?.['n/no-sync']?.[0] !== 0) {
+					throw new Error('Untyped TypeScript config unexpectedly enabled n/no-sync without type information');
 				}
 
 				if (typedTsConfig.rules?.['n/no-sync']?.[0] !== 2) {
@@ -298,18 +302,19 @@ describe("published package", () => {
 				if (!getPluginNames(defaultConfig).has('sonarjs') || defaultTsConfig.rules?.['sonarjs/no-exclusive-tests']?.[0] !== 2) {
 					throw new Error('Default config did not enable the bundled SonarJS policy');
 				}
-				if (defaultTsConfig.rules?.['sonarjs/no-try-promise']?.[0] !== 0 || typedTsConfig.rules?.['sonarjs/no-try-promise']?.[0] !== 2) {
+				if (untypedTsConfig.rules?.['sonarjs/no-try-promise']?.[0] !== 0 || typedTsConfig.rules?.['sonarjs/no-try-promise']?.[0] !== 2) {
 					throw new Error('SonarJS type-aware rules did not follow typed linting');
 				}
 
+				// A rule that needs type information would stop ESLint in a TypeScript file without it.
+				await new ESLint({ overrideConfig: untyped, overrideConfigFile: true }).lintText(
+					"import fs from 'node:fs';\nfs.readFileSync('fixture.txt', 'utf8');\n",
+					{ filePath: 'example.ts' },
+				);
 				const eslint = new ESLint({
 					overrideConfig: defaultConfig,
 					overrideConfigFile: true,
 				});
-				await eslint.lintText(
-					"import fs from 'node:fs';\nfs.readFileSync('fixture.txt', 'utf8');\n",
-					{ filePath: 'example.ts' },
-				);
 				const [sonarjsResult] = await eslint.lintText(
 					'it.only("case", () => {});',
 					{ filePath: 'example.test.js' },

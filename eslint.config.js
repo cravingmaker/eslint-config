@@ -20,7 +20,6 @@ export default createConfig(
           { format: null, modifiers: ["requiresQuotes"], selector: "property" },
         ],
       },
-      typeChecked: true,
     },
   },
   {

@@ -98,6 +98,7 @@ describe("SonarJS policy", () => {
             "sonarjs/no-try-promise": "warn",
           },
         },
+        typescript: { typeChecked: false },
       }),
       overrideConfigFile: true,
     });

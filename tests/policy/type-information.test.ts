@@ -90,6 +90,8 @@ const typedSources = [
 const writtenSources = typedSources.filter((filePath) => {
   return !filePath.startsWith("src/generated/");
 });
+// Typed linting off. It is on by default.
+const untyped = { typeChecked: false } as const;
 // Typed linting that leaves out the script, which no tsconfig includes.
 const withoutScripts = {
   ignoresTypeAware: ["scripts/**"],
@@ -144,7 +146,7 @@ one override each, with typed linting on and with typed linting off.
 const shapes: readonly Shape[] = [
   [
     "typed linting off",
-    { typescript: { ignoresTypeAware: ["scripts/**"] } },
+    { typescript: { ...untyped, ignoresTypeAware: ["scripts/**"] } },
     [],
   ],
   ["typed linting on", { typescript: withoutScripts }, typedSources],
@@ -237,7 +239,7 @@ const shapes: readonly Shape[] = [
   ],
   [
     "an override in functional and typed linting off",
-    { functional: functionalOverride },
+    { functional: functionalOverride, typescript: untyped },
     [],
   ],
   [
@@ -248,7 +250,7 @@ const shapes: readonly Shape[] = [
   ],
   [
     "an override of a deprecated rule in functional and typed linting off",
-    { functional: deprecatedOverride },
+    { functional: deprecatedOverride, typescript: untyped },
     [],
   ],
   [
@@ -257,7 +259,11 @@ const shapes: readonly Shape[] = [
     typedSources,
     { "n/no-sync": [2, { allowAtRootLevel: false }] },
   ],
-  ["an override in node and typed linting off", { node: nodeOverride }, []],
+  [
+    "an override in node and typed linting off",
+    { node: nodeOverride, typescript: untyped },
+    [],
+  ],
   [
     "an override of a disabled alternative in sonarjs",
     {
@@ -269,7 +275,10 @@ const shapes: readonly Shape[] = [
   ],
   [
     "an override in sonarjs and typed linting off",
-    { sonarjs: { overrides: { "sonarjs/deprecation": "warn" } } },
+    {
+      sonarjs: { overrides: { "sonarjs/deprecation": "warn" } },
+      typescript: untyped,
+    },
     [],
   ],
   [
@@ -288,7 +297,7 @@ const shapes: readonly Shape[] = [
   ],
   [
     "an override in typescript and typed linting off",
-    { typescript: typescriptOverride },
+    { typescript: { ...typescriptOverride, ...untyped } },
     [],
   ],
 ];

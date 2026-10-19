@@ -360,7 +360,7 @@ Inspector options can be forwarded with `--`, for example
 Both tools resolve this repository's `eslint.config.js`, which differs
 from what a consumer gets by default:
 
-- Typed linting is on, and `overridesTypeAware` adds an option to
+- `overridesTypeAware` adds an option to
   `@typescript-eslint/naming-convention`.
 - The `"auto"` frameworks follow this repository's manifest, which
   declares `react` and `svelte`: React and Svelte are on, and Express
@@ -689,7 +689,7 @@ Review each finding before removing code or adding an exception.
    names the blocks in order. In
    `tests/policy/__snapshots__/effective-rules/`, the snapshots
    `default/eslint.config.js.txt`, `default/src__Component.svelte.txt`,
-   and `type-checked/src__example.test.ts.txt` show the result. The
+   and `default/src__example.test.ts.txt` show the result. The
    README's "File-role exceptions" describes the roles to consumers.
 
 4. **Change the behavior in a task of its own.** A new role, rule, or
@@ -839,6 +839,16 @@ The reference that the recipes link to, grouped by topic.
 
 ### Parsing and type information
 
+- **Typed linting is on by default.** `createConfig()` reads type
+  information for TypeScript files, and so does `defaultContext`, which a
+  builder falls back to. A TypeScript file that no tsconfig includes,
+  such as a path that `lintText` makes up, then fails with a parsing
+  error that says it "was not found by the project service". A test of
+  rules that need no type information sets
+  `typescript: { typeChecked: false }`, or gives a builder a context with
+  `typeAware: undefined`. A test of typed linting lints a file on disk,
+  as `tests/configs/typescript/rules.test.ts` does with
+  `tests/utilities.ts`.
 - **Type information follows the type-aware scope.** Only
   `typescript/parser-type-aware` sets `projectService`, over
   `context.typeAware`, which stays within the files that
@@ -925,6 +935,13 @@ The reference that the recipes link to, grouped by topic.
   the members around it, and its fix cannot remove it. A function that
   follows another function in the same group needs a doc comment without
   a paragraph break.
+- **The tsconfig is the one that the README asks for.** `tsconfig.json`
+  and `tests/fixtures/tsconfig.json` set `strict`, `noImplicitReturns`,
+  and `allowUnreachableCode: false`, and `tests/package/readme.test.ts`
+  checks them against the README. With `noImplicitReturns`, a function
+  that returns a value on some paths ends with `return;` where it would
+  otherwise reach its end; `no-useless-return` is off in TypeScript files
+  so that it does not remove it.
 
 The repository's own `eslint.config.js` permits explicit unset values in
 rule-option maps. Core and plugin modules follow the same lint rules. Test

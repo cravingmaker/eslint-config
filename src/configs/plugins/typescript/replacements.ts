@@ -15,9 +15,10 @@ import {
   preferPromiseRejectErrorsOptions,
 } from "../../shared-options.js";
 
-// Core rules that the TypeScript compiler already checks in TypeScript files.
+// Core rules that the TypeScript compiler already checks in TypeScript files, with the compiler options
+// `strict`, `noImplicitReturns`, and `allowUnreachableCode: false`.
 const compilerCheckedRules: Rules = {
-  // --- Turned off rules (18/18) -------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (19/19) -------------------------------------------------------------------------------------------------------------------.
   "constructor-super": "off", // Handled by the TypeScript compiler (`ts(2335)` & `ts(2377)`).
   "getter-return": "off", // Handled by the TypeScript compiler (`ts(2378)`).
   "no-class-assign": "off", // Handled by the TypeScript compiler (`ts(2629)`).
@@ -33,8 +34,9 @@ const compilerCheckedRules: Rules = {
   "no-setter-return": "off", // Handled by the TypeScript compiler (`ts(2408)`).
   "no-this-before-super": "off", // Handled by the TypeScript compiler (`ts(2376)` & `ts(17009)`).
   "no-undef": "off", // Handled by the TypeScript compiler (`ts(2304)` & `ts(2552)`).
-  "no-unreachable": "off", // Handled by the TypeScript compiler (`ts(7027)`).
+  "no-unreachable": "off", // Handled by the TypeScript compiler (`ts(7027)`) with `allowUnreachableCode: false`.
   "no-unsafe-negation": "off", // Handled by the TypeScript compiler (`ts(2365)` & `ts(2322)` & `ts(2358)`). Manually fixable by editor suggestions.
+  "no-useless-return": "off", // Handled by the TypeScript compiler (`ts(7030)`) with `noImplicitReturns`, which requires the `return;` that this rule removes. Automatically fixable by the --fix command.
   "no-with": "off", // Handled by the TypeScript compiler (`ts(1101)` & `ts(2410)`).
 } as const;
 
@@ -162,7 +164,7 @@ const typeAwareReplacementRules: Rules = {
 } as const;
 
 export {
-  compilerCheckedRules, // 18 rules, 0 automatically fixable, 1 editor suggestions fixable.
+  compilerCheckedRules, // 19 rules, 1 automatically fixable, 1 editor suggestions fixable.
   replacementRules, // 22 rules, 3 automatically fixable, 8 editor suggestions fixable.
   typeAwareReplacementRules, // 16 rules, 5 automatically fixable, 4 editor suggestions fixable.
 };

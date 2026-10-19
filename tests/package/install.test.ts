@@ -55,6 +55,13 @@ const defaultConfig = `import { createConfig } from "@cravingmaker/eslint-config
 
 export default createConfig();
 `;
+// The default config for the React fixtures, which typed linting leaves out: React ships no type declarations, so the tsconfig of the fixtures does not include them.
+const reactConfig = `import { createConfig } from "@cravingmaker/eslint-config";
+
+export default createConfig({
+  typescript: { ignoresTypeAware: ["fixtures/react/**"] },
+});
+`;
 // A config that turns on the rule of React Refresh through the overrides of the React feature.
 const refreshOverrideConfig = `import { createConfig } from "@cravingmaker/eslint-config";
 
@@ -62,6 +69,7 @@ export default createConfig({
   react: {
     overrides: { "react-refresh/only-export-components": "error" },
   },
+  typescript: { ignoresTypeAware: ["fixtures/react/**"] },
 });
 `;
 /*
@@ -283,7 +291,7 @@ describe("a consumer without optional peers", () => {
         import { createConfig } from "@cravingmaker/eslint-config";
 
         const eslint = new ESLint({
-          overrideConfig: await createConfig({ environments: ["node"] }),
+          overrideConfig: await createConfig({ environments: ["node"], typescript: { typeChecked: false } }),
           overrideConfigFile: true,
         });
         const cases = [
@@ -499,7 +507,7 @@ describe("a consumer with a partial peer set", () => {
   it("lints the React fixtures without React Refresh, which needs a bundler that the project does not declare", async () => {
     const filePaths = [...fixturesWithoutPeers, ...reactFixtures];
 
-    expect(await lint(withPartialPeers, defaultConfig, filePaths)).toEqual(
+    expect(await lint(withPartialPeers, reactConfig, filePaths)).toEqual(
       withoutMessages(filePaths),
     );
   }, 120_000);
@@ -558,6 +566,8 @@ import { createConfig } from "@cravingmaker/eslint-config";
 
 export default createConfig({
   projectRootDirectory: path.join(import.meta.dirname, "fixtures"),
+  // React ships no type declarations.
+  typescript: { ignoresTypeAware: ["fixtures/react/**"] },
 });
 `,
       ["fixtures"],

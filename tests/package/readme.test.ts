@@ -6,6 +6,7 @@ import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 import markdown from "@eslint/markdown";
+import ts from "typescript";
 import { afterAll, describe, expect, it } from "vitest";
 
 import {
@@ -58,6 +59,10 @@ const codeBlocks: readonly CodeBlock[] = markdown.processors.markdown
 const examples = codeBlocks.filter(({ language }) => {
   return language === "js";
 });
+// The JSON block is the tsconfig that the README asks of every project with TypeScript files.
+const tsconfigExamples = codeBlocks.filter(({ language }) => {
+  return language === "json";
+});
 // The packages that the `npm install` commands of the README name.
 const installedPackages = codeBlocks
   .filter(({ language }) => {
@@ -85,9 +90,11 @@ This one lets typed linting parse them; it reports the errors in their types, bu
 */
 const reactTsconfig = JSON.stringify({
   compilerOptions: {
+    allowUnreachableCode: false,
     jsx: "react-jsx",
     module: "nodenext",
     noEmit: true,
+    noImplicitReturns: true,
     strict: true,
     target: "es2024",
     types: [],
@@ -105,6 +112,22 @@ afterAll(async () => {
 
 const compareText = (left: string, right: string): number => {
   return left.localeCompare(right);
+};
+const isRecord = (
+  value: unknown,
+): value is Readonly<Record<string, unknown>> => {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+};
+// The compiler options of a tsconfig, read from `text` as the compiler reads them, comments included.
+const readCompilerOptions = (
+  fileName: string,
+  text: string,
+): ts.CompilerOptions => {
+  const tsconfig: unknown = ts.parseConfigFileTextToJson(fileName, text).config;
+  return ts.convertCompilerOptionsFromJson(
+    isRecord(tsconfig) ? tsconfig.compilerOptions : undefined,
+    path.dirname(fileName),
+  ).options;
 };
 /*
 Writes `example` as the `eslint.config.js` of a project in the consumer in `consumer`, next to a
@@ -167,13 +190,14 @@ const consumer = await createConsumer(temporaryDirectory, "readme", tarball, [
 ]);
 
 describe("the README", () => {
-  it("has examples and install commands, and no other code than shell commands, examples, and output", () => {
+  it("has examples, install commands, and a tsconfig, and no other code than shell commands, examples, the tsconfig, and output", () => {
     expect(examples).not.toHaveLength(0);
     expect(installedPackages).not.toHaveLength(0);
+    expect(tsconfigExamples).toHaveLength(1);
     expect(
       codeBlocks
         .filter(({ language }) => {
-          return !["bash", "js", "text"].includes(language);
+          return !["bash", "js", "json", "text"].includes(language);
         })
         .map(({ language, line }) => {
           return `${language} at line ${String(line)}`;
@@ -192,6 +216,33 @@ describe("the README", () => {
     );
   });
 
+  it("asks for the compiler options that the tsconfigs of this repository and of the fixtures set", async () => {
+    const [tsconfigExample] = tsconfigExamples;
+    expect(tsconfigExamples).toHaveLength(1);
+    const expected = readCompilerOptions("README.md", tsconfigExample.text);
+    const repositoryTsconfig = fileURLToPath(
+      new URL("../../tsconfig.json", import.meta.url),
+    );
+    const fixturesTsconfig = path.join(fixturesDirectory, "tsconfig.json");
+
+    expect(Object.keys(expected)).not.toHaveLength(0);
+    expect(
+      readCompilerOptions(
+        repositoryTsconfig,
+        await readFile(repositoryTsconfig, "utf8"),
+      ),
+    ).toMatchObject(expected);
+    expect(
+      readCompilerOptions(
+        fixturesTsconfig,
+        await readFile(fixturesTsconfig, "utf8"),
+      ),
+    ).toMatchObject(expected);
+    expect(
+      readCompilerOptions("react/tsconfig.json", reactTsconfig),
+    ).toMatchObject(expected);
+  });
+
   it.concurrent.for(examples)(
     "example at line $line type-checks, and lints the fixtures without a fatal message",
     { timeout: 120_000 },
@@ -206,10 +257,13 @@ describe("the README", () => {
           [
             path.join(consumer, "node_modules", "typescript", "bin", "tsc"),
             "--allowJs",
+            "--allowUnreachableCode",
+            "false",
             "--checkJs",
             "--module",
             "nodenext",
             "--noEmit",
+            "--noImplicitReturns",
             "--pretty",
             "false",
             "--skipLibCheck",

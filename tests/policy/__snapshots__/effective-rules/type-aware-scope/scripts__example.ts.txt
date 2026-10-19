@@ -13,7 +13,7 @@ linterOptions:
   reportUnusedDisableDirectives: 1
 settings:
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 1399 (error 881, off 466, warn 52)
+rules: 1399 (error 880, off 467, warn 52)
 
 @eslint-community/eslint-comments/disable-enable-pair: error [{"allowWholeFile":true}]
 @eslint-community/eslint-comments/no-aggregating-enable: error
@@ -541,7 +541,7 @@ no-useless-concat: error
 no-useless-constructor: off
 no-useless-escape: error [{"allowRegexCharacters":[]}]
 no-useless-rename: error [{"ignoreDestructuring":false,"ignoreExport":false,"ignoreImport":false}]
-no-useless-return: error
+no-useless-return: off
 no-var: error
 no-void: error [{"allowAsStatement":true}]
 no-warning-comments: off [{"location":"start","terms":["todo","fixme","xxx"]}]

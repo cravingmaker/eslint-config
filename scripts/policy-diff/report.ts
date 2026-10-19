@@ -220,6 +220,7 @@ const readInstalledVersion = async (
   } catch {
     // Uninstalled packages and unreadable manifests are reported as dependency mismatches.
   }
+  return;
 };
 /**
 Lists the packages of the lockfile that are not installed in `directory` with their locked
@@ -324,6 +325,7 @@ const readLockedPackagesIfValid = (
   } catch {
     // A malformed optional lockfile contributes no dependency comparison.
   }
+  return;
 };
 const readLockfile = async (file: string): Promise<string | undefined> => {
   try {
@@ -332,6 +334,7 @@ const readLockfile = async (file: string): Promise<string | undefined> => {
   } catch {
     // A project can legitimately have no lockfile.
   }
+  return;
 };
 const summarize = (results: readonly SnapshotResult[]): string => {
   const count = (status: SnapshotResult["outcome"]["status"]): string => {
@@ -441,6 +444,7 @@ const readGitObject = async (
   } catch {
     // A baseline can legitimately omit the requested Git object.
   }
+  return;
 };
 /**
 Reads the snapshots and the lockfile of `commit` through Git in `directory`. A commit without
@@ -454,6 +458,7 @@ const readGitFile = async (
   if (typeof blob === "string") {
     return await git(["cat-file", "blob", blob], directory);
   }
+  return;
 };
 const readBaseline = async (
   commit: string,

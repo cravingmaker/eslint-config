@@ -2,14 +2,15 @@
   "name": "@cravingmaker/eslint-config",
   "version": "0.1.0",
   "private": false,
-  "description": "Craving Maker's ESLint configuration (Flat Config)",
+  "description": "Craving Maker's TypeScript-first ESLint configuration (Flat Config)",
   "keywords": [
     "cravingmaker",
     "eslint",
     "eslint-config",
     "style",
     "code-style",
-    "lint"
+    "lint",
+    "typescript"
   ],
   "homepage": "https://github.com/cravingmaker/eslint-config#readme",
   "bugs": {

@@ -64,6 +64,7 @@ const eslint = new ESLint({
     express: false,
     react: false,
     svelte: false,
+    typescript: { typeChecked: false },
   }),
   overrideConfigFile: true,
 });

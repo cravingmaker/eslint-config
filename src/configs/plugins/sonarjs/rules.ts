@@ -289,7 +289,7 @@ const otherRules: Rules = {
   "sonarjs/no-for-in-iterable": "off", // Handled by `@typescript-eslint/no-for-in-array`.
   "sonarjs/no-function-declaration-in-block": "off", // Handled by `no-inner-declarations`.
   "sonarjs/no-implicit-dependencies": "off", // Handled by `import-x/no-extraneous-dependencies`.
-  "sonarjs/no-inconsistent-returns": "off", // Prefer the TypeScript compiler option noImplicitReturns, as for `@typescript-eslint/consistent-return`.
+  "sonarjs/no-inconsistent-returns": "off", // Handled by the TypeScript compiler (`ts(7030)`) with `noImplicitReturns`.
   "sonarjs/no-incorrect-string-concat": "off", // Handled by `@typescript-eslint/restrict-plus-operands`.
   "sonarjs/no-intrusive-permissions": "off", // Deprecated upstream; keep the rule disabled.
   "sonarjs/no-ip-forward": "off", // Deprecated upstream; keep the rule disabled.

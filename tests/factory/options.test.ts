@@ -114,14 +114,14 @@ describe("resolveOptions", () => {
     ).toBe(false);
   });
 
-  it("resolves the TypeScript defaults from the project root", () => {
+  it("resolves the TypeScript defaults from the project root, with typed linting on", () => {
     const resolved = resolveOptions({ projectRootDirectory: "/project" });
 
     expect(resolved.typescript).toEqual({
       tsconfigRootDir: "/project",
-      typeChecked: false,
+      typeChecked: true,
     });
-    expect(resolved.typeAware).toBeUndefined();
+    expect(resolved.typeAware).toEqual([[...typescriptFiles, "!**/*.svelte"]]);
   });
 
   // Typescript-eslint takes an absolute `tsconfigRootDir` only, so both directories are resolved.
@@ -323,6 +323,13 @@ describe("resolveOptions", () => {
     const resolved = resolveOptions({ typescript: false });
 
     expect(resolved.typescript).toBeUndefined();
+    expect(resolved.typeAware).toBeUndefined();
+  });
+
+  it("has no type-aware scope when typed linting is off", () => {
+    const resolved = resolveOptions({ typescript: { typeChecked: false } });
+
+    expect(resolved.typescript?.typeChecked).toBe(false);
     expect(resolved.typeAware).toBeUndefined();
   });
 

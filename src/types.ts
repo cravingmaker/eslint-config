@@ -121,6 +121,10 @@ type Options = {
   Svelte components and rune modules. While it is on, the features for JavaScript and TypeScript sources also lint the scripts of the components that it parses, without type information.
   */
   readonly svelte?: Feature | "auto";
+  /**
+  TypeScript files, linted with typescript-eslint's strict rules and, unless `typeChecked` is
+  `false`, with type information from the nearest `tsconfig.json` of each file.
+  */
   readonly typescript?: Feature<TypeScriptOptions>;
   readonly unicorn?: Feature;
   readonly unusedImports?: Feature;
@@ -188,7 +192,8 @@ type TypeScriptOptions = FeatureOptions & {
   */
   readonly tsconfigRootDir?: string;
   /**
-  Whether to lint with type information. Defaults to `false`.
+  Whether to lint with type information, which typescript-eslint reads from the nearest
+  `tsconfig.json` of each file. Defaults to `true`. `false` turns off the rules that need it.
   */
   readonly typeChecked?: boolean;
 };

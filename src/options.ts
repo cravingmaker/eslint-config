@@ -161,12 +161,12 @@ Resolves the files that the parser reads with type information and that get type
 `filesTypeAware` without `ignoresTypeAware`, within the TypeScript sources that the TypeScript
 feature parses, because type information needs its parser, and without Svelte components, whose
 parser reads none, whatever `files` names. Each list of ignores is applied on its own, so a
-negated pattern brings back only what its own list left out.
+negated pattern brings back only what its own list left out. None while the TypeScript feature
+or typed linting is off.
 */
 const resolveTypeAwareScope = (
-  value: Feature<TypeScriptOptions> = true,
+  typescript: ResolvedTypeScriptOptions | undefined,
 ): TypeAwareScope | undefined => {
-  const typescript = resolveFeature(value);
   if (typescript?.typeChecked !== true) {
     return;
   }
@@ -185,9 +185,10 @@ const resolveTypeAwareScope = (
   return withoutIgnores(narrowFiles(parsed, filesTypeAware), ignoresTypeAware);
 };
 /**
-Applies the defaults to the options of the TypeScript feature. typescript-eslint takes an
-absolute `tsconfigRootDir` only, so the tsconfig directory becomes an absolute path: a relative
-one is resolved from the working directory, as the project root is, and not from that root.
+Applies the defaults to the options of the TypeScript feature. Typed linting is on unless
+`typeChecked` is `false`. typescript-eslint takes an absolute `tsconfigRootDir` only, so the
+tsconfig directory becomes an absolute path: a relative one is resolved from the working
+directory, as the project root is, and not from that root.
 */
 const resolveTypeScript = (
   projectRootDirectory: string,
@@ -202,7 +203,7 @@ const resolveTypeScript = (
     tsconfigRootDir: path.resolve(
       typescript.tsconfigRootDir ?? projectRootDirectory,
     ),
-    typeChecked: typescript.typeChecked ?? false,
+    typeChecked: typescript.typeChecked !== false,
   };
 };
 /**
@@ -218,6 +219,10 @@ const resolveOptions = (
   ),
 ): ResolvedOptions => {
   const svelte = resolveDetectedFeature(detection.svelte, options.svelte);
+  const typescript = resolveTypeScript(
+    projectRootDirectory,
+    options.typescript,
+  );
   return {
     comments: resolveFeature(options.comments),
     express: resolveDetectedFeature(detection.express, options.express),
@@ -241,8 +246,8 @@ const resolveOptions = (
     stylistic: resolveFeature(options.stylistic),
     svelte,
     svelteComponents: resolveSvelteComponents(svelte),
-    typeAware: resolveTypeAwareScope(options.typescript),
-    typescript: resolveTypeScript(projectRootDirectory, options.typescript),
+    typeAware: resolveTypeAwareScope(typescript),
+    typescript,
     unicorn: resolveFeature(options.unicorn),
     unusedImports: resolveFeature(options.unusedImports),
   };
