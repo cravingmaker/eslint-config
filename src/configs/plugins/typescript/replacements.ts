@@ -69,10 +69,8 @@ const replacementRules: Rules = {
     },
   ],
   "@typescript-eslint/max-params": [
-    "error",
+    "warn",
     {
-      maximum: undefined,
-
       ...maxParamsOptions,
       countVoidThis: false,
     },
@@ -107,7 +105,7 @@ const replacementRules: Rules = {
 
 // Core rules replaced by typescript-eslint extension rules that need type information.
 const typeAwareReplacementRules: Rules = {
-  // --- Rules with default options (4/16) ----------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (4/15) ----------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/dot-notation": [
     "error",
     {
@@ -131,7 +129,7 @@ const typeAwareReplacementRules: Rules = {
   ],
   "@typescript-eslint/require-await": "error", // Manually fixable by editor suggestions.
 
-  // --- Rules with overridden options (4/16) -------------------------------------------------------------------------------------------------------.
+  // --- Rules with overridden options (4/15) -------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/naming-convention": ["error", ...namingConventionOptions],
   "@typescript-eslint/only-throw-error": [
     "error",
@@ -152,11 +150,10 @@ const typeAwareReplacementRules: Rules = {
   ], // Automatically fixable by the --fix command.
   "@typescript-eslint/return-await": ["error", "always"], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
 
-  // --- Turned off rules (8/16) --------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (7/15) --------------------------------------------------------------------------------------------------------------------.
   camelcase: "off", // Handled by `@typescript-eslint/naming-convention`.
   "dot-notation": "off", // Handled by `@typescript-eslint/dot-notation`. Automatically fixable by the --fix command.
   "no-implied-eval": "off", // Handled by `@typescript-eslint/no-implied-eval`.
-  "no-return-await": "off", // Handled by `@typescript-eslint/return-await`. Manually fixable by editor suggestions.
   "no-throw-literal": "off", // Handled by `@typescript-eslint/only-throw-error`.
   "prefer-destructuring": "off", // Handled by `@typescript-eslint/prefer-destructuring`. Automatically fixable by the --fix command.
   "prefer-promise-reject-errors": "off", // Handled by `@typescript-eslint/prefer-promise-reject-errors`.
@@ -191,5 +188,5 @@ export {
   compilerCheckedRules, // 19 rules, 1 automatically fixable, 1 editor suggestions fixable.
   replacementRules, // 22 rules, 3 automatically fixable, 8 editor suggestions fixable.
   tsxTypeAwareReplacementRules, // 1 rule, 0 automatically fixable, 0 editor suggestions fixable.
-  typeAwareReplacementRules, // 16 rules, 5 automatically fixable, 4 editor suggestions fixable.
+  typeAwareReplacementRules, // 15 rules, 5 automatically fixable, 3 editor suggestions fixable.
 };

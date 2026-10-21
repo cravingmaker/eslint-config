@@ -167,7 +167,7 @@ const otherRules: Rules = {
     },
   ], // Automatically fixable by the --fix command.
 
-  // --- Rules with overridden options (28/122) -----------------------------------------------------------------------------------------------------.
+  // --- Rules with overridden options (29/122) -----------------------------------------------------------------------------------------------------.
   "arrow-body-style": ["error", "always"], // Automatically fixable by the --fix command.
   "capitalized-comments": [
     "error",
@@ -179,7 +179,7 @@ const otherRules: Rules = {
     },
   ], // Automatically fixable by the --fix command.
   complexity: [
-    "error",
+    "warn",
     {
       max: 10,
       variant: "classic",
@@ -226,7 +226,7 @@ const otherRules: Rules = {
     },
   ],
   "max-params": [
-    "error",
+    "warn",
     {
       countThis: "never",
       ...maxParamsOptions,
@@ -234,6 +234,7 @@ const otherRules: Rules = {
   ],
   "no-else-return": ["error", { allowElseIf: false }], // Automatically fixable by the --fix command.
   "no-param-reassign": ["error", { props: false }],
+  "no-plusplus": ["error", { allowForLoopAfterthoughts: false }],
   "no-restricted-globals": [
     "error",
     {
@@ -288,7 +289,7 @@ const otherRules: Rules = {
   // Complemented by `sonarjs/unicode-aware-regex` for implicit string patterns when type information is available.
   "require-unicode-regexp": ["error", { requireFlag: undefined }], // Adding either flag can change matching behavior, so review existing patterns. Manually fixable by editor suggestions.
 
-  // --- Turned off rules (30/122) ------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (29/122) ------------------------------------------------------------------------------------------------------------------.
   "consistent-return": "off", // Prefer type-aware return analysis over syntax-only consistency checks.
   "consistent-this": "off", // Prefer lexical this through arrow functions over introducing aliases.
   "func-style": "off", // Handled by `@cravingmaker/prefer-arrow-functions`, preserving expression style and semantic exceptions that this rule cannot express.
@@ -307,7 +308,6 @@ const otherRules: Rules = {
   "no-invalid-this": "off", // Prefer TypeScript's strict/noImplicitThis checks where available.
   "no-magic-numbers": "off", // Prefer named constants for meaningful domain values without unnecessarily restricting literals.
   "no-negated-condition": "off", // Handled by `unicorn/no-negated-condition`.
-  "no-plusplus": "off", // Prefer increment and decrement operators for counters while assessing side effects separately.
   "no-restricted-exports": "off", // Prefer to restrict export names only when explicit public API conventions require it.
   "no-restricted-properties": "off", // Prefer to add restrictions only for specific APIs with documented alternatives.
   "no-ternary": "off", // Prefer conditional expressions to avoid unnecessary branching statements.

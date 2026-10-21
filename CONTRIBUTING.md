@@ -240,10 +240,19 @@ on an unclassified rule.
 
 The authored core maps are the reference for rule policy. Enabled rules
 declare canonical options; deprecated aliases do not need duplicate entries.
+Omit deprecated core and plugin rule keys at every severity, including `off`.
+The authored-map guard checks installed metadata before optional-peer filtering.
+Omission leaves a preceding consumer setting active: in particular, an earlier
+`no-return-await` prohibition can conflict with TypeScript's retained
+`return-await: ["error", "always"]` policy. A consumer can disable it in a later
+config. Keep canonical `max` without the redundant `maximum` alias on TypeScript's
+parameter limit; retain its supported `countVoidThis: false`. Stylistic's
+annotation-spacing `overrides: { arrow: "ignore" }` is an intentional neutral
+compatibility guard that prevents a Prettier fix loop, rather than an unused alias.
 The core reference selects default forms for `curly` and `radix`.
 
-Stylistic explicitly inventories every bundled rule, including deprecated and
-experimental rules as `"off"`. Its upstream rule list has overlapping tags
+Stylistic explicitly inventories every current non-deprecated bundled rule,
+including experimental rules as `"off"`. Its upstream rule list has overlapping tags
 rather than exclusive categories, so `rules.ts` groups recommended and other
 rules, as the uncategorized plugins do. Stable token spacing and structural
 checks remain on when they agree with Prettier; its disable list is not a policy
@@ -251,7 +260,7 @@ source. Width, indentation, quote, and semicolon choices stay with Prettier.
 
 SonarJS has no exclusive upstream rule categories, so its explicit inventory stays in
 `rules.ts`, grouped into recommended and other rules. Both groups include disabled
-and deprecated rules; neither imports the upstream preset. Capability comments come
+non-deprecated rules; neither imports the upstream preset. Capability comments come
 from rule metadata. The fixed inventory in `rules-type-aware.ts` guards every rule
 that requires type information, even disabled alternatives that overrides may enable.
 SonarJS owns duplicated branches across non-adjacent conditionals and switches,
@@ -261,6 +270,26 @@ repeated expression. Existing rules retain other overlaps, with a `Handled by` c
 checks warn; correctness checks error. This follows the priority order in
 [the coding principles](CODING_PRINCIPLES.md), with readability ahead of forced
 abstractions or arbitrary limits on domain models.
+
+Quantitative maintainability limits use `warn`: core complexity, parameter,
+line-count, block-depth, and callback-depth limits; the TypeScript parameter
+owner; Unicorn's nested-call limit; HTML element depth; and SonarJS cognitive,
+expression, and regex complexity. These twelve owner entries request contextual
+review rather than a mechanical API rewrite. Preserve their numeric options,
+replacement ownership, typed scopes, and justified repository exceptions.
+Security and correctness policies keep their independently reviewed severities.
+The repository still runs `eslint . --max-warnings 0`, so warnings fail its gate.
+An ordinary consumer CLI permits warnings; `--quiet` skips warning rules unless
+`--max-warnings` is also present, when they run and count but their output is hidden.
+
+Use explicit updates (`count = count + 1` or `count = count - 1`), including
+`for` update clauses. Core `no-plusplus` rejects prefix/postfix `++` and `--`
+without automatic fixes. Keep both compound-assignment owners set to `never`,
+including arithmetic, exponentiation, shifts, bitwise, and logical assignments.
+Migrate deliberately: preserve expression results, numeric coercion, BigInt's
+`1n`, receiver/key/getter evaluation counts, and conditional setters. Expand
+logical assignments with explicit branches when an unconditional property write
+would change behavior. Do not add a blanket replacement helper or suppression.
 
 An option set to `undefined` deliberately retains inference from settings,
 the project's engines or tsconfig, or a rule's optional behavior without a

@@ -250,7 +250,7 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (11/65) ---------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (11/52) ---------------------------------------------------------------------------------------------------------.
   // Keep this AWS CDK check active even when the root manifest omits CDK.
   "sonarjs/aws-iam-all-resources-accessible": "error",
   "sonarjs/class-prototype": "error",
@@ -265,14 +265,12 @@ const otherRules: Rules = {
   // Complemented by `require-unicode-regexp` for general flag enforcement on regex literals and constructors.
   "sonarjs/unicode-aware-regex": "error",
 
-  // --- Turned off rules (54/65) -------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (41/52) -------------------------------------------------------------------------------------------------------------------.
   "sonarjs/arguments-usage": "off", // Handled by `prefer-rest-params`.
   "sonarjs/array-constructor": "off", // Handled by `@typescript-eslint/no-array-constructor` and `unicorn/no-new-array`. Manually fixable by editor suggestions.
   "sonarjs/arrow-function-convention": "off", // Handled by `arrow-body-style` and Prettier.
   "sonarjs/bool-param-default": "off", // Handled by `@typescript-eslint/default-param-last` and TypeScript; defaults should follow API semantics.
   "sonarjs/comment-regex": "off", // Comment restrictions depend on the project; no universal pattern is required.
-  "sonarjs/conditional-indentation": "off", // Deprecated upstream; keep the rule disabled.
-  "sonarjs/confidential-information-logging": "off", // Deprecated upstream; keep the rule disabled.
   "sonarjs/cyclomatic-complexity": "off", // Handled by `complexity`; cognitive complexity measures the separate readability cost.
   "sonarjs/declarations-in-global-scope": "off", // Handled by `import-x/unambiguous` and `no-implicit-globals`.
   "sonarjs/destructuring-assignment-syntax": "off", // Handled by `@typescript-eslint/prefer-destructuring` and `prefer-destructuring`.
@@ -280,9 +278,7 @@ const otherRules: Rules = {
   "sonarjs/file-header": "off", // Copyright and license headers depend on the project.
   "sonarjs/file-name-differ-from-class": "off", // Handled by `unicorn/filename-case` and `import-x/no-anonymous-default-export` without coupling each module to a class.
   "sonarjs/for-in": "off", // Handled by `guard-for-in`.
-  "sonarjs/frame-ancestors": "off", // Deprecated upstream; keep the rule disabled.
   "sonarjs/function-name": "off", // Handled by `@typescript-eslint/naming-convention`.
-  "sonarjs/hidden-files": "off", // Deprecated upstream; keep the rule disabled.
   "sonarjs/max-lines": "off", // Handled by `max-lines`.
   "sonarjs/max-lines-per-function": "off", // Handled by `max-lines-per-function`.
   "sonarjs/max-union-size": "off", // Discriminated unions should model the domain without an arbitrary constituent limit.
@@ -295,36 +291,27 @@ const otherRules: Rules = {
   "sonarjs/no-implicit-dependencies": "off", // Handled by `import-x/no-extraneous-dependencies`.
   "sonarjs/no-inconsistent-returns": "off", // Handled by the TypeScript compiler (`ts(7030)`) with `noImplicitReturns`.
   "sonarjs/no-incorrect-string-concat": "off", // Handled by `@typescript-eslint/restrict-plus-operands`.
-  "sonarjs/no-intrusive-permissions": "off", // Deprecated upstream; keep the rule disabled.
-  "sonarjs/no-ip-forward": "off", // Deprecated upstream; keep the rule disabled.
-  "sonarjs/no-mixed-content": "off", // Deprecated upstream; keep the rule disabled.
-  "sonarjs/no-redundant-parentheses": "off", // Deprecated upstream; keep the rule disabled. Manually fixable by editor suggestions.
   "sonarjs/no-reference-error": "off", // Handled by `no-undef` and the TypeScript compiler.
   "sonarjs/no-require-or-define": "off", // Handled by `@typescript-eslint/no-require-imports` and `import-x/no-amd`.
   "sonarjs/no-return-type-any": "off", // Handled by `@typescript-eslint/no-explicit-any` and `@typescript-eslint/no-unsafe-return`.
-  "sonarjs/no-tab": "off", // Deprecated upstream; keep the rule disabled.
   "sonarjs/no-undefined-assignment": "off", // Handled by `no-undefined` and `unicorn/no-useless-undefined`.
-  "sonarjs/no-unsafe-unzip": "off", // Deprecated upstream; keep the rule disabled.
   "sonarjs/no-unused-function-argument": "off", // Handled by `unused-imports/no-unused-vars`. Manually fixable by editor suggestions.
   "sonarjs/no-variable-usage-before-declaration": "off", // Handled by `@typescript-eslint/no-use-before-define` and `no-use-before-define`.
   "sonarjs/no-wildcard-import": "off", // Namespace imports are useful for APIs such as TypeScript; import style is handled by `unicorn/import-style`.
   "sonarjs/non-number-in-arithmetic-expression": "off", // Handled by the TypeScript compiler and `@typescript-eslint/restrict-plus-operands`.
   "sonarjs/operation-returning-nan": "off", // Handled by `@typescript-eslint/restrict-plus-operands` and the TypeScript compiler.
-  "sonarjs/os-command": "off", // Deprecated upstream; keep the rule disabled.
   "sonarjs/prefer-immediate-return": "off", // Named intermediate values can improve readability and debugging. Automatically fixable by the --fix command.
   "sonarjs/prefer-object-literal": "off", // Handled by `no-object-constructor`.
   "sonarjs/shorthand-property-grouping": "off", // Handled by `perfectionist/sort-objects`.
   "sonarjs/strings-comparison": "off", // String ordering is valid when lexicographic comparison is intended.
   "sonarjs/too-many-break-or-continue-in-loop": "off", // Early loop exits can reduce nesting and improve readability.
-  "sonarjs/useless-string-operation": "off", // Deprecated upstream; keep the rule disabled.
   "sonarjs/values-not-convertible-to-numbers": "off", // Handled by the TypeScript compiler and `@typescript-eslint/no-unnecessary-condition`.
   "sonarjs/variable-name": "off", // Handled by `@typescript-eslint/naming-convention`.
-  "sonarjs/web-sql-database": "off", // Deprecated upstream; keep the rule disabled.
 } as const;
 
 const sonarjsRules: Rules = {
-  ...recommendedRules, // 230/295 rules, 5 automatically fixable, 36 editor suggestions fixable.
-  ...otherRules, // 65/295 rules, 1 automatically fixable, 4 editor suggestions fixable.
+  ...recommendedRules, // 230/282 rules, 5 automatically fixable, 36 editor suggestions fixable.
+  ...otherRules, // 52/282 rules, 1 automatically fixable, 3 editor suggestions fixable.
 } as const;
 
 export { sonarjsRules };

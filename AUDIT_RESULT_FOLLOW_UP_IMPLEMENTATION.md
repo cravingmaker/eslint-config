@@ -130,7 +130,7 @@ migrations and supplies a verified baseline for each refactor.
 | 4     | Passing configurations, conditional peer metadata, typed TSX names        | D4–D7 and D7 AST follow-up       | 3          | Complete    |
 | 5     | Verified ownership, complementary checks, safe execution preference       | D8.1–D8.12                       | 4          | Complete    |
 | 6     | Retained review signals and known parser/fix failures                     | D9, D10.1–D10.2, D11.1–D11.3     | 5          | Complete    |
-| 7     | Severity, deprecated entries/options, generated ignores, explicit updates | D12, D13.1–D13.2, D14, D19       | 6          | Not started |
+| 7     | Severity, deprecated entries/options, generated ignores, explicit updates | D12, D13.1–D13.2, D14, D19       | 6          | Complete    |
 | 8     | Source-map-free package                                                   | D15, R7                          | 7          | Not started |
 | 9     | Source, test, and ambient declaration ownership                           | D18.1–D18.6, R11                 | 8          | Not started |
 | 10    | Production utility/builder consolidation and Svelte negations             | R1, R2                           | 9          | Not started |
@@ -1716,3 +1716,129 @@ The production `promise-function-async` exception in
 `src/options.ts` and `src/configs/plugins/react/rules.ts` are targeted existing
 exceptions, not whole-file directives. Their synchronous-data and typed-key
 contracts still require preservation and later review.
+
+#### Stage 7 — severity, deprecated rules, ignores, and explicit updates
+
+- **Status/date:** Complete, 22 October 2026.
+- **Stage-entry commit:** `d1fb5e3edba78e918fb8e81871ebfc84c0010588`.
+  The worktree was clean on `cravingmaker/implement-stage-7`; a fresh fetch
+  confirmed that `origin/main` matched the completed Stage 6 baseline.
+- **Implementation commit(s):** Uncommitted at validation; the implementation
+  and this handoff are delivered together.
+- **Decisions/findings covered:** D12 = A, D13.1 = A, D13.2 = A, D14 = A,
+  and D19; the Stage 7 portions of P6–P8 and the explicit-update finding.
+- **Changes and rationale:**
+  - D12 changes exactly five active owners to `warn`: core complexity and
+    max-params, TypeScript max-params, Unicorn max-nested-calls, and HTML
+    max-element-depth. All twelve approved limits now warn with their original
+    limits/options, replacement ownership, and typed/feature scopes. Tests
+    exercise the five changed boundaries, TypeScript void/non-void `this`,
+    typed/untyped ownership, and feature/consumer overrides. Actual CLI runs
+    verify ordinary success, the unchanged zero-warning failure budget,
+    quiet-mode skipping, and hidden-but-counted warnings with both flags.
+  - D13.1 removes all **17 deprecated rule IDs** found in installed metadata:
+    native `no-return-await`, three Stylistic IDs, and thirteen SonarJS IDs.
+    Two additional SonarJS off-map occurrences are removed as well. The fixed
+    typed-ID list retains those two IDs solely to guard explicit consumer
+    overrides; it does not author deprecated default rule entries. Tests keep
+    those overrides inside typed scope and verify the accepted inheritance
+    effect: an earlier `no-return-await` error survives, the TypeScript
+    `return-await: always` policy remains active, and a later user config wins.
+    Authored-map guards inspect source maps and Refresh variants before
+    compatibility filtering, reject deprecated and unknown IDs, and cover
+    scalar/tuple string/numeric severities even if peer filtering hides a key.
+    Current non-deprecated inventory coverage and compatibility utilities remain.
+    Composition counts now reflect 282 SonarJS entries, 95 Stylistic/internal
+    entries, and 15 typed TypeScript replacement entries.
+  - D13.2 removes only TypeScript max-params' redundant `maximum: undefined`.
+    Shared `max: 4`, supported `countVoidThis: false`, the canonical-alias
+    allowance, and Stylistic's explained `overrides: { arrow: "ignore" }`
+    remain. A direct authored-option guard and composed function-type
+    formatting regression protect both boundaries.
+  - D14 appends exactly `**/.next/` and `**/.svelte-kit/` to the existing
+    generated-directory defaults before caller patterns. Real directory
+    discovery tests cover root/nested outputs, framework features on/off,
+    retained sibling sources, caller additions, directory re-inclusion, later
+    re-exclusion, and the pruned-parent boundary for descendant-only negations.
+  - D19 enables native `no-plusplus` with no for-loop exception; both existing
+    compound-assignment owners retain `never`. Regressions reject prefix,
+    postfix, for-loop, arithmetic/exponentiation/shift/bitwise, and logical
+    compounds in JavaScript and TypeScript. Explicit assignments, BigInt `1n`,
+    conditional writes, independent bitwise restrictions, feature scopes,
+    overrides, and repeated ESLint/Prettier convergence are protected.
+    AST inspection of tracked JavaScript/TypeScript source and scripts plus
+    fixture inspection found no executable production counter/compound updates
+    to migrate. The embedded Svelte click fixture now caches the previous count,
+    assigns explicitly, and returns the cached value; executing its actual
+    handler verifies both state and postfix results for ordinary counts, a
+    precision boundary, and NaN. No unused migration helper is introduced.
+  - README and contributor guidance now explain warning budgets/quiet mode,
+    deprecated-rule inheritance, generated directories and negations, explicit
+    updates, and semantics-preserving migration.
+- **Runtime/dependencies:** Node.js `24.22.0`, npm `11.19.1`, ESLint `10.12.0`,
+  TypeScript `6.0.3`, typescript-eslint `8.70.0`, Stylistic `5.10.0`, SonarJS
+  `4.2.2`, HTML plugin/parser `0.66.1`, and Vitest `5.0.3`. Commands use
+  `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16`. Dependencies, peer ranges, exports/public options,
+  ESM output, compiler contracts, scripts/hooks, and source maps are unchanged.
+- **Tests/commands and development evidence:**
+  - `npm ci`, `npm run prepare`, and the entry `npm run build` passed;
+    installation reported zero vulnerabilities.
+  - Before behavioral edits, the six-suite regression run reproduced **42
+    failures / 208 passes** for the old severities, deprecated entries/alias,
+    inherited disable, generated directories, and missing update prohibition.
+    The first implementation run passed **7 files / 262 tests**.
+  - Additional checks exposed stale Stylistic deprecated-entry assertions and
+    an invalid test assumption that the always-on JavaScript feature could
+    take an empty `files` list. Tests now exercise its supported narrowed,
+    ignored, and override boundaries. Unsupported `Iterator.concat` typing
+    and synthetic tuple typing were corrected without changing public policy.
+    The corrected deprecation/update/Stylistic run passed **3 files / 176 tests**.
+  - `npx vitest run tests/policy/effective-rules.test.ts -u` passed **33 tests**
+    and updated exactly **17 snapshots** through the supported process.
+    No snapshot was edited by hand. Installed metadata independently verified
+    the changed rule-group and fixability counts.
+  - Explicit ESLint of all changed source/test/docs files, `npx tsc --noEmit`,
+    and `git diff --check` passed. The final documentation handoff is checked
+    separately after adding this validation record.
+- **Final validation:** `npm run validate` passed **71 files / 2,710 tests**,
+  formatting, build/generation, TypeScript, Knip, zero-warning repository lint,
+  README/packed consumers, Publint, and ATTW's ESM profile. The passing test
+  phase took **378.05 seconds**. The first full attempt passed 70 files but
+  hit one unchanged watcher assertion at `tests/fixtures/sample.ts` with
+  "Compared values have no visual difference." The focused watcher/fixture
+  run then passed **2 files / 144 tests**, and the entire validation command
+  passed on retry with the same environment. No assertion, timeout, coverage,
+  or hook was weakened. Broken-optional-peer stderr belongs to a passing
+  negative test.
+- **Policy/snapshot delta:**
+  `node scripts/policy-diff.ts --base d1fb5e3edba78e918fb8e81871ebfc84c0010588`
+  reports **17 changed / 16 unchanged**, with no new, removed, or failed
+  snapshots and no locked-package changes. Every changed rule entry maps to
+  exactly the five severity owners, `no-plusplus`, or the seventeen removed
+  deprecated IDs; only their derived totals change otherwise. An independent
+  report check verified this exact **23-ID** set. Directory discovery and
+  inherited/typed override behavior are additionally tested directly.
+  The cumulative report against implementation starting point
+  `008a08207f28441297a2476b4798136aeb1023de` reports **25 changed / 8 unchanged**,
+  with no new, removed, failed, or locked-package changes. Earlier deltas keep
+  their Stage 2–6 decision mapping; this stage adds only D12/D13.1/D19 snapshot
+  changes, with D13.2/D14 verified by their focused behavioral tests.
+- **Artifacts/consumer compatibility:** Full packed-consumer validation passed,
+  including disabled/missing/partial/broken optional peers, README examples,
+  declarations, exports, and tarball checks. The dedicated advertised-minimum-
+  peer CI matrix has not been run locally. Generated `dist/` and
+  `src/typegen.d.ts` remain excluded from the commit.
+- **Retained exceptions/upstream conditions:** Stage 3's module-spacing/Svelte
+  padding conditions, D8.10's unsafe typed RegExp fix condition, D11.2's five
+  temporary Markdown exclusions, and Stage 6's Security suppression inventory
+  remain unchanged. The annotation-spacing arrow guard and deprecated typed-ID
+  override guards remain intentional compatibility boundaries.
+- **Unrelated work preserved:** The initial tree was clean; every changed file
+  belongs to Stage 7 policy, regression coverage, documentation, or this handoff.
+- **Remaining work:** None within Stage 7; requested commit/push/PR delivery
+  follows this validation record.
+- **Next stage:** Stage 8, D15/R7: remove source maps from build and published
+  artifacts. No Stage 8 artifact or build setting is changed here.
+- **PR/CI:** Commit and PR requested after local completion; remote CI has not
+  been evaluated in this record.

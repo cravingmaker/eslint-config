@@ -7,6 +7,7 @@ import { builtinRules } from "eslint/use-at-your-own-risk";
 import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
+import { replacementRules } from "../../src/configs/plugins/typescript/replacements.js";
 
 type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 type RulePlugin = {
@@ -232,6 +233,14 @@ const missingOptions = (
 };
 
 describe("explicit rule options", () => {
+  it("omits the redundant TypeScript parameter alias before compatibility filtering", () => {
+    const entry = replacementRules["@typescript-eslint/max-params"];
+    expect(entry).toEqual(["warn", { countVoidThis: false, max: 4 }]);
+    expect(Array.isArray(entry) ? entry[1] : undefined).not.toHaveProperty(
+      "maximum",
+    );
+  });
+
   it("declares enabled rules' canonical options or explicitly leaves them unset", async () => {
     const config = await createConfig({
       express: true,

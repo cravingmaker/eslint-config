@@ -85,7 +85,7 @@ export default createConfig({
 | Option                                                                                                                                            | Default         | Description                                                                                                                                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `projectRootDirectory`                                                                                                                            | `process.cwd()` | The directory whose `package.json` decides the `"auto"` features. It is also the default of `typescript.tsconfigRootDir`. A relative path is resolved from the working directory.           |
-| `ignores`                                                                                                                                         | `[]`            | Patterns of files that no feature lints, in addition to `**/dist/`, `**/build/`, and `**/coverage/`.                                                                                        |
+| `ignores`                                                                                                                                         | `[]`            | Patterns of files that no feature lints, in addition to `**/dist/`, `**/build/`, `**/coverage/`, `**/.next/`, and `**/.svelte-kit/`.                                                        |
 | `environments`                                                                                                                                    | `[]`            | Runtimes whose globals are defined in JavaScript, TypeScript, and Svelte files, named as in the [globals](https://www.npmjs.com/package/globals) package: `"browser"`, `"node"`, and so on. |
 | `globals`                                                                                                                                         | `{}`            | More globals, or changes to those of `environments`, such as `{ MY_GLOBAL: "readonly" }`.                                                                                                   |
 | `javascript`                                                                                                                                      | `{}`            | ESLint's core rules. Always on, so it takes only an object.                                                                                                                                 |
@@ -93,6 +93,11 @@ export default createConfig({
 | `comments`, `node`, `security`, `sonarjs`, `imports`, `unusedImports`, `promise`, `regexp`, `unicorn`, `functional`, `perfectionist`, `stylistic` | `true`          | Code-quality and style plugins for JavaScript and TypeScript.                                                                                                                               |
 | `html`, `json`, `packageJson`, `markdown`                                                                                                         | `true`          | File formats. `json` also takes `overridesJsonc` and `overridesJson5`.                                                                                                                      |
 | `react`, `svelte`, `express`                                                                                                                      | `"auto"`        | Frameworks, described in [Frameworks](#frameworks).                                                                                                                                         |
+
+Generated directories are ignored at the root and inside workspaces, regardless
+of framework detection or feature toggles. Caller `ignores` patterns follow the
+defaults in order. A directory negation such as `"!**/.next/"` re-includes that
+directory; negating only a file inside a still-ignored directory cannot do so.
 
 ### Feature values
 
@@ -156,7 +161,7 @@ A source is a JavaScript or TypeScript file: `**/*.{js,mjs,jsx,mjsx,ts,mts,tsx,m
 | `packageJson`   | [eslint-plugin-package-json](https://www.npmjs.com/package/eslint-plugin-package-json), [eslint-enforce-package-type](https://www.npmjs.com/package/eslint-enforce-package-type)                                                                                                   | `**/package.json`                                                      |
 | `markdown`      | [@eslint/markdown](https://www.npmjs.com/package/@eslint/markdown)                                                                                                                                                                                                                 | `**/*.md`, as GitHub Flavored Markdown with YAML front matter and math |
 
-SonarJS adds control-flow, security, accessibility, and test checks. Every exported rule has an explicit setting, including deprecated rules as `off`. Disabled overlaps name their owner in the policy. SonarJS owns duplicate-branch checks across conditionals and switches; the overlapping Unicorn rule is off. Checks that need human review, such as complexity thresholds and suspected hardcoded secrets, warn. Rules that require type information run with [typed linting](#typed-linting), which is on by default, within its scope and the SonarJS feature's own `files` and `ignores`.
+SonarJS adds control-flow, security, accessibility, and test checks. Every current non-deprecated rule has an explicit setting; deprecated rule entries are omitted. Disabled overlaps name their owner in the policy. SonarJS owns duplicate-branch checks across conditionals and switches; the overlapping Unicorn rule is off. Checks that need human review, such as complexity thresholds and suspected hardcoded secrets, warn. Rules that require type information run with [typed linting](#typed-linting), which is on by default, within its scope and the SonarJS feature's own `files` and `ignores`.
 
 The `packageJson` feature requires `type: "module"`. A package with `exports` or `publishConfig.exports` must also expose `"./package.json": "./package.json"`; use `packageJson.overrides` to change these rules.
 
@@ -258,7 +263,7 @@ tsconfig. Rename actual rune modules and update their imports deliberately.
 
 Four rules are off in components, because components break them by design:
 
-- `functional/no-let` and `unicorn/no-top-level-assignment-in-function`: the instance script runs once per component instance, so its top-level variables are the instance's state, which Svelte updates through assignments, as in `let count = $state(0)` with `onclick={() => count++}`. `bind:` targets need `let` as well.
+- `functional/no-let` and `unicorn/no-top-level-assignment-in-function`: the instance script runs once per component instance, so its top-level variables are the instance's state, which Svelte updates through assignments, as in `let count = $state(0)` with `onclick={() => { count = count + 1; }}`. When migrating an expression handler whose postfix result must be preserved, cache its previous value before the assignment and return that value. `bind:` targets need `let` as well.
 - `import-x/no-mutable-exports`: the props of legacy mode are `export let` declarations.
 - `import-x/unambiguous`: svelte-eslint-parser puts the statements of a script below its element instead of the program, where the rule looks for them.
 
@@ -405,10 +410,24 @@ export default createConfig({
 ```
 
 The core policy also requires braces around branches, arrow expressions with block bodies for ordinary functions,
-and expanded assignments (`value = value + amount` and
-`value = value || fallback`). Prettier preserves those syntax choices; it
+and explicit assignments (`value = value + amount`). Prefix/postfix `++` and `--`
+are errors, including in `for` update clauses. Arithmetic, bitwise, and logical
+compound assignments are errors too. Use explicit branches for logical updates
+when needed to preserve conditional setters, and preserve receiver/key evaluation,
+numeric coercion, and BigInt operands when migrating. Prettier preserves those syntax choices; it
 continues to decide indentation, quotes, and wrapping. The formatter tests check
 that its output agrees with the enabled Stylistic rules across supported layouts.
+
+Size, complexity, parameter-count, and nesting limits warn at their existing
+thresholds because they require contextual review. A consumer's ordinary ESLint
+command permits warnings; `--max-warnings 0` fails on them, as this repository
+requires. `--quiet` alone skips warning-level rules; combined with a warning
+budget it runs them and hides their output while still counting the warnings.
+
+Deprecated rule IDs are omitted even when they were previously disabled. An
+earlier consumer config that enables `no-return-await` therefore keeps that rule
+active and can conflict with `@typescript-eslint/return-await: ["error", "always"]`.
+Disable the deprecated rule in a later [user config](#user-configs) if inherited.
 
 `@cravingmaker/prefer-arrow-functions` owns function style in the `javascript`
 feature. It replaces `func-style` and `prefer-arrow-callback` so declarations,

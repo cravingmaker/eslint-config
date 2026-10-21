@@ -47,7 +47,7 @@ const otherRules: Rules = {
   "@html-eslint/svg-require-viewbox": "error",
 
   // --- Rules with overridden options (5/22) -------------------------------------------------------------------------------------------------------.
-  "@html-eslint/max-element-depth": ["error", { max: 6 }],
+  "@html-eslint/max-element-depth": ["warn", { max: 6 }],
   "@html-eslint/no-restricted-attr-values": [
     "error",
     {

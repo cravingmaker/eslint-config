@@ -13,7 +13,7 @@ linterOptions:
   reportUnusedDisableDirectives: 1
 settings:
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 1403 (error 955, off 393, warn 55)
+rules: 1386 (error 953, off 375, warn 58)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/starred-documentation: error
@@ -58,16 +58,13 @@ rules: 1403 (error 955, off 393, warn 55)
 @stylistic/jsx-equals-spacing: error ["never"]
 @stylistic/jsx-first-prop-new-line: off ["multiline-multiprop"]
 @stylistic/jsx-function-call-newline: off ["multiline"]
-@stylistic/jsx-indent: off [4]
 @stylistic/jsx-indent-props: off [4]
 @stylistic/jsx-max-props-per-line: off [{"maximum":1}]
 @stylistic/jsx-newline: off [{"allowMultilines":false,"prevent":false}]
 @stylistic/jsx-one-expression-per-line: off [{"allow":"none"}]
 @stylistic/jsx-pascal-case: error [{"allowAllCaps":false,"allowLeadingUnderscore":false,"allowNamespace":false,"ignore":[]}]
-@stylistic/jsx-props-no-multi-spaces: off
 @stylistic/jsx-quotes: off ["prefer-double"]
 @stylistic/jsx-self-closing-comp: error [{"component":true,"html":true}]
-@stylistic/jsx-sort-props: off [{"callbacksLast":false,"ignoreCase":false,"locale":"auto","multiline":"ignore","noSortAlphabetically":false,"reservedFirst":false,"reservedLast":[],"shorthandFirst":false,"shorthandLast":false}]
 @stylistic/jsx-tag-spacing: error [{"afterOpening":"never","beforeClosing":"never","beforeSelfClosing":"always","closingSlash":"never"}]
 @stylistic/jsx-wrap-multilines: off [{"arrow":"parens","assignment":"parens","condition":"ignore","declaration":"parens","logical":"ignore","prop":"ignore","propertyValue":"ignore","return":"parens"}]
 @stylistic/key-spacing: error [{"afterColon":true,"beforeColon":false,"ignoredNodes":[],"mode":"strict"}]
@@ -143,7 +140,7 @@ rules: 1403 (error 955, off 393, warn 55)
 @typescript-eslint/explicit-member-accessibility: error [{"accessibility":"no-public","ignoredMethodNames":[],"overrides":{"constructors":"off","parameterProperties":"off"}}]
 @typescript-eslint/explicit-module-boundary-types: off
 @typescript-eslint/init-declarations: off
-@typescript-eslint/max-params: error [{"countVoidThis":false,"max":4}]
+@typescript-eslint/max-params: warn [{"countVoidThis":false,"max":4}]
 @typescript-eslint/member-ordering: off
 @typescript-eslint/method-signature-style: error ["property"]
 @typescript-eslint/naming-convention: error [{"format":["camelCase","PascalCase"],"selector":"import"},{"format":["camelCase","UPPER_CASE"],"leadingUnderscore":"allow","selector":"variable","trailingUnderscore":"allow"},{"format":["camelCase"],"leadingUnderscore":"allow","selector":"default","trailingUnderscore":"allow"},{"format":["PascalCase"],"selector":"typeLike"}]
@@ -256,7 +253,7 @@ block-scoped-var: error
 camelcase: off [{"allow":[],"ignoreDestructuring":false,"ignoreGlobals":false,"ignoreImports":false,"properties":"always"}]
 capitalized-comments: error ["always",{"ignoreConsecutiveComments":true,"ignoreInlineComments":true,"ignorePattern":""}]
 class-methods-use-this: off [{"enforceForClassFields":true,"exceptMethods":[],"ignoreOverrideMethods":false}]
-complexity: error [{"max":10,"variant":"classic"}]
+complexity: warn [{"max":10,"variant":"classic"}]
 consistent-return: off [{"treatUndefinedAsUnspecified":false}]
 consistent-this: off ["that"]
 constructor-super: off
@@ -493,7 +490,7 @@ no-object-constructor: error
 no-octal: error
 no-octal-escape: error
 no-param-reassign: error [{"props":false}]
-no-plusplus: off [{"allowForLoopAfterthoughts":false}]
+no-plusplus: error [{"allowForLoopAfterthoughts":false}]
 no-promise-executor-return: error [{"allowVoid":false}]
 no-proto: error
 no-prototype-builtins: error
@@ -505,7 +502,6 @@ no-restricted-imports: error [{"message":"Use Uint8Array instead.","name":"buffe
 no-restricted-properties: off
 no-restricted-syntax: error [{"message":"Use Uint8Array instead.","selector":"NewExpression[callee.type='Identifier'][callee.name='Buffer']"}]
 no-return-assign: error ["always"]
-no-return-await: off
 no-script-url: error
 no-self-assign: error [{"props":true}]
 no-self-compare: error
@@ -779,8 +775,6 @@ sonarjs/comma-or-logical-or-case: off
 sonarjs/comment-regex: off [{"flags":"","message":"The regular expression matches this comment.","regularExpression":""}]
 sonarjs/composite-assertions: error
 sonarjs/concise-regex: off
-sonarjs/conditional-indentation: off
-sonarjs/confidential-information-logging: off
 sonarjs/constructor-for-side-effects: off
 sonarjs/content-length: off [{"fileUploadSizeLimit":8000000,"standardSizeLimit":2000000}]
 sonarjs/content-security-policy: warn
@@ -811,7 +805,6 @@ sonarjs/file-uploads: warn
 sonarjs/fixme-tag: off
 sonarjs/for-in: off
 sonarjs/for-loop-increment-sign: off
-sonarjs/frame-ancestors: off
 sonarjs/function-inside-loop: off
 sonarjs/function-name: off [{"format":"^[_a-z][a-zA-Z0-9]*$"}]
 sonarjs/function-return-type: off
@@ -819,7 +812,6 @@ sonarjs/future-reserved-words: off
 sonarjs/generator-without-yield: off
 sonarjs/hardcoded-secret-signatures: warn
 sonarjs/hashing: warn
-sonarjs/hidden-files: off
 sonarjs/hooks-before-test-cases: error
 sonarjs/in-operator-type-error: off
 sonarjs/inconsistent-function-call: error
@@ -901,18 +893,15 @@ sonarjs/no-inconsistent-returns: off
 sonarjs/no-incorrect-string-concat: off
 sonarjs/no-internal-api-use: error
 sonarjs/no-interpolation-in-inline-snapshots: error
-sonarjs/no-intrusive-permissions: off [{"permissions":["geolocation"]}]
 sonarjs/no-invalid-regexp: off
 sonarjs/no-invariant-returns: error
 sonarjs/no-inverted-boolean-check: off
-sonarjs/no-ip-forward: off
 sonarjs/no-labels: off
 sonarjs/no-literal-call: error
 sonarjs/no-mime-sniff: warn
 sonarjs/no-misleading-array-reverse: off
 sonarjs/no-misleading-character-class: off
 sonarjs/no-mixed-completion-style: error
-sonarjs/no-mixed-content: off
 sonarjs/no-mutate-reactive-state-in-updated-hook: error
 sonarjs/no-nested-assignment: off
 sonarjs/no-nested-conditional: off
@@ -928,7 +917,6 @@ sonarjs/no-redundant-assignments: off
 sonarjs/no-redundant-boolean: off
 sonarjs/no-redundant-jump: off
 sonarjs/no-redundant-optional: off
-sonarjs/no-redundant-parentheses: off
 sonarjs/no-reference-error: off
 sonarjs/no-referrer-policy: warn
 sonarjs/no-regex-spaces: off
@@ -941,7 +929,6 @@ sonarjs/no-session-cookies-on-static-assets: error
 sonarjs/no-skipped-tests: warn
 sonarjs/no-small-switch: error
 sonarjs/no-sonar-comments: error
-sonarjs/no-tab: off
 sonarjs/no-table-as-layout: error
 sonarjs/no-trivial-assertions: error
 sonarjs/no-try-promise: error
@@ -949,7 +936,6 @@ sonarjs/no-undefined-argument: off
 sonarjs/no-undefined-assignment: off
 sonarjs/no-unenclosed-multiline-block: off
 sonarjs/no-uniq-key: error
-sonarjs/no-unsafe-unzip: off
 sonarjs/no-unthrown-error: error
 sonarjs/no-unused-collection: error
 sonarjs/no-unused-function-argument: off
@@ -970,7 +956,6 @@ sonarjs/non-number-in-arithmetic-expression: off
 sonarjs/null-dereference: off
 sonarjs/object-alt-content: error
 sonarjs/operation-returning-nan: off
-sonarjs/os-command: off
 sonarjs/parameterized-tests: warn
 sonarjs/post-message: error
 sonarjs/prefer-cypress-should: error
@@ -1023,13 +1008,11 @@ sonarjs/unverified-hostname: error
 sonarjs/updated-const-var: off
 sonarjs/updated-loop-counter: error
 sonarjs/use-type-alias: warn
-sonarjs/useless-string-operation: off
 sonarjs/values-not-convertible-to-numbers: off
 sonarjs/variable-name: off [{"format":"^[_$A-Za-z][$A-Za-z0-9]*$|^[_$A-Z][_$A-Z0-9]+$"}]
 sonarjs/vitest-mock-at-module-scope: error
 sonarjs/void-use: off
 sonarjs/weak-ssl: warn
-sonarjs/web-sql-database: off
 sonarjs/x-powered-by: warn
 sonarjs/xml-parser-xxe: error
 sort-imports: off [{"allowSeparatedGroups":false,"ignoreCase":false,"ignoreDeclarationSort":false,"ignoreMemberSort":false,"memberSyntaxSortOrder":["none","all","multiple","single"]}]
@@ -1077,7 +1060,7 @@ unicorn/isolated-functions: error [{"comments":["@isolated"],"functions":["makeS
 unicorn/iteration-fallback-style: error ["guard"]
 unicorn/key-name-casing: off [{"PascalCase":false,"SCREAMING_SNAKE_CASE":false,"camelCase":true,"ignore":[],"kebab-case":false,"snake_case":false}]
 unicorn/logical-assignment-operators: off ["always"]
-unicorn/max-nested-calls: error [{"max":3}]
+unicorn/max-nested-calls: warn [{"max":3}]
 unicorn/name-replacements: error [{"allowList":{"i18n":true,"i18nKey":true,"tsconfigRootDir":true},"checkDefaultAndNamespaceImports":"internal","checkFilenames":true,"checkProperties":false,"checkShorthandImports":"internal","checkShorthandProperties":false,"checkVariables":true,"extendDefaultAllowList":true,"extendDefaultReplacements":true,"ignore":["\\.spec$","\\.test$","\\.e2e$"],"replacements":{"ctx":false,"e":{"error":true,"event":false},"fn":{"function":false},"ref":false,"req":false,"res":false}}]
 unicorn/new-for-builtins: error
 unicorn/no-abusive-eslint-disable: error

@@ -277,7 +277,7 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (5/32) ----------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (5/29) ----------------------------------------------------------------------------------------------------------.
   "@stylistic/function-call-spacing": ["error", "never"], // Automatically fixable by the --fix command.
   "@stylistic/jsx-pascal-case": [
     "error",
@@ -304,7 +304,7 @@ const otherRules: Rules = {
     },
   ], // Automatically fixable by the --fix command.
 
-  // --- Rules with overridden options (1/32) -------------------------------------------------------------------------------------------------------.
+  // --- Rules with overridden options (1/29) -------------------------------------------------------------------------------------------------------.
   "@stylistic/padding-line-between-statements": [
     "error",
     {
@@ -317,7 +317,7 @@ const otherRules: Rules = {
     },
   ], // Automatically fixable by the --fix command.
 
-  // --- Turned off rules (26/32) -------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (23/29) -------------------------------------------------------------------------------------------------------------------.
   "@stylistic/array-bracket-newline": "off", // Handled by `prettier`; line wrapping depends on print width and array contents. Automatically fixable by the --fix command.
   "@stylistic/array-element-newline": "off", // Handled by `prettier`; preserve compact arrays where their elements fit. Automatically fixable by the --fix command.
   "@stylistic/curly-newline": "off", // Handled by `prettier`; preserve compact empty blocks and print-width-based wrapping. Automatically fixable by the --fix command.
@@ -327,10 +327,7 @@ const otherRules: Rules = {
   "@stylistic/function-paren-newline": "off", // Handled by `prettier`; parameter wrapping depends on print width. Automatically fixable by the --fix command.
   "@stylistic/implicit-arrow-linebreak": "off", // Handled by `arrow-body-style`, which requires block bodies. Automatically fixable by the --fix command.
   "@stylistic/jsx-child-element-spacing": "off", // Prefer explicit JSX whitespace where rendered text requires it; spaces affect output.
-  "@stylistic/jsx-indent": "off", // Deprecated; handled by `prettier` rather than the replacement `@stylistic/indent`. Automatically fixable by the --fix command.
   "@stylistic/jsx-newline": "off", // Handled by `prettier`; preserve author grouping without arbitrary JSX blank lines. Automatically fixable by the --fix command.
-  "@stylistic/jsx-props-no-multi-spaces": "off", // Deprecated; handled by `@stylistic/no-multi-spaces`. Automatically fixable by the --fix command.
-  "@stylistic/jsx-sort-props": "off", // Deprecated; handled by `perfectionist/sort-jsx-props`. Automatically fixable by the --fix command.
   "@stylistic/line-comment-position": "off", // Prefer to allow concise inline comments when they clarify adjacent code.
   "@stylistic/linebreak-style": "off", // Handled by `prettier`; consumers choose `endOfLine`. Automatically fixable by the --fix command.
   "@stylistic/lines-around-comment": "off", // Prefer related comments beside their code without mandatory surrounding blank lines. Automatically fixable by the --fix command.
@@ -347,9 +344,9 @@ const otherRules: Rules = {
 } as const;
 
 const stylisticRules: Rules = {
-  ...recommendedRules, // 65/98 rules, 61 automatically fixable, 0 editor suggestions fixable.
-  ...otherRules, // 32/98 rules, 28 automatically fixable, 0 editor suggestions fixable.
-  "@cravingmaker/svelte-function-variable-padding": "error", // Internal policy: 1/98 rules, 1 automatically fixable, 0 editor suggestions fixable.
+  ...recommendedRules, // 65/95 rules, 61 automatically fixable, 0 editor suggestions fixable.
+  ...otherRules, // 29/95 rules, 25 automatically fixable, 0 editor suggestions fixable.
+  "@cravingmaker/svelte-function-variable-padding": "error", // Internal policy: 1/95 rules, 1 automatically fixable, 0 editor suggestions fixable.
 } as const;
 
 export { stylisticRules };

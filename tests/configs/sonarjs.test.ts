@@ -22,12 +22,19 @@ const requiresTypeChecking = (documentation: object | undefined): boolean => {
 };
 
 describe("SonarJS policy", () => {
-  it("classifies every exported rule, including deprecated rules", () => {
+  it("classifies every current non-deprecated rule", () => {
     expect(sortRuleIds(Object.keys(sonarjsRules))).toEqual(
       sortRuleIds(
-        Object.keys(pluginSonarjs.rules).map((name) => {
-          return `sonarjs/${name}`;
-        }),
+        Object.entries(pluginSonarjs.rules)
+          .filter(([, rule]) => {
+            return (
+              typeof rule.meta?.deprecated === "undefined" ||
+              rule.meta.deprecated === false
+            );
+          })
+          .map(([name]) => {
+            return `sonarjs/${name}`;
+          }),
       ),
     );
   });
