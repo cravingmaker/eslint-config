@@ -40,6 +40,7 @@ const filePaths = [
 const isRecord = (value: unknown): value is UnknownRecord => {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 };
+
 const isObjectOptionExplicit = (
   schema: UnknownRecord,
   value: UnknownRecord,
@@ -58,9 +59,11 @@ const isObjectOptionExplicit = (
     })
   );
 };
+
 const isUnknownArray = (value: unknown): value is readonly unknown[] => {
   return Array.isArray(value);
 };
+
 const isMatchingScalarShape = (
   schema: UnknownRecord,
   value: unknown,
@@ -79,6 +82,7 @@ const isMatchingScalarShape = (
   }
   return true;
 };
+
 // This selects an option form; ESLint performs the full schema validation below.
 const isMatchingOptionShape = (schema: unknown, value: unknown): boolean => {
   if (typeof value === "undefined" || !isRecord(schema)) {
@@ -95,6 +99,7 @@ const isMatchingOptionShape = (schema: unknown, value: unknown): boolean => {
     })
   );
 };
+
 const objectSchemas = (schema: unknown): readonly UnknownRecord[] => {
   if (!isRecord(schema)) {
     return [];
@@ -109,6 +114,7 @@ const objectSchemas = (schema: unknown): readonly UnknownRecord[] => {
     ? [schema]
     : [];
 };
+
 const isOptionExplicit = (
   schema: unknown,
   options: readonly unknown[],
@@ -125,6 +131,7 @@ const isOptionExplicit = (
       }))
   );
 };
+
 const optionSchemas = (schema: unknown): ReadonlyArray<readonly unknown[]> => {
   if (isUnknownArray(schema)) {
     return [schema];
@@ -145,6 +152,7 @@ const optionSchemas = (schema: unknown): ReadonlyArray<readonly unknown[]> => {
   // can deliberately have no entries, such as require-attrs and no-restricted-syntax.
   return [[]];
 };
+
 // The second SonarJS option is the internal "silence-issues" mode, which suppresses
 // diagnostics. The numeric threshold alone is the public reporting option form.
 const hasCognitiveComplexityReportingOptions = (
@@ -158,6 +166,7 @@ const hasCognitiveComplexityReportingOptions = (
     })
   );
 };
+
 const missingOptions = (
   id: string,
   rule: unknown,
@@ -221,6 +230,7 @@ const missingOptions = (
     ? []
     : (missing.at(0) ?? [`${id} option form`]);
 };
+
 describe("explicit rule options", () => {
   it("declares enabled rules' canonical options or explicitly leaves them unset", async () => {
     const config = await createConfig({
@@ -343,6 +353,7 @@ const getOffRuleIds = async (
       return ruleId;
     });
 };
+
 /*
 ESLint validates rule options only while a rule is enabled, and a later config that enables a rule with a bare severity keeps the options configured before.
 Options retained on an off rule must still be valid when a consumer enables it.

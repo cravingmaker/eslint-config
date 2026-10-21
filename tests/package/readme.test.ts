@@ -113,11 +113,13 @@ afterAll(async () => {
 const compareText = (left: string, right: string): number => {
   return left.localeCompare(right);
 };
+
 const isRecord = (
   value: unknown,
 ): value is Readonly<Record<string, unknown>> => {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 };
+
 // The compiler options of a tsconfig, read from `text` as the compiler reads them, comments included.
 const readCompilerOptions = (
   fileName: string,
@@ -129,6 +131,7 @@ const readCompilerOptions = (
     path.dirname(fileName),
   ).options;
 };
+
 /*
 Writes `example` as the `eslint.config.js` of a project in the consumer in `consumer`, next to a
 copy of the fixtures, and returns its directory. The project declares what the consumer declares,
@@ -154,6 +157,7 @@ const createExampleProject = async (
   await writeFile(path.join(directory, "eslint.config.js"), text);
   return directory;
 };
+
 // The fatal messages of `results`, such as parsing errors, with their file and, if any, position.
 const getFatalMessages = (
   directory: string,

@@ -1,5 +1,14 @@
 import type { Rules } from "../../../types.js";
 
+import { transparentWrappers } from "../../../rules/function-values.js";
+
+// A direct initializer may pass through any number of transparent TypeScript wrappers.
+// Exclude functions nested inside calls, objects, or other value-producing expressions.
+const functionExpression =
+  ":matches(ArrowFunctionExpression, FunctionExpression)";
+const transparentWrapper = `:matches(${[...transparentWrappers].join(", ")})`;
+const functionVariable = `VariableDeclaration:has(> VariableDeclarator[id.type="Identifier"]:has(> ${functionExpression}.init, > ${transparentWrapper}.init:has(${functionExpression}:not(${transparentWrapper} :not(${transparentWrapper}) ${functionExpression}))))`;
+
 // Rule list: https://eslint.style/rules.
 // Stable token spacing and structural checks stay on even when eslint-config-prettier disables them.
 const recommendedRules: Rules = {
@@ -295,7 +304,20 @@ const otherRules: Rules = {
     },
   ], // Automatically fixable by the --fix command.
 
-  // --- Turned off rules (27/32) -------------------------------------------------------------------------------------------------------------------.
+  // --- Rules with overridden options (1/32) -------------------------------------------------------------------------------------------------------.
+  "@stylistic/padding-line-between-statements": [
+    "error",
+    {
+      blankLine: "always",
+      next: "*",
+      prev: [
+        { selector: functionVariable },
+        { selector: `ExportNamedDeclaration:has(> ${functionVariable})` },
+      ],
+    },
+  ], // Automatically fixable by the --fix command.
+
+  // --- Turned off rules (26/32) -------------------------------------------------------------------------------------------------------------------.
   "@stylistic/array-bracket-newline": "off", // Handled by `prettier`; line wrapping depends on print width and array contents. Automatically fixable by the --fix command.
   "@stylistic/array-element-newline": "off", // Handled by `prettier`; preserve compact arrays where their elements fit. Automatically fixable by the --fix command.
   "@stylistic/curly-newline": "off", // Handled by `prettier`; preserve compact empty blocks and print-width-based wrapping. Automatically fixable by the --fix command.
@@ -313,21 +335,21 @@ const otherRules: Rules = {
   "@stylistic/linebreak-style": "off", // Handled by `prettier`; consumers choose `endOfLine`. Automatically fixable by the --fix command.
   "@stylistic/lines-around-comment": "off", // Prefer related comments beside their code without mandatory surrounding blank lines. Automatically fixable by the --fix command.
   "@stylistic/max-len": "off", // Handled by `prettier`; print width is a wrapping target, and literals or URLs may exceed it.
-  "@stylistic/multiline-comment-style": "off", // Prefer both grouped line comments and bare block comments; documentation stars are handled by `unicorn/no-asterisk-prefix-in-documentation-comments`. Automatically fixable by the --fix command.
+  "@stylistic/multiline-comment-style": "off", // Preserve ordinary grouped line and block comments; documentation stars are handled by `@cravingmaker/starred-documentation`. Automatically fixable by the --fix command.
   "@stylistic/newline-per-chained-call": "off", // Handled by `prettier`; chain wrapping depends on call structure and print width. Automatically fixable by the --fix command.
   "@stylistic/no-confusing-arrow": "off", // Handled by `arrow-body-style`, which requires block bodies. Automatically fixable by the --fix command.
   "@stylistic/nonblock-statement-body-position": "off", // Handled by `curly`, which requires block bodies. Automatically fixable by the --fix command.
   "@stylistic/object-curly-newline": "off", // Handled by `prettier`; object and type wrapping depends on print width and source grouping. Automatically fixable by the --fix command.
   "@stylistic/object-property-newline": "off", // Handled by `prettier`; preserve compact objects where their properties fit. Automatically fixable by the --fix command.
   "@stylistic/one-var-declaration-per-line": "off", // Handled by `one-var`, which requires separate declarations. Automatically fixable by the --fix command.
-  "@stylistic/padding-line-between-statements": "off", // Prefer grouping related statements; import and module separation are handled by `perfectionist/sort-imports` and `perfectionist/sort-modules`. Automatically fixable by the --fix command.
   "@stylistic/semi-style": "off", // Handled by `prettier`; preserve leading semicolons that protect ASI-sensitive statements. Automatically fixable by the --fix command.
   "@stylistic/wrap-regex": "off", // Prefer natural regex syntax without redundant parentheses. Automatically fixable by the --fix command.
 } as const;
 
 const stylisticRules: Rules = {
-  ...recommendedRules, // 65/97 rules, 61 automatically fixable, 0 editor suggestions fixable.
-  ...otherRules, // 32/97 rules, 28 automatically fixable, 0 editor suggestions fixable.
+  ...recommendedRules, // 65/98 rules, 61 automatically fixable, 0 editor suggestions fixable.
+  ...otherRules, // 32/98 rules, 28 automatically fixable, 0 editor suggestions fixable.
+  "@cravingmaker/svelte-function-variable-padding": "error", // Internal policy: 1/98 rules, 1 automatically fixable, 0 editor suggestions fixable.
 } as const;
 
 export { stylisticRules };

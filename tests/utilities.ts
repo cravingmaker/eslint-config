@@ -15,12 +15,12 @@ type LintOptions = {
   readonly tsTypeChecked?: boolean;
 };
 /**
-Lints `code` as `filePath` against the full `createConfig` output and returns the ID of the rule
-behind each message. The helpers turn every framework on, so that the result does not depend on
-the frameworks that this repository's manifest declares. A file that ESLint ignores, or code that
-it cannot parse, fails the assertion: no rule reports such a file, so a negative assertion would
-pass without linting anything, and a positive one would fail for the wrong reason.
-*/
+ * Lints `code` as `filePath` against the full `createConfig` output and returns the ID of the rule
+ * behind each message. The helpers turn every framework on, so that the result does not depend on
+ * the frameworks that this repository's manifest declares. A file that ESLint ignores, or code that
+ * it cannot parse, fails the assertion: no rule reports such a file, so a negative assertion would
+ * pass without linting anything, and a positive one would fail for the wrong reason.
+ */
 const lintRuleIds = async (
   code: string,
   {
@@ -62,12 +62,13 @@ const lintRuleIds = async (
     return message.ruleId;
   });
 };
-/**
-Asserts that linting `code` reports `ruleId`.
 
-@example
-await expectLintError('const a = 1;\n', 'no-unused-vars', { filePath: 'test.js' });
-*/
+/**
+ * Asserts that linting `code` reports `ruleId`.
+ *
+ * @example
+ * await expectLintError('const a = 1;\n', 'no-unused-vars', { filePath: 'test.js' });
+ */
 const expectLintError = async (
   code: string,
   ruleId: string,
@@ -79,10 +80,11 @@ const expectLintError = async (
     `Expected rule "${ruleId}" to fire.\nReported rules: [${ruleIds.join(", ")}]`,
   ).toContain(ruleId);
 };
+
 /**
-Asserts that linting `code` does not report `ruleId`. It still fails when ESLint ignores the
-file or cannot parse the code.
-*/
+ * Asserts that linting `code` does not report `ruleId`. It still fails when ESLint ignores the
+ * file or cannot parse the code.
+ */
 const expectNoLintError = async (
   code: string,
   ruleId: string,
@@ -94,4 +96,5 @@ const expectNoLintError = async (
     `Expected rule "${ruleId}" not to fire.\nReported rules: [${ruleIds.join(", ")}]`,
   ).not.toContain(ruleId);
 };
+
 export { expectLintError, expectNoLintError };

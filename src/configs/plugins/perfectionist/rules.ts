@@ -511,7 +511,9 @@ const perfectionistRules: Rules = {
           "export-declare-function",
         ],
       ],
-      newlinesBetween: 1,
+      // The installed spacing fixer counts documentation paragraphs and can repeatedly produce a no-op fix.
+      // Keep declaration ordering; function-variable separation is handled by `@stylistic/padding-line-between-statements`.
+      newlinesBetween: "ignore",
     },
   ], // Automatically fixable by the --fix command.
   "perfectionist/sort-named-exports": [

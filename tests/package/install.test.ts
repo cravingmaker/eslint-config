@@ -110,6 +110,7 @@ afterAll(async () => {
 const compareText = (left: string, right: string): number => {
   return left.localeCompare(right);
 };
+
 // A project root in the consumer in `directory` whose manifest declares `dependencies`.
 const createProjectRoot = async (
   directory: string,
@@ -129,6 +130,7 @@ const createProjectRoot = async (
   );
   return projectRootDirectory;
 };
+
 /*
 Runs the ESLint CLI of the consumer in `directory` with `config` as `eslint.config.js` on
 `filePaths`, and returns the messages of each file by path.
@@ -162,6 +164,7 @@ const lint = async (
     }),
   );
 };
+
 // Runs `script` as an ES module in the consumer in `directory` and returns what it prints.
 const run = async (directory: string, script: string): Promise<string> => {
   const { stdout } = await execute(
@@ -171,6 +174,7 @@ const run = async (directory: string, script: string): Promise<string> => {
   );
   return stdout;
 };
+
 /*
 Calls `createConfig` in the consumer in `directory` with the options of each case, and returns
 the names of the framework blocks for each, or the message that it fails with.
@@ -201,6 +205,7 @@ const runFrameworkCases = async (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The script prints an object.
   return JSON.parse(output) as Readonly<Record<string, unknown>>;
 };
+
 // `filePaths` without messages, by path.
 const withoutMessages = (filePaths: readonly string[]): Messages => {
   return Object.fromEntries(
@@ -283,6 +288,45 @@ describe("the packed package", () => {
 });
 
 describe("a consumer without optional peers", () => {
+  it("ships the internal arrow and documentation policies with stable function spacing", async () => {
+    const output = await run(
+      withoutPeers,
+      String.raw`
+      import { ESLint } from "eslint";
+      import { createConfig } from "@cravingmaker/eslint-config";
+      const config = await createConfig({ typescript: { typeChecked: false } });
+      const reporter = new ESLint({ overrideConfig: config, overrideConfigFile: true });
+      const fixer = new ESLint({ fix: true, overrideConfig: config, overrideConfigFile: true });
+      const cases = [];
+      for (const filePath of ["example.js", "example.ts"]) {
+        const [reported] = await reporter.lintText("export const double = function double(value) {\n  return value * 2;\n};\n", { filePath });
+        const source = "const first = (value) => {\n  return value;\n};\n/**\nDescribe the second function.\n\nExplain a detail.\n*/\nconst second = (value) => {\n  return value;\n};\nexport { first, second };\n";
+        const [first] = await fixer.lintText(source, { filePath });
+        const [second] = await fixer.lintText(first.output ?? source, { filePath });
+        cases.push({
+          arrowReports: reported.messages.map(({ ruleId, fix, suggestions }) => ({ ruleId, fix, suggestions })),
+          fatalErrors: reported.fatalErrorCount + first.fatalErrorCount + second.fatalErrorCount,
+          changedAgain: typeof second.output === "string",
+          messages: first.messages.concat(second.messages),
+          text: first.output ?? source,
+        });
+      }
+      process.stdout.write(JSON.stringify(cases));
+    `,
+    );
+    expect(JSON.parse(output)).toEqual(
+      ["js", "ts"].map(() => {
+        return {
+          arrowReports: [{ ruleId: "@cravingmaker/prefer-arrow-functions" }],
+          changedAgain: false,
+          fatalErrors: 0,
+          messages: [],
+          text: "const first = (value) => {\n  return value;\n};\n\n/**\n * Describe the second function.\n *\n * Explain a detail.\n */\nconst second = (value) => {\n  return value;\n};\n\nexport { first, second };\n",
+        };
+      }),
+    );
+  });
+
   it("converges on uppercase escapes and commented imports from the installed package", async () => {
     const output = await run(
       withoutPeers,
@@ -350,8 +394,8 @@ describe("a consumer without optional peers", () => {
             'import path from "node:path";',
             "",
             "/**",
-            "Read the configured directories.",
-            "*/",
+            " * Read the configured directories.",
+            " */",
             'const directories = [os.tmpdir(), path.resolve(".")];',
             String.raw`const pattern = /\u{E9}/u;`,
             String.raw`const characters = ["\u{AB}", "\u{E9}", "\u{E9}"];`,

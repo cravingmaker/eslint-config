@@ -39,7 +39,7 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (67/122) --------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (65/122) --------------------------------------------------------------------------------------------------------.
   "accessor-pairs": [
     "error",
     {
@@ -75,15 +75,6 @@ const otherRules: Rules = {
   "dot-notation": ["error", { allowPattern: "", ...dotNotationOptions }], // Automatically fixable by the --fix command.
   eqeqeq: ["error", "always", { null: "always" }], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "func-names": ["error", "always", { generators: "always" }],
-  "func-style": [
-    "error",
-    "expression",
-    {
-      allowArrowFunctions: false,
-      allowTypeAnnotation: false,
-      overrides: undefined,
-    },
-  ],
   "guard-for-in": "error",
   "no-alert": "error",
   "no-array-constructor": "error", // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
@@ -153,13 +144,6 @@ const otherRules: Rules = {
   ], // Automatically fixable by the --fix command.
   "no-useless-return": "error", // Automatically fixable by the --fix command.
   "no-var": "error", // Automatically fixable by the --fix command.
-  "prefer-arrow-callback": [
-    "error",
-    {
-      allowNamedFunctions: false,
-      allowUnboundThis: true,
-    },
-  ], // Automatically fixable by the --fix command.
   "prefer-exponentiation-operator": "error", // Automatically fixable by the --fix command.
   "prefer-named-capture-group": "error", // Manually fixable by editor suggestions.
   "prefer-numeric-literals": "error", // Automatically fixable by the --fix command.
@@ -297,9 +281,10 @@ const otherRules: Rules = {
   // Complemented by `sonarjs/unicode-aware-regex` for implicit string patterns when type information is available.
   "require-unicode-regexp": ["error", { requireFlag: undefined }], // Adding either flag can change matching behavior, so review existing patterns. Manually fixable by editor suggestions.
 
-  // --- Turned off rules (28/122) ------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (30/122) ------------------------------------------------------------------------------------------------------------------.
   "consistent-return": "off", // Prefer type-aware return analysis over syntax-only consistency checks.
   "consistent-this": "off", // Prefer lexical this through arrow functions over introducing aliases.
+  "func-style": "off", // Handled by `@cravingmaker/prefer-arrow-functions`, preserving expression style and semantic exceptions that this rule cannot express.
   "id-denylist": "off", // Prefer to restrict identifier names only when explicit naming conventions require it.
   "id-length": "off", // Prefer descriptive names while allowing conventional short identifiers where appropriate.
   "id-match": "off", // Prefer context-aware naming conventions over a single restrictive regex.
@@ -321,6 +306,7 @@ const otherRules: Rules = {
   "no-ternary": "off", // Prefer conditional expressions to avoid unnecessary branching statements.
   "no-underscore-dangle": "off", // Prefer to allow underscores for naming conventions, unused bindings, and external API compatibility.
   "no-warning-comments": "off", // Handled by `unicorn/expiring-todo-comments`.
+  "prefer-arrow-callback": "off", // Handled by `@cravingmaker/prefer-arrow-functions` without automatic function-identity changes. Automatically fixable by the --fix command.
   "sort-imports": "off", // Handled by `perfectionist/sort-imports`. Automatically fixable by the --fix command.
   "sort-keys": "off", // Handled by `perfectionist/sort-objects`.
   "sort-vars": "off", // Prefer declaration order based on dependencies and readability. Automatically fixable by the --fix command.

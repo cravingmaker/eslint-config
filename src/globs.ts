@@ -45,10 +45,10 @@ const testFiles = ["**/*.{test,spec}.*"] as const;
 const configFiles = ["**/*.config.*"] as const;
 
 /**
-The default files of a feature that lints JavaScript or TypeScript sources: `patterns`, and the
-Svelte components whose scripts it also lints. Each nested array is a set of patterns that a file
-must all match.
-*/
+ * The default files of a feature that lints JavaScript or TypeScript sources: `patterns`, and the
+ * Svelte components whose scripts it also lints. Each nested array is a set of patterns that a file
+ * must all match.
+ */
 const withSvelteComponents = (
   patterns: readonly string[],
   svelteComponents: ReadonlyArray<string | readonly string[]>,

@@ -2,7 +2,7 @@ path: packages/app/package.json
 ignored: false
 language: @/js
 processor: none
-plugins: @ @eslint-community/eslint-comments @stylistic enforce-package-type functional import-x markdown n package-json perfectionist promise regexp security sonarjs unicorn unused-imports
+plugins: @ @cravingmaker @eslint-community/eslint-comments @stylistic enforce-package-type functional import-x markdown n package-json perfectionist promise regexp security sonarjs unicorn unused-imports
 languageOptions:
   ecmaVersion: 2026
   parser: "[Parser jsonc-eslint-parser]"

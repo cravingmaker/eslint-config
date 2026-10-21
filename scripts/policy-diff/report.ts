@@ -24,8 +24,8 @@ import {
 } from "./compare.js";
 
 /**
-What the baseline commit holds: its snapshots by path below the snapshot directory, and its lockfile, which an old commit may not have.
-*/
+ * What the baseline commit holds: its snapshots by path below the snapshot directory, and its lockfile, which an old commit may not have.
+ */
 type Baseline = {
   readonly commit: string;
   readonly snapshots: ReadonlyMap<string, string>;
@@ -35,22 +35,22 @@ type Baseline = {
   readonly lockfile?: string;
 };
 /**
-A package of a lockfile, by its path below the project, such as `node_modules/eslint`.
-*/
+ * A package of a lockfile, by its path below the project, such as `node_modules/eslint`.
+ */
 type LockedPackage = {
   readonly isOptional: boolean;
   readonly version: string;
 };
 /**
-The report and whether every snapshot could be compared.
-*/
+ * The report and whether every snapshot could be compared.
+ */
 type Report = {
   readonly isComplete: boolean;
   readonly text: string;
 };
 /**
-The functions that describe the snapshots of a scenario.
-*/
+ * The functions that describe the snapshots of a scenario.
+ */
 type SnapshotDescriber = {
   readonly createEslint: typeof createEslint;
   readonly describeSnapshot: typeof describeSnapshot;
@@ -69,9 +69,9 @@ Compares the effective configuration of the working tree, built with
 \`npm run build\`, with the snapshots in ${snapshotDirectory}/
 at <git-ref>, HEAD by default.`;
 /**
-Lists the packages whose locked version differs between two lockfiles, by path, with the
-`node_modules/` prefix left out.
-*/
+ * Lists the packages whose locked version differs between two lockfiles, by path, with the
+ * `node_modules/` prefix left out.
+ */
 const compareLockedPackages = (
   before: ReadonlyMap<string, LockedPackage>,
   after: ReadonlyMap<string, LockedPackage>,
@@ -93,16 +93,19 @@ const compareLockedPackages = (
         : `~ ${name}: ${previous} → ${next}`;
     });
 };
+
 /**
-Fails with a message for the person who runs the report.
-*/
+ * Fails with a message for the person who runs the report.
+ */
 const fail = (message: string): never => {
   // eslint-disable-next-line functional/no-throw-statements -- The report must not look complete when its inputs are not.
   throw new Error(message);
 };
+
 const getMessage = (error: unknown): string => {
   return Error.isError(error) ? error.message : String(error);
 };
+
 const describeScenario = async (
   { name, options, snapshots }: EffectiveScenario,
   { createEslint: create, describeSnapshot: describe }: SnapshotDescriber,
@@ -119,6 +122,7 @@ const describeScenario = async (
       scenario: name,
     };
   };
+
   try {
     const eslint = await create(options);
     return await Promise.all(
@@ -138,10 +142,11 @@ const describeScenario = async (
     });
   }
 };
+
 /**
-Describes every snapshot of `scenarios` with the built package. A failure is kept with the
-snapshot that it belongs to, so that the report can still list the others.
-*/
+ * Describes every snapshot of `scenarios` with the built package. A failure is kept with the
+ * snapshot that it belongs to, so that the report can still list the others.
+ */
 const describeCurrentSnapshots = async (
   scenarios: readonly EffectiveScenario[],
   describer: SnapshotDescriber,
@@ -153,9 +158,10 @@ const describeCurrentSnapshots = async (
   );
   return described.flat();
 };
+
 /**
-Lists the snapshots with `status` under `title`, or nothing when there are none.
-*/
+ * Lists the snapshots with `status` under `title`, or nothing when there are none.
+ */
 const listResults = (
   results: readonly SnapshotResult[],
   status: SnapshotResult["outcome"]["status"],
@@ -181,9 +187,10 @@ const listResults = (
   });
   return lines.length === 0 ? [] : [title, ...lines, ""];
 };
+
 /**
-Reads the command line: `--base <git-ref>`, HEAD by default, and `--help`.
-*/
+ * Reads the command line: `--base <git-ref>`, HEAD by default, and `--help`.
+ */
 const parseCommandLine = (
   commandLine: readonly string[],
 ):
@@ -203,6 +210,7 @@ const parseCommandLine = (
   });
   return values.help ? { help: true } : { base: values.base };
 };
+
 const readInstalledVersion = async (
   key: string,
   directory: string,
@@ -222,10 +230,11 @@ const readInstalledVersion = async (
   }
   return;
 };
+
 /**
-Lists the packages of the lockfile that are not installed in `directory` with their locked
-version. An optional package, such as one for another platform, may be missing.
-*/
+ * Lists the packages of the lockfile that are not installed in `directory` with their locked
+ * version. An optional package, such as one for another platform, may be missing.
+ */
 const findInstallMismatches = async (
   packages: ReadonlyMap<string, LockedPackage>,
   directory: string,
@@ -243,9 +252,10 @@ const findInstallMismatches = async (
   );
   return mismatches.flat();
 };
+
 /**
-Describes the packages of the working tree's lockfile against those of the baseline. The report calculates the configuration with the installed packages, so they must be those of the lockfile.
-*/
+ * Describes the packages of the working tree's lockfile against those of the baseline. The report calculates the configuration with the installed packages, so they must be those of the lockfile.
+ */
 const describeDependencies = async (
   previous?: ReadonlyMap<string, LockedPackage>,
   current?: ReadonlyMap<string, LockedPackage>,
@@ -280,9 +290,10 @@ const describeDependencies = async (
         }),
       ];
 };
+
 /**
-Reads the packages of a lockfile, without the project itself.
-*/
+ * Reads the packages of a lockfile, without the project itself.
+ */
 const readLockedPackages = (
   text: string,
 ): ReadonlyMap<string, LockedPackage> => {
@@ -310,10 +321,11 @@ const readLockedPackages = (
     ),
   );
 };
+
 /**
-Reads the packages of a lockfile like `readLockedPackages`, or nothing without a lockfile or
-when it is not JSON.
-*/
+ * Reads the packages of a lockfile like `readLockedPackages`, or nothing without a lockfile or
+ * when it is not JSON.
+ */
 const readLockedPackagesIfValid = (
   text?: string,
 ): ReadonlyMap<string, LockedPackage> | undefined => {
@@ -327,6 +339,7 @@ const readLockedPackagesIfValid = (
   }
   return;
 };
+
 const readLockfile = async (file: string): Promise<string | undefined> => {
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- The lockfile of the project.
@@ -336,6 +349,7 @@ const readLockfile = async (file: string): Promise<string | undefined> => {
   }
   return;
 };
+
 const summarize = (results: readonly SnapshotResult[]): string => {
   const count = (status: SnapshotResult["outcome"]["status"]): string => {
     return String(
@@ -344,6 +358,7 @@ const summarize = (results: readonly SnapshotResult[]): string => {
       }).length,
     );
   };
+
   if (
     results.every(({ outcome }) => {
       return outcome.status === "unchanged";
@@ -353,9 +368,10 @@ const summarize = (results: readonly SnapshotResult[]): string => {
   }
   return `Summary: ${count("changed")} changed, ${count("new")} new, ${count("removed")} removed, ${count("failed")} failed, ${count("unchanged")} unchanged.`;
 };
+
 /**
-Formats the results: the changes of each changed snapshot, the lists of new, removed, and failed snapshots, and a summary, which says that the policy is unchanged only when every snapshot is.
-*/
+ * Formats the results: the changes of each changed snapshot, the lists of new, removed, and failed snapshots, and a summary, which says that the policy is unchanged only when every snapshot is.
+ */
 const formatResults = (
   results: readonly SnapshotResult[],
 ): readonly string[] => {
@@ -388,9 +404,10 @@ const formatResults = (
     summarize(results),
   ];
 };
+
 /**
-The environment without the variables that Git reads, whose names start with `GIT_`.
-*/
+ * The environment without the variables that Git reads, whose names start with `GIT_`.
+ */
 const withoutGitVariables = (
   environment: Readonly<NodeJS.ProcessEnv>,
 ): NodeJS.ProcessEnv => {
@@ -400,11 +417,12 @@ const withoutGitVariables = (
     }),
   );
 };
+
 /**
-Runs Git in `directory` with `gitArguments`, without a shell, and returns its output. Git finds
-the repository from `directory`: a Git hook, such as the pre-push hook that runs the tests, sets
-`GIT_DIR` and other variables that would point it to the repository of the hook.
-*/
+ * Runs Git in `directory` with `gitArguments`, without a shell, and returns its output. Git finds
+ * the repository from `directory`: a Git hook, such as the pre-push hook that runs the tests, sets
+ * `GIT_DIR` and other variables that would point it to the repository of the hook.
+ */
 const git = async (
   gitArguments: readonly string[],
   directory: string,
@@ -418,9 +436,10 @@ const git = async (
   });
   return stdout;
 };
+
 /**
-Runs Git like `git` for a command that prints one line, and returns that line.
-*/
+ * Runs Git like `git` for a command that prints one line, and returns that line.
+ */
 const gitLine = async (
   gitArguments: readonly string[],
   directory: string,
@@ -428,10 +447,11 @@ const gitLine = async (
   const output = await git(gitArguments, directory);
   return output.trim();
 };
+
 /**
-Resolves `object` to the name of a Git object in `directory`, or nothing when it names none.
-Git reads it as a revision even when it starts with a dash, so it cannot pass an option.
-*/
+ * Resolves `object` to the name of a Git object in `directory`, or nothing when it names none.
+ * Git reads it as a revision even when it starts with a dash, so it cannot pass an option.
+ */
 const readGitObject = async (
   object: string,
   directory: string,
@@ -446,10 +466,11 @@ const readGitObject = async (
   }
   return;
 };
+
 /**
-Reads the snapshots and the lockfile of `commit` through Git in `directory`. A commit without
-snapshots cannot be a baseline.
-*/
+ * Reads the snapshots and the lockfile of `commit` through Git in `directory`. A commit without
+ * snapshots cannot be a baseline.
+ */
 const readGitFile = async (
   object: string,
   directory: string,
@@ -460,6 +481,7 @@ const readGitFile = async (
   }
   return;
 };
+
 const readBaseline = async (
   commit: string,
   directory: string,
@@ -505,9 +527,10 @@ const readBaseline = async (
     tree,
   };
 };
+
 /**
-Resolves `revision` to the commit that it names in `directory`, or fails.
-*/
+ * Resolves `revision` to the commit that it names in `directory`, or fails.
+ */
 const resolveCommit = async (
   revision: string,
   directory: string,
@@ -517,11 +540,12 @@ const resolveCommit = async (
     commit ?? fail(`The base is not a commit of this project: ${revision}`)
   );
 };
+
 /**
-Builds the report for `base`: the context that tells a refactor from a dependency update, then
-the differences of each snapshot, then a summary. Fails when the baseline cannot be read or the
-installed packages are not those of the lockfile.
-*/
+ * Builds the report for `base`: the context that tells a refactor from a dependency update, then
+ * the differences of each snapshot, then a summary. Fails when the baseline cannot be read or the
+ * installed packages are not those of the lockfile.
+ */
 const createReport = async (base: string): Promise<Report> => {
   if (process.cwd() !== projectDirectory) {
     return fail(
@@ -570,9 +594,10 @@ const createReport = async (base: string): Promise<Report> => {
     ].join("\n"),
   };
 };
+
 /**
-Runs the report for the command line, prints it, and returns the exit status: 0 for a report, also one with differences, and 1 when the report cannot be made or is incomplete.
-*/
+ * Runs the report for the command line, prints it, and returns the exit status: 0 for a report, also one with differences, and 1 when the report cannot be made or is incomplete.
+ */
 const runPolicyDiff = async (
   commandLine: readonly string[],
 ): Promise<number> => {
@@ -594,6 +619,7 @@ const runPolicyDiff = async (
     return 1;
   }
 };
+
 export {
   compareLockedPackages,
   describeCurrentSnapshots,

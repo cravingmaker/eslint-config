@@ -106,6 +106,7 @@ const describeScope = async (filePath: string): Promise<Scope> => {
     }),
   };
 };
+
 // How each of `filePaths` is scoped, by path.
 const describeScopes = async (
   filePaths: readonly string[],

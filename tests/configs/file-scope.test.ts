@@ -104,6 +104,7 @@ const describeLeftIn = async (
         return filePath;
       });
   };
+
   return {
     byFiles: pathsWith("no-console"),
     byIgnores: pathsWith("no-debugger"),

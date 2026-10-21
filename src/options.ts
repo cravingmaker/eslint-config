@@ -20,8 +20,8 @@ import { svelteComponentFiles, typescriptFiles } from "./globs.js";
 import { narrowFiles, withoutIgnores } from "./utilities/file-scope.js";
 
 /**
-What the project uses, for the options whose default is `"auto"`.
-*/
+ * What the project uses, for the options whose default is `"auto"`.
+ */
 type Detection = {
   readonly express: boolean;
   readonly react: boolean;
@@ -29,15 +29,15 @@ type Detection = {
   readonly svelte: boolean;
 };
 /**
-The options of `createConfig` with every default applied. A feature that is off is `undefined`.
-*/
+ * The options of `createConfig` with every default applied. A feature that is off is `undefined`.
+ */
 type ResolvedOptions = {
   readonly comments: FeatureOptions | undefined;
   readonly express: FeatureOptions | undefined;
   readonly functional: FeatureOptions | undefined;
   /**
-    The built-in globals, then those of `environments`, then `globals`.
-  */
+   * The built-in globals, then those of `environments`, then `globals`.
+   */
   readonly globals: Readonly<Linter.Globals>;
   readonly html: FeatureOptions | undefined;
   readonly ignores: readonly string[];
@@ -57,8 +57,8 @@ type ResolvedOptions = {
   readonly stylistic: FeatureOptions | undefined;
   readonly svelte: FeatureOptions | undefined;
   /**
-    The Svelte components whose scripts the features for JavaScript and TypeScript sources lint.
-  */
+   * The Svelte components whose scripts the features for JavaScript and TypeScript sources lint.
+   */
   readonly svelteComponents: ReadonlyArray<string | readonly string[]>;
   readonly typeAware: TypeAwareScope | undefined;
   readonly typescript: ResolvedTypeScriptOptions | undefined;
@@ -89,12 +89,14 @@ const resolveFeature = <Settings extends FeatureOptions>(
   }
   return value === true ? {} : value;
 };
+
 const resolveDetectedFeature = (
   isDetected: boolean,
   value: Feature | "auto" = "auto",
 ): FeatureOptions | undefined => {
   return resolveFeature(value === "auto" ? isDetected : value);
 };
+
 const resolveGlobals = (
   environments: readonly GlobalEnvironment[],
   globals: Readonly<Linter.Globals> = {},
@@ -110,12 +112,14 @@ const resolveGlobals = (
     ...globals,
   };
 };
+
 /**
-Resolves the manifest directory without applying any feature defaults.
-*/
+ * Resolves the manifest directory without applying any feature defaults.
+ */
 const resolveProjectRootDirectory = (projectRootDirectory?: string): string => {
   return path.resolve(projectRootDirectory ?? process.cwd());
 };
+
 const resolveReact = (
   detection: Detection,
   value: Feature<ReactOptions> | "auto" = "auto",
@@ -130,9 +134,10 @@ const resolveReact = (
     refresh: refresh === "auto" ? detection.reactRefresh : refresh,
   };
 };
+
 /**
-Resolves the Svelte components whose scripts the features for JavaScript and TypeScript sources lint: the components among the Svelte feature's files, without its ignores, because only svelte-eslint-parser reads them. None while the Svelte feature is off.
-*/
+ * Resolves the Svelte components whose scripts the features for JavaScript and TypeScript sources lint: the components among the Svelte feature's files, without its ignores, because only svelte-eslint-parser reads them. None while the Svelte feature is off.
+ */
 const resolveSvelteComponents = (
   svelte: FeatureOptions | undefined,
 ): ReadonlyArray<string | readonly string[]> => {
@@ -156,14 +161,15 @@ const resolveSvelteComponents = (
       : [...(typeof entry === "string" ? [entry] : entry), ...excluded];
   });
 };
+
 /**
-Resolves the files that the parser reads with type information and that get type-aware rules:
-`filesTypeAware` without `ignoresTypeAware`, within the TypeScript sources that the TypeScript
-feature parses, because type information needs its parser, and without Svelte components, whose
-parser reads none, whatever `files` names. Each list of ignores is applied on its own, so a
-negated pattern brings back only what its own list left out. None while the TypeScript feature
-or typed linting is off.
-*/
+ * Resolves the files that the parser reads with type information and that get type-aware rules:
+ * `filesTypeAware` without `ignoresTypeAware`, within the TypeScript sources that the TypeScript
+ * feature parses, because type information needs its parser, and without Svelte components, whose
+ * parser reads none, whatever `files` names. Each list of ignores is applied on its own, so a
+ * negated pattern brings back only what its own list left out. None while the TypeScript feature
+ * or typed linting is off.
+ */
 const resolveTypeAwareScope = (
   typescript: ResolvedTypeScriptOptions | undefined,
 ): TypeAwareScope | undefined => {
@@ -184,12 +190,13 @@ const resolveTypeAwareScope = (
   );
   return withoutIgnores(narrowFiles(parsed, filesTypeAware), ignoresTypeAware);
 };
+
 /**
-Applies the defaults to the options of the TypeScript feature. Typed linting is on unless
-`typeChecked` is `false`. typescript-eslint takes an absolute `tsconfigRootDir` only, so the
-tsconfig directory becomes an absolute path: a relative one is resolved from the working
-directory, as the project root is, and not from that root.
-*/
+ * Applies the defaults to the options of the TypeScript feature. Typed linting is on unless
+ * `typeChecked` is `false`. typescript-eslint takes an absolute `tsconfigRootDir` only, so the
+ * tsconfig directory becomes an absolute path: a relative one is resolved from the working
+ * directory, as the project root is, and not from that root.
+ */
 const resolveTypeScript = (
   projectRootDirectory: string,
   value: Feature<TypeScriptOptions> = true,
@@ -206,11 +213,12 @@ const resolveTypeScript = (
     typeChecked: typescript.typeChecked !== false,
   };
 };
+
 /**
-Applies the defaults to the options of `createConfig`. Every feature is on unless it is
-`false`, except `react`, `svelte`, and `express`, whose `"auto"` default follows `detection`.
-The project root becomes an absolute path: a relative one is resolved from the working directory, which is also its default. Preparation passes the root it used to read the manifest.
-*/
+ * Applies the defaults to the options of `createConfig`. Every feature is on unless it is
+ * `false`, except `react`, `svelte`, and `express`, whose `"auto"` default follows `detection`.
+ * The project root becomes an absolute path: a relative one is resolved from the working directory, which is also its default. Preparation passes the root it used to read the manifest.
+ */
 const resolveOptions = (
   options: Options = {},
   detection: Detection = undetected,
@@ -252,5 +260,6 @@ const resolveOptions = (
     unusedImports: resolveFeature(options.unusedImports),
   };
 };
+
 export { resolveOptions, resolveProjectRootDirectory };
 export type { Detection, ResolvedOptions };

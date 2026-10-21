@@ -5,11 +5,11 @@ import { registerHooks } from "node:module";
 import process from "node:process";
 
 /**
-Resolves an import of a TypeScript module that names its `.js` file to the `.ts` source when
-there is no `.js` file. The modules of this repository import each other by their `.js` names,
-as the compiler expects, but Node.js, which strips the types of a `.ts` file, looks for the
-name as it is written.
-*/
+ * Resolves an import of a TypeScript module that names its `.js` file to the `.ts` source when
+ * there is no `.js` file. The modules of this repository import each other by their `.js` names,
+ * as the compiler expects, but Node.js, which strips the types of a `.ts` file, looks for the
+ * name as it is written.
+ */
 const resolveTypeScriptSource = (
   specifier: string,
   context: Readonly<ResolveHookContext>,

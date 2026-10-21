@@ -14,8 +14,8 @@ import {
 } from "../../../scripts/policy-diff/compare.js";
 
 /**
-The setting lines and rule lines of a description.
-*/
+ * The setting lines and rule lines of a description.
+ */
 type Lines = {
   readonly rules: readonly string[];
   readonly settings: readonly string[];
@@ -46,8 +46,8 @@ const typescriptFile = {
 } as const satisfies Lines;
 const ignoredFile = "path: src/example.ts\nignored: true\nconfig: none\n";
 /**
-Formats the changes from the description `before` to the description `after`.
-*/
+ * Formats the changes from the description `before` to the description `after`.
+ */
 const listChanges = (before: string, after: string): readonly string[] => {
   const changes = compareDescriptions(
     parseDescription(before),
@@ -55,9 +55,10 @@ const listChanges = (before: string, after: string): readonly string[] => {
   );
   return formatChanges(changes);
 };
+
 /**
-Replaces `line` with `replacements`, none to remove it.
-*/
+ * Replaces `line` with `replacements`, none to remove it.
+ */
 const replaceLine = (
   lines: readonly string[],
   line: string,
@@ -67,9 +68,10 @@ const replaceLine = (
     return current === line ? replacements : current;
   });
 };
+
 /**
-A snapshot of the default scenario with the file and the path that `name` gives.
-*/
+ * A snapshot of the default scenario with the file and the path that `name` gives.
+ */
 const snapshotOf = (
   name: string,
   description: CurrentSnapshot["description"],
@@ -81,10 +83,11 @@ const snapshotOf = (
     scenario: "default",
   };
 };
+
 /**
-Writes a description with the count of its rules between the settings and the rules, as
-`describeEffectiveConfig` does.
-*/
+ * Writes a description with the count of its rules between the settings and the rules, as
+ * `describeEffectiveConfig` does.
+ */
 const writeDescription = ({ rules, settings }: Lines): string => {
   const count = (severity: string): string => {
     return String(
@@ -93,6 +96,7 @@ const writeDescription = ({ rules, settings }: Lines): string => {
       }).length,
     );
   };
+
   return [
     ...settings,
     `rules: ${String(rules.length)} (error ${count("error")}, off ${count("off")}, warn ${count("warn")})`,
@@ -101,12 +105,14 @@ const writeDescription = ({ rules, settings }: Lines): string => {
     "",
   ].join("\n");
 };
+
 /**
-Formats the changes from the description of the TypeScript file to the description of `lines`.
-*/
+ * Formats the changes from the description of the TypeScript file to the description of `lines`.
+ */
 const listChangesTo = (lines: Lines): readonly string[] => {
   return listChanges(writeDescription(typescriptFile), writeDescription(lines));
 };
+
 describe("parseDescription", () => {
   it("reads what describeEffectiveConfig writes", async () => {
     const eslint = new ESLint({

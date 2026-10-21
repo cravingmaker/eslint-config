@@ -30,6 +30,7 @@ const createEslint = async (options: Options): Promise<ESLint> => {
     overrideConfigFile: true,
   });
 };
+
 // What `select` reads from the configuration for each of `filePaths`, by path. The
 // configuration is `undefined` for a file that no block's `files` matches.
 const describeByPath = async <Value>(

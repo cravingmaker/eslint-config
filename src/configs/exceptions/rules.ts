@@ -5,12 +5,12 @@ import { configFiles, sourceFiles, testFiles } from "../../globs.js";
 import { narrowFiles } from "../../utilities/file-scope.js";
 
 /**
-A feature that holds rules a file role turns off.
-*/
+ * A feature that holds rules a file role turns off.
+ */
 type ExceptionFeature = "functional" | "imports" | "unicorn";
 /**
-The files of one role, and the rules that are off in them by the feature that holds each rule.
-*/
+ * The files of one role, and the rules that are off in them by the feature that holds each rule.
+ */
 type FileRole = {
   readonly files: NonNullable<Linter.Config["files"]>;
   readonly rules: Readonly<
@@ -19,10 +19,10 @@ type FileRole = {
 };
 
 /**
-Rules that files with a particular role break by design, and the files of each role with
-`options`. Each exception replaces a suppression that every such file would need; add one only
-with similar evidence.
-*/
+ * Rules that files with a particular role break by design, and the files of each role with
+ * `options`. Each exception replaces a suppression that every such file would need; add one only
+ * with similar evidence.
+ */
 const fileRoles = ({
   svelteComponents,
 }: ResolvedOptions): Readonly<Record<string, FileRole>> => {

@@ -53,6 +53,7 @@ const lint = async (
   }
   return { messages: result.messages, text: result.output ?? text };
 };
+
 /*
 Called in an isolated Node process. Waiting for the warning event before removing its listener captures ESLint's asynchronous circular-fix warnings without depending on their message text.
 */
@@ -71,6 +72,7 @@ const runFixCycle = async (
     // eslint-disable-next-line functional/immutable-data -- Node delivers warnings through a callback during this cycle only.
     warnings.push({ code: warning.code, name: warning.name });
   };
+
   /* eslint-enable functional/no-expression-statements, functional/no-return-void -- Restore the guards after the event callback. */
   // eslint-disable-next-line functional/no-expression-statements -- The listener is removed in finally, including on lint or formatter failure.
   process.on("warning", capture);
@@ -93,6 +95,7 @@ const runFixCycle = async (
     process.off("warning", capture);
   }
 };
+
 const traceFixCycles = async (
   engines: LintEngines,
   text: string,
@@ -102,6 +105,7 @@ const traceFixCycles = async (
   const second = await runFixCycle(engines, first.formatted.text, filePath);
   return [first, second];
 };
+
 /*
 A formatter can undo an ESLint fix and leave the final text unchanged. Check both transitions in the second cycle as well as final diagnostics, warnings, and remaining fixable reports.
 */
@@ -125,6 +129,7 @@ const convergenceProblems = ([first, second]: FixTrace): readonly string[] => {
       : []),
   ];
 };
+
 const reportRange = ({
   column,
   endColumn,
@@ -138,10 +143,12 @@ const reportRange = ({
   }
   return;
 };
+
 // Diagnostic ends are exclusive: adjacent ranges are not overlapping reports.
 const isRangeBeforeEnd = (left: ReportRange, right: ReportRange): boolean => {
   return left[0] < right[2] || (left[0] === right[2] && left[1] < right[3]);
 };
+
 /*
 Compare selected rule reports by their complete ranges, including containment. Callers review specific sample/rule pairs; an intersection alone is not evidence of a redundant concern.
 */

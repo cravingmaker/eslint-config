@@ -12,6 +12,7 @@ const sortRuleIds = (ids: readonly string[]): readonly string[] => {
     return left.localeCompare(right);
   });
 };
+
 const requiresTypeChecking = (documentation: object | undefined): boolean => {
   return (
     typeof documentation !== "undefined" &&

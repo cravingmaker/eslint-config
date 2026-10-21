@@ -250,6 +250,7 @@ const temporaryDirectory = await realpath(createdDirectory);
 const createEslint = (configs: readonly Linter.Config[]): ESLint => {
   return new ESLint({ overrideConfig: [...configs], overrideConfigFile: true });
 };
+
 // A project root whose manifest declares `dependencies`.
 const createProject = async (
   name: string,
@@ -269,6 +270,7 @@ const createProject = async (
   );
   return directory;
 };
+
 /*
 Project roots for the `"auto"` default: one whose manifest declares every framework, and one whose
 manifest declares none. Every optional peer is installed in this repository, so the second shows
@@ -321,6 +323,7 @@ const createScopedEslint = async (options: Options): Promise<ESLint> => {
     overrideConfigFile: true,
   });
 };
+
 /*
 The configuration that ESLint resolves for `filePath`, as reviewable text without the plugins
 line: setup blocks register their plugins for every file, whatever the feature's files are.
@@ -341,6 +344,7 @@ const describeFile = async (
     })
     .join("\n");
 };
+
 // The description of each application file, in the order of `appPaths`.
 const describeAppFiles = async (eslint: ESLint): Promise<readonly string[]> => {
   return await Promise.all(
@@ -349,6 +353,7 @@ const describeAppFiles = async (eslint: ESLint): Promise<readonly string[]> => {
     }),
   );
 };
+
 // The feature segment of each block name, without repeats.
 const getFeatureNames = (
   configs: readonly Linter.Config[],
@@ -361,6 +366,7 @@ const getFeatureNames = (
     ),
   ];
 };
+
 // The severity of `ruleId` in the configuration for `filePath`, or `undefined` when it is not set.
 const getSeverity = async (
   eslint: ESLint,
@@ -376,6 +382,7 @@ const getSeverity = async (
   const rules = new Map(Object.entries(config?.rules ?? {}));
   return rules.get(ruleId)?.[0];
 };
+
 // `options` with `feature` set to `value`.
 const withFeature = (
   options: Options,
@@ -384,6 +391,7 @@ const withFeature = (
 ): Options => {
   return { ...options, [feature]: value };
 };
+
 // How ESLint resolves each file of `app/` with the defaults, without and with typed linting.
 const defaultDescriptions = {
   typed: await describeAppFiles(await createScopedEslint(typedOptions)),
@@ -552,6 +560,7 @@ describe.each(
       }),
     );
   };
+
   it("is on by default and with auto when the project declares it, as with true", async () => {
     const [enabled, ...detected] = await resolveValues(declaredRoot, [
       true,

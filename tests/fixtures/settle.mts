@@ -1,6 +1,6 @@
 /**
-Waits for every promise in `promises` and keeps the values of those that fulfill.
-*/
+ * Waits for every promise in `promises` and keeps the values of those that fulfill.
+ */
 export const settle = async <Value,>(
   promises: ReadonlyArray<Promise<Value>>,
 ): Promise<readonly Value[]> => {

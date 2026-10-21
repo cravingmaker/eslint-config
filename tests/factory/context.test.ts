@@ -26,6 +26,7 @@ const createDirectory = async (name: string): Promise<string> => {
   await mkdir(directory);
   return directory;
 };
+
 const createProject = async (
   name: string,
   manifest: string,

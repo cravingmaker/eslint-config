@@ -74,6 +74,7 @@ const getEffectiveConfig = async (
   return (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
 };
+
 // The settings of the eslint-plugin-react-hooks rules in `config`.
 const getHooksRules = (
   config: EffectiveConfig | undefined,
@@ -84,11 +85,13 @@ const getHooksRules = (
     }),
   );
 };
+
 const getPluginNames = (config: EffectiveConfig | undefined): string[] => {
   return Object.keys(config?.plugins ?? {}).toSorted((left, right) => {
     return left.localeCompare(right);
   });
 };
+
 // The severity of each of `ruleIds` in `config`, or `undefined` where it does not set the rule.
 const getSeverities = (
   config: EffectiveConfig | undefined,
@@ -259,6 +262,7 @@ describe("react feature", () => {
         }),
       );
     };
+
     const withoutRefresh = {
       "@cravingmaker/eslint-config/react/hooks": [
         "react-hooks/exhaustive-deps",

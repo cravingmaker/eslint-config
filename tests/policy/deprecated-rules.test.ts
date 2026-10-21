@@ -20,9 +20,11 @@ const findPluginName = (
     return ruleId.startsWith(`${name}/`);
   });
 };
+
 const isPluginRule = (value: unknown): value is PluginRule => {
   return typeof value === "object" && value !== null;
 };
+
 const isDeprecatedConfiguredRule = (
   ruleId: string,
   pluginNames: readonly string[],
@@ -43,6 +45,7 @@ const isDeprecatedConfiguredRule = (
     rule.meta.deprecated !== false
   );
 };
+
 describe("deprecated rule handling", () => {
   it("does not enable deprecated plugin rules", async () => {
     const config = await createConfig({

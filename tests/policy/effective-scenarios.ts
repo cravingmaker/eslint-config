@@ -7,18 +7,18 @@ import { describeEffectiveConfig } from "./effective-config.js";
 
 type ConfigOptions = NonNullable<Parameters<typeof createConfig>[0]>;
 /**
-A set of options and the snapshots of the configuration that they give.
-*/
+ * A set of options and the snapshots of the configuration that they give.
+ */
 type EffectiveScenario = {
   readonly name: string;
   readonly options: ConfigOptions;
   readonly snapshots: readonly EffectiveSnapshot[];
 };
 /**
-The description of the configuration that ESLint resolves for `filePath`, stored in `path`
-under `__snapshots__/effective-rules/`. With `ruleIdPrefix`, it keeps only the rules whose ID
-starts with it.
-*/
+ * The description of the configuration that ESLint resolves for `filePath`, stored in `path`
+ * under `__snapshots__/effective-rules/`. With `ruleIdPrefix`, it keeps only the rules whose ID
+ * starts with it.
+ */
 type EffectiveSnapshot = {
   readonly filePath: string;
   readonly path: string;
@@ -130,8 +130,8 @@ const suites = [
 const reactRefreshVariants = ["generic", "next", "vite"] as const;
 
 /**
-Every scenario of the effective-rules snapshots, in the order that the snapshot test and the policy difference report present them.
-*/
+ * Every scenario of the effective-rules snapshots, in the order that the snapshot test and the policy difference report present them.
+ */
 const effectiveScenarios: readonly EffectiveScenario[] = [
   ...suites.map(({ filePaths, name, options }) => {
     return {
@@ -166,10 +166,11 @@ const createEslint = async (options: ConfigOptions): Promise<ESLint> => {
     overrideConfigFile: true,
   });
 };
+
 /**
-Describes the configuration that `eslint` resolves for the file of `snapshot`, as its snapshot
-stores it.
-*/
+ * Describes the configuration that `eslint` resolves for the file of `snapshot`, as its snapshot
+ * stores it.
+ */
 const describeSnapshot = async (
   eslint: ESLint,
   { filePath, ruleIdPrefix }: EffectiveSnapshot,

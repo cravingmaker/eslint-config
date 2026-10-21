@@ -1,13 +1,13 @@
 import { isDeepStrictEqual } from "node:util";
 
 /**
-A change between two descriptions: a setting, by its name, or a rule, by its ID. A side without a value has no such setting or rule.
-*/
+ * A change between two descriptions: a setting, by its name, or a rule, by its ID. A side without a value has no such setting or rule.
+ */
 type Change = RuleChange | SettingChange;
 /**
-A snapshot that the current scenarios describe: its text, or why it could not be calculated.
-With `ruleIdPrefix`, the snapshot keeps only the rules whose ID starts with it.
-*/
+ * A snapshot that the current scenarios describe: its text, or why it could not be calculated.
+ * With `ruleIdPrefix`, the snapshot keeps only the rules whose ID starts with it.
+ */
 type CurrentSnapshot = {
   readonly description:
     | {
@@ -23,10 +23,10 @@ type CurrentSnapshot = {
   readonly ruleIdPrefix?: string;
 };
 /**
-A description of the configuration that ESLint resolves for a file, as
-`describeEffectiveConfig` writes it: the settings in their order, sections flattened to
-`section.key`, and the entry of each rule. A file without a configuration has no rules.
-*/
+ * A description of the configuration that ESLint resolves for a file, as
+ * `describeEffectiveConfig` writes it: the settings in their order, sections flattened to
+ * `section.key`, and the entry of each rule. A file without a configuration has no rules.
+ */
 type Description = {
   readonly settings: ReadonlyMap<string, string>;
 
@@ -40,8 +40,8 @@ type RuleChange = {
   readonly before?: RuleEntry;
 };
 /**
-The severity of a rule and its options as JSON text, empty without options.
-*/
+ * The severity of a rule and its options as JSON text, empty without options.
+ */
 type RuleEntry = {
   readonly options: string;
   readonly severity: string;
@@ -54,8 +54,8 @@ type SettingChange = {
   readonly before?: string;
 };
 /**
-The comparison of one snapshot with the baseline. A new snapshot has no baseline, and a removed one has no current scenario.
-*/
+ * The comparison of one snapshot with the baseline. A new snapshot has no baseline, and a removed one has no current scenario.
+ */
 type SnapshotResult = {
   readonly label: string;
   readonly outcome:
@@ -92,6 +92,7 @@ const compareText = (left: string, right: string): number => {
   }
   return left > right ? 1 : 0;
 };
+
 const countSeverity = (
   rules: ReadonlyMap<string, RuleEntry>,
   severity: string,
@@ -105,6 +106,7 @@ const countSeverity = (
       .toArray().length,
   );
 };
+
 const formatJsonPath = (path: string, key: number | string): string => {
   if (typeof key === "number") {
     return `${path}[${String(key)}]`;
@@ -113,6 +115,7 @@ const formatJsonPath = (path: string, key: number | string): string => {
     ? `${path}.${key}`
     : `${path}[${JSON.stringify(key)}]`;
 };
+
 const formatRule = (
   ruleId: string,
   { options, severity }: RuleEntry,
@@ -121,6 +124,7 @@ const formatRule = (
     ? `${ruleId}: ${severity}`
     : `${ruleId}: ${severity} ${options}`;
 };
+
 const isJson = (text: string): boolean => {
   try {
     return typeof JSON.parse(text) !== "undefined";
@@ -128,6 +132,7 @@ const isJson = (text: string): boolean => {
     return false;
   }
 };
+
 const isJsonList = (text: string): boolean => {
   try {
     return Array.isArray(JSON.parse(text));
@@ -135,15 +140,17 @@ const isJsonList = (text: string): boolean => {
     return false;
   }
 };
+
 const isRecord = (
   value: unknown,
 ): value is Readonly<Record<string, unknown>> => {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 };
+
 /**
-Lists the words of a space-separated list that one side has and the other does not, as `+word`
-and `-word`, in the order of each list.
-*/
+ * Lists the words of a space-separated list that one side has and the other does not, as `+word`
+ * and `-word`, in the order of each list.
+ */
 const listWordChanges = (before: string, after: string): readonly string[] => {
   const previous = new Set(
     before.split(" ").filter((word) => {
@@ -166,17 +173,19 @@ const listWordChanges = (before: string, after: string): readonly string[] => {
     }),
   ];
 };
+
 /**
-Fails on a description that `describeEffectiveConfig` cannot have written, such as a truncated
-file.
-*/
+ * Fails on a description that `describeEffectiveConfig` cannot have written, such as a truncated
+ * file.
+ */
 const malformed = (reason: string): never => {
   // eslint-disable-next-line functional/no-throw-statements -- A description that cannot be read must not compare as unchanged.
   throw new Error(`Not a description of an effective configuration: ${reason}`);
 };
+
 /**
-Reads rule lines. `lineOffset` is the number of lines before them in the file, for messages.
-*/
+ * Reads rule lines. `lineOffset` is the number of lines before them in the file, for messages.
+ */
 const parseRules = (
   lines: readonly string[],
   lineOffset: number,
@@ -200,10 +209,11 @@ const parseRules = (
     ? rules
     : malformed("a rule is listed more than once");
 };
+
 /**
-Reads the settings before the rules: `key: value` lines, and sections whose `  key: value`
-lines become `section.key`, with a JSON value.
-*/
+ * Reads the settings before the rules: `key: value` lines, and sections whose `  key: value`
+ * lines become `section.key`, with a JSON value.
+ */
 const parseSettings = (
   lines: readonly string[],
 ): ReadonlyMap<string, string> => {
@@ -231,11 +241,12 @@ const parseSettings = (
     }),
   );
 };
+
 /**
-Reads a description that `describeEffectiveConfig` wrote. With `ruleIdPrefix`, the description
-holds only the lines of the rules whose ID starts with it, as a snapshot that keeps the rules of
-one plugin does.
-*/
+ * Reads a description that `describeEffectiveConfig` wrote. With `ruleIdPrefix`, the description
+ * holds only the lines of the rules whose ID starts with it, as a snapshot that keeps the rules of
+ * one plugin does.
+ */
 const parsePrefixedDescription = (
   lines: readonly string[],
   prefix: string,
@@ -248,12 +259,14 @@ const parsePrefixedDescription = (
     ? { rules, settings: new Map() }
     : malformed(`${otherRule} does not start with ${prefix}`);
 };
+
 const isDescriptionHeader = (
   lines: readonly string[],
   settings: ReadonlyMap<string, string>,
 ): boolean => {
   return /^path: ./u.test(lines.at(0) ?? "") && settings.has("ignored");
 };
+
 const parseConfigDescription = (lines: readonly string[]): Description => {
   const separator = lines.indexOf("");
   const settings = parseSettings(
@@ -286,6 +299,7 @@ const parseConfigDescription = (lines: readonly string[]): Description => {
         `it counts ${String(settings.get("rules"))}, but lists ${actualCount.total} rules`,
       );
 };
+
 const parseDescription = (text: string, ruleIdPrefix?: string): Description => {
   if (!text.endsWith("\n")) {
     return malformed("it does not end with a line break");
@@ -296,9 +310,10 @@ const parseDescription = (text: string, ruleIdPrefix?: string): Description => {
   }
   return parseConfigDescription(lines);
 };
+
 /**
-The keys of two maps, those of `left` first, each in the order of its map.
-*/
+ * The keys of two maps, those of `left` first, each in the order of its map.
+ */
 const unionOfKeys = (
   left: ReadonlyMap<string, unknown>,
   right: ReadonlyMap<string, unknown>,
@@ -306,11 +321,12 @@ const unionOfKeys = (
   const keys = new Set(left.keys());
   return keys.union(right).values().toArray();
 };
+
 /**
-Lists the settings and rules that differ between two descriptions, settings first in the order
-of the descriptions, then rules by ID. Rules are compared only when both files have a
-configuration; otherwise the `rules` setting shows the change.
-*/
+ * Lists the settings and rules that differ between two descriptions, settings first in the order
+ * of the descriptions, then rules by ID. Rules are compared only when both files have a
+ * configuration; otherwise the `rules` setting shows the change.
+ */
 const compareDescriptions = (
   before: Description,
   after: Description,
@@ -343,6 +359,7 @@ const compareDescriptions = (
     });
   return [...settingChanges, ...ruleChanges];
 };
+
 const compareSnapshot = (
   baseline: ReadonlyMap<string, string>,
   { description, filePath, path, ruleIdPrefix, scenario }: CurrentSnapshot,
@@ -383,9 +400,10 @@ const compareSnapshot = (
     };
   }
 };
+
 /**
-Compares each current snapshot with the baseline snapshot at the same path, and adds the baseline snapshots that no scenario describes any more, by path. A snapshot that cannot be described or read fails, and is never reported as unchanged.
-*/
+ * Compares each current snapshot with the baseline snapshot at the same path, and adds the baseline snapshots that no scenario describes any more, by path. A snapshot that cannot be described or read fails, and is never reported as unchanged.
+ */
 const compareSnapshots = (
   baseline: ReadonlyMap<string, string>,
   current: readonly CurrentSnapshot[],
@@ -416,9 +434,10 @@ const compareSnapshots = (
     ...removed,
   ];
 };
+
 /**
-Lists the differences between two JSON values by path: the keys of objects, and the items of arrays of the same length. Any other difference shows both values.
-*/
+ * Lists the differences between two JSON values by path: the keys of objects, and the items of arrays of the same length. Any other difference shows both values.
+ */
 const listJsonChanges = (
   path: string,
   before: unknown,
@@ -457,6 +476,7 @@ const listJsonChanges = (
   }
   return [`~ ${path}: ${JSON.stringify(before)} → ${JSON.stringify(after)}`];
 };
+
 const formatRuleChange = ({
   after,
   before,
@@ -485,6 +505,7 @@ const formatRuleChange = ({
     }),
   ];
 };
+
 const formatSettingChange = ({
   after,
   before,
@@ -511,10 +532,11 @@ const formatSettingChange = ({
     ? listJsonChanges(name, JSON.parse(before), JSON.parse(after))
     : [`~ ${name}: ${before} → ${after}`];
 };
+
 /**
-Formats the changes of one snapshot, one line each, marked `+` for added, `-` for removed, and
-`~` for changed. A changed rule lists its changed options below it, by path.
-*/
+ * Formats the changes of one snapshot, one line each, marked `+` for added, `-` for removed, and
+ * `~` for changed. A changed rule lists its changed options below it, by path.
+ */
 const formatChanges = (changes: readonly Change[]): readonly string[] => {
   return changes.flatMap((change) => {
     return change.kind === "rule"
@@ -522,6 +544,7 @@ const formatChanges = (changes: readonly Change[]): readonly string[] => {
       : formatSettingChange(change);
   });
 };
+
 export type { CurrentSnapshot, SnapshotResult };
 export {
   compareDescriptions,

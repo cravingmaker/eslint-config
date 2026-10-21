@@ -41,6 +41,7 @@ const createEslint = async (
     overrideConfigFile: true,
   });
 };
+
 // The names of the exception blocks in `configs`.
 const getExceptionNames = (
   configs: readonly Linter.Config[],
@@ -49,6 +50,7 @@ const getExceptionNames = (
     return name.startsWith(prefix) ? name : [];
   });
 };
+
 // The severity of each of `ruleIds` in the configuration for `filePath`, or `undefined` for a
 // rule that the configuration does not set.
 const getSeverities = async (
@@ -64,6 +66,7 @@ const getSeverities = async (
     return rules.get(ruleId)?.[0];
   });
 };
+
 // The severities of `ruleIds` for each of `filePaths`, by path.
 const getSeveritiesByPath = async (
   eslint: ESLint,

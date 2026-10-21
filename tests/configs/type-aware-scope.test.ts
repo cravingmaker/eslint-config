@@ -116,6 +116,7 @@ const createEslint = async (typescript: TypeScriptOptions): Promise<ESLint> => {
     overrideConfigFile: true,
   });
 };
+
 // How each of `filePaths` is linted, by path.
 const describeTypeInformation = async (
   eslint: ESLint,
@@ -144,6 +145,7 @@ const describeTypeInformation = async (
     ),
   );
 };
+
 // The fatal errors of each of `filePaths`, and whether `ruleId` reports it, by path.
 const lintByPath = async (
   eslint: ESLint,

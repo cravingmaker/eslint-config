@@ -57,6 +57,7 @@ const withoutOwner = {
 const compareText = (left: string, right: string): number => {
   return left.localeCompare(right);
 };
+
 /*
 Lints every fixture with every feature and framework on, apart from the features that `options`
 turn off, and returns the messages of each by path. React Refresh uses its strictest variant,

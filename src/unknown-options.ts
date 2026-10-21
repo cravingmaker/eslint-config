@@ -1,17 +1,17 @@
 import type { FeatureOptions, Options } from "./types.js";
 
 /**
-The keys of an options object, each as a property. The compiler rejects such an object when it
-lacks a key of `Settings`, and an object literal when it names any other key.
-*/
+ * The keys of an options object, each as a property. The compiler rejects such an object when it
+ * lacks a key of `Settings`, and an object literal when it names any other key.
+ */
 type KeysOf<Settings> = Readonly<Record<keyof Settings, true>>;
 /**
-What each option of `createConfig` takes as keys. An option is a feature when it takes the
-options that every feature takes, and it then has the keys of its own options object. Any other
-option has `false`: it takes a list, a path, or, as `globals` does, a record whose keys are
-the user's. The type maps the required options, because `-?` would also remove `undefined` from
-the values.
-*/
+ * What each option of `createConfig` takes as keys. An option is a feature when it takes the
+ * options that every feature takes, and it then has the keys of its own options object. Any other
+ * option has `false`: it takes a list, a path, or, as `globals` does, a record whose keys are
+ * the user's. The type maps the required options, because `-?` would also remove `undefined` from
+ * the values.
+ */
 type OptionKeys = {
   [Option in keyof Required<Options>]: FeatureOptions extends Options[Option]
     ? KeysOf<Exclude<Options[Option], boolean | string | undefined>>
@@ -24,10 +24,10 @@ const featureKeys = {
   overrides: true,
 } as const satisfies KeysOf<FeatureOptions>;
 /**
-Every option of `createConfig`, with the keys of its options object. The compiler checks both
-against the types in `types.ts`: a new option, or a new key of a feature's options, does not
-compile until it is listed here.
-*/
+ * Every option of `createConfig`, with the keys of its options object. The compiler checks both
+ * against the types in `types.ts`: a new option, or a new key of a feature's options, does not
+ * compile until it is listed here.
+ */
 const optionKeys = {
   comments: featureKeys,
   environments: false,
@@ -94,9 +94,9 @@ const replacedOptions = new Map<string, string>([
   ["tsTypeChecked", "`typescript.typeChecked`"],
 ]);
 /**
-The own properties of `value`, or none when it is not an object. The types do not bind a config
-file without `// @ts-check`, so an option can hold any value.
-*/
+ * The own properties of `value`, or none when it is not an object. The types do not bind a config
+ * file without `// @ts-check`, so an option can hold any value.
+ */
 const entriesOf = (
   value: unknown,
 ): ReadonlyArray<readonly [string, unknown]> => {
@@ -104,6 +104,7 @@ const entriesOf = (
     ? Object.entries(value)
     : [];
 };
+
 // `names` as code in a sentence, such as "`files`, `ignores`, and `overrides`".
 const list = (names: readonly string[]): string => {
   const conjunction = new Intl.ListFormat("en", { type: "conjunction" });
@@ -113,13 +114,14 @@ const list = (names: readonly string[]): string => {
     }),
   );
 };
+
 /**
-Describes the keys of `options` that `createConfig` does not know, in one message, or returns
-`undefined` when it knows them all. An unknown option comes with the options that exist, an
-option of 0.1.0 with what replaces it, and an unknown key in the object of a feature with the
-keys of that feature. The names of globals and the IDs of rules are the user's, and are not
-checked.
-*/
+ * Describes the keys of `options` that `createConfig` does not know, in one message, or returns
+ * `undefined` when it knows them all. An unknown option comes with the options that exist, an
+ * option of 0.1.0 with what replaces it, and an unknown key in the object of a feature with the
+ * keys of that feature. The names of globals and the IDs of rules are the user's, and are not
+ * checked.
+ */
 const describeUnknownOptions = (options: Options): string | undefined => {
   const entries = entriesOf(options);
   const unknown = entries
@@ -178,11 +180,12 @@ const describeUnknownOptions = (options: Options): string | undefined => {
       : []),
   ].join("\n");
 };
+
 /**
-Returns `options` when `createConfig` knows each of their keys, and throws otherwise, with the
-message of `describeUnknownOptions`. The factory goes on with what this returns, so it reads no
-option before the check.
-*/
+ * Returns `options` when `createConfig` knows each of their keys, and throws otherwise, with the
+ * message of `describeUnknownOptions`. The factory goes on with what this returns, so it reads no
+ * option before the check.
+ */
 const rejectUnknownOptions = (options: Options): Options => {
   const message = describeUnknownOptions(options);
   if (typeof message !== "undefined") {
@@ -191,4 +194,5 @@ const rejectUnknownOptions = (options: Options): Options => {
   }
   return options;
 };
+
 export { rejectUnknownOptions };

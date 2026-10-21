@@ -359,6 +359,7 @@ const createEslint = async (options: ConfigOptions): Promise<ESLint> => {
     overrideConfigFile: true,
   });
 };
+
 const getEffectiveConfig = async (
   eslint: ESLint,
   filePath: string,
@@ -367,6 +368,7 @@ const getEffectiveConfig = async (
   return (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
 };
+
 // Whether the rule declares that it needs type information.
 const requiresTypeInformation = (
   plugins: ReadonlyMap<string, Plugin | undefined>,
@@ -380,6 +382,7 @@ const requiresTypeInformation = (
     true
   );
 };
+
 // How ESLint resolves `filePath`: whether the parser reads type information, and the rules that
 // need it there and are on, apart from those that check for it themselves.
 const describeTypeInformation = async (
@@ -410,6 +413,7 @@ const describeTypeInformation = async (
       }),
   };
 };
+
 // Vitest takes rows of one length, so a shape without an override gets no settings.
 const rows = shapes.map(
   ([description, options, typed, overridden = {}]): Required<Shape> => {

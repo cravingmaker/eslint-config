@@ -1,6 +1,8 @@
 import type { ESLint } from "eslint";
 
 import { writeFile } from "node:fs/promises";
+// eslint-disable-next-line n/no-unsupported-features/node-builtins -- registerHooks is available throughout the supported Node.js range.
+import { registerHooks } from "node:module";
 
 import pluginEslintComments from "@eslint-community/eslint-plugin-eslint-comments";
 import pluginEnforcePackageType from "eslint-enforce-package-type";
@@ -28,10 +30,26 @@ import pluginHtmlSvelte from "@html-eslint/eslint-plugin-svelte";
 import pluginStylistic from "@stylistic/eslint-plugin";
 import { plugin as pluginTypeScript } from "typescript-eslint";
 
+// Node strips TypeScript but does not resolve the compiler's relative .js imports to source files.
+const hooks = registerHooks({
+  resolve: (specifier, context, nextResolve) => {
+    return nextResolve(
+      context.parentURL?.endsWith(".ts") === true &&
+        /^\.{1,2}\/.*\.js$/u.test(specifier)
+        ? specifier.replace(/\.js$/u, ".ts")
+        : specifier,
+      context,
+    );
+  },
+});
+const { internalPlugin } = await import("../src/rules/index.js");
+hooks.deregister();
+
 // Keys are the plugin names that createConfig registers. The empty key holds ESLint's core rules.
 const plugins: Record<string, ESLint.Plugin> = {
   // eslint-disable-next-line @typescript-eslint/no-deprecated -- ESLint exposes its core rules only through this registry
   "": { rules: Object.fromEntries(builtinRules) },
+  "@cravingmaker": internalPlugin,
   "enforce-package-type": pluginEnforcePackageType,
   "@eslint-community/eslint-comments": pluginEslintComments,
   "express-security": pluginExpressSecurity,
@@ -60,10 +78,10 @@ const plugins: Record<string, ESLint.Plugin> = {
 };
 
 /**
-Drops repeated copies of a top-level declaration. json-schema-to-typescript can emit one
-definition twice, as it does for `unicorn/name-replacements`, and a repeated interface fails
-to compile when declaration files are type-checked.
-*/
+ * Drops repeated copies of a top-level declaration. json-schema-to-typescript can emit one
+ * definition twice, as it does for `unicorn/name-replacements`, and a repeated interface fails
+ * to compile when declaration files are type-checked.
+ */
 const removeRepeatedDeclarations = (source: string): string => {
   const parts = source.split(/^(?=(?:interface|type) |\/\/ -{5} )/mu);
   return parts

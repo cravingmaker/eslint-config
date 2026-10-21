@@ -6,6 +6,7 @@ import pluginStylistic from "@stylistic/eslint-plugin";
 import { defaultContext } from "../../../context.js";
 import { sourceFiles, withSvelteComponents } from "../../../globs.js";
 import { stylisticRules } from "./rules.js";
+import { internalPlugin } from "../../../rules/index.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 
 // Builds the flat config for @stylistic/eslint-plugin.
@@ -16,7 +17,10 @@ const stylistic = (
   return [
     {
       name: "@cravingmaker/eslint-config/stylistic/setup",
-      plugins: { "@stylistic": pluginStylistic },
+      plugins: {
+        "@cravingmaker": internalPlugin,
+        "@stylistic": pluginStylistic,
+      },
     },
     {
       files: narrowFiles(
@@ -25,7 +29,10 @@ const stylistic = (
       ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/stylistic/rules",
-      rules: { ...stylisticRules, ...overrides },
+      rules: {
+        ...stylisticRules,
+        ...overrides,
+      },
     },
   ];
 };

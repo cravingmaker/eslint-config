@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 /**
-A button that counts its clicks.
-*/
+ * A button that counts its clicks.
+ */
 export const Counter = ({
   initialCount,
 }: {

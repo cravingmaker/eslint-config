@@ -42,9 +42,9 @@ const buildFeature = <
 };
 
 /**
-Builds the ESLint flat config. It is TypeScript first: TypeScript files get typescript-eslint's strict rules, with type information unless `typescript.typeChecked` is `false`. Frameworks are detected from the project manifest, and all other features are on unless explicitly disabled. Rule ownership is declared in each feature's map.
-File-role exceptions follow the features, then user configs apply in the order supplied.
-*/
+ * Builds the ESLint flat config. It is TypeScript first: TypeScript files get typescript-eslint's strict rules, with type information unless `typescript.typeChecked` is `false`. Frameworks are detected from the project manifest, and all other features are on unless explicitly disabled. Rule ownership is declared in each feature's map.
+ * File-role exceptions follow the features, then user configs apply in the order supplied.
+ */
 const createConfig = async (
   options: Options = {},
   // eslint-disable-next-line functional/functional-parameters, functional/prefer-immutable-types -- The public signature takes user configs as rest arguments of ESLint's mutable config type.

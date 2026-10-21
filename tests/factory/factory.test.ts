@@ -43,6 +43,7 @@ const createProject = async (
   );
   return directory;
 };
+
 // The block with `name` after the package prefix.
 const findBlock = (
   configs: readonly Linter.Config[],
@@ -52,6 +53,7 @@ const findBlock = (
     return config.name === `${prefix}${name}`;
   });
 };
+
 // The feature segment of each block name, without repeats.
 const getFeatureOrder = async (
   options: Parameters<typeof createConfig>[0] = {},
@@ -64,6 +66,7 @@ const getFeatureOrder = async (
     return features.indexOf(feature) === index;
   });
 };
+
 // The framework features among the blocks, in order.
 const getFrameworks = async (
   options: Parameters<typeof createConfig>[0] = {},
@@ -380,6 +383,7 @@ describe("createConfig", () => {
         )),
       ];
     };
+
     const [first, second, fromReversed] = await Promise.all(
       [options, options, reversed].map(async (value) => {
         return await describeOutput(await createConfig(value));

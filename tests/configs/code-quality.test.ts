@@ -104,6 +104,7 @@ const getRules = async (
     { readonly rules?: RuleEntries } | undefined;
   return config?.rules;
 };
+
 // The severity of a rule in the configuration for a file, or `undefined` when it is not set.
 const getSeverity = async (
   eslint: ESLint,
@@ -124,7 +125,11 @@ describe.each(features)("$name feature", ({ build, name, plugin, rule }) => {
       name: `@cravingmaker/eslint-config/${name}/setup`,
     });
     expect(setup).not.toHaveProperty("files");
-    expect(Object.keys(setup.plugins ?? {})).toEqual([plugin]);
+    expect(Object.keys(setup.plugins ?? {})).toEqual(
+      ["@stylistic", "unicorn"].includes(plugin)
+        ? ["@cravingmaker", plugin]
+        : [plugin],
+    );
     expect(rules).toMatchObject({
       name: `@cravingmaker/eslint-config/${name}/rules`,
     });

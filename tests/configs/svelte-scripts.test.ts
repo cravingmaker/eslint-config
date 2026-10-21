@@ -161,6 +161,7 @@ const createEslint = async (options: Options): Promise<ESLint> => {
     overrideConfigFile: true,
   });
 };
+
 // The messages of each of `filePaths` in the fixture project as `line:column rule`, by path.
 const describeMessages = async (
   filePaths: readonly string[],
@@ -185,6 +186,7 @@ const describeMessages = async (
     }),
   );
 };
+
 const getEffectiveConfig = async (
   eslint: ESLint,
   filePath: string,
@@ -193,6 +195,7 @@ const getEffectiveConfig = async (
   return (await eslint.calculateConfigForFile(filePath)) as
     EffectiveConfig | undefined;
 };
+
 // The severity of each of `ruleIds` in `rules`, or `undefined` for a rule that they do not set.
 const getSeverities = (
   rules: RuleEntries | undefined,
@@ -203,6 +206,7 @@ const getSeverities = (
     return entries.get(ruleId)?.[0];
   });
 };
+
 // The rules of the Svelte feature's own plugin in `rules`.
 const getSvelteRuleIds = (
   rules: RuleEntries | undefined,
@@ -211,6 +215,7 @@ const getSvelteRuleIds = (
     return ruleId.startsWith("@html-eslint/svelte/");
   });
 };
+
 // `rules` without `ruleIds`.
 const withoutRules = (
   rules: RuleEntries | undefined,

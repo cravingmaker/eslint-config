@@ -145,6 +145,7 @@ const createEslint = async (isTypeChecked: boolean): Promise<ESLint> => {
     overrideConfigFile: true,
   });
 };
+
 /*
 Runs eslint --fix on `code` as `filePath`, and returns the fixed code and the messages that remain,
 marking those that ESLint could still fix.
@@ -167,6 +168,7 @@ const fix = async (
     output: result.output ?? code,
   };
 };
+
 const format = async (
   code: string,
   filePath: string,

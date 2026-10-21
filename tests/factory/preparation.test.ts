@@ -27,6 +27,7 @@ const createProject = async (manifest?: string): Promise<string> => {
   await writeFile(path.join(directory, "package.json"), manifest, "utf8");
   return directory;
 };
+
 const describeSources = async (
   configs: readonly Linter.Config[],
 ): Promise<readonly string[]> => {
@@ -40,6 +41,7 @@ const describeSources = async (
     }),
   );
 };
+
 const frameworkBlocks = (
   configs: readonly Linter.Config[],
 ): readonly string[] => {
