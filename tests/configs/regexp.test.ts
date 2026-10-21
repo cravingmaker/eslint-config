@@ -5,6 +5,26 @@ import { expectLintError, expectNoLintError } from "../utilities.js";
 const jsOptions = { filePath: "test.js" } as const;
 
 describe("regexp rules", () => {
+  it.each([
+    [String.raw`\x1b`, String.raw`\x1B`],
+    [String.raw`\u00e9`, String.raw`\u00E9`],
+    [String.raw`\u{e9}`, String.raw`\u{E9}`],
+  ])(
+    "regexp/letter-case: requires uppercase escapes for %s",
+    async (lowercase, uppercase) => {
+      await expectLintError(
+        `export const pattern = /${lowercase}/u;\n`,
+        "regexp/letter-case",
+        jsOptions,
+      );
+      await expectNoLintError(
+        `export const pattern = /${uppercase}/u;\n`,
+        "regexp/letter-case",
+        jsOptions,
+      );
+    },
+  );
+
   it("regexp/hexadecimal-escape: disallows hexadecimal escapes in favor of alternatives", async () => {
     await expectLintError(
       `const pattern = /\\x41/u;\nconsole.log(pattern);\n`,

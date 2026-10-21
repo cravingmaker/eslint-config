@@ -29,6 +29,7 @@ type SampleResult = {
 };
 
 const escapeSource = `${String.raw`export const pattern = /\u{e9}/u;`}\n`;
+const stringEscapeSource = `${String.raw`export const characters = ["\xab", "\u00e9", "\u{e9}"];`}\n`;
 const importSource = [
   "// First section.",
   'import path from "node:path";',
@@ -63,7 +64,41 @@ const sources = new Map([
     "export const load = (task) => { return task.then((value) => { return value; }); };\n",
   ],
   ["D1-D2-D3-Stages-2-3", `${importSource}\n${escapeSource}\n${moduleSource}`],
+  [
+    "D1-D2-Stage-2",
+    `${importSource.replace("export const", "const")}\n${escapeSource.replace("export const", "const")}\nexport { directories, pattern };\n`,
+  ],
   ["D1-Stage-2", escapeSource],
+  ["D1-strings-Stage-2", stringEscapeSource],
+  [
+    "D2-following-comment-Stage-2",
+    [
+      'import os from "node:os";',
+      "// Read the temporary directory.",
+      "export const directory = os.tmpdir();",
+      "",
+    ].join("\n"),
+  ],
+  [
+    "D2-following-statement-Stage-2",
+    [
+      'import os from "node:os";',
+      "export const directory = os.tmpdir();",
+      "",
+    ].join("\n"),
+  ],
+  [
+    "D2-multiline-comment-Stage-2",
+    [
+      'import os from "node:os";',
+      "",
+      "/**",
+      "Read the temporary directory.",
+      "*/",
+      "export const directory = os.tmpdir();",
+      "",
+    ].join("\n"),
+  ],
   ["D2-Stage-2", importSource],
   ["D3-Stage-3", moduleSource],
   ["escapes", `${String.raw`export const pattern = /\a/;`}\n`],
@@ -344,41 +379,36 @@ describe("combined ESLint fixes and the package formatter", () => {
     expect(selectReports(getTrace("sort.js"), [rule])).toEqual([]);
   });
   it.each(["js", "ts"])(
-    "D1 / Stage 2: characterizes the escape-case loop in %s",
+    "D1: converges on uppercase regex escapes in %s",
     (extension) => {
       const trace = getTrace(`D1-Stage-2.${extension}`);
       expect(
-        trace.map(({ fixed, formatted, warnings }) => {
-          return { fixed: fixed.text, formatted: formatted.text, warnings };
+        trace[0].before.messages.map(({ ruleId }) => {
+          return ruleId;
         }),
       ).toEqual(
-        [0, 1].map(() => {
-          return {
-            fixed: escapeSource,
-            formatted: escapeSource,
-            warnings: [{ name: "ESLintCircularFixesWarning" }],
-          };
-        }),
+        expect.arrayContaining(["regexp/letter-case", "unicorn/escape-case"]),
       );
-      expect(
-        trace[1].formatted.messages.map(({ fix, ruleId }) => {
-          return { fix, ruleId };
-        }),
-      ).toEqual([
-        {
-          fix: { range: [23, 32], text: String.raw`/\u{E9}/u` },
-          ruleId: "unicorn/escape-case",
-        },
-      ]);
-      expect(convergenceProblems(trace)).toEqual([
-        "warning:ESLintCircularFixesWarning",
-        "warning:ESLintCircularFixesWarning",
-        "fixable-reports",
-      ]);
+      expect(trace[1].formatted.text).toBe(
+        `${String.raw`export const pattern = /\u{E9}/u;`}\n`,
+      );
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
     },
   );
   it.each(["js", "ts"])(
-    "D2 / Stage 2: characterizes the import-comment loop in %s",
+    "D1: converges on uppercase hexadecimal and Unicode string escapes in %s",
+    (extension) => {
+      const trace = getTrace(`D1-strings-Stage-2.${extension}`);
+      expect(trace[1].formatted.text).toBe(
+        `${String.raw`export const characters = ["\u{AB}", "\u{E9}", "\u{E9}"];`}\n`,
+      );
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
+    },
+  );
+  it.each(["js", "ts"])(
+    "D2: sorts imports across interleaved comments and converges in %s",
     (extension) => {
       const trace = getTrace(`D2-Stage-2.${extension}`);
       const output = [
@@ -390,29 +420,70 @@ describe("combined ESLint fixes and the package formatter", () => {
         'export const directories = [os.tmpdir(), path.resolve(".")];',
         "",
       ].join("\n");
+      expect(trace[1].formatted.text).toBe(output);
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
+    },
+  );
+  it.each(["js", "ts"])(
+    "D2: permits a following comment without inserting a blank line in %s",
+    (extension) => {
+      const trace = getTrace(`D2-following-comment-Stage-2.${extension}`);
+      expect(trace[1].formatted.text).toBe(trace[0].before.text);
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
+    },
+  );
+  it.each(["js", "ts"])(
+    "D2: retains a blank line before an ordinary statement in %s",
+    (extension) => {
+      const trace = getTrace(`D2-following-statement-Stage-2.${extension}`);
       expect(
-        trace.map(({ fixed, formatted, warnings }) => {
-          return { fixed: fixed.text, formatted: formatted.text, warnings };
-        }),
-      ).toEqual(
-        [0, 1].map(() => {
-          return {
-            fixed: output,
-            formatted: output,
-            warnings: [{ name: "ESLintCircularFixesWarning" }],
-          };
-        }),
+        selectReports(trace, ["import-x/newline-after-import"]),
+      ).toHaveLength(1);
+      expect(trace[1].formatted.text).toBe(
+        [
+          'import os from "node:os";',
+          "",
+          "export const directory = os.tmpdir();",
+          "",
+        ].join("\n"),
       );
-      expect(
-        trace[1].formatted.messages.map(({ ruleId }) => {
-          return ruleId;
-        }),
-      ).toEqual(["import-x/newline-after-import"]);
-      expect(convergenceProblems(trace)).toEqual([
-        "warning:ESLintCircularFixesWarning",
-        "warning:ESLintCircularFixesWarning",
-        "fixable-reports",
-      ]);
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
+    },
+  );
+  it.each(["js", "ts"])(
+    "D2: preserves multiline documentation after the final import in %s",
+    (extension) => {
+      const trace = getTrace(`D2-multiline-comment-Stage-2.${extension}`);
+      expect(trace[0].before.messages).toEqual([]);
+      expect(trace[1].formatted.text).toBe(trace[0].before.text);
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
+    },
+  );
+  it.each(["js", "ts"])(
+    "D1/D2: converges on combined escapes and commented imports in %s",
+    (extension) => {
+      const trace = getTrace(`D1-D2-Stage-2.${extension}`);
+      expect(trace[1].formatted.text).toBe(
+        [
+          "// Second section.",
+          'import os from "node:os";',
+          "// First section.",
+          'import path from "node:path";',
+          "",
+          'const directories = [os.tmpdir(), path.resolve(".")];',
+          "",
+          String.raw`const pattern = /\u{E9}/u;`,
+          "",
+          "export { directories, pattern };",
+          "",
+        ].join("\n"),
+      );
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
     },
   );
   it.each(["js", "ts"])(
@@ -470,7 +541,7 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D1-D3 / Stages 2-3: detects interacting loops in mixed %s",
+    "D3 / Stage 3: retains only the module-spacing loop in mixed %s",
     (extension) => {
       const trace = getTrace(`D1-D2-D3-Stages-2-3.${extension}`);
       expect(trace[1].formatted).toEqual(trace[0].formatted);
@@ -490,33 +561,31 @@ describe("combined ESLint fixes and the package formatter", () => {
           .map(({ ruleId }) => {
             return ruleId;
           }),
-      ).toEqual([
-        "perfectionist/sort-imports",
-        "unicorn/escape-case",
-        "perfectionist/sort-modules",
-      ]);
+      ).toEqual(["perfectionist/sort-modules"]);
+      expect(trace[1].formatted.text).toContain(String.raw`/\u{E9}/u`);
+      expect(
+        trace[1].formatted.messages.filter(({ ruleId }) => {
+          return (
+            typeof ruleId === "string" &&
+            [
+              "import-x/newline-after-import",
+              "perfectionist/sort-imports",
+              "regexp/letter-case",
+              "unicorn/escape-case",
+            ].includes(ruleId)
+          );
+        }),
+      ).toEqual([]);
       expect(convergenceProblems(trace)).toContain("fixable-reports");
     },
   );
   it.each(["js", "ts"])(
-    "D1 / Stage 2: detects the loop in a Svelte %s script",
+    "D1: converges on uppercase escapes in a Svelte %s script",
     (language) => {
       const trace = getTrace(`D1-Stage-2.${language}.svelte`);
-      expect(trace[1].formatted).toEqual(trace[0].formatted);
-      expect(
-        trace.map(({ warnings }) => {
-          return warnings;
-        }),
-      ).toEqual([
-        [{ name: "ESLintCircularFixesWarning" }],
-        [{ name: "ESLintCircularFixesWarning" }],
-      ]);
-      expect(
-        trace[1].formatted.messages.map(({ ruleId }) => {
-          return ruleId;
-        }),
-      ).toEqual(["unicorn/escape-case"]);
-      expect(convergenceProblems(trace)).toContain("fixable-reports");
+      expect(trace[1].formatted.text).toContain(String.raw`/\u{E9}/u`);
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
     },
   );
 });

@@ -283,6 +283,88 @@ describe("the packed package", () => {
 });
 
 describe("a consumer without optional peers", () => {
+  it("converges on uppercase escapes and commented imports from the installed package", async () => {
+    const output = await run(
+      withoutPeers,
+      String.raw`
+        import process from "node:process";
+        import { setImmediate } from "node:timers/promises";
+        import { ESLint } from "eslint";
+        import { createConfig } from "@cravingmaker/eslint-config";
+
+        const eslint = new ESLint({
+          fix: true,
+          overrideConfig: await createConfig({ typescript: { typeChecked: false } }),
+          overrideConfigFile: true,
+        });
+        const source = [
+          "// First section.",
+          'import path from "node:path";',
+          "// Second section.",
+          'import os from "node:os";',
+          "",
+          "/**",
+          "Read the configured directories.",
+          "*/",
+          'const directories = [os.tmpdir(), path.resolve(".")];',
+          'const pattern = /\\u{e9}/u;',
+          'const characters = ["\\xab", "\\u00e9", "\\u{e9}"];',
+          "",
+          "export { characters, directories, pattern };",
+          "",
+        ].join("\n");
+        const warnings = [];
+        const capture = (warning) => { warnings.push(warning.name); };
+        process.on("warning", capture);
+        try {
+          const cases = [];
+          for (const filePath of ["example.js", "example.ts"]) {
+            if (await eslint.isPathIgnored(filePath)) throw new Error(filePath + " was ignored");
+            const [first] = await eslint.lintText(source, { filePath });
+            const [second] = await eslint.lintText(first.output ?? source, { filePath });
+            cases.push({
+              changedAgain: typeof second.output === "string",
+              fatalErrors: first.fatalErrorCount + second.fatalErrorCount,
+              messages: first.messages.concat(second.messages),
+              text: first.output ?? source,
+            });
+          }
+          await setImmediate();
+          process.stdout.write(JSON.stringify({ cases, warnings }));
+        } finally {
+          process.off("warning", capture);
+        }
+      `,
+    );
+
+    expect(JSON.parse(output)).toEqual({
+      cases: ["js", "ts"].map(() => {
+        return {
+          changedAgain: false,
+          fatalErrors: 0,
+          messages: [],
+          text: [
+            "// Second section.",
+            'import os from "node:os";',
+            "// First section.",
+            'import path from "node:path";',
+            "",
+            "/**",
+            "Read the configured directories.",
+            "*/",
+            'const directories = [os.tmpdir(), path.resolve(".")];',
+            String.raw`const pattern = /\u{E9}/u;`,
+            String.raw`const characters = ["\u{AB}", "\u{E9}", "\u{E9}"];`,
+            "",
+            "export { characters, directories, pattern };",
+            "",
+          ].join("\n"),
+        };
+      }),
+      warnings: [],
+    });
+  });
+
   it("reports Buffer globals, imports, and types from the installed package", async () => {
     const output = await run(
       withoutPeers,

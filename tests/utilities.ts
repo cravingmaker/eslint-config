@@ -4,6 +4,7 @@ import { ESLint } from "eslint";
 import { expect } from "vitest";
 
 import { createConfig } from "../dist/index.mjs";
+
 type LintOptions = {
   // The virtual file path used to select the correct config block (e.g. 'test.ts', 'test.js').
   readonly filePath: string;
