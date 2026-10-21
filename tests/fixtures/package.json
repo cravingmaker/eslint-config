@@ -19,7 +19,7 @@
   },
   "peerDependenciesMeta": {
     "react": {
-      "optional": true
+      "optional": false
     },
     "svelte": {
       "optional": true

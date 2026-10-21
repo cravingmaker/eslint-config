@@ -42,6 +42,7 @@ describe("typescript feature", () => {
       "@cravingmaker/eslint-config/typescript/parser-type-aware",
       "@cravingmaker/eslint-config/typescript/rules",
       "@cravingmaker/eslint-config/typescript/rules-type-aware",
+      "@cravingmaker/eslint-config/typescript/rules-type-aware-tsx",
     ]);
     expect(Object.keys(configs[0]?.plugins ?? {})).toEqual([
       "@typescript-eslint",
@@ -205,6 +206,7 @@ describe("typescript feature", () => {
       "@cravingmaker/eslint-config/typescript/parser-type-aware",
       "@cravingmaker/eslint-config/typescript/rules",
       "@cravingmaker/eslint-config/typescript/rules-type-aware",
+      "@cravingmaker/eslint-config/typescript/rules-type-aware-tsx",
     ]);
     expect(inside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual([
       1,

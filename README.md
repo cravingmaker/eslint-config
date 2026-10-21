@@ -160,6 +160,8 @@ SonarJS adds control-flow, security, accessibility, and test checks. Every expor
 
 The `packageJson` feature requires `type: "module"`. A package with `exports` or `publishConfig.exports` must also expose `"./package.json": "./package.json"`; use `packageJson.overrides` to change these rules.
 
+Peer dependencies are optional. When `peerDependencies` is declared, every peer needs an entry in nonempty `peerDependenciesMeta` with an explicit boolean `optional`: `true` for an optional peer, `false` for a required peer. A package without peers can omit metadata; an explicitly empty object remains invalid. The bundled `@cravingmaker/require-peer-metadata` rule owns conditional completeness, while Package JSON's shape, relationship, and nonempty-field rules validate metadata that is present. Use `packageJson.overrides` to change this policy.
+
 The `json` feature lints three languages:
 
 - JSON: `**/*.json`, apart from `package.json`, `package-lock.json`, and the JSONC files below.
@@ -315,6 +317,8 @@ export default createConfig({
 
 `filesTypeAware` and `ignoresTypeAware` decide both where the parser reads type information and where the rules that need it apply, so no such rule runs without it. JavaScript files never get type information, and neither do Svelte components.
 
+In typed `.tsx` files, function-valued `const` bindings and function declarations may also use PascalCase, so arrow components such as `Greeting` pass naming checks. Ordinary data retains its existing naming formats, as do other extensions. This allowance identifies function types, not React components; function-style checks still require arrows where their semantic exceptions do not apply. Feature overrides and user configs can replace the naming policy.
+
 `typeChecked: false` turns typed linting off, for a project without a tsconfig, for example. TypeScript files then get the rules that work without type information, and the rules that need it are off:
 
 ```js
@@ -389,6 +393,8 @@ The rule reports without fixes or suggestions: review hoisting and function
 identity when converting, and use a scoped override for constructor contracts
 that are only visible outside the defining file.
 
+Array callbacks explicitly forward their intended arguments through block-bodied arrows. `unicorn/no-array-callback-reference` stays enabled and `functional/prefer-tacit` stays off: passing a function directly to `map` also supplies the index and array, which can change the result of a function with optional parameters.
+
 The `unicorn` feature enables `@cravingmaker/starred-documentation` for multiline
 `/** ... */` comments. It preserves paragraph breaks and ordinary line/block
 comments; `unicorn/no-asterisk-prefix-in-documentation-comments` stays off.
@@ -450,7 +456,7 @@ Some files break a rule by design. These rules are off in them:
 
 | Files                                                              | Rules that are off                                                                                                                                   |
 | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Config files: sources named `*.config.*`, such as `vite.config.ts` | `import-x/no-default-export`, because tools read their config from the default export                                                                |
+| Config files: sources named `*.config.*`, such as `vite.config.ts` | `import-x/no-default-export` and `unicorn/no-top-level-side-effects`, because tools assemble their config at module load and read its default export |
 | Test files: sources named `*.test.*` or `*.spec.*`                 | `functional/no-expression-statements` and `functional/no-return-void`, because tests and assertions are calls whose results go unused                |
 | Svelte components                                                  | `functional/no-let`, `import-x/no-mutable-exports`, `import-x/unambiguous`, and `unicorn/no-top-level-assignment-in-function`; see [Svelte](#svelte) |
 
@@ -553,8 +559,8 @@ CommonJS is not supported, and `.cjs` and `.cts` files get no rules:
 These are open, and each needs a decision in this package or a fix upstream:
 
 - **TypeScript files that the TypeScript feature leaves out do not parse.** The JavaScript and code-quality features still lint them, but only the TypeScript feature sets a parser that reads TypeScript. With `typescript: false`, and for a file outside `typescript.files` or in `typescript.ignores`, ESLint reports `Parsing error: Unexpected token :`. Keep the TypeScript feature on for every TypeScript file that ESLint lints, and leave other TypeScript files out with the global `ignores`.
-- **Typed linting reports React components.** Typed linting is on by default, and in React code, `@typescript-eslint/naming-convention` allows only camelCase function names, `functional/no-return-void` reports event handlers and effects that call a state setter, and `functional/functional-parameters` reports handlers written inline in JSX. Leave React files out of typed linting with `ignoresTypeAware`.
-- **An application's `package.json` cannot pass.** `package-json/require-peerDependenciesMeta` requires a field that only packages with peer dependencies have, and `require-author`, `require-devDependencies`, `require-devEngines`, and `require-scripts` apply to private packages as well. JSON has no disable comments, so turn such rules off with `packageJson.overrides`.
+- **Typed linting reports some React handlers and effects.** `functional/no-return-void` reports event handlers and effects that call a state setter, and `functional/functional-parameters` reports handlers written inline in JSX. These checks remain independent of the typed TSX naming allowance. Leave React files out of typed linting with `ignoresTypeAware` when needed.
+- **Private manifests still require package information.** `require-author`, `require-devDependencies`, `require-devEngines`, and `require-scripts` apply to private packages as well. JSON has no disable comments, so use `packageJson.overrides` when a project does not need those fields. Peer metadata is required only when peers are declared.
 - **A URL in square brackets stops the run.** In a Markdown file, a URL or email address in square brackets, such as `[https://example.com]`, makes five rules of @eslint/markdown 8.0.3 throw "Custom getLoc() method must be implemented in the subclass", and ESLint stops. The rules are `no-bare-urls`, `no-invalid-label-refs`, `no-missing-label-refs`, `no-reference-like-urls`, and `no-space-in-emphasis`.
 - **Custom elements become self-closing in HTML files.** `@html-eslint/require-closing-tags` fixes `<my-element></my-element>` to `<my-element />`, which browsers read as a start tag without an end. Keep explicit end tags with `html: { overrides: { "@html-eslint/require-closing-tags": ["warn", { selfClosing: "always", selfClosingCustomPatterns: [] }] } }`.
 - **`.svelte.mjs` and `.svelte.mts` files do not parse.** The Svelte feature includes them, but svelte-eslint-parser reads them as components and fails with `Parsing error: Expected token }`. Name rune modules `.svelte.js` or `.svelte.ts`.

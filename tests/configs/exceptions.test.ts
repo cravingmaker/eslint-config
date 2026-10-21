@@ -24,7 +24,10 @@ const testFileRules = [
   "functional/no-expression-statements",
   "functional/no-return-void",
 ] as const;
-const configFileRules = ["import-x/no-default-export"] as const;
+const configFileRules = [
+  "import-x/no-default-export",
+  "unicorn/no-top-level-side-effects",
+] as const;
 const svelteComponentRules = [
   "functional/no-let",
   "import-x/no-mutable-exports",
@@ -101,15 +104,15 @@ describe("file-role exceptions", () => {
     ).toEqual(expected);
   });
 
-  it("turn off import-x/no-default-export in config files", async () => {
+  it("allow default exports and configuration assembly in config sources", async () => {
     const eslint = await createEslint(baseOptions);
     const expected = {
-      "eslint.config.js": [0],
-      "packages/app/vitest.config.mts": [0],
+      "eslint.config.js": [0, 0],
+      "packages/app/vitest.config.mts": [0, 0],
       // A module named `config` is not a config file.
-      "src/config.ts": [2],
-      "src/example.js": [2],
-      "vite.config.ts": [0],
+      "src/config.ts": [2, 2],
+      "src/example.js": [2, 2],
+      "vite.config.ts": [0, 0],
     };
 
     expect(
@@ -161,7 +164,61 @@ describe("file-role exceptions", () => {
     expect(getExceptionNames(withoutFunctional)).toEqual([
       `${prefix}config-files`,
     ]);
-    expect(getExceptionNames(withoutImports)).toEqual([`${prefix}test-files`]);
+    expect(getExceptionNames(withoutImports)).toEqual([
+      `${prefix}config-files`,
+      `${prefix}test-files`,
+    ]);
+  });
+
+  it("emits only enabled config-file owners, including Unicorn without Imports", async () => {
+    const configs = await Promise.all(
+      [
+        { imports: false },
+        { unicorn: false },
+        { imports: false, unicorn: false },
+      ].map(async (options) => {
+        return await createConfig({ ...baseOptions, ...options });
+      }),
+    );
+    expect(
+      configs.map((config) => {
+        return config.find(({ name }) => {
+          return name === `${prefix}config-files`;
+        })?.rules;
+      }),
+    ).toEqual([
+      { "unicorn/no-top-level-side-effects": "off" },
+      { "import-x/no-default-export": "off" },
+      undefined,
+    ]);
+  });
+
+  it("retains application diagnostics and permits a following config override", async () => {
+    const source = "export default defineConfig({});";
+    const ruleId = "unicorn/no-top-level-side-effects";
+    const eslint = await createEslint({
+      ...baseOptions,
+      typescript: { typeChecked: false },
+    });
+    const overridden = await createEslint(baseOptions, [
+      {
+        files: ["**/*.config.js"],
+        rules: { [ruleId]: "error" },
+      },
+    ]);
+    const results = await Promise.all([
+      eslint.lintText(source, { filePath: "tools/vite.config.js" }),
+      eslint.lintText(source, { filePath: "src/application.js" }),
+      overridden.lintText(source, { filePath: "tools/vite.config.js" }),
+    ]);
+    expect(
+      results.map(([result]) => {
+        expect(result.fatalErrorCount).toBe(0);
+        return result.messages.filter(({ ruleId: reported }) => {
+          return reported === ruleId;
+        }).length;
+      }),
+    ).toEqual([0, 1, 1]);
   });
 
   it("apply to Svelte components only while the Svelte feature is on", async () => {

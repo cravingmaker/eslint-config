@@ -132,32 +132,6 @@ const readCompilerOptions = (
   ).options;
 };
 
-/*
-Writes `example` as the `eslint.config.js` of a project in the consumer in `consumer`, next to a
-copy of the fixtures, and returns its directory. The project declares what the consumer declares,
-so the frameworks are detected as in the consumer.
-*/
-const createExampleProject = async (
-  consumer: string,
-  { index, text }: CodeBlock,
-): Promise<string> => {
-  const directory = path.join(consumer, "examples", String(index));
-  await mkdir(directory, { recursive: true });
-  await cp(
-    path.join(consumer, "package.json"),
-    path.join(directory, "package.json"),
-  );
-  await cp(fixturesDirectory, path.join(directory, "fixtures"), {
-    recursive: true,
-  });
-  await writeFile(
-    path.join(directory, "fixtures", "react", "tsconfig.json"),
-    reactTsconfig,
-  );
-  await writeFile(path.join(directory, "eslint.config.js"), text);
-  return directory;
-};
-
 // The fatal messages of `results`, such as parsing errors, with their file and, if any, position.
 const getFatalMessages = (
   directory: string,
@@ -193,7 +167,54 @@ const consumer = await createConsumer(temporaryDirectory, "readme", tarball, [
   "@types/node",
 ]);
 
+/*
+Writes `example` as the `eslint.config.js` of a project in the consumer in `consumer`, next to a
+copy of the fixtures, and returns its directory. The project declares what the consumer declares,
+so the frameworks are detected as in the consumer.
+*/
+const createExampleProject = async ({
+  index,
+  text,
+}: CodeBlock): Promise<string> => {
+  const directory = path.join(consumer, "examples", String(index));
+  await mkdir(directory, { recursive: true });
+  await cp(
+    path.join(consumer, "package.json"),
+    path.join(directory, "package.json"),
+  );
+  await cp(fixturesDirectory, path.join(directory, "fixtures"), {
+    recursive: true,
+  });
+  await writeFile(
+    path.join(directory, "fixtures", "react", "tsconfig.json"),
+    reactTsconfig,
+  );
+  await writeFile(path.join(directory, "eslint.config.js"), text);
+  return directory;
+};
+
 describe("the README", () => {
+  it("lints the actual Usage configuration without consumer exceptions", async () => {
+    const [example] = examples;
+    expect(example.text).toContain("export default createConfig();");
+    const directory = await createExampleProject(example);
+    const { exitCode, stderr, stdout } = await runCommand(
+      process.execPath,
+      [
+        path.join(consumer, "node_modules", "eslint", "bin", "eslint.js"),
+        "--format",
+        "json",
+        "eslint.config.js",
+      ],
+      directory,
+    );
+    expect(exitCode, stderr).toBe(0);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint's JSON formatter prints this result shape.
+    const results = JSON.parse(stdout) as readonly LintResult[];
+    expect(results).toHaveLength(1);
+    expect(results[0]?.messages).toEqual([]);
+  });
+
   it("has examples, install commands, and a tsconfig, and no other code than shell commands, examples, the tsconfig, and output", () => {
     expect(examples).not.toHaveLength(0);
     expect(installedPackages).not.toHaveLength(0);
@@ -252,7 +273,7 @@ describe("the README", () => {
     "example at line $line type-checks, and lints the fixtures without a fatal message",
     { timeout: 120_000 },
     async (example, { expect: expectInTest }) => {
-      const directory = await createExampleProject(consumer, example);
+      const directory = await createExampleProject(example);
 
       // Only the example: install.test.ts checks the declarations of the package without
       // `skipLibCheck`.

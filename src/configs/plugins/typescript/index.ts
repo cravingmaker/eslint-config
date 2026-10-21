@@ -7,6 +7,7 @@ import { typescriptParser } from "./parser.js";
 import {
   compilerCheckedRules,
   replacementRules,
+  tsxTypeAwareReplacementRules,
   typeAwareReplacementRules,
 } from "./replacements.js";
 import {
@@ -36,6 +37,11 @@ const typescript = async (
     overridesTypeAware = {},
   } = options;
   const parserConfigs = await typescriptParser(options, context);
+  const tsxRules = {
+    ...tsxTypeAwareReplacementRules,
+    ...overrides,
+    ...overridesTypeAware,
+  };
 
   return [
     ...parserConfigs,
@@ -69,6 +75,14 @@ const typescript = async (
               ...overridesTypeAware,
             },
           ),
+          {
+            files: narrowFiles(context.typeAware, ["**/*.tsx"]),
+            name: "@cravingmaker/eslint-config/typescript/rules-type-aware-tsx",
+            rules: {
+              "@typescript-eslint/naming-convention":
+                tsxRules["@typescript-eslint/naming-convention"],
+            },
+          },
         ]),
   ];
 };

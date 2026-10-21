@@ -288,6 +288,65 @@ describe("the packed package", () => {
 });
 
 describe("a consumer without optional peers", () => {
+  it("ships passing configs, conditional metadata, explicit callbacks, and typed TSX names", async () => {
+    const output = await run(
+      withoutPeers,
+      String.raw`
+      import { mkdir, readFile, writeFile } from "node:fs/promises";
+      import path from "node:path";
+      import { ESLint } from "eslint";
+      import { createConfig } from "@cravingmaker/eslint-config";
+      const directory = path.resolve("stage-four");
+      await mkdir(directory);
+      await writeFile(path.join(directory, "package.json"), await readFile("package.json", "utf8"));
+      await writeFile(path.join(directory, "tsconfig.json"), JSON.stringify({ compilerOptions: { strict: true }, include: ["*.tsx"] }));
+      const source = 'const double = (value: number): number => {\n  return value * 2;\n};\n\nconst values = [1, 2, 3].map((value) => {\n  return double(value);\n});\n\nconst Greeting = (name: string): string => {\n  return name;\n};\n\nexport { Greeting, values };\n';
+      await writeFile(path.join(directory, "component.tsx"), source);
+      const eslint = new ESLint({ cwd: directory, overrideConfig: await createConfig({ projectRootDirectory: directory }), overrideConfigFile: true });
+      const metadata = JSON.parse(await readFile("fixtures/package.json", "utf8"));
+      const application = structuredClone(metadata);
+      delete application.peerDependencies;
+      delete application.peerDependenciesMeta;
+      const missing = structuredClone(metadata);
+      delete missing.peerDependenciesMeta;
+      const cases = [
+        [${JSON.stringify(defaultConfig)}, "eslint.config.js"],
+        [JSON.stringify(application), "apps/app/package.json"],
+        [JSON.stringify(metadata), "packages/library/package.json"],
+        [source, "component.tsx"],
+        [JSON.stringify(missing), "packages/missing/package.json"],
+        [${JSON.stringify(defaultConfig)}, "application.js"],
+        [source.replace('(value) => {\n  return double(value);\n}', 'double'), "component.tsx"],
+      ];
+      const results = [];
+      for (const [code, filePath] of cases) {
+        const [result] = await eslint.lintText(code, { filePath });
+        results.push({ fatal: result.fatalErrorCount, rules: result.messages.map(({ ruleId }) => ruleId) });
+      }
+      process.stdout.write(JSON.stringify(results));
+    `,
+    );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The consumer script emits these diagnostic summaries.
+    const results = JSON.parse(output) as ReadonlyArray<{
+      readonly fatal: number;
+      readonly rules: readonly string[];
+    }>;
+    expect(results).toHaveLength(7);
+    expect(results.slice(0, 5)).toEqual([
+      { fatal: 0, rules: [] },
+      { fatal: 0, rules: [] },
+      { fatal: 0, rules: [] },
+      { fatal: 0, rules: [] },
+      { fatal: 0, rules: ["@cravingmaker/require-peer-metadata"] },
+    ]);
+    expect(results[5]?.fatal).toBe(0);
+    expect(results[5]?.rules).toContain("unicorn/no-top-level-side-effects");
+    expect(results[6]).toEqual({
+      fatal: 0,
+      rules: ["unicorn/no-array-callback-reference"],
+    });
+  });
+
   it("ships the internal arrow and documentation policies with stable function spacing", async () => {
     const output = await run(
       withoutPeers,

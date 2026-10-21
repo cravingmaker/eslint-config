@@ -21,7 +21,8 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (12/31) ---------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (12/32) ---------------------------------------------------------------------------------------------------------.
+  "@cravingmaker/require-peer-metadata": "error",
   "package-json/require-author": ["error", { ignorePrivate: false }], // Automatically fixable by the --fix command.
   "package-json/require-bugs": ["error", { ignorePrivate: true }],
   "package-json/require-devDependencies": ["error", { ignorePrivate: false }],
@@ -30,15 +31,11 @@ const otherRules: Rules = {
   "package-json/require-homepage": ["error", { ignorePrivate: true }],
   "package-json/require-keywords": ["error", { ignorePrivate: true }],
   "package-json/require-package-json-export": "error", // Manually fixable by editor suggestions.
-  "package-json/require-peerDependenciesMeta": [
-    "error",
-    { ignorePrivate: false },
-  ],
   "package-json/require-private": "error", // Automatically fixable by the --fix command.
   "package-json/require-scripts": ["error", { ignorePrivate: false }],
   "package-json/require-types": ["error", { ignorePrivate: true }],
 
-  // --- Turned off rules (19/31) -------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (20/32) -------------------------------------------------------------------------------------------------------------------.
   "package-json/require-bin": "off", // Prefer to be optional.
   "package-json/require-browser": "off", // Prefer to be optional; only relevant to browser-targeted packages.
   "package-json/require-bundleDependencies": "off", // Prefer to be optional.
@@ -57,12 +54,13 @@ const otherRules: Rules = {
   "package-json/require-os": "off", // Prefer to be optional.
   "package-json/require-packageManager": "off", // Prefer to be optional.
   "package-json/require-peerDependencies": "off", // Prefer to be optional.
+  "package-json/require-peerDependenciesMeta": "off", // Handled by `@cravingmaker/require-peer-metadata`; metadata is required only when peers are declared.
   "package-json/require-publishConfig": "off", // Prefer to be optional.
 } as const;
 
 const requirePropertiesRules: Rules = {
-  ...recommendedRules, // 10/41 rules, 1 automatically fixable, 1 editor suggestions fixable.
-  ...otherRules, // 31/41 rules, 2 automatically fixable, 1 editor suggestions fixable.
+  ...recommendedRules, // 10/42 rules, 1 automatically fixable, 1 editor suggestions fixable.
+  ...otherRules, // 32/42 rules, 2 automatically fixable, 1 editor suggestions fixable.
 } as const;
 
 export { requirePropertiesRules };

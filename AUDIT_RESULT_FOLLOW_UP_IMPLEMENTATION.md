@@ -127,7 +127,7 @@ migrations and supplies a verified baseline for each refactor.
 | 1     | Baseline and combined-rule regression harness                             | P1–P3; guard against regressions | None       | Complete    |
 | 2     | Escape-case and import-spacing convergence                                | D1, D2                           | 1          | Complete    |
 | 3     | Arrow functions, starred documentation, function spacing                  | D3                               | 2          | Complete    |
-| 4     | Passing configurations, conditional peer metadata, typed TSX names        | D4–D7 and D7 AST follow-up       | 3          | Not started |
+| 4     | Passing configurations, conditional peer metadata, typed TSX names        | D4–D7 and D7 AST follow-up       | 3          | Complete    |
 | 5     | Verified ownership, complementary checks, safe execution preference       | D8.1–D8.12                       | 4          | Not started |
 | 6     | Retained review signals and known parser/fix failures                     | D9, D10.1–D10.2, D11.1–D11.3     | 5          | Not started |
 | 7     | Severity, deprecated entries/options, generated ignores, explicit updates | D12, D13.1–D13.2, D14, D19       | 6          | Not started |
@@ -1323,5 +1323,122 @@ Do not continue to Stage <N+1> or publish/merge/release without my instruction.
 - **Next stage:** Stage 4, D4–D7 and the D7 AST-name follow-up: shared config-file
   exceptions, conditional Package JSON peer metadata, Functional tacit ownership,
   and typed TSX names. No Stage 4 work is included here.
+- **PR/CI:** Commit and PR requested after local completion; remote CI has not
+  been evaluated in this record.
+
+#### Stage 4 — passing configurations, peer metadata, and typed TSX names
+
+- **Status/date:** Complete, 21 October 2026.
+- **Stage-entry commit:** `311598b92d56630842fa0b4056f0b6741ae77dc0`.
+  The worktree was clean on `cravingmaker/implement-stage-4`, matching
+  `origin/main` and containing the completed Stage 3 handoff.
+- **Implementation commit(s):** Uncommitted at validation; the implementation
+  and this handoff are delivered together.
+- **Decisions/findings covered:** D4 = A; D5 = B; D6 = A; D7 = A;
+  D7 AST-name follow-up = B.
+- **Changes and rationale:**
+  - D4 adds `unicorn/no-top-level-side-effects` to the shared config-file role,
+    conditional on Unicorn being enabled and retaining the existing source-file
+    intersection. The redundant repository-only tool-config block is removed.
+    Application modules still report; a following consumer config can restore
+    the rule for tool configs.
+  - D5 replaces the unconditional metadata requirement with the bundled,
+    nonfixing `@cravingmaker/require-peer-metadata` rule. It checks root peer
+    completeness only. Installed Package JSON validation already requires each
+    metadata entry's boolean `optional`; it retains ownership of malformed or
+    missing boolean values, while nonempty-field and relationship checks stay
+    enabled. The new rule adds no conditional report to an existing empty or
+    malformed metadata object. Peers remain optional; no-peer applications can
+    omit metadata. The repository and lockfile root explicitly mark ESLint as
+    required with `optional: false`; the manifest fixture covers required and
+    optional peers without changing peer ranges.
+  - D6 keeps Unicorn's callback-reference guard and disables Functional's tacit
+    preference with the owner reason, including its type-aware off map. Explicit
+    consumer enablement remains limited to typed scope. The obsolete local
+    suppression in `src/utilities/plugin-policy.ts` is removed.
+  - D7 adds one `typescript/rules-type-aware-tsx` block after the existing typed
+    block. It changes only naming for function-valued `const` bindings and
+    functions in typed `.tsx`, retaining the existing accepted formats,
+    underscores, ordinary-data policy, other extensions, type-aware scope,
+    parser routing, and feature/typed/user override precedence. The D3 arrow
+    owner and typed promise checks remain active. AST-name property suppressions
+    are retained; no whitelist, detector, or transitive enum dependency is added.
+- **Internal integration:** The existing Package JSON setup block registers the
+  shared internal plugin with the existing JSONC parser. The new rule uses the
+  direct parser dependency's AST/listener types and a documented ESLint listener
+  boundary assertion. Existing type generation and inventory tests cover its ID;
+  no new public option, dependency, optional-peer requirement, or export is added.
+  Existing block names/order are retained around the single new typed TSX block.
+- **Runtime/dependencies:** Node.js `24.22.0` from `.nvmrc`, npm `11.19.1`,
+  ESLint `10.12.0`, TypeScript `6.0.3`, typescript-eslint `8.70.0`, Package JSON
+  `1.10.1`, Functional `10.0.1`, Unicorn `77.0.0`, and Vitest `5.0.3`.
+  Locked package versions and peer ranges are unchanged. Commands use
+  `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16` on this host.
+- **Tests/commands and development evidence:**
+  - `npm ci` and `npm run prepare`: passed; npm reported zero vulnerabilities.
+    The stage-entry build and four owning feature suites passed **28 tests**.
+  - Before source edits, D4's new scope/behavior regressions failed four cases
+    and D5's missing/partial metadata and no-peer controls reproduced the
+    unconditional requirement. Correcting the new TSX project's conflicting
+    same-stem filenames exposed five intended PascalCase naming failures and
+    the combined arrow/typed-control failure. A simple forwarding-arrow
+    regression also failed against the unchanged Functional policy.
+  - The first implementation run passed **8 files / 96 tests**. Expanded checks
+    cover root/nested manifests, private/public manifests, absent/empty/partial
+    metadata, required/optional booleans, existing shape/relationship errors,
+    multiple missing peers, and feature/files/ignores/override controls.
+  - The callback runtime regression retains `[2,4,6]` through composed fixes;
+    directly passing the function with a default second parameter produces
+    `[0,2,6]`. Consumer overrides can explicitly restore tacit preference in
+    typed files only.
+  - `npx vitest run tests/policy -u`: **13 files / 1,162 tests passed**;
+    exactly **8 snapshots** were updated through the supported process.
+  - The six-file integration run passed **106 tests** and found one new packed
+    sample that omitted its imported dependency declaration, used ungrouped
+    exports, and appended a manifest field out of order. Correcting that sample
+    to preserve the consumer manifest, group exports, and retain field order
+    made `npx vitest run tests/package/install.test.ts -t 'ships passing configs'`
+    pass. Assertions and package policy were not weakened. The actual README
+    Usage configuration also passed with no diagnostics in its external consumer.
+  - The first pre-push run passed **65 files / 1,969 tests** and hit the existing
+    regular-UI watcher comparison on `tests/fixtures/sample.ts`. The unchanged
+    `npx vitest run tests/vitest-watch.test.ts --maxWorkers=1` then passed both
+    tests. Watcher source, assertions, timeouts, worker coverage, and hooks were
+    unchanged; this delivery retry is separate from the complete validation below.
+- **Final validation:** `npm run validate` passed **66 test files / 1,970 tests**,
+  formatting, build/generation, TypeScript, Knip, zero-warning repository lint,
+  README and packed-consumer/minimum-peer suites, Publint, and ATTW's ESM profile.
+  No timeout, assertion, worker coverage, or hook was weakened. Explicit ESLint
+  checks passed all **27 changed source/test/documentation/manifest files**
+  outside the separately checked fixture project and ignored lockfile;
+  `git diff --check` passed.
+- **Policy/snapshot delta:** The built stage-entry comparison reports **8 changed
+  / 25 unchanged**, with no added, removed, or failed snapshots and unchanged
+  locked packages. D4 changes only the config-file side-effect severity; D5 adds
+  the internal conditional owner and disables the unconditional owner in two
+  manifest snapshots; D6 disables tacit preference in five typed snapshots;
+  D7 appends the two targeted naming entries in the typed TSX snapshot. Derived
+  rule/severity totals are the only other differences. Every changed snapshot
+  line was checked against this exact owner list. The final
+  `npm run policy:diff -- --base 311598b92d56630842fa0b4056f0b6741ae77dc0`
+  passed with the same result. The cumulative
+  `node scripts/policy-diff.ts --base 008a08207f28441297a2476b4798136aeb1023de`
+  also passed: **25 changed / 8 unchanged**, with no additions, removals,
+  failures, or locked-package changes. Its rule IDs contain only the approved
+  Stage 2, Stage 3, and Stage 4 owners.
+- **Artifacts/consumer compatibility:** Existing public options/exports, ESM
+  output, and optional-peer loading are preserved. The packed no-optional-peer
+  regression verifies passing tool config, no-peer/explicit-peer manifests,
+  forwarding callbacks, and typed PascalCase names with negative controls.
+  Generated `dist/` and `src/typegen.d.ts` remain excluded from the commit.
+- **Retained exceptions/upstream conditions:** The Stage 3 module-spacing and
+  Svelte-padding conditions and later-stage D8 overlaps remain unchanged.
+- **Unrelated work preserved:** The initial tree was clean; all changes belong
+  to Stage 4 policy, regression coverage, affected documentation, or handoff.
+- **Remaining work:** None within Stage 4; requested commit/push/PR delivery
+  follows this validation record.
+- **Next stage:** Stage 5, D8.1–D8.12: verified ownership, complementary checks,
+  and safe execution preference. No Stage 5 policy is implemented here.
 - **PR/CI:** Commit and PR requested after local completion; remote CI has not
   been evaluated in this record.

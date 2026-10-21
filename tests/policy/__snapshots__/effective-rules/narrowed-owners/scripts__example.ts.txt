@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 875 (error 477, off 341, warn 57)
+rules: 875 (error 476, off 342, warn 57)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/svelte-function-variable-padding: error
@@ -309,7 +309,7 @@ functional/no-throw-statements: error [{"allowToRejectPromises":false}]
 functional/no-try-statements: off
 functional/prefer-immutable-types: error [{"enforcement":"None","ignoreClasses":false,"ignoreInferredTypes":true,"parameters":{"enforcement":"ReadonlyShallow"},"suggestions":{"ReadonlyShallow":[[{"message":"Prepend with readonly.","pattern":"^([_$a-zA-Z\\xA0-\\uFFFF][_$a-zA-Z0-9\\xA0-\\uFFFF]*\\[\\])$","replace":"readonly $1"},{"message":"Use Readonly$1 instead of $1.","pattern":"^(Array|Map|Set)<(.+)>$","replace":"Readonly$1<$2>"}],[{"message":"Surround with Readonly.","pattern":"^(.+)$","replace":"Readonly<$1>"}]]}}]
 functional/prefer-property-signatures: error [{"ignoreIfReadonlyWrapped":false}]
-functional/prefer-tacit: error [{"checkMemberExpressions":false}]
+functional/prefer-tacit: off
 functional/readonly-type: error ["keyword"]
 functional/type-declaration-immutability: error [{"ignoreInterfaces":false,"rules":[{"comparator":"AtLeast","identifiers":"I?Immutable.+","immutability":"Immutable"},{"comparator":"AtLeast","identifiers":"I?ReadonlyDeep.+","immutability":"ReadonlyDeep"},{"comparator":"AtLeast","fixer":[{"pattern":"^(Array|Map|Set)<(.+)>$","replace":"Readonly$1<$2>"},{"pattern":"^(.+)$","replace":"Readonly<$1>"}],"identifiers":"I?Readonly.+","immutability":"ReadonlyShallow"},{"comparator":"AtMost","fixer":[{"pattern":"^Readonly(Array|Map|Set)<(.+)>$","replace":"$1<$2>"},{"pattern":"^Readonly<(.+)>$","replace":"$1"}],"identifiers":"I?Mutable.+","immutability":"Mutable"}]}]
 getter-return: off [{"allowImplicit":true}]

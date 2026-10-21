@@ -123,8 +123,11 @@ describe("package contract", () => {
 
     expect(packageManifest.peerDependencies).toEqual(expectedPeerDependencies);
     expect(Object.keys(packageManifest.peerDependenciesMeta)).toEqual(
-      expectedOptionalPeerDependencies,
+      peerDependencyNames,
     );
+    expect(packageManifest.peerDependenciesMeta.eslint).toEqual({
+      optional: false,
+    });
     expect(
       expectedOptionalPeerDependencies.filter((dependency) => {
         return (

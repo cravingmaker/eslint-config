@@ -27,12 +27,15 @@ const fileRoles = ({
   svelteComponents,
 }: ResolvedOptions): Readonly<Record<string, FileRole>> => {
   return {
-    // Tools such as ESLint, Vite, and Vitest read their config from the default export. Only
+    // Tools such as ESLint, Vite, and Vitest assemble their config at module load and read its default export. Only
     // JavaScript and TypeScript sources, as for test files: on its own, a pattern such as
     // `**/*.config.*` would make ESLint lint every file it matches, such as a YAML file.
     "config-files": {
       files: narrowFiles(configFiles, sourceFiles),
-      rules: { imports: ["import-x/no-default-export"] },
+      rules: {
+        imports: ["import-x/no-default-export"],
+        unicorn: ["unicorn/no-top-level-side-effects"],
+      },
     },
     // The instance script of a component runs once per instance, so its top-level variables are
     // the instance's state. Svelte updates them through assignments, which need `let`, as do the

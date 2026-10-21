@@ -13,7 +13,7 @@ linterOptions:
   reportUnusedDisableDirectives: 1
 settings:
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 1403 (error 958, off 388, warn 57)
+rules: 1403 (error 957, off 389, warn 57)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/starred-documentation: error
@@ -311,7 +311,7 @@ functional/no-throw-statements: error [{"allowToRejectPromises":false}]
 functional/no-try-statements: off
 functional/prefer-immutable-types: error [{"enforcement":"None","ignoreClasses":false,"ignoreInferredTypes":true,"parameters":{"enforcement":"ReadonlyShallow"},"suggestions":{"ReadonlyShallow":[[{"message":"Prepend with readonly.","pattern":"^([_$a-zA-Z\\xA0-\\uFFFF][_$a-zA-Z0-9\\xA0-\\uFFFF]*\\[\\])$","replace":"readonly $1"},{"message":"Use Readonly$1 instead of $1.","pattern":"^(Array|Map|Set)<(.+)>$","replace":"Readonly$1<$2>"}],[{"message":"Surround with Readonly.","pattern":"^(.+)$","replace":"Readonly<$1>"}]]}}]
 functional/prefer-property-signatures: error [{"ignoreIfReadonlyWrapped":false}]
-functional/prefer-tacit: error [{"checkMemberExpressions":false}]
+functional/prefer-tacit: off
 functional/readonly-type: error ["keyword"]
 functional/type-declaration-immutability: error [{"ignoreInterfaces":false,"rules":[{"comparator":"AtLeast","identifiers":"I?Immutable.+","immutability":"Immutable"},{"comparator":"AtLeast","identifiers":"I?ReadonlyDeep.+","immutability":"ReadonlyDeep"},{"comparator":"AtLeast","fixer":[{"pattern":"^(Array|Map|Set)<(.+)>$","replace":"Readonly$1<$2>"},{"pattern":"^(.+)$","replace":"Readonly<$1>"}],"identifiers":"I?Readonly.+","immutability":"ReadonlyShallow"},{"comparator":"AtMost","fixer":[{"pattern":"^Readonly(Array|Map|Set)<(.+)>$","replace":"$1<$2>"},{"pattern":"^Readonly<(.+)>$","replace":"$1"}],"identifiers":"I?Mutable.+","immutability":"Mutable"}]}]
 getter-return: off [{"allowImplicit":true}]

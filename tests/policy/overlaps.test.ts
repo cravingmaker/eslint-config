@@ -57,6 +57,11 @@ const pairs = [
     "unicorn/no-duplicate-if-branches",
     ["sonarjs/no-duplicated-branches", "sonarjs/no-all-duplicated-branches"],
   ],
+  [
+    "unicorn",
+    "functional/prefer-tacit",
+    ["unicorn/no-array-callback-reference"],
+  ],
   ["unicorn", "n/no-process-exit", ["unicorn/no-process-exit"]],
   ["unicorn", "n/prefer-node-protocol", ["unicorn/prefer-node-protocol"]],
   ["unicorn", "no-negated-condition", ["unicorn/no-negated-condition"]],
