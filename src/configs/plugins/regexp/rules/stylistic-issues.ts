@@ -5,6 +5,7 @@ const recommendedRules: Rules = {
   // --- Rules with default options (10/11) ---------------------------------------------------------------------------------------------------------.
   // eslint-disable-next-line unicorn/prefer-string-raw -- This schema option requires a string literal type.
   "regexp/match-any": ["error", { allows: ["[\\s\\S]", "dotAll"] }], // Automatically fixable by the --fix command.
+  // Complemented by `no-useless-escape` for string, template, and additional regex-literal checks.
   "regexp/no-useless-escape": "error", // Automatically fixable by the --fix command.
   "regexp/no-useless-non-capturing-group": ["error", { allowTop: "partial" }], // Automatically fixable by the --fix command.
   "regexp/prefer-d": ["error", { insideCharacterClass: "ignore" }], // Automatically fixable by the --fix command.

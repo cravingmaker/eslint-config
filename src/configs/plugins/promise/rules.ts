@@ -39,6 +39,7 @@ const otherRules: Rules = {
   "promise/avoid-new": "error",
   "promise/no-multiple-resolved": "error",
   "promise/prefer-await-to-callbacks": "error",
+  // Complemented by `unicorn/prefer-await` for awaited, yielded, constructor, top-level, and statically computed chains.
   "promise/prefer-await-to-then": ["error", { strict: false }],
   "promise/prefer-catch": "error", // Automatically fixable by the --fix command.
   "promise/spec-only": ["error", { allowedMethods: [] }],
