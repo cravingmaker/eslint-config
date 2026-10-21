@@ -243,7 +243,8 @@ describe("the README", () => {
     ).toMatchObject(expected);
   });
 
-  it.concurrent.for(examples)(
+  // Each example starts ESLint and TypeScript processes; serialize them to bound memory use.
+  it.for(examples)(
     "example at line $line type-checks, and lints the fixtures without a fatal message",
     { timeout: 120_000 },
     async (example, { expect: expectInTest }) => {

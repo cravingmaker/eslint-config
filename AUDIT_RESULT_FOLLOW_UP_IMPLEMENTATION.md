@@ -2,8 +2,9 @@
 
 This document is the execution guide for the confirmed decisions in
 [AUDIT_RESULT.md](AUDIT_RESULT.md). It was prepared on 21 October 2026 for an AI
-to implement one stage at a time. Writing this guide does not implement the
-audit. Every stage below starts as **Not started**.
+to implement one stage at a time. Writing this guide did not implement the
+audit. Every stage initially started as **Not started**; the ledger and execution
+records below track subsequent implementation.
 
 ## Authority and goals
 
@@ -123,7 +124,7 @@ migrations and supplies a verified baseline for each refactor.
 
 | Stage | Deliverable                                                               | Decisions/findings               | Depends on | Status      |
 | ----- | ------------------------------------------------------------------------- | -------------------------------- | ---------- | ----------- |
-| 1     | Baseline and combined-rule regression harness                             | P1–P3; guard against regressions | None       | Not started |
+| 1     | Baseline and combined-rule regression harness                             | P1–P3; guard against regressions | None       | Complete    |
 | 2     | Escape-case and import-spacing convergence                                | D1, D2                           | 1          | Not started |
 | 3     | Arrow functions, starred documentation, function spacing                  | D3                               | 2          | Not started |
 | 4     | Passing configurations, conditional peer metadata, typed TSX names        | D4–D7 and D7 AST follow-up       | 3          | Not started |
@@ -967,4 +968,103 @@ Do not continue to Stage <N+1> or publish/merge/release without my instruction.
 
 ### Execution records
 
-No implementation stage has been executed by the preparation of this guide.
+#### Stage 1 — baseline and combined-rule regression harness
+
+- **Status/date:** Complete, 21 October 2026.
+- **Stage-entry commit:** `008a08207f28441297a2476b4798136aeb1023de`.
+  The worktree was clean on `t3/bc96dba3`, matching `origin/main`.
+- **Implementation commit(s):** Uncommitted at validation; the implementation
+  and this handoff are delivered together.
+- **Decisions/findings covered:** Stage 1's guard for P1–P3; D1/D2 and D3
+  loop characterizations; retained complementary checks from D8.4, D8.6,
+  D8.8, D8.9, D8.11, D8.12, and the existing export-placement/grouping owners.
+  P2's policy corrections remain assigned to Stage 4.
+- **Changes and rationale:** Added `tests/policy/fix-convergence.ts` and
+  `fix-convergence.test.ts`. The runner uses the built public factory in a real
+  temporary project and records complete reports before fixes, after fixes,
+  and after the package formatter, through two full cycles. It exercises
+  JavaScript, typed TypeScript, JSX/TSX, and JavaScript/TypeScript scripts in
+  Svelte components. A typed-only comparator report verifies that TypeScript
+  services are actually active. Warning types/codes are captured in an isolated
+  Node process; listener counts and warnings outside the cycles are checked.
+  Controls detect text changes hidden by formatting, changed diagnostics,
+  real unexpected warnings, and nested diagnostic ranges; parser failures and
+  ignored files are rejected. Complementary overlaps are reviewed by named
+  sample and individual rule IDs, with their distinct concerns; unreviewed
+  samples/rules receive no namespace-wide exemption. Contributor instructions
+  explain how to run and extend the suite. README consumer examples now run
+  sequentially: their existing `it.concurrent` registration spawned several
+  ESLint/TypeScript processes even with one Vitest worker. All examples,
+  assertions, isolation, and 120-second timeouts are retained.
+- **Runtime/dependencies:** Node.js `24.22.0` from `.nvmrc`, npm `11.19.1`,
+  ESLint `10.12.0`, TypeScript `6.0.3`, typescript-eslint `8.70.0`, Vitest
+  `5.0.3`, Prettier `3.9.10`, `@cravingmaker/prettier-config` `0.3.2`,
+  Import X `4.17.1`, Perfectionist `5.12.1`, RegExp `3.3.1`, Unicorn
+  `77.0.0`, Promise `7.3.0`, Security `4.2.0`, SonarJS `4.2.2`, and Stylistic
+  `5.10.0`. Dependency versions and the lockfile are unchanged.
+- **Tests/commands:**
+  - `npm ci` and `npm run prepare`: passed; npm reported zero vulnerabilities.
+  - Stage-entry `npm run validate`, with `NODE_OPTIONS=--max-old-space-size=4096`
+    and `VITEST_MAX_WORKERS=1`: passed, **62 test files / 1,787 tests**, plus formatting,
+    build, generated types/typechecking, Knip, zero-warning repository lint,
+    packed consumers, Publint, and Are the Types Wrong. No baseline retry.
+  - `node scripts/policy-diff.ts --base 008a08207f28441297a2476b4798136aeb1023de`: all **33 effective snapshots**
+    matched before implementation, using the existing build.
+  - `npx vitest run tests/policy/fix-convergence.test.ts`, with the same environment:
+    **33 tests passed**. Development
+    probes established the exact loop outputs; fixture filenames avoid
+    TypeScript's same-stem `.ts`/`.tsx` project-service exclusion, and Node
+    imports use the installed Node declarations in the temporary project.
+  - `npx tsc --noEmit`, `npm run knip`, and explicit ESLint checks of all three
+    changed TypeScript files and the updated documentation: passed.
+  - The first completion `npm run validate` attempt with one worker passed all
+    **1,820 tests**, but the existing package-install suite's `afterAll` cleanup
+    exceeded its unchanged 10-second hook timeout. The pipeline failed; this
+    is not counted as a validation pass.
+  - A retry at the repository's standard two-worker limit hit the unchanged
+    120-second timeout in twelve existing README example tests. That failed
+    run was cancelled, and its remaining processes and temporary consumers
+    were cleaned up. This host has 8 GiB of RAM; the package suites also
+    start multiple ESLint processes. No assertion or timeout was changed.
+  - Another single-worker attempt with `UV_THREADPOOL_SIZE=16` exposed the
+    remaining within-file README concurrency and was stopped before adjusting
+    that suite's scheduling. The final retry retains the 4 GiB heap and one
+    test-file worker, with additional filesystem workers for consumer cleanup.
+  - Final `npm run validate`, with `NODE_OPTIONS=--max-old-space-size=4096`,
+    `VITEST_MAX_WORKERS=1`, and `UV_THREADPOOL_SIZE=16`: passed, **63 test files /
+    1,820 tests**, including all **33 new harness tests** and the existing
+    README/packed-consumer suites, plus formatting, build, generated types,
+    typechecking, Knip, zero-warning lint, Publint, and Are the Types Wrong.
+  - `npm run policy:diff -- --base 008a08207f28441297a2476b4798136aeb1023de`:
+    passed; all **33 effective snapshots** match the stage-entry commit and
+    the lockfile resolves the same packages. `git diff --check` also passed.
+- **Policy/snapshot delta:** Verified zero against the stage-entry SHA; no
+  runtime policy or snapshot edits. This is also Stage 1's cumulative
+  implementation baseline.
+- **Artifacts/consumer compatibility:** Both entry and completion validation
+  passed the existing packed-consumer and README suites. Public options/exports, ESM output,
+  optional peers, feature scopes, and generated artifacts are unchanged;
+  generated `dist/` and `src/typegen.d.ts` are excluded from the commit.
+- **Retained exceptions/upstream conditions:** D1 and D2 are exact known-defect
+  characterizations owned by **Stage 2**; D3 is owned by **Stage 3**. The mixed
+  D1/D2/D3 sample must be updated in both stages. The Svelte escape cases belong
+  to Stage 2. All currently reproduce circular-fix warnings and remaining
+  fixable reports; none claims that a loop is resolved. D8 complementary
+  overlaps retain the maintainer's approved coverage. The D8.1 equality overlap
+  control records a remaining duplicate for **Stage 5** to replace with its
+  single-owner assertion; the independent unreviewed-sample and same-namespace
+  rule controls must remain. Other stages' restoration
+  conditions and policy decisions are untouched.
+- **Unrelated work preserved:** The initial tree was clean. Changes are limited
+  to the two harness files, README consumer scheduling, contributor instructions,
+  and this ledger/handoff.
+- **Remaining work:** None within Stage 1; requested commit/PR delivery follows
+  this validation record. Do not start Stage 2 without the next instruction.
+- **Next stage:** Stage 2, D1/D2: the RegExp stylistic map at
+  `src/configs/plugins/regexp/rules/stylistic-issues.ts`, the existing Unicorn
+  escape policy, `src/configs/plugins/import-x/rules/style-guide.ts`, and
+  Perfectionist's import policy. Replace the D1/D2, mixed, and Svelte baseline
+  assertions with the approved convergence checks while retaining D3's Stage 3
+  characterization.
+- **PR/CI:** Commit and PR requested after local completion; remote CI has not
+  been evaluated in this record.
