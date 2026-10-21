@@ -748,9 +748,17 @@ The reference that the recipes link to, grouped by topic.
   using real projects for typed files and component parsers. The harness checks
   both second-cycle transitions, so a formatter cannot hide an ESLint rewrite.
   Approved complementary overlaps name a sample, rule IDs, and distinct concerns;
-  a shared location or plugin namespace is not an automatic exception. The D1/D2
-  loop characterizations belong to Stage 2 and D3 to Stage 3 of the audit
-  follow-up: replace them with positive convergence assertions in those stages.
+  a shared location or plugin namespace is not an automatic exception. D1/D2
+  assert uppercase escapes and import-comment convergence, separately and
+  together. Only D3's module-spacing characterization, including its mixed
+  sample, remains for Stage 3 of the audit follow-up to replace with positive
+  convergence assertions.
+- **Import comments keep their documentation layout.**
+  `import-x/newline-after-import` uses `considerComments: false` and
+  `exactCount: false`, with `count: 1` as a minimum. The rule counts intervening
+  comment lines, so an exact gap would reject multiline documentation after
+  the final import. Perfectionist still sorts across comments within each
+  configured import group.
 
 ### Policy and snapshots
 

@@ -125,7 +125,7 @@ migrations and supplies a verified baseline for each refactor.
 | Stage | Deliverable                                                               | Decisions/findings               | Depends on | Status      |
 | ----- | ------------------------------------------------------------------------- | -------------------------------- | ---------- | ----------- |
 | 1     | Baseline and combined-rule regression harness                             | P1–P3; guard against regressions | None       | Complete    |
-| 2     | Escape-case and import-spacing convergence                                | D1, D2                           | 1          | Not started |
+| 2     | Escape-case and import-spacing convergence                                | D1, D2                           | 1          | Complete    |
 | 3     | Arrow functions, starred documentation, function spacing                  | D3                               | 2          | Not started |
 | 4     | Passing configurations, conditional peer metadata, typed TSX names        | D4–D7 and D7 AST follow-up       | 3          | Not started |
 | 5     | Verified ownership, complementary checks, safe execution preference       | D8.1–D8.12                       | 4          | Not started |
@@ -182,7 +182,8 @@ effective snapshot changes. This stage does not claim that the loops are fixed.
 
 ## Stage 2: escape-case and import-spacing convergence
 
-**Decisions:** D1 = A; D2 = A.
+**Decisions:** D1 = A; D2 = A, including the maintainer's 21 October 2026
+implementation follow-up approving `exactCount: false` for multiline comments.
 
 **Primary locations:** RegExp stylistic rule map, Unicorn escape-case entry,
 `src/configs/plugins/import-x/rules/style-guide.ts`, Perfectionist import policy,
@@ -192,9 +193,12 @@ and the Stage 1 regressions. Stage 9 will later rename the import feature folder
 
 1. Set `regexp/letter-case`'s `hexadecimalEscape` and `unicodeEscape` to
    `"uppercase"`. Preserve its other options and Unicorn's uppercase policy.
-2. Set `import-x/newline-after-import`'s `considerComments` to `false`. Preserve
-   its count/other settings and `perfectionist/sort-imports`, including
-   `partitionByComment: false`. Comments must not create new import partitions.
+2. Set `import-x/newline-after-import`'s `considerComments` and `exactCount` to
+   `false`. Retain `count: 1` as a minimum and preserve `perfectionist/sort-imports`,
+   including `partitionByComment: false`. Comments must not create new import
+   partitions. The exact-count change was approved after implementation
+   reproduced its conflict with required multiline documentation; it supersedes
+   this stage's original instruction to preserve that setting.
 3. Replace the D1/D2 baseline characterizations with passing repeated-fix and
    formatter-convergence assertions. Test escaped regex/string values and
    imports followed by comments, interleaved comments, and ordinary statements.
@@ -1066,5 +1070,114 @@ Do not continue to Stage <N+1> or publish/merge/release without my instruction.
   Perfectionist's import policy. Replace the D1/D2, mixed, and Svelte baseline
   assertions with the approved convergence checks while retaining D3's Stage 3
   characterization.
+- **PR/CI:** Commit and PR requested after local completion; remote CI has not
+  been evaluated in this record.
+
+#### Stage 2 — escape-case and import-spacing convergence
+
+- **Status/date:** Complete, 21 October 2026.
+- **Stage-entry commit:** `48ed7d1548a79465b0bd70d048ccf187c1d049e7`.
+  The worktree was clean on `cravingmaker/implement-audit-stage-two`, matching
+  `origin/main` and containing the completed Stage 1 handoff.
+- **Implementation commit(s):** Uncommitted at validation; the implementation
+  and this handoff are delivered together.
+- **Decisions/findings covered:** D1 = A; D2 = A, including the maintainer's
+  explicit 21 October follow-up approving `exactCount: false`.
+- **Changes and rationale:** RegExp's hexadecimal and Unicode escape casing
+  now agrees with Unicorn's uppercase policy. Import X ignores comments as
+  import boundaries and retains `count: 1` as a minimum. The maintainer approved
+  disabling exact spacing after the existing combination rejected multiline
+  documentation, which Unicorn requires. Perfectionist still sorts across
+  comments with its original grouping and `partitionByComment: false`. Rule
+  categories/counts, README/contributor guidance, and D2's decision record now
+  describe these settings. No declaration comments or fixtures were relocated,
+  compacted, or suppressed in the final change.
+- **Regression coverage:** Replaced D1/D2 characterizations with positive
+  repeated ESLint–Prettier checks for JavaScript, typed TypeScript, and Svelte
+  scripts. Added hexadecimal/Unicode string values, comments between imports,
+  a following comment, multiline documentation, an ordinary following
+  statement, and a combined D1/D2 sample. The installed-package regression
+  checks JavaScript and untyped TypeScript with uppercase escapes, sorted
+  imports, unchanged multiline documentation, stable second fixes, and no
+  diagnostics or warnings in a consumer without optional peers.
+- **Runtime/dependencies:** Node.js `24.22.0` from `.nvmrc`, npm `11.19.1`,
+  ESLint `10.12.0`, TypeScript `6.0.3`, typescript-eslint `8.70.0`, Vitest
+  `5.0.3`, RegExp `3.3.1`, Import X `4.17.1`, Unicorn `77.0.0`, Perfectionist
+  `5.12.1`, Prettier `3.9.10`, and `@cravingmaker/prettier-config` `0.3.2`.
+  Dependency versions and the lockfile are unchanged. Test commands use
+  `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16` on this host.
+- **Tests/commands:**
+  - `npm ci` and `npm run prepare`: passed; npm reported zero vulnerabilities.
+  - Stage-entry `npm run build` followed by
+    `npx vitest run tests/policy/fix-convergence.test.ts`: all **33 tests passed**.
+  - Before the initial policy changes,
+    `npx vitest run tests/configs/regexp.test.ts tests/policy/fix-convergence.test.ts`
+    failed **15 of 49 tests**, reproducing the escape/import defects.
+  - Intermediate targeted runs exposed the multiline-documentation conflict
+    in existing React fixtures. Against the preceding `exactCount: true` build,
+    `npx vitest run tests/policy/fix-convergence.test.ts -t 'multiline documentation'`
+    then failed both new JavaScript/TypeScript cases. The maintainer-approved
+    exact-count correction preserves the original documentation layout.
+  - After rebuilding, `npx vitest run tests/policy -u`: **13 files / 1,152 tests
+    passed**, including all **43 convergence/harness tests**; **14 snapshots**
+    were updated through the supported process.
+  - Explicit ESLint checks of every changed TypeScript/source/documentation
+    file with `--max-warnings 0`: passed.
+  - `npx vitest run tests/configs/regexp.test.ts tests/configs/imports.test.ts tests/configs/perfectionist.test.ts tests/package/install.test.ts`:
+    **4 files / 33 tests passed**, including consumers without optional peers,
+    with a partial peer set, and with all optional peers.
+  - The first completion `npm run validate` passed formatting, build, typecheck,
+    and Knip, then found missing import-to-statement blank lines in
+    `src/configs/plugins/react/index.ts` and `tests/utilities.ts`. The new minimum
+    spacing requires one added blank line in each file; no code/comment content
+    changed.
+  - The next `npm run validate` passed every static check and **1,833 tests**,
+    but the existing regular-UI watcher comparison failed on
+    `tests/fixtures/sample.ts` (**1 failed / 1,833 passed** across 63 files).
+    `npx vitest run tests/vitest-watch.test.ts --maxWorkers=1` passed both tests
+    without edits. No watcher source, assertion, timeout, or hook was changed;
+    the final complete retry used the same environment.
+  - Final `npm run validate`: passed **63 test files / 1,834 tests**, including
+    all **43 convergence/harness tests**, README and packed-consumer suites,
+    formatting, build, generated types/typechecking, Knip, zero-warning
+    repository lint, Publint, and Are the Types Wrong. No assertion, timeout,
+    worker coverage, or hook was weakened to obtain this pass.
+  - `npm run policy:diff -- --base 48ed7d1548a79465b0bd70d048ccf187c1d049e7`:
+    passed; only the four approved options differ in **14 snapshots**, with
+    **19 unchanged** and unchanged dependencies. The cumulative check used
+    `node scripts/policy-diff.ts --base 008a08207f28441297a2476b4798136aeb1023de`
+    and reported the same decision-mapped delta. `git diff --check` passed.
+- **Policy/snapshot delta:** The built policy comparison against the stage-entry
+  SHA reports **14 changed / 19 unchanged** snapshots, no additions, removals,
+  failures, or dependency changes. Every changed snapshot was also checked
+  against the exact expected four-option transformation: only
+  `regexp/letter-case`'s `hexadecimalEscape`/`unicodeEscape` become `"uppercase"`,
+  and `import-x/newline-after-import`'s `considerComments`/`exactCount` become
+  `false`. All other snapshot lines are unchanged. The cumulative comparison
+  against the implementation starting point
+  `008a08207f28441297a2476b4798136aeb1023de` reports the same four approved
+  option changes in the same **14 changed / 19 unchanged** snapshots, with
+  unchanged dependencies.
+- **Artifacts/consumer compatibility:** The final full gate passed the existing
+  packed-consumer, minimum-peer, README, public API/type, Publint, and ESM
+  declaration checks. Public options/exports, optional-peer loading, feature
+  scopes, block names/order, and consumer overrides are unchanged. Generated
+  `dist/` and `src/typegen.d.ts` remain excluded from the commit.
+- **Retained exceptions/upstream conditions:** D3's standalone and mixed
+  module-spacing characterizations remain owned by **Stage 3**. The mixed case
+  now requires only the D3 fixable report and rejects D1/D2 reports. Existing
+  D8 overlap exceptions and the Stage 5 equality control are unchanged.
+- **Unrelated work preserved:** The initial tree was clean. The final scope is
+  the two owning rule maps, two required import-spacing fixes, Stage 2 regressions,
+  the fourteen reviewed snapshots, affected guidance, and this
+  decision/ledger/handoff update. No dependency,
+  public API, feature scope, override composition, or other stage is changed.
+- **Remaining work:** None within Stage 2; requested commit/PR delivery follows
+  this validation record.
+- **Next stage:** Stage 3, D3: core function-style policy, Stylistic padding,
+  Perfectionist module sorting, Unicorn documentation-comment policy, and
+  `tests/policy/fix-convergence.test.ts`. Read the complete D3 decision before
+  replacing the remaining characterizations; no Stage 3 work is included here.
 - **PR/CI:** Commit and PR requested after local completion; remote CI has not
   been evaluated in this record.

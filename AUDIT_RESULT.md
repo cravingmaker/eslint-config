@@ -409,6 +409,16 @@ The D8.6 clarification requires retaining complementary checks when a proposed r
 
 **Maintainer choice:** A — set `considerComments: false` in `import-x/newline-after-import` and retain the current `perfectionist/sort-imports` policy. Confirmed by the maintainer on 20 October 2026.
 
+**Implementation follow-up:** On 21 October 2026, the maintainer also approved
+`exactCount: false` after Stage 2 reproduced a conflict: with
+`considerComments: false`, the retained `exactCount: true` counts multiline
+documentation as excess import-to-statement spacing, while
+`unicorn/single-line-block-comment-style` requires multiline documentation.
+Retain `count: 1` as the minimum and leave Perfectionist's ordering, grouping,
+and `partitionByComment: false` unchanged. This explicit instruction supersedes
+Stage 2's earlier requirement to retain the exact-count setting; documentation
+comments keep their original content and placement.
+
 ### D3: module spacing and paragraphs in documentation comments
 
 **Initial recommendation, before the discussion below:** A — temporarily set `newlinesBetween: "ignore"` in `perfectionist/sort-modules`, retaining its other options and `unicorn/no-asterisk-prefix-in-documentation-comments`. Declaration ordering remains enforced, and documentation comments retain their existing style owner and paragraph breaks.

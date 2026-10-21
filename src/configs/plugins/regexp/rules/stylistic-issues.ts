@@ -21,17 +21,8 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (9/11) ----------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (8/11) ----------------------------------------------------------------------------------------------------------.
   "regexp/grapheme-string-literal": "error",
-  "regexp/letter-case": [
-    "error",
-    {
-      caseInsensitive: "lowercase",
-      controlEscape: "uppercase",
-      hexadecimalEscape: "lowercase",
-      unicodeEscape: "lowercase",
-    },
-  ], // Automatically fixable by the --fix command.
   "regexp/prefer-lookaround": [
     "error",
     { lookbehind: true, strictTypes: true },
@@ -68,8 +59,18 @@ const otherRules: Rules = {
     },
   ], // Automatically fixable by the --fix command.
 
-  // --- Rules with overridden options (1/11) -------------------------------------------------------------------------------------------------------.
+  // --- Rules with overridden options (2/11) -------------------------------------------------------------------------------------------------------.
   "regexp/hexadecimal-escape": ["error", "never"], // Automatically fixable by the --fix command.
+  // Match `unicorn/escape-case` so regex and string fixes converge on uppercase escapes.
+  "regexp/letter-case": [
+    "error",
+    {
+      caseInsensitive: "lowercase",
+      controlEscape: "uppercase",
+      hexadecimalEscape: "uppercase",
+      unicodeEscape: "uppercase",
+    },
+  ], // Automatically fixable by the --fix command.
 
   // --- Turned off rules (1/11) --------------------------------------------------------------------------------------------------------------------.
   "regexp/prefer-named-capture-group": "off", // Handled by `prefer-named-capture-group`.

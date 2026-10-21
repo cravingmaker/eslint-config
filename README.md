@@ -378,6 +378,15 @@ and expanded assignments (`value = value + amount` and
 continues to decide indentation, quotes, and wrapping. The formatter tests check
 that its output agrees with the enabled Stylistic rules across supported layouts.
 
+Hexadecimal and Unicode escapes use uppercase letters in regular expressions and
+strings. Comments do not partition import sorting groups:
+`perfectionist/sort-imports` owns ordering and spacing within groups, while
+`import-x/newline-after-import` checks the spacing before the next statement
+without treating comments as import boundaries. These policies converge when
+ESLint fixes and Prettier formatting run repeatedly.
+The newline rule retains `count: 1` as a minimum and uses `exactCount: false`, so
+multiline documentation after the imports is accepted.
+
 ## Rules that replace other rules
 
 Each overlapping check has a fixed owner. The winning rule is enabled in its

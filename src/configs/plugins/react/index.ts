@@ -13,6 +13,7 @@ import { hooksRules, htmlReactRules, refreshRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 import { importPeer } from "../../../utilities/import-peer.js";
 import { supportedPluginPolicy } from "../../../utilities/plugin-policy.js";
+
 type ReactFeatureOptions = FeatureOptions & {
   /**
     The React Refresh variant, or `false` for no React Refresh rule.

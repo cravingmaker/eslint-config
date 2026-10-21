@@ -201,7 +201,7 @@ import-x/group-exports: error
 import-x/max-dependencies: off
 import-x/named: error [{"commonjs":false}]
 import-x/namespace: error [{"allowComputed":false}]
-import-x/newline-after-import: error [{"considerComments":true,"count":1,"exactCount":true}]
+import-x/newline-after-import: error [{"considerComments":false,"count":1,"exactCount":false}]
 import-x/no-absolute-path: error [{"amd":false,"commonjs":true,"esmodule":true}]
 import-x/no-amd: error
 import-x/no-anonymous-default-export: error [{"allowAnonymousClass":false,"allowAnonymousFunction":false,"allowArray":false,"allowArrowFunction":false,"allowCallExpression":true,"allowLiteral":false,"allowNew":false,"allowObject":false}]
@@ -509,7 +509,7 @@ regexp/confusing-quantifier: error
 regexp/control-character-escape: error
 regexp/grapheme-string-literal: error
 regexp/hexadecimal-escape: error ["never"]
-regexp/letter-case: error [{"caseInsensitive":"lowercase","controlEscape":"uppercase","hexadecimalEscape":"lowercase","unicodeEscape":"lowercase"}]
+regexp/letter-case: error [{"caseInsensitive":"lowercase","controlEscape":"uppercase","hexadecimalEscape":"uppercase","unicodeEscape":"uppercase"}]
 regexp/match-any: error [{"allows":["[\\s\\S]","dotAll"]}]
 regexp/negation: error
 regexp/no-contradiction-with-assertion: error

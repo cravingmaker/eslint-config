@@ -10,10 +10,21 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (7/17) ----------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (8/17) ----------------------------------------------------------------------------------------------------------.
   "import-x/consistent-type-specifier-style": ["error", "prefer-top-level"], // Automatically fixable by the --fix command.
   "import-x/exports-last": "error",
   "import-x/group-exports": "error",
+  "import-x/newline-after-import": [
+    "error",
+    {
+      count: 1,
+
+      // Perfectionist sorts across comments without competing blank-line fixes.
+      considerComments: false,
+      // Comment lines count toward an exact gap, so allow multiline documentation.
+      exactCount: false,
+    },
+  ], // Automatically fixable by the --fix command.
   "import-x/no-anonymous-default-export": [
     "error",
     {
@@ -39,7 +50,7 @@ const otherRules: Rules = {
     },
   ],
 
-  // --- Rules with overridden options (3/17) -------------------------------------------------------------------------------------------------------.
+  // --- Rules with overridden options (2/17) -------------------------------------------------------------------------------------------------------.
   "import-x/extensions": [
     "error",
     "ignorePackages",
@@ -55,15 +66,6 @@ const otherRules: Rules = {
       tsx: "never",
     },
   ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
-  "import-x/newline-after-import": [
-    "error",
-    {
-      count: 1,
-
-      considerComments: true,
-      exactCount: true,
-    },
-  ], // Automatically fixable by the --fix command.
   "import-x/no-namespace": [
     "error",
     {
