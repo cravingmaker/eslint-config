@@ -742,6 +742,16 @@ The reference that the recipes link to, grouped by topic.
   `<!-- eslint-skip -->` comment. The install commands must name ESLint,
   the package, and every optional peer but React and Svelte.
 
+- **Combined rules need repeated fixes and formatting.** Build, then run
+  `npx vitest run tests/policy/fix-convergence.test.ts`. Its isolated Node
+  runner records reports and warning types through two ESLint–Prettier cycles,
+  using real projects for typed files and component parsers. The harness checks
+  both second-cycle transitions, so a formatter cannot hide an ESLint rewrite.
+  Approved complementary overlaps name a sample, rule IDs, and distinct concerns;
+  a shared location or plugin namespace is not an automatic exception. The D1/D2
+  loop characterizations belong to Stage 2 and D3 to Stage 3 of the audit
+  follow-up: replace them with positive convergence assertions in those stages.
+
 ### Policy and snapshots
 
 - **Snapshots record the policy.** `tests/policy/__snapshots__/` holds
@@ -965,8 +975,9 @@ network access.
 
 Vitest runs at most two test files at once to limit memory pressure: each
 worker loads ESLint and TypeScript, and the package tests also start child
-processes. The limit applies to local tests, validation, CI, and the
-pre-push hook.
+processes. README consumer examples run sequentially within their suite because
+each starts additional TypeScript and ESLint processes. These limits apply to
+local tests, validation, CI, and the pre-push hook.
 
 For faster feedback, run `npm run test:unit` for unit tests or
 `npm run test:package` for package consumer tests. Both commands build the
