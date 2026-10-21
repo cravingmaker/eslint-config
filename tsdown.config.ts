@@ -5,4 +5,6 @@ export default defineConfig({
   entry: ["src/index.ts"],
   format: ["esm"],
   outDir: "dist",
+  // Do not publish original source through source maps.
+  sourcemap: false,
 });

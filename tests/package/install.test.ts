@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-non-literal-fs-filename -- The consumers are created in a temporary directory. */
 
-import { mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 
@@ -243,14 +243,53 @@ describe("the packed package", () => {
 
     expect(stdout.trim().split("\n").toSorted(compareText)).toEqual([
       "package/dist/index.d.mts",
-      "package/dist/index.d.mts.map",
       "package/dist/index.mjs",
-      "package/dist/index.mjs.map",
       "package/LICENSE",
       "package/package.json",
       "package/README.md",
     ]);
+
+    const installedFiles = await readdir(
+      path.join(
+        withoutPeers,
+        "node_modules",
+        "@cravingmaker",
+        "eslint-config",
+        "dist",
+      ),
+    );
+
+    expect(installedFiles.toSorted(compareText)).toEqual([
+      "index.d.mts",
+      "index.mjs",
+    ]);
   });
+
+  it.each(["index.d.mts", "index.mjs"])(
+    "packs and installs %s without external or inline source maps",
+    async (filename) => {
+      const { stdout } = await execute("tar", [
+        "-xOzf",
+        tarball,
+        `package/dist/${filename}`,
+      ]);
+
+      expect(stdout).not.toContain("sourceMappingURL");
+      expect(
+        await readFile(
+          path.join(
+            withoutPeers,
+            "node_modules",
+            "@cravingmaker",
+            "eslint-config",
+            "dist",
+            filename,
+          ),
+          "utf8",
+        ),
+      ).toBe(stdout);
+    },
+  );
 
   it("exports createConfig from its root and nothing else", async () => {
     const output = await run(

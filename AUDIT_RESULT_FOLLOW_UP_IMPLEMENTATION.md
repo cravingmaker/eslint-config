@@ -131,7 +131,7 @@ migrations and supplies a verified baseline for each refactor.
 | 5     | Verified ownership, complementary checks, safe execution preference       | D8.1–D8.12                       | 4          | Complete    |
 | 6     | Retained review signals and known parser/fix failures                     | D9, D10.1–D10.2, D11.1–D11.3     | 5          | Complete    |
 | 7     | Severity, deprecated entries/options, generated ignores, explicit updates | D12, D13.1–D13.2, D14, D19       | 6          | Complete    |
-| 8     | Source-map-free package                                                   | D15, R7                          | 7          | Not started |
+| 8     | Source-map-free package                                                   | D15, R7                          | 7          | Complete    |
 | 9     | Source, test, and ambient declaration ownership                           | D18.1–D18.6, R11                 | 8          | Not started |
 | 10    | Production utility/builder consolidation and Svelte negations             | R1, R2                           | 9          | Not started |
 | 11    | Derived disabled maps, shared test boundaries, local suppressions         | R3–R5                            | 10         | Not started |
@@ -1842,3 +1842,101 @@ contracts still require preservation and later review.
   artifacts. No Stage 8 artifact or build setting is changed here.
 - **PR/CI:** Commit and PR requested after local completion; remote CI has not
   been evaluated in this record.
+
+#### Stage 8 — publish without source maps
+
+- **Status/date:** Complete, 22 October 2026.
+- **Stage-entry commit:** `8273526416e19aa001fa73250e217aa1f8c971a1`.
+  The worktree was clean on `cravingmaker/implement-stage-8`; a fresh fetch
+  confirmed that `origin/main` matched the completed Stage 7 baseline.
+- **Implementation commit(s):** Uncommitted at validation; the implementation
+  and this handoff are delivered together.
+- **Decisions/findings covered:** D15 = A; R7.
+- **Changes and rationale:** TypeScript now explicitly disables declaration
+  maps, and tsdown explicitly disables source maps with the required comment,
+  `Do not publish original source through source maps.` Declaration generation,
+  the ESM entry/output, runtime/type exports, and the `dist` package allowlist
+  remain unchanged. A clean build removes the old maps and emits only
+  `index.mjs` and `index.d.mts`. README migration/debugging guidance and the
+  contributor build contract explain the accepted loss of mapped TypeScript
+  runtime frames, reduced disclosure of original source embedded in maps,
+  continued inspectability of emitted JavaScript, and the need to keep secrets
+  out of bundled code. Consumer lint diagnostics keep their source locations.
+- **Regression coverage:** Local-build tests require the exact two-file dist
+  inventory and reject `sourceMappingURL` in both bundles. The actual tarball
+  inventory retains only those bundles and the existing package documents.
+  Installed-consumer checks require the same dist inventory, reject external
+  and inline map references in each tarball bundle, and compare the installed
+  files byte for byte with the tarball. Exact inventories also reject hidden
+  maps, extra directories, and publication of `src/`.
+- **Runtime/dependencies:** Node.js `24.22.0`, npm `11.19.1`, tsdown `0.23.1`,
+  Rolldown `1.2.13`, TypeScript `6.0.3`, and Vitest `5.0.3`. Commands use
+  `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16`. Dependency versions/peer ranges, public options,
+  rule policy/scopes/order, scripts, and hooks are unchanged.
+- **Tests/commands and development evidence:**
+  - `npm ci`, `npm run prepare`, and the stage-entry `npm run build` passed.
+    The captured entry build contained both external map files.
+  - Before the build-option changes,
+    `npx vitest run tests/package/contract.test.ts tests/package/install.test.ts -t 'source.map|contains the build|builds only'`
+    reproduced all **6 expected failures** for the old inventories and map
+    references. No expected failure or skip was added to the suites.
+  - After the changes,
+    `npx vitest run tests/package/contract.test.ts tests/package/install.test.ts`
+    passed **2 files / 30 tests** in **66.06 seconds**, including real npm
+    installations with missing, partial, and complete optional-peer sets.
+  - Prettier and changed-file ESLint initially caught a transient test syntax
+    error and three sorting/await-expression errors. These were corrected
+    without new suppressions or policy changes; formatting, explicit ESLint
+    of all seven changed files with `--max-warnings 0`, and `git diff --check`
+    then passed. The final documentation handoff is checked separately after
+    adding this validation record.
+- **Final validation:** `npm run validate` passed on its first full run:
+  **71 files / 2,715 tests**, formatting, clean build/generation, TypeScript,
+  Knip, zero-warning repository lint, README/packed consumers, Publint, and
+  ATTW's ESM profile. The test phase took **400.56 seconds**. Broken-optional-
+  peer stderr belongs to a passing negative test. No gate, timeout, coverage,
+  assertion, or hook was weakened.
+- **Policy/snapshot delta:**
+  `npm run policy:diff -- --base 8273526416e19aa001fa73250e217aa1f8c971a1`
+  reports **all 33 snapshots unchanged**, with unchanged locked packages.
+  The cumulative report,
+  `node scripts/policy-diff.ts --base 008a08207f28441297a2476b4798136aeb1023de`,
+  retains **25 changed / 8 unchanged**, with no new, removed, failed, or
+  locked-package changes. Its differences remain the completed Stage 2–7
+  decisions; Stage 8 adds no effective-rule or snapshot difference.
+- **Artifacts/consumer compatibility:** Both emitted bundles match their
+  captured stage-entry counterparts after removing only source-map-reference
+  comments and trailing whitespace; normalized SHA-256 checks matched for
+  runtime and declarations. An actual temporary `npm pack --ignore-scripts`
+  tarball was inspected, and each packed bundle matched the local build byte
+  for byte with no map reference. The five entries are `dist/index.mjs`,
+  `dist/index.d.mts`, `LICENSE`, `README.md`, and `package.json`. Measured
+  compressed/unpacked sizes changed from **264,510 / 1,639,993 bytes** at entry
+  to **171,018 / 1,078,024 bytes** after the README update; the two removed maps
+  accounted for **562,623 bytes**. Temporary inspection tarballs were deleted;
+  package suites clean up their own packs/consumers. Public imports, declarations,
+  optional-peer behavior, Publint, and ATTW passed. The dedicated advertised-
+  minimum-peer CI matrix has not been run locally.
+- **Audit/CI limitation:** The current registry audit reports **two moderate
+  findings** in the unchanged locked `vitest` and `@vitest/ui` versions
+  (`5.0.3`); `npm audit --json` returned status 1. The package manifest and
+  lockfile match the entry commit exactly. CI's separate `release:check`
+  audit gate may fail for these findings; dependency upgrades are outside
+  Stage 8. This does not change the passing `npm run validate` result.
+- **Retained exceptions/upstream conditions:** Earlier stages' temporary
+  exclusions, compatibility guards, and Security suppression inventory remain
+  unchanged. Source-map omission is the final D15 choice, with no upstream
+  restoration condition.
+- **Unrelated work preserved:** The initial tree was clean; every changed file
+  belongs to Stage 8 build settings, package regressions, documentation, or this
+  handoff. Generated `dist/` and `src/typegen.d.ts` remain outside the commit.
+- **Remaining work:** None within Stage 8; requested commit/push/PR delivery
+  follows this validation record.
+- **Next stage:** Stage 9, D18.1–D18.6/R11: source, test, and ambient declaration
+  ownership migrations, using the current `import-x/`, Package JSON
+  `other-rules.ts`, React category aliases, Node typed maps, and
+  `src/types/eslint-plugin-promise.d.ts` paths. No Stage 9 migration is included.
+- **PR/CI:** Commit and PR requested after local completion; remote CI has not
+  been evaluated in this record. The unchanged dependency-audit limitation
+  above must be distinguished from local Stage 8 validation.

@@ -768,6 +768,18 @@ The reference that the recipes link to, grouped by topic.
 - **Internal builders are tested from source.** Feature builders are not
   exported from the package root. Tests for them import from `src/`, as
   `tests/configs/core/index.test.ts` does.
+- **Published builds contain no source maps.** Keep `declarationMap: false`
+  in `tsconfig.json` and explicit `sourcemap: false` in `tsdown.config.ts`,
+  with declaration generation enabled. A clean `dist/` contains only
+  `index.mjs` and `index.d.mts`, with no `sourceMappingURL` references.
+  Package tests check the local build, an actual tarball, and its installed
+  files. Keep the package allowlist at `dist`; do not publish `src/` to
+  replace declaration maps. This reduces disclosure of original source
+  embedded in maps and accepts runtime stack frames in emitted JavaScript
+  instead of mapped TypeScript. Emitted code remains inspectable, and
+  secrets must stay out of bundled code. Preserve runtime and declaration
+  content when changing build settings, excluding only map-reference
+  comments and trailing whitespace from comparisons.
 - **The defaults detect frameworks from this repository's manifest.**
   `"auto"` reads the manifest at `projectRootDirectory`, which defaults
   to the working directory. A test that runs in this repository with the
