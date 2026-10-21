@@ -32,7 +32,6 @@ const objectSchemasOf = (schema: unknown): readonly UnknownRecord[] => {
   }
   const alternatives = schema.oneOf ?? schema.anyOf;
   if (isUnknownArray(alternatives)) {
-    // eslint-disable-next-line functional/prefer-tacit -- Keep the recursive visitor independent of flatMap's index and array arguments.
     return alternatives.flatMap((alternative) => {
       return objectSchemasOf(alternative);
     });

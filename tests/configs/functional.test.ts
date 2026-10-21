@@ -1,12 +1,17 @@
 import type { Context } from "../../src/types.js";
 
+import { execFile } from "node:child_process";
+import process from "node:process";
+import { promisify } from "node:util";
+
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
+import { createConfig } from "../../dist/index.mjs";
 import { functional } from "../../src/configs/plugins/functional/index.js";
 import { defaultContext } from "../../src/context.js";
 import { typescriptFiles } from "../../src/globs.js";
-import { expectLintError } from "../utilities.js";
+import { expectLintError, expectNoLintError } from "../utilities.js";
 
 type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 
@@ -48,6 +53,35 @@ const getReadonlyTypeSeverity = async (
 };
 
 describe("functional feature", () => {
+  it("lets consumers restore tacit preference only where type information is available", async () => {
+    const eslint = new ESLint({
+      overrideConfig: functional(
+        {
+          overrides: {
+            "functional/prefer-tacit": [
+              "warn",
+              { checkMemberExpressions: false },
+            ],
+          },
+        },
+        typedContext,
+      ),
+      overrideConfigFile: true,
+    });
+    const configs = await Promise.all(
+      ["src/example.ts", "src/example.js", "src/example.d.ts"].map(
+        async (filePath) => {
+          return await getRules(eslint, filePath);
+        },
+      ),
+    );
+    expect(
+      configs.map((rules) => {
+        return Number(rules?.["functional/prefer-tacit"]?.[0]);
+      }),
+    ).toEqual([1, 0, 0]);
+  });
+
   it("turns off the rules that need type information without typed linting", async () => {
     const eslint = new ESLint({
       overrideConfig: functional({}, untypedContext),
@@ -217,6 +251,50 @@ describe("functional feature", () => {
 });
 
 describe("functional rules", () => {
+  it("allows a block-bodied wrapper for a single-argument callback", async () => {
+    await expectNoLintError(
+      "const double = (value: number): number => { return value * 2; }; export const values = [1, 2, 3].map((value) => { return double(value); });",
+      "functional/prefer-tacit",
+      tsOptions,
+    );
+  });
+
+  it("keeps explicit forwarding arrows instead of passing array callback arguments", async () => {
+    const code = `const multiply = (value, factor = 2) => { return value * factor; };
+export const values = [1, 2, 3].map((value) => { return multiply(value); });`;
+    await expectNoLintError(code, "functional/prefer-tacit", tsOptions);
+    await expectLintError(
+      code.replace("(value) => { return multiply(value); }", "multiply"),
+      "unicorn/no-array-callback-reference",
+      tsOptions,
+    );
+    const eslint = new ESLint({
+      fix: true,
+      overrideConfig: await createConfig({ react: false, svelte: false }),
+      overrideConfigFile: true,
+    });
+    const [result] = await eslint.lintText(code, {
+      filePath: tsOptions.filePath,
+    });
+    expect(result.fatalErrorCount).toBe(0);
+    const fixed = result.output ?? code;
+    expect(fixed).toContain("multiply(value)");
+    // eslint-disable-next-line @typescript-eslint/strict-void-return -- execFile's callback form also returns the child process.
+    const execute = promisify(execFile);
+    const forwarded = await execute(process.execPath, [
+      "--input-type=module",
+      "--eval",
+      `${fixed}\nconsole.log(JSON.stringify(values));`,
+    ]);
+    const direct = await execute(process.execPath, [
+      "--input-type=module",
+      "--eval",
+      `${code.replace("(value) => { return multiply(value); }", "multiply")}\nconsole.log(JSON.stringify(values));`,
+    ]);
+    expect(forwarded.stdout.trim()).toBe("[2,4,6]");
+    expect(direct.stdout.trim()).toBe("[0,2,6]");
+  });
+
   it("functional/readonly-type: requires readonly type literal properties", async () => {
     await expectLintError(
       `type User = Readonly<{ name: string }>;\nconst user: User = { name: 'Ada' };\nconsole.log(user);\n`,

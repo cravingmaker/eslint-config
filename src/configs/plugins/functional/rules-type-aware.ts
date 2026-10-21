@@ -14,7 +14,7 @@ const typeAwareRulesOff: Rules = {
   "functional/no-throw-statements": "off", // Requires type information; enabled only in the type-aware scope.
   "functional/prefer-immutable-types": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "functional/prefer-property-signatures": "off", // Requires type information; enabled only in the type-aware scope.
-  "functional/prefer-tacit": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
+  "functional/prefer-tacit": "off", // Handled by `unicorn/no-array-callback-reference`; explicit consumer enablement still requires type information. Manually fixable by editor suggestions.
   "functional/readonly-type": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
   "functional/type-declaration-immutability": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
 } as const;

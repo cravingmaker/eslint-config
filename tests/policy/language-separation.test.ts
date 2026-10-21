@@ -17,11 +17,11 @@ const otherLanguages = [
   { filePath: "index.html", plugins: ["@html-eslint"] },
   {
     filePath: "package.json",
-    plugins: ["enforce-package-type", "package-json"],
+    plugins: ["@cravingmaker", "enforce-package-type", "package-json"],
   },
   {
     filePath: "packages/app/package.json",
-    plugins: ["enforce-package-type", "package-json"],
+    plugins: ["@cravingmaker", "enforce-package-type", "package-json"],
   },
   { filePath: "README.md", plugins: ["markdown"] },
   { filePath: "settings.jsonc", plugins: ["json"] },

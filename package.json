@@ -164,6 +164,9 @@
     "@html-eslint/eslint-plugin-svelte": {
       "optional": true
     },
+    "eslint": {
+      "optional": false
+    },
     "eslint-plugin-express-security": {
       "optional": true
     },

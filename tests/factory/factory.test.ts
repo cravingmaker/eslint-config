@@ -190,6 +190,7 @@ describe("createConfig", () => {
       "typescript/parser-type-aware",
       "typescript/rules",
       "typescript/rules-type-aware",
+      "typescript/rules-type-aware-tsx",
       "react/html",
       "react/hooks",
       "react/refresh",

@@ -163,8 +163,33 @@ const typeAwareReplacementRules: Rules = {
   "require-await": "off", // Handled by `@typescript-eslint/require-await`. Manually fixable by editor suggestions.
 } as const;
 
+// Function-valued constants can name components in typed TSX; ordinary data keeps
+// the shared naming policy. A function type alone does not identify a React component.
+const tsxTypeAwareReplacementRules: Rules = {
+  // --- Rules with overridden options (1/1) -------------------------------------------------------------------------------------------------------.
+  "@typescript-eslint/naming-convention": [
+    "error",
+    ...namingConventionOptions,
+    {
+      format: ["camelCase", "UPPER_CASE", "PascalCase"],
+      leadingUnderscore: "allow",
+      modifiers: ["const"],
+      selector: "variable",
+      trailingUnderscore: "allow",
+      types: ["function"],
+    },
+    {
+      format: ["camelCase", "PascalCase"],
+      leadingUnderscore: "allow",
+      selector: "function",
+      trailingUnderscore: "allow",
+    },
+  ],
+} as const;
+
 export {
   compilerCheckedRules, // 19 rules, 1 automatically fixable, 1 editor suggestions fixable.
   replacementRules, // 22 rules, 3 automatically fixable, 8 editor suggestions fixable.
+  tsxTypeAwareReplacementRules, // 1 rule, 0 automatically fixable, 0 editor suggestions fixable.
   typeAwareReplacementRules, // 16 rules, 5 automatically fixable, 4 editor suggestions fixable.
 };

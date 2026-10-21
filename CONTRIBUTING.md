@@ -145,6 +145,21 @@ script statements that the installed native padding rule cannot visit. The
 companion has its own override ID; it never duplicates native nested-statement
 diagnostics or loads an optional peer.
 
+Package JSON's existing setup block registers the same internal plugin for
+`@cravingmaker/require-peer-metadata`. The rule checks only root peer metadata
+completeness; upstream shape validation already requires each entry's boolean
+`optional`, the nonempty-field rule rejects empty objects, and the relationship
+rule rejects undeclared peers. Keep these owners without duplicate conditional
+reports, automatic fixes, or new peer dependencies. Every declared peer in this
+repository's manifest has explicit metadata, including `optional: false` for ESLint.
+
+The TypeScript builder adds `typescript/rules-type-aware-tsx` after its general
+typed block. It changes only naming for function-valued `const` bindings and
+functions in typed `.tsx`, within the already resolved type-aware scope; all
+feature and typed overrides still win. Ordinary data, other extensions, parser
+routing, and the arrow-style owner retain their policies. Actual AST property
+contracts continue to use targeted naming suppressions; do not add a name whitelist.
+
 The builders share these modules:
 
 | Module                           | Holds                                                                                                        |
@@ -751,7 +766,8 @@ The reference that the recipes link to, grouped by topic.
 - **The README examples run.** `tests/package/readme.test.ts` installs
   what the `npm install` commands of the README name, writes each
   JavaScript block of the README as the `eslint.config.js` of a project
-  in that consumer, type-checks it, and lints the fixtures with it. A
+  in that consumer, type-checks it, and lints the fixtures with it. The Usage
+  configuration itself must also lint without diagnostics in that consumer. A
   block that must not run, such as the options of 0.1.0, follows an
   `<!-- eslint-skip -->` comment. The install commands must name ESLint,
   the package, and every optional peer but React and Svelte.

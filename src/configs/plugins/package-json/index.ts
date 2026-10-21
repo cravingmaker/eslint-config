@@ -6,6 +6,7 @@ import * as jsoncParser from "jsonc-eslint-parser";
 
 import { packageJsonFiles } from "../../../globs.js";
 import { packageJsonRules } from "./rules.js";
+import { internalPlugin } from "../../../rules/index.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 
 const packageJson = ({
@@ -16,7 +17,10 @@ const packageJson = ({
   return [
     {
       name: "@cravingmaker/eslint-config/package-json/setup",
-      plugins: { "package-json": pluginPackageJson },
+      plugins: {
+        "@cravingmaker": internalPlugin,
+        "package-json": pluginPackageJson,
+      },
     },
     {
       files: narrowFiles(packageJsonFiles, files),

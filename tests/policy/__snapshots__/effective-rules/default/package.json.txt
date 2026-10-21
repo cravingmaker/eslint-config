@@ -11,8 +11,9 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 100 (error 80, off 20, warn 0)
+rules: 101 (error 80, off 21, warn 0)
 
+@cravingmaker/require-peer-metadata: error
 enforce-package-type/enforce-package-type: error [{"enforceType":"module"}]
 package-json/bin-name-casing: error
 package-json/exports-subpaths-style: error [{"prefer":"explicit"}]
@@ -55,7 +56,7 @@ package-json/require-os: off
 package-json/require-package-json-export: error
 package-json/require-packageManager: off
 package-json/require-peerDependencies: off
-package-json/require-peerDependenciesMeta: error [{"ignorePrivate":false}]
+package-json/require-peerDependenciesMeta: off
 package-json/require-private: error
 package-json/require-publishConfig: off
 package-json/require-repository: error [{"ignorePrivate":true}]
