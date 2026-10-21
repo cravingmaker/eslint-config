@@ -17,7 +17,8 @@ const recommendedRules: Rules = {
     "warn",
     {
       selfClosing: "always",
-      selfClosingCustomPatterns: ["-"],
+      // HTML custom elements need explicit end tags; a trailing slash does not close them.
+      selfClosingCustomPatterns: [],
     },
   ], // Automatically fixable by the --fix command.
 } as const;

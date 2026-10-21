@@ -430,9 +430,9 @@ describe("createConfig", () => {
       ],
       overrideConfigFile: true,
     });
-    // A bare URL, and a comment before a key that is there twice.
+    // An image without alt text, and a comment before a key that is there twice.
     const [[notes], [babelrc]] = await Promise.all([
-      eslint.lintText("# Notes\n\nSee https://example.com for more.\n", {
+      eslint.lintText("# Notes\n\n![](image.png)\n", {
         filePath: "docs/notes.markdown",
       }),
       eslint.lintText(
@@ -447,7 +447,7 @@ describe("createConfig", () => {
           return ruleId ?? message;
         });
       }),
-    ).toEqual([["markdown/no-bare-urls"], ["json/no-duplicate-keys"]]);
+    ).toEqual([["markdown/require-alt-text"], ["json/no-duplicate-keys"]]);
   });
 
   // Typescript-eslint takes an absolute `tsconfigRootDir` only, and reports any other as a parsing

@@ -91,7 +91,7 @@ const features = [
     fileNames: ["README.md"],
     files: ["app/**/*.md"],
     name: "markdown",
-    ruleId: "markdown/no-bare-urls",
+    ruleId: "markdown/require-alt-text",
   },
   {
     feature: "node",
@@ -655,7 +655,7 @@ describe("the files of a feature", () => {
     // of its rules.
     const cases = [
       ["data.json", ".babelrc", "json/no-duplicate-keys"],
-      ["README.md", "notes.markdown", "markdown/no-bare-urls"],
+      ["README.md", "notes.markdown", "markdown/require-alt-text"],
       ["src/example.js", "src/example.cjs", "eqeqeq"],
     ] as const;
     const severities = await Promise.all(

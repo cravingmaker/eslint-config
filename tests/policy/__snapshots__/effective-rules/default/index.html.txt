@@ -59,7 +59,7 @@ rules: 65 (error 52, off 9, warn 4)
 @html-eslint/quotes: off
 @html-eslint/require-attrs: error [{"attr":"alt","message":"Add an alt attribute to images to support screen readers and ensure accessibility.","tag":"img"},{"attr":"width","message":"Set the width attribute on images to reserve space and prevent page layout shifting as the image loads.","tag":"img"},{"attr":"height","message":"Set the height attribute on images to reserve space and prevent page layout shifting as the image loads.","tag":"img"},{"attr":"loading","message":"Include the loading attribute to control image load priority and improve initial page performance.","tag":"img"},{"attr":"decoding","message":"Include the decoding attribute to optimize how the browser renders the image.","tag":"img"},{"attr":"title","message":"Add a title attribute to iframes to describe the nested content for screen readers.","tag":"iframe"},{"attr":"type","message":"Set the type attribute on input fields to ensure predictable user input handling and mobile keyboard behavior.","tag":"input"}]
 @html-eslint/require-button-type: error
-@html-eslint/require-closing-tags: warn [{"selfClosing":"always","selfClosingCustomPatterns":["-"]}]
+@html-eslint/require-closing-tags: warn [{"selfClosing":"always","selfClosingCustomPatterns":[]}]
 @html-eslint/require-content: error
 @html-eslint/require-details-summary: error
 @html-eslint/require-doctype: error

@@ -129,7 +129,7 @@ migrations and supplies a verified baseline for each refactor.
 | 3     | Arrow functions, starred documentation, function spacing                  | D3                               | 2          | Complete    |
 | 4     | Passing configurations, conditional peer metadata, typed TSX names        | D4–D7 and D7 AST follow-up       | 3          | Complete    |
 | 5     | Verified ownership, complementary checks, safe execution preference       | D8.1–D8.12                       | 4          | Complete    |
-| 6     | Retained review signals and known parser/fix failures                     | D9, D10.1–D10.2, D11.1–D11.3     | 5          | Not started |
+| 6     | Retained review signals and known parser/fix failures                     | D9, D10.1–D10.2, D11.1–D11.3     | 5          | Complete    |
 | 7     | Severity, deprecated entries/options, generated ignores, explicit updates | D12, D13.1–D13.2, D14, D19       | 6          | Not started |
 | 8     | Source-map-free package                                                   | D15, R7                          | 7          | Not started |
 | 9     | Source, test, and ambient declaration ownership                           | D18.1–D18.6, R11                 | 8          | Not started |
@@ -1547,3 +1547,172 @@ Do not continue to Stage <N+1> or publish/merge/release without my instruction.
   signals and known parser/fix failures. No Stage 6 policy is implemented here.
 - **PR/CI:** Commit and PR requested after local completion; remote CI has not
   been evaluated in this record.
+
+#### Stage 6 — review signals and known parser/fix failures
+
+- **Status/date:** Complete, 21 October 2026.
+- **Stage-entry commit:** `ae66847b3ceaa1da85100c1c0c444dc9fbf85a39`.
+  The worktree was clean on `cravingmaker/implement-stage-6`; a fresh fetch
+  confirmed that `origin/main` matched this completed Stage 5 baseline.
+- **Implementation commit(s):** Uncommitted at validation; the implementation
+  and this handoff are delivered together.
+- **Decisions/findings covered:** D9 = B, D10.1 = B, D10.2 = B, and
+  D11.1–D11.3 = A; the Stage 6 portion of P4/P5.
+- **Changes and rationale:**
+  - D9 retains the error severity, `allowAny: false`, all four function-kind
+    checks, empty allowed-Promise names, and existing type-aware scope.
+    Regression cases cover synchronous opaque data, hidden Promises,
+    explicit Promise contracts, concrete synchronous returns, getters,
+    independent unsafe-type checks, feature/typed boundaries, and an explicit
+    uncertainty-policy override. Opaque-return reports have no fix or
+    suggestion. The targeted synchronous rule-option suppression in
+    `src/utilities/plugin-policy.ts` is retained.
+  - D10.1/D10.2 retain both Security warnings throughout the current source,
+    helper, and test scopes. Tests demonstrate reviewed and unreviewed dynamic
+    operations, literal negative controls, feature boundaries, and local
+    suppressions that leave later unrelated warnings visible. No test-role
+    exception, test-glob expansion, or compiler-option change is introduced.
+    `tests/configs/svelte-scripts.test.ts` now suppresses four inspected
+    filesystem operations locally; `tests/policy/overlaps.test.ts` suppresses
+    eight fixed-rule-ID lookup statements locally. Their former whole-file
+    Security directives are removed; unrelated directives are preserved.
+  - D11.1 sets only HTML's `selfClosingCustomPatterns` to `[]`, keeping `warn`
+    and `selfClosing: "always"`. Explicit custom-element end tags survive
+    composed fixes and formatting. Existing self-closing/missing-tag forms
+    report without a guessed boundary fix; standard void-element fixes remain.
+  - D11.2 keeps all twenty-one explicit Markdown IDs and sets the five approved
+    entries to scalar `off`, with the exact version/cause/upstream comment and
+    their capability annotations. Fourteen rules remain active; GFM, YAML
+    front matter, math, scopes, and overrides are preserved. The usual feature
+    sentinel is now `markdown/require-alt-text`; explicit `no-bare-urls`
+    override behavior is tested separately on non-triggering input.
+  - D11.3 narrows only the Svelte glob to `.svelte`, `.svelte.js`, and
+    `.svelte.ts`. The extra `.svelte.mjs`/`.svelte.mts` suffixes remain ordinary
+    sources, with normal diagnostics and conditional TypeScript services.
+    They receive no Svelte rune/template support. Supported rune/component
+    parsing, feature filtering, component roles, and optional peers remain.
+  - README and contributor guidance describe the retained review policy,
+    custom-element/manual-fix boundary, temporary Markdown coverage loss and
+    restoration requirement, and supported Svelte filenames.
+- **Runtime/dependencies:** Node.js `24.22.0` from `.nvmrc`, npm `11.19.1`, ESLint `10.12.0`,
+  TypeScript `6.0.3`, typescript-eslint `8.70.0`, HTML plugin/parser `0.66.1`,
+  Markdown `8.0.3`, Security `4.2.0`, Svelte `5.57.2`, svelte-eslint-parser
+  `1.9.0`, Prettier `3.9.10`, and Vitest `5.0.3`. Validation uses
+  `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16`. Dependencies, peer ranges, public options/exports,
+  ESM output, and consumer compiler contracts are unchanged.
+- **Tests/commands and development evidence:**
+  - `npm ci`, `npm run prepare`, and the stage-entry `npm run build` passed;
+    npm reported zero vulnerabilities.
+  - Before policy changes, the HTML/Markdown/Svelte regressions reproduced
+    the end-tag rewrite, missing manual-review warnings, GFM `getLoc()`
+    exceptions, and extra-suffix parser failures, including a typed `.mts`
+    case. The initial parser-name assertion was corrected to read Espree's
+    `name` rather than assuming every parser supplies `meta.name`.
+  - The first composed run exposed test-expectation issues: ESLint supplies
+    schema defaults on disabled Markdown rules; Security recognizes a path
+    built entirely from literals; and an explicitly `any` return differs from
+    an inferred unsafe return. Tests now assert the intended severity and use
+    actual temporary-path and independent inferred/explicit-type controls.
+    No production policy was changed to satisfy those expectations.
+  - The targeted config/factory/overlap run passed **9 files / 356 tests**:
+    `npx vitest run tests/configs/html.test.ts tests/configs/markdown.test.ts
+tests/configs/svelte.test.ts tests/configs/svelte-scripts.test.ts
+tests/configs/security.test.ts
+tests/configs/typescript/promise-function-async.test.ts
+tests/factory/factory.test.ts tests/factory/feature-toggles.test.ts
+tests/policy/overlaps.test.ts`.
+  - `npx vitest run tests/package/install.test.ts -t 'ships Stage 6'` passed
+    both new real-installed packed-consumer cases, with and without optional
+    peers. They exercise Markdown crashes/retained diagnostics, HTML fix
+    stability, opaque-return and Security review signals, ordinary typed
+    extra suffixes, normal equality diagnostics, parser selection, and rune
+    support only with the Svelte feature active.
+  - `npx vitest run tests/policy -u` passed **14 files / 1,646 tests** and
+    updated exactly **2 snapshots** through the supported process. Their
+    complete diff contains only the approved entries described below.
+  - `npx tsc --noEmit`, explicit ESLint checks of the changed source/test
+    files, and `git diff --check` passed. Development formatting and lint fixes
+    did not alter production policy beyond D11's three approved changes.
+- **Final validation:** `npm run validate` passed **68 files / 2,526 tests**,
+  formatting, build/generation, TypeScript, Knip, zero-warning repository lint,
+  all README and packed-consumer suites, Publint, and ATTW's ESM profile.
+  The test phase took approximately 22 minutes with one worker; it needed no
+  retry. No coverage, assertion, timeout, or hook was weakened. The expected
+  broken-optional-peer fixture's stderr is part of a passing negative test.
+- **Policy/snapshot delta:** The stage-entry report
+  `node scripts/policy-diff.ts --base ae66847b3ceaa1da85100c1c0c444dc9fbf85a39`
+  reports **2 changed / 31 unchanged**, with no new, removed, or failed
+  snapshots and no locked-package changes. The only changed rule entries are
+  HTML's custom-pattern option and the five approved Markdown severities;
+  derived severity totals change accordingly. Extra-suffix parser routing is
+  tested directly, including a real typed project and packed consumers.
+  The cumulative report against implementation starting point
+  `008a08207f28441297a2476b4798136aeb1023de` reports **25 changed / 8 unchanged**,
+  with no new, removed, failed, or locked-package changes. Prior entries map
+  to D1/D2 convergence, D3 function/documentation/spacing, D4–D7 passing
+  configurations/metadata/naming, and D8 ownership/safe fixes; this stage adds
+  only the D11 HTML/Markdown settings above. Svelte routing remains covered
+  directly because the existing snapshot paths use the supported suffixes.
+- **Artifacts/consumer compatibility:** The new packed tests pass for actual
+  npm-installed consumers with all optional peers and with none. Full package
+  validation passed, including existing disabled/missing/partial/broken-peer
+  cases, public declarations/exports, and pack contents. The dedicated CI
+  matrix for advertised minimum peer versions has not been run locally.
+  Generated `dist/` and `src/typegen.d.ts` remain excluded from the commit.
+- **Retained exceptions/upstream conditions:**
+  - D8.10: TypeScript RegExp execution preference remains scalar off until the
+    actual corrected dependency combination passes inherited flags, match/exec
+    arrays, computed access, repeated fixes, and restored unique diagnostics.
+    Stage 6 does not change this Stage 5 condition.
+  - D11.2: The five Markdown exclusions are temporary coverage losses, not an
+    upstream fix. Restore each only after the actual dependency combination
+    passes all recorded crashing inputs (including `[https://example.com]`),
+    restored unique diagnostics/fixes, and language/scope/override controls.
+  - Stage 3's module-spacing and Svelte-padding conditions remain unchanged.
+- **Unrelated work preserved:** The initial tree was clean; all changes belong
+  to Stage 6 policy, regressions, documentation, or this handoff.
+- **Remaining work:** None within Stage 6; requested commit/push/PR delivery
+  follows this validation record.
+- **Next stage:** Stage 7, D12, D13.1–D13.2, D14, and D19: severities,
+  deprecated entries/options, generated ignores, and explicit updates. No
+  Stage 7 policy is implemented here.
+- **PR/CI:** Commit and PR requested after local completion; remote CI has not
+  been evaluated in this record.
+
+##### Whole-file Security suppression inventory for Stage 11
+
+After narrowing the two directives above, **18 whole-file filesystem-rule
+directives and one whole-file object-injection directive** remain across
+18 files. This inventory identifies review boundaries, not completed approval
+of every suppressed operation. Stage 11 must inspect each operation, narrow
+where feasible, and retain unrelated rule tokens in combined directives.
+
+- `tests/package/contract.test.ts` has both Security tokens alongside six
+  unrelated tokens. Review the fixed repository-manifest URLs and every
+  manifest/lockfile-derived key separately; preserve the other tokens.
+- `tests/package/consumers.ts`, `tests/package/consumers.test.ts`,
+  `tests/package/install.test.ts`, `tests/package/readme.test.ts`, and
+  `tests/package/smoke.test.ts` own temporary consumers, but operations span
+  repository fixtures, tarballs, child-project paths, and cleanup. Confirm
+  each path's origin before replacing the broad directive. Preserve smoke's
+  separate `n/no-sync` exception.
+- `tests/factory/context.test.ts`, `factory.test.ts`, `feature-toggles.test.ts`,
+  `preparation.test.ts`, and `workspaces.test.ts` under `tests/factory/` build
+  temporary manifests/workspaces. Record fixed child names and cleanup roots
+  per operation rather than relying on the filename role.
+- `tests/configs/react.test.ts`, `tests/configs/type-aware-scope.test.ts`, and
+  `tests/configs/typescript/naming.test.ts` create temporary parser/type
+  projects. Separate fixture writes and dependency links from cleanup.
+- `tests/policy/rule-ownership.test.ts` and `tests/policy/type-information.test.ts`
+  own temporary typed consumers. Review the fixed fixture matrix, dependency
+  links, and real-path/cleanup boundary per operation.
+- `tests/scripts/policy-diff/report.test.ts` builds temporary repositories and
+  package snapshots; `tests/vitest-watch.test.ts` creates temporary watcher
+  inputs. Review source-path provenance, generated child paths, and cleanup.
+
+The production `promise-function-async` exception in
+`src/utilities/plugin-policy.ts` and the local Security key exceptions in
+`src/options.ts` and `src/configs/plugins/react/rules.ts` are targeted existing
+exceptions, not whole-file directives. Their synchronous-data and typed-key
+contracts still require preservation and later review.

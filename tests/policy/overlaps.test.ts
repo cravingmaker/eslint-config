@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-object-injection -- Rule IDs come from the fixed ownership cases. */
-
 import type { Options } from "../../src/types.js";
 
 import process from "node:process";
@@ -105,9 +103,11 @@ describe.each(pairs)("%s: %s stays off with %s", (owner, loser, winners) => {
 
   it("enables the winner and keeps the loser off", async () => {
     const rules = await getRules({}, filePath);
+    // eslint-disable-next-line security/detect-object-injection -- The loser is selected from the fixed ownership cases above.
     expect(rules[loser]?.[0]).toBe(0);
     expect(
       winners.map((winner) => {
+        // eslint-disable-next-line security/detect-object-injection -- The winner is selected from the fixed ownership cases above.
         return rules[winner]?.[0];
       }),
     ).toEqual(
@@ -119,9 +119,11 @@ describe.each(pairs)("%s: %s stays off with %s", (owner, loser, winners) => {
 
   it("keeps the loser off when its winner is disabled", async () => {
     const rules = await getRules({ [owner]: false }, filePath);
+    // eslint-disable-next-line security/detect-object-injection -- The loser is selected from the fixed ownership cases above.
     expect(rules[loser]?.[0]).toBe(0);
     expect(
       winners.some((winner) => {
+        // eslint-disable-next-line security/detect-object-injection -- The winner is selected from the fixed ownership cases above.
         return (rules[winner]?.[0] ?? 0) !== 0;
       }),
     ).toBe(false);
@@ -139,14 +141,17 @@ describe.each(pairs)("%s: %s stays off with %s", (owner, loser, winners) => {
       options,
       filePath.replace("example.", "example.generated."),
     );
+    // eslint-disable-next-line security/detect-object-injection -- Both lookups use a loser selected from the fixed ownership cases above.
     expect([outside[loser]?.[0], ignored[loser]?.[0]]).toEqual([0, 0]);
   });
 
   it("keeps the same ownership in Svelte scripts", async () => {
     const rules = await getRules({}, "src/Component.svelte");
+    // eslint-disable-next-line security/detect-object-injection -- The loser is selected from the fixed ownership cases above.
     expect(rules[loser]?.[0]).toBe(0);
     expect(
       winners.map((winner) => {
+        // eslint-disable-next-line security/detect-object-injection -- The winner is selected from the fixed ownership cases above.
         return rules[winner]?.[0];
       }),
     ).toEqual(
@@ -233,6 +238,7 @@ describe("TypeScript replacements", () => {
     ];
     expect(
       replacements.map(([core = "", extension = ""]) => {
+        // eslint-disable-next-line security/detect-object-injection -- Both IDs come from the fixed core and TypeScript replacement pairs.
         return [rules[core]?.[0], rules[extension]?.[0]];
       }),
     ).toEqual(
