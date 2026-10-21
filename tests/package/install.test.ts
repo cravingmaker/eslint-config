@@ -287,7 +287,106 @@ describe("the packed package", () => {
   });
 });
 
-describe("a consumer without optional peers", () => {
+describe("packed consumer policy regressions", () => {
+  it.each([
+    ["with all optional peers", withAllPeers, true],
+    ["without optional peers", withoutPeers, false],
+  ] as const)(
+    "ships Stage 6 parser, fix, and review boundaries %s",
+    async (_name, consumer, svelteEnabled) => {
+      const output = await run(
+        consumer,
+        String.raw`
+        import { mkdir, writeFile } from "node:fs/promises";
+        import path from "node:path";
+        import { ESLint } from "eslint";
+        import { createConfig } from "@cravingmaker/eslint-config";
+        const directory = path.resolve("stage-six");
+        await mkdir(directory);
+        await writeFile(path.join(directory, "package.json"), JSON.stringify({ type: "module" }));
+        await writeFile(path.join(directory, "tsconfig.json"), JSON.stringify({ compilerOptions: { strict: true, noImplicitReturns: true, allowUnreachableCode: false, module: "nodenext" }, include: ["*.ts", "*.mts"] }));
+        const opaque = 'export const parse = (raw: string): unknown => { return JSON.parse(raw); };\n';
+        const ordinary = 'export const options = { value: 1 };\nPromise.resolve(options);\n';
+        await writeFile(path.join(directory, "opaque.ts"), opaque);
+        await writeFile(path.join(directory, "options.svelte.mts"), ordinary);
+        const config = await createConfig({ projectRootDirectory: directory, svelte: ${svelteEnabled ? "true" : '"auto"'} });
+        const reporter = new ESLint({ cwd: directory, overrideConfig: config, overrideConfigFile: true });
+        const fixer = new ESLint({ cwd: directory, fix: true, overrideConfig: config, overrideConfigFile: true });
+        const sources = [
+          ["[https://example.com]\n\n![](image.png)\n", "README.md"],
+          ["<my-element></my-element>\n<p>After</p>\n", "index.html"],
+          [opaque, "opaque.ts"],
+          [ordinary, "options.svelte.mts"],
+          ['export const check = 1 == 1;\n', "options.svelte.mjs"],
+          ['import { readFile } from "node:fs/promises";\nawait readFile(process.env.INPUT_FILE, "utf8");\nconst key = "dev";\nexport const value = record[key];\n', "fixture.test.js"],
+          ['export const state = $state({ count: 0 });\n', "state.svelte.js"],
+        ];
+        const summaries = [];
+        for (const [source, filePath] of sources) {
+          const [result] = await reporter.lintText(source, { filePath });
+          const rules = result.messages.map(({ ruleId }) => ruleId);
+          summaries.push({ fatal: result.fatalErrorCount, rules });
+        }
+        const [fixed] = await fixer.lintText(sources[1][0], { filePath: "index.html" });
+        const [second] = await fixer.lintText(fixed.output ?? sources[1][0], { filePath: "index.html" });
+        const [opaqueResult] = await reporter.lintText(opaque, { filePath: "opaque.ts" });
+        const review = opaqueResult.messages.find(({ ruleId }) => ruleId === "@typescript-eslint/promise-function-async");
+        const parsers = [];
+        for (const filePath of ["options.svelte.mjs", "options.svelte.mts", "state.svelte.js"]) {
+          const { languageOptions: { parser } } = await reporter.calculateConfigForFile(filePath);
+          parsers.push(parser.meta?.name ?? parser.name);
+        }
+        process.stdout.write(JSON.stringify({ summaries, parsers, retainedTags: (fixed.output ?? sources[1][0]).includes("<my-element></my-element>"), stable: second.output === undefined, opaqueReview: { severity: review?.severity, fix: review?.fix } }));
+      `,
+      );
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The packed consumer emits these lint summaries.
+      const result = JSON.parse(output) as {
+        readonly opaqueReview: {
+          readonly severity: number;
+
+          readonly fix?: unknown;
+        };
+        readonly parsers: readonly string[];
+        readonly retainedTags: boolean;
+        readonly stable: boolean;
+        readonly summaries: ReadonlyArray<{
+          readonly fatal: number;
+          readonly rules: readonly string[];
+        }>;
+      };
+      expect(
+        result.summaries.map(({ fatal }) => {
+          return fatal;
+        }),
+      ).toEqual([0, 0, 0, 0, 0, 0, 0]);
+      expect(result.summaries[0]?.rules).toEqual(["markdown/require-alt-text"]);
+      expect(result.summaries[1]?.rules).not.toContain(
+        "@html-eslint/require-closing-tags",
+      );
+      expect(result.summaries[3]?.rules).toContain(
+        "@typescript-eslint/no-floating-promises",
+      );
+      expect(result.summaries[4]?.rules).toContain("eqeqeq");
+      expect(result.summaries[5]?.rules).toEqual(
+        expect.arrayContaining([
+          "security/detect-non-literal-fs-filename",
+          "security/detect-object-injection",
+        ]),
+      );
+      expect(result.summaries[6]?.rules.includes("no-undef")).toBe(
+        !svelteEnabled,
+      );
+      expect(result.parsers).toEqual([
+        "espree",
+        "typescript-eslint/parser",
+        svelteEnabled ? "svelte-eslint-parser" : "espree",
+      ]);
+      expect(result.retainedTags).toBe(true);
+      expect(result.stable).toBe(true);
+      expect(result.opaqueReview).toEqual({ severity: 2 });
+    },
+  );
+
   it("ships Stage 5 ownership and preserves global-match results without optional peers", async () => {
     const output = await run(
       withoutPeers,

@@ -10,10 +10,9 @@ const jsxFiles = ["**/*.{jsx,mjsx}"] as const;
 
 // Files that can hold React components.
 const reactFiles = ["**/*.{jsx,mjsx,tsx,mtsx}"] as const;
-// Svelte components and modules that use runes.
-const svelteFiles = [
-  "**/*.{svelte,svelte.js,svelte.mjs,svelte.ts,svelte.mts}",
-] as const;
+// Match the component and rune-module suffixes recognized by svelte-eslint-parser 1.9.0.
+// Other .mjs/.mts sources keep ordinary JavaScript/TypeScript parsing.
+const svelteFiles = ["**/*.{svelte,svelte.js,svelte.ts}"] as const;
 // Svelte components. Rune modules are JavaScript and TypeScript sources by their extension.
 const svelteComponentFiles = ["**/*.svelte"] as const;
 // ES module sources, where Express apps live.

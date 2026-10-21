@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
-
 import type { Linter } from "eslint";
 import type { Options } from "../../src/types.js";
 
@@ -122,6 +120,8 @@ const projectFiles = {
     "export const visits = writable(0);",
     "",
   ].join("\n"),
+  "src/options.svelte.mts":
+    "export const options = { value: 1 };\nPromise.resolve(options);\n",
   "tsconfig.json": JSON.stringify({
     compilerOptions: {
       module: "esnext",
@@ -130,7 +130,7 @@ const projectFiles = {
       strict: true,
       target: "es2022",
     },
-    include: ["src/**/*.ts", "src/**/*.svelte"],
+    include: ["src/**/*.ts", "src/**/*.mts", "src/**/*.svelte"],
   }),
 } as const;
 
@@ -140,11 +140,15 @@ const projectDirectory = await mkdtemp(
 await Promise.all(
   Object.entries(projectFiles).map(async ([fileName, content]) => {
     const filePath = path.join(projectDirectory, fileName);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The parent path comes from the fixed fixture names within this suite's new temporary project.
     await mkdir(path.dirname(filePath), { recursive: true });
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The fixed fixture name is joined to this suite's new temporary project directory.
     await writeFile(filePath, content, "utf8");
   }),
 );
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- The fixed node_modules directory is inside this suite's new temporary project.
 await mkdir(path.join(projectDirectory, "node_modules"));
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- This links the repository's installed Svelte package into the fixed temporary fixture location.
 await symlink(
   path.join(rootDirectory, "node_modules", "svelte"),
   path.join(projectDirectory, "node_modules", "svelte"),
@@ -229,6 +233,18 @@ const withoutRules = (
 };
 
 describe("svelte scripts", () => {
+  it("keeps type information for ordinary .svelte.mts modules", async () => {
+    const messages = await describeMessages(["src/options.svelte.mts"]);
+    expect(messages["src/options.svelte.mts"]).toContain(
+      "2:1 @typescript-eslint/no-floating-promises",
+    );
+    expect(
+      messages["src/options.svelte.mts"].some((message) => {
+        return message.endsWith("fatal");
+      }),
+    ).toBe(false);
+  });
+
   it("get the rules of TypeScript sources without typed linting, apart from the rules that components break", async () => {
     const eslint = await createEslint({
       ...baseOptions,

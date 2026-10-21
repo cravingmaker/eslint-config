@@ -756,6 +756,19 @@ The reference that the recipes link to, grouped by topic.
   decision such as a rule that stays off, or wiring instead. A negative
   test needs a sample that the rule reports when it is on, or it cannot
   fail.
+- **Known parser and fix workarounds need composed regressions.**
+  `tests/configs/html.test.ts` preserves custom-element end tags and manual
+  correction boundaries while keeping void-element fixes. The Markdown suite
+  lints bracketed URL/email and shorthand-autolink cases through the public
+  config, retaining unrelated diagnostics, GFM, front matter, math, and explicit
+  overrides. Its five scalar-off entries document the missing-position crash
+  in Markdown 8.0.3; restore each only after checking the actual corrected
+  dependency combination against the trigger corpus and its unique diagnostics
+  and fixes. Use an active rule such as `markdown/require-alt-text` as the normal
+  feature-scope sentinel. Svelte tests keep `.svelte`, `.svelte.js`, and
+  `.svelte.ts` on the component/rune parser; `.svelte.mjs` and `.svelte.mts`
+  stay ordinary sources, with typed checks conditional on the existing scope.
+  The packed-consumer regression covers these boundaries with and without peers.
 - **The fixtures are a project of their own.** `tests/fixtures/` has its
   own `package.json` and `tsconfig.json`. The repository's `eslint .`
   ignores the folder and the root tsconfig leaves it out, so
@@ -974,6 +987,17 @@ The reference that the recipes link to, grouped by topic.
 
 ### Code in this repository
 
+- **Review signals apply to opaque returns and test operations too.**
+  Keep `promise-function-async`'s `allowAny: false`, all function-kind checks,
+  and the existing typed scope. Clarify return contracts or explain a local
+  synchronous-data exception, as in `src/utilities/plugin-policy.ts`; do not
+  convert a synchronous API to async just to satisfy the diagnostic. Keep
+  Security's filesystem-path and computed-key warnings in tests as well as
+  production. Operation-level comments must state the inspected path or key
+  boundary and leave later unrelated operations visible. Stage 6's handoff in
+  [the audit implementation guide](AUDIT_RESULT_FOLLOW_UP_IMPLEMENTATION.md)
+  inventories the remaining whole-file directives for Stage 11; preserve
+  unrelated rule tokens when narrowing a combined directive.
 - **`functional/prefer-immutable-types` shares a cache across files.** It
   checks parameters shallowly, which gives the same result whatever files
   are linted together, except for a parameter whose type is a mapped type

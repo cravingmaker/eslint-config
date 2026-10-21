@@ -149,7 +149,7 @@ A source is a JavaScript or TypeScript file: `**/*.{js,mjs,jsx,mjsx,ts,mts,tsx,m
 | `perfectionist` | [eslint-plugin-perfectionist](https://www.npmjs.com/package/eslint-plugin-perfectionist)                                                                                                                                                                                           | Sources                                                                |
 | `stylistic`     | [@stylistic/eslint-plugin](https://eslint.style/rules)                                                                                                                                                                                                                             | Sources                                                                |
 | `react`         | [@html-eslint/eslint-plugin-react](https://www.npmjs.com/package/@html-eslint/eslint-plugin-react), [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks), [eslint-plugin-react-refresh](https://www.npmjs.com/package/eslint-plugin-react-refresh) | The hooks rules in sources, the others in `**/*.{jsx,mjsx,tsx,mtsx}`   |
-| `svelte`        | [@html-eslint/eslint-plugin-svelte](https://www.npmjs.com/package/@html-eslint/eslint-plugin-svelte), with [svelte-eslint-parser](https://www.npmjs.com/package/svelte-eslint-parser)                                                                                              | `**/*.svelte`, and rune modules: `**/*.svelte.{js,mjs,ts,mts}`         |
+| `svelte`        | [@html-eslint/eslint-plugin-svelte](https://www.npmjs.com/package/@html-eslint/eslint-plugin-svelte), with [svelte-eslint-parser](https://www.npmjs.com/package/svelte-eslint-parser)                                                                                              | `**/*.svelte`, and rune modules: `**/*.svelte.{js,ts}`                 |
 | `express`       | [eslint-plugin-express-security](https://www.npmjs.com/package/eslint-plugin-express-security)                                                                                                                                                                                     | `**/*.{js,mjs,ts,mts}`                                                 |
 | `html`          | [@html-eslint/eslint-plugin](https://www.npmjs.com/package/@html-eslint/eslint-plugin)                                                                                                                                                                                             | `**/*.html`                                                            |
 | `json`          | [@eslint/json](https://www.npmjs.com/package/@eslint/json)                                                                                                                                                                                                                         | JSON, JSONC, and JSON5 files, below                                    |
@@ -250,6 +250,12 @@ The `svelte` feature lints components (`.svelte`) and rune modules (`.svelte.js`
 - **Scripts.** svelte-eslint-parser hands every script of a component to typescript-eslint's parser, with `lang="ts"` or without. The scripts therefore get the rules of TypeScript sources, apart from the React and Express rules, and without type information. Core rules that the TypeScript compiler checks, such as `no-undef`, are off in components as in TypeScript files. A project with no TypeScript files whose components are written in JavaScript can keep `no-undef` with `typescript: false`.
 - **Rune modules** are sources by their extension, so they get the rules of JavaScript or TypeScript sources in full.
 
+Use `.svelte.js` or `.svelte.ts` for rune modules. Files ending in `.svelte.mjs`
+and `.svelte.mts` keep ordinary JavaScript and TypeScript parsing and checks;
+they are linted as sources, without Svelte rune or template support. Typed
+`.svelte.mts` checks still depend on the TypeScript feature and the project's
+tsconfig. Rename actual rune modules and update their imports deliberately.
+
 Four rules are off in components, because components break them by design:
 
 - `functional/no-let` and `unicorn/no-top-level-assignment-in-function`: the instance script runs once per component instance, so its top-level variables are the instance's state, which Svelte updates through assignments, as in `let count = $state(0)` with `onclick={() => count++}`. `bind:` targets need `let` as well.
@@ -329,6 +335,22 @@ export default createConfig({
 });
 ```
 
+`@typescript-eslint/promise-function-async` treats `any` and `unknown` return
+types as potentially asynchronous (`allowAny: false`). It reports hidden
+Promises and deliberately synchronous opaque-data boundaries for review;
+the opaque-return reports have no automatic fix. Clarify the return contract
+or justify a local exception when the API must stay synchronous. Adding
+`async` changes that API to return a Promise. The independent explicit-any
+and unsafe-type checks remain enabled.
+
+The Security feature also retains warnings for dynamic filesystem paths and
+computed identifier keys in source files, helpers, and tests. These warnings
+request review; they do not establish a vulnerability or prove that an
+unreported operation is safe. Use an operation-level suppression only after
+inspecting its trust boundary, such as a fixed fixture filename in a new
+temporary directory or a key selected from a fixed fixture table. A test
+filename alone does not justify suppressing other operations in that file.
+
 ## Formatting with Prettier
 
 Prettier runs as a separate step. ESLint enforces compatible token spacing and
@@ -355,6 +377,12 @@ rules are explicitly off. Other disabled layout rules include:
 - `no-unexpected-multiline`.
 - `unicorn/empty-brace-spaces`, `unicorn/number-literal-case`, and `unicorn/no-nested-ternary`. Core `no-nested-ternary` reports directly nested result branches and has no fix for Prettier to undo. Conditional-position nesting is outside its coverage.
 - The layout rules of @html-eslint: `attrs-newline`, `class-spacing`, `element-newline`, `indent`, `no-extra-spacing-tags`, `no-extra-spacing-text`, `no-multiple-empty-lines`, `no-trailing-spaces`, and `quotes`.
+
+In HTML, custom elements retain explicit end tags, such as
+`<my-element></my-element>`. A trailing slash does not close an HTML custom
+element. Existing self-closing or missing-end-tag custom elements receive
+warnings and need manual boundary review; the rule does not guess where to
+insert an end tag. Standard void elements retain the self-closing convention.
 
 `unicorn/template-indent` checks templates tagged `outdent`, `dedent`, `sql`, or `styled`, the arguments of `dedent` and `stripIndent`, and templates after an `/* indent */` comment. It leaves out `gql` and `html` templates and those after an `/* HTML */` comment, which Prettier formats.
 
@@ -600,14 +628,12 @@ CommonJS is not supported, and `.cjs` and `.cts` files get no rules:
 
 ### Known issues
 
-These are open, and each needs a decision in this package or a fix upstream:
+These limitations and temporary upstream workarounds remain:
 
 - **TypeScript files that the TypeScript feature leaves out do not parse.** The JavaScript and code-quality features still lint them, but only the TypeScript feature sets a parser that reads TypeScript. With `typescript: false`, and for a file outside `typescript.files` or in `typescript.ignores`, ESLint reports `Parsing error: Unexpected token :`. Keep the TypeScript feature on for every TypeScript file that ESLint lints, and leave other TypeScript files out with the global `ignores`.
 - **Typed linting reports some React handlers and effects.** `functional/no-return-void` reports event handlers and effects that call a state setter, and `functional/functional-parameters` reports handlers written inline in JSX. These checks remain independent of the typed TSX naming allowance. Leave React files out of typed linting with `ignoresTypeAware` when needed.
 - **Private manifests still require package information.** `require-author`, `require-devDependencies`, `require-devEngines`, and `require-scripts` apply to private packages as well. JSON has no disable comments, so use `packageJson.overrides` when a project does not need those fields. Peer metadata is required only when peers are declared.
-- **A URL in square brackets stops the run.** In a Markdown file, a URL or email address in square brackets, such as `[https://example.com]`, makes five rules of @eslint/markdown 8.0.3 throw "Custom getLoc() method must be implemented in the subclass", and ESLint stops. The rules are `no-bare-urls`, `no-invalid-label-refs`, `no-missing-label-refs`, `no-reference-like-urls`, and `no-space-in-emphasis`.
-- **Custom elements become self-closing in HTML files.** `@html-eslint/require-closing-tags` fixes `<my-element></my-element>` to `<my-element />`, which browsers read as a start tag without an end. Keep explicit end tags with `html: { overrides: { "@html-eslint/require-closing-tags": ["warn", { selfClosing: "always", selfClosingCustomPatterns: [] }] } }`.
-- **`.svelte.mjs` and `.svelte.mts` files do not parse.** The Svelte feature includes them, but svelte-eslint-parser reads them as components and fails with `Parsing error: Expected token }`. Name rune modules `.svelte.js` or `.svelte.ts`.
+- **Five Markdown rules are temporarily disabled.** GFM autolink nodes without source positions crash five rules of @eslint/markdown 8.0.3 ([eslint/markdown#619](https://github.com/eslint/markdown/issues/619)). `markdown/no-bare-urls`, `markdown/no-invalid-label-refs`, `markdown/no-missing-label-refs`, `markdown/no-reference-like-urls`, and `markdown/no-space-in-emphasis` are explicitly off, so bracketed URLs and emails can be linted. This temporarily loses their unique reports and fixes for bare URLs, invalid or missing labels, reference-like URLs, and emphasis spacing throughout the Markdown scope. The other fourteen rules, GFM, YAML front matter, and math remain active. Re-enable each rule only after the actual corrected dependency combination passes the triggering corpus and its restored diagnostics/fixes; a new version number alone is insufficient.
 - **Legacy Svelte types.** In legacy mode, `unicorn/name-replacements` asks to rename the `$$Props` interface, which Svelte's tooling reads by that name, and `unused-imports/no-unused-vars` reports `$$Events` and `$$Slots`. `import-x/no-duplicates` reports `svelte/animate` and `svelte/transition` imported in one file, because both resolve to one declaration file.
 - **Global declaration files.** A declaration file without imports or exports, such as the `vite-env.d.ts` that Vite generates, is reported by `import-x/unambiguous`, and its `/// <reference types="vite/client" />` by `@typescript-eslint/triple-slash-reference`. Add the types to `compilerOptions.types` in the tsconfig instead, and write declarations as a module, with `declare global` and `export {}`.
 
