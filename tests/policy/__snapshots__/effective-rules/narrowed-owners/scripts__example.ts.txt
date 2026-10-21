@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 875 (error 476, off 342, warn 57)
+rules: 875 (error 474, off 346, warn 55)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/svelte-function-variable-padding: error
@@ -230,7 +230,7 @@ rules: 875 (error 476, off 342, warn 57)
 @typescript-eslint/prefer-readonly: error [{"onlyInlineLambdas":false}]
 @typescript-eslint/prefer-readonly-parameter-types: off
 @typescript-eslint/prefer-reduce-type-parameter: error
-@typescript-eslint/prefer-regexp-exec: error
+@typescript-eslint/prefer-regexp-exec: off
 @typescript-eslint/prefer-return-this-type: error
 @typescript-eslint/prefer-string-starts-ends-with: error [{"allowSingleElementEquality":"never"}]
 @typescript-eslint/promise-function-async: error [{"allowAny":false,"allowedPromiseNames":[],"checkArrowFunctions":true,"checkFunctionDeclarations":true,"checkFunctionExpressions":true,"checkMethodDeclarations":true}]
@@ -387,7 +387,7 @@ no-constant-binary-expression: error [{"checkRelationalComparisons":false}]
 no-constant-condition: error [{"checkLoops":"allExceptWhileTrue"}]
 no-constructor-return: error
 no-continue: off
-no-control-regex: error
+no-control-regex: off
 no-debugger: error
 no-delete-var: error
 no-div-regex: off
@@ -403,7 +403,7 @@ no-empty-character-class: off
 no-empty-function: off [{"allow":[]}]
 no-empty-pattern: error [{"allowObjectPatternsAsParameters":false}]
 no-empty-static-block: error
-no-eq-null: error
+no-eq-null: off
 no-eval: error [{"allowIndirect":false}]
 no-ex-assign: error
 no-extend-native: error [{"exceptions":[]}]
@@ -455,7 +455,7 @@ no-restricted-exports: off [{}]
 no-restricted-globals: error [{"checkGlobalObject":true,"globalObjects":["global"],"globals":[{"message":"Use Uint8Array instead.","name":"Buffer"}]}]
 no-restricted-imports: error [{"message":"Use Uint8Array instead.","name":"buffer"},{"message":"Use Uint8Array instead.","name":"node:buffer"}]
 no-restricted-properties: off
-no-restricted-syntax: off
+no-restricted-syntax: error [{"message":"Use Uint8Array instead.","selector":"NewExpression[callee.type='Identifier'][callee.name='Buffer']"}]
 no-return-assign: error ["always"]
 no-return-await: off
 no-script-url: error
@@ -573,9 +573,9 @@ security/detect-bidi-characters: warn
 security/detect-buffer-noassert: warn
 security/detect-child-process: warn
 security/detect-disable-mustache-escape: warn
-security/detect-eval-with-expression: warn
+security/detect-eval-with-expression: off
 security/detect-invisible-characters: warn
-security/detect-new-buffer: warn
+security/detect-new-buffer: off
 security/detect-no-csrf-before-method-override: warn
 security/detect-non-literal-fs-filename: warn
 security/detect-non-literal-regexp: warn

@@ -39,7 +39,7 @@ const recommendedRules: Rules = {
 } as const;
 
 const otherRules: Rules = {
-  // --- Rules with default options (65/122) --------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (64/122) --------------------------------------------------------------------------------------------------------.
   "accessor-pairs": [
     "error",
     {
@@ -87,7 +87,6 @@ const otherRules: Rules = {
   ],
   "no-caller": "error",
   "no-empty-function": ["error", { ...noEmptyFunctionOptions }], // Manually fixable by editor suggestions.
-  "no-eq-null": "error",
   "no-eval": ["error", { allowIndirect: false }],
   "no-extend-native": ["error", { exceptions: [] }],
   "no-extra-bind": "error", // Automatically fixable by the --fix command.
@@ -168,7 +167,7 @@ const otherRules: Rules = {
     },
   ], // Automatically fixable by the --fix command.
 
-  // --- Rules with overridden options (27/122) -----------------------------------------------------------------------------------------------------.
+  // --- Rules with overridden options (28/122) -----------------------------------------------------------------------------------------------------.
   "arrow-body-style": ["error", "always"], // Automatically fixable by the --fix command.
   "capitalized-comments": [
     "error",
@@ -248,6 +247,14 @@ const otherRules: Rules = {
     { message: "Use Uint8Array instead.", name: "buffer" },
     { message: "Use Uint8Array instead.", name: "node:buffer" },
   ],
+  // Reject direct Buffer construction without suggesting another restricted Buffer API.
+  "no-restricted-syntax": [
+    "error",
+    {
+      message: "Use Uint8Array instead.",
+      selector: "NewExpression[callee.type='Identifier'][callee.name='Buffer']",
+    },
+  ],
   "no-return-assign": ["error", "always"],
   "no-sequences": ["error", { allowInParentheses: false }],
   "no-shadow": ["error", { ...noShadowOptions }],
@@ -295,6 +302,7 @@ const otherRules: Rules = {
   "no-console": "off", // Prefer to allow console output in scripts and CLIs; apply logging restrictions where needed. Manually fixable by editor suggestions.
   "no-continue": "off", // Prefer early iteration skipping when it reduces unnecessary nesting.
   "no-div-regex": "off", // Prefer natural regex syntax over unnecessary character classes. Automatically fixable by the --fix command.
+  "no-eq-null": "off", // Handled by `eqeqeq`, including strict null comparisons.
   "no-inline-comments": "off", // Prefer to allow concise inline comments when they clarify adjacent code.
   "no-invalid-this": "off", // Prefer TypeScript's strict/noImplicitThis checks where available.
   "no-magic-numbers": "off", // Prefer named constants for meaningful domain values without unnecessarily restricting literals.
@@ -302,7 +310,6 @@ const otherRules: Rules = {
   "no-plusplus": "off", // Prefer increment and decrement operators for counters while assessing side effects separately.
   "no-restricted-exports": "off", // Prefer to restrict export names only when explicit public API conventions require it.
   "no-restricted-properties": "off", // Prefer to add restrictions only for specific APIs with documented alternatives.
-  "no-restricted-syntax": "off", // Prefer targeted rules; broad syntax restrictions need a concrete justification.
   "no-ternary": "off", // Prefer conditional expressions to avoid unnecessary branching statements.
   "no-underscore-dangle": "off", // Prefer to allow underscores for naming conventions, unused bindings, and external API compatibility.
   "no-warning-comments": "off", // Handled by `unicorn/expiring-todo-comments`.

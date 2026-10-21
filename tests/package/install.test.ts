@@ -288,6 +288,55 @@ describe("the packed package", () => {
 });
 
 describe("a consumer without optional peers", () => {
+  it("ships Stage 5 ownership and preserves global-match results without optional peers", async () => {
+    const output = await run(
+      withoutPeers,
+      String.raw`
+      import { mkdir, writeFile } from "node:fs/promises";
+      import path from "node:path";
+      import { ESLint } from "eslint";
+      import { createConfig } from "@cravingmaker/eslint-config";
+      const directory = path.resolve("stage-five");
+      await mkdir(directory, { recursive: true });
+      await writeFile(path.join(directory, "package.json"), JSON.stringify({ type: "module" }));
+      await writeFile(path.join(directory, "tsconfig.json"), JSON.stringify({ compilerOptions: { strict: true, module: "nodenext" }, include: ["*.ts"] }));
+      const source = 'export const read = (text: string, source: RegExp) => { return text.match(new RegExp(source)); };\n';
+      await writeFile(path.join(directory, "match.ts"), source);
+      const config = await createConfig({ projectRootDirectory: directory });
+      const reporter = new ESLint({ cwd: directory, overrideConfig: config, overrideConfigFile: true });
+      const fixer = new ESLint({ cwd: directory, fix: true, overrideConfig: config, overrideConfigFile: true });
+      const owners = ["eqeqeq", "no-eq-null", "no-eval", "security/detect-eval-with-expression", "no-nested-ternary", "unicorn/no-unnecessary-nested-ternary", "no-restricted-syntax", "unicorn/no-new-buffer", "security/detect-new-buffer"];
+      const [diagnostics] = await reporter.lintText('value == null; eval(input); enabled ? (ready ? "yes" : "no") : "no"; new Buffer(size);', { filePath: "sample.js" });
+      const [first] = await fixer.lintText(source, { filePath: "match.ts" });
+      const fixed = first.output ?? source;
+      const [second] = await fixer.lintText(fixed, { filePath: "match.ts" });
+      await writeFile(path.join(directory, "fixed.ts"), fixed);
+      const { read } = await import("./stage-five/fixed.ts");
+      process.stdout.write(JSON.stringify({
+        fatal: [diagnostics.fatalErrorCount, first.fatalErrorCount, second.fatalErrorCount],
+        owners: diagnostics.messages.map(({ ruleId }) => ruleId).filter((ruleId) => owners.includes(ruleId)),
+        execution: second.messages.map(({ ruleId }) => ruleId).filter((ruleId) => ruleId?.includes("prefer-regexp-exec")),
+        unchangedMatch: fixed.includes("text.match(new RegExp(source))"),
+        stable: second.output === undefined,
+        results: [read("aba", /a/gu), read("aba", /a/u)],
+      }));
+    `,
+    );
+    expect(JSON.parse(output)).toEqual({
+      execution: ["regexp/prefer-regexp-exec"],
+      fatal: [0, 0, 0],
+      owners: [
+        "eqeqeq",
+        "no-eval",
+        "no-nested-ternary",
+        "no-restricted-syntax",
+      ],
+      results: [["a", "a"], ["a"]],
+      stable: true,
+      unchangedMatch: true,
+    });
+  });
+
   it("ships passing configs, conditional metadata, explicit callbacks, and typed TSX names", async () => {
     const output = await run(
       withoutPeers,

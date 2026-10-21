@@ -154,7 +154,7 @@ const features = [
     fileNames: ["example.js", "example.ts"],
     files: ["app/**/*.js", "app/**/*.ts"],
     name: "security",
-    ruleId: "security/detect-eval-with-expression",
+    ruleId: "security/detect-unsafe-regex",
   },
   {
     feature: "sonarjs",

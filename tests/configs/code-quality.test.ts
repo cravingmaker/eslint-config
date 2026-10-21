@@ -67,7 +67,7 @@ const features = [
     build: security,
     name: "security",
     plugin: "security",
-    rule: "security/detect-eval-with-expression",
+    rule: "security/detect-unsafe-regex",
   },
   {
     build: sonarjs,

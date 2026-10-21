@@ -1,7 +1,7 @@
 import type { Rules } from "../../../../types.js";
 
 const recommendedRules: Rules = {
-  // --- Rules with default options (324/338) -------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (322/338) -------------------------------------------------------------------------------------------------------.
   "unicorn/better-dom-traversing": "error", // Manually fixable by editor suggestions.
   "unicorn/catch-error-name": ["error", { ignore: [], name: "error" }], // Automatically fixable by the --fix command.
   "unicorn/class-reference-in-static-methods": [
@@ -189,7 +189,6 @@ const recommendedRules: Rules = {
   "unicorn/no-negated-condition": "error", // Automatically fixable by the --fix command.
   "unicorn/no-negation-in-equality-check": "error", // Manually fixable by editor suggestions.
   "unicorn/no-new-array": "error", // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
-  "unicorn/no-new-buffer": "error", // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "unicorn/no-non-function-verb-prefix": [
     "error",
     {
@@ -238,7 +237,6 @@ const recommendedRules: Rules = {
   "unicorn/no-unnecessary-boolean-comparison": "error", // Automatically fixable by the --fix command.
   "unicorn/no-unnecessary-fetch-options": "error", // Automatically fixable by the --fix command.
   "unicorn/no-unnecessary-global-this": "error", // Automatically fixable by the --fix command.
-  "unicorn/no-unnecessary-nested-ternary": "error", // Automatically fixable by the --fix command.
   "unicorn/no-unnecessary-parameters": ["error", { minimumCallCount: 2 }], // Automatically fixable by the --fix command.
   "unicorn/no-unnecessary-polyfills": ["error", { targets: undefined }],
   "unicorn/no-unnecessary-slice-end": "error", // Automatically fixable by the --fix command.
@@ -565,7 +563,7 @@ const recommendedRules: Rules = {
     },
   ], // Automatically fixable by the --fix command.
 
-  // --- Turned off rules (11/338) ------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (13/338) ------------------------------------------------------------------------------------------------------------------.
   "unicorn/consistent-json-file-read": "off", // Prefer explicit JSON file reading behavior. Automatically fixable by the --fix command.
   "unicorn/empty-brace-spaces": "off", // Handled by `prettier`. Automatically fixable by the --fix command.
   "unicorn/logical-assignment-operators": "off", // Handled by `logical-assignment-operators`. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
@@ -573,7 +571,9 @@ const recommendedRules: Rules = {
   "unicorn/no-empty-link-text": "off", // Markdown-only rule; preserve the existing Markdown policy.
   "unicorn/no-leading-empty-lines": "off", // Handled by `prettier`. Automatically fixable by the --fix command.
   "unicorn/no-nested-ternary": "off", // Handled by `no-nested-ternary`, prettier removes the parentheses that this rule requires. Automatically fixable by the --fix command.
+  "unicorn/no-new-buffer": "off", // Handled by `no-restricted-syntax`; Buffer API autofixes conflict with the Uint8Array policy. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "unicorn/no-typeof-undefined": "off", // Handled by `no-undefined`, which requires typeof checks. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  "unicorn/no-unnecessary-nested-ternary": "off", // Handled by `no-nested-ternary` for nested result branches; simplification requires manual review. Automatically fixable by the --fix command.
   "unicorn/number-literal-case": "off", // Handled by `prettier`. Automatically fixable by the --fix command.
   "unicorn/operator-assignment": "off", // Handled by `operator-assignment`. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "unicorn/prefer-iterator-zip": "off", // `Iterator.zip` is unavailable in the checked Node 24.22 and 26.12 runtimes. Manually fixable by editor suggestions.

@@ -234,7 +234,7 @@ const recommendedRules: Rules = {
   "sonarjs/prefer-default-last": "off", // Handled by `default-case-last`.
   "sonarjs/prefer-promise-shorthand": "off", // Handled by `unicorn/prefer-promise-static-methods` and `promise/avoid-new`. Manually fixable by editor suggestions.
   "sonarjs/prefer-read-only-props": "off", // Handled by `functional/prefer-immutable-types` for function parameters. Manually fixable by editor suggestions.
-  "sonarjs/prefer-regexp-exec": "off", // Handled by `@typescript-eslint/prefer-regexp-exec`. Manually fixable by editor suggestions.
+  "sonarjs/prefer-regexp-exec": "off", // Prefer `regexp/prefer-regexp-exec` for manual review of non-global match rewrites. Manually fixable by editor suggestions.
   "sonarjs/prefer-single-boolean-return": "off", // Handled by `unicorn/prefer-boolean-return`. Manually fixable by editor suggestions.
   "sonarjs/prefer-type-guard": "off", // Inferred type predicates can be clearer than assertions; TypeScript infers them when safe. Manually fixable by editor suggestions.
   "sonarjs/prefer-while": "off", // Handled by `unicorn/no-for-loop` and `unicorn/prefer-while-loop-condition`. Automatically fixable by the --fix command.

@@ -14,7 +14,7 @@ linterOptions:
 settings:
   import-x/parsers: {"espree":[".js",".mjs",".cjs"]}
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 1359 (error 862, off 445, warn 52)
+rules: 1359 (error 859, off 450, warn 50)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/starred-documentation: error
@@ -421,7 +421,7 @@ no-constant-binary-expression: error [{"checkRelationalComparisons":false}]
 no-constant-condition: error [{"checkLoops":"allExceptWhileTrue"}]
 no-constructor-return: error
 no-continue: off
-no-control-regex: error
+no-control-regex: off
 no-debugger: error
 no-delete-var: error
 no-div-regex: off
@@ -437,7 +437,7 @@ no-empty-character-class: off
 no-empty-function: off [{"allow":[]}]
 no-empty-pattern: error [{"allowObjectPatternsAsParameters":false}]
 no-empty-static-block: error
-no-eq-null: error
+no-eq-null: off
 no-eval: error [{"allowIndirect":false}]
 no-ex-assign: error
 no-extend-native: error [{"exceptions":[]}]
@@ -489,7 +489,7 @@ no-restricted-exports: off [{}]
 no-restricted-globals: error [{"checkGlobalObject":true,"globalObjects":["global"],"globals":[{"message":"Use Uint8Array instead.","name":"Buffer"}]}]
 no-restricted-imports: error [{"message":"Use Uint8Array instead.","name":"buffer"},{"message":"Use Uint8Array instead.","name":"node:buffer"}]
 no-restricted-properties: off
-no-restricted-syntax: off
+no-restricted-syntax: error [{"message":"Use Uint8Array instead.","selector":"NewExpression[callee.type='Identifier'][callee.name='Buffer']"}]
 no-return-assign: error ["always"]
 no-script-url: error
 no-self-assign: error [{"props":true}]
@@ -683,9 +683,9 @@ security/detect-bidi-characters: warn
 security/detect-buffer-noassert: warn
 security/detect-child-process: warn
 security/detect-disable-mustache-escape: warn
-security/detect-eval-with-expression: warn
+security/detect-eval-with-expression: off
 security/detect-invisible-characters: warn
-security/detect-new-buffer: warn
+security/detect-new-buffer: off
 security/detect-no-csrf-before-method-override: warn
 security/detect-non-literal-fs-filename: warn
 security/detect-non-literal-regexp: warn
@@ -1127,7 +1127,7 @@ unicorn/no-negated-condition: error
 unicorn/no-negation-in-equality-check: error
 unicorn/no-nested-ternary: off
 unicorn/no-new-array: error
-unicorn/no-new-buffer: error
+unicorn/no-new-buffer: off
 unicorn/no-non-function-verb-prefix: error [{"ignore":[],"verbs":["get","set","unset","delete","add","remove","destroy","create"]}]
 unicorn/no-nonstandard-builtin-properties: error
 unicorn/no-null: error [{"checkArguments":true,"checkStrictEquality":false}]
@@ -1159,7 +1159,7 @@ unicorn/no-unnecessary-await: error
 unicorn/no-unnecessary-boolean-comparison: error
 unicorn/no-unnecessary-fetch-options: error
 unicorn/no-unnecessary-global-this: error
-unicorn/no-unnecessary-nested-ternary: error
+unicorn/no-unnecessary-nested-ternary: off
 unicorn/no-unnecessary-parameters: error [{"minimumCallCount":2}]
 unicorn/no-unnecessary-polyfills: error [{}]
 unicorn/no-unnecessary-slice-end: error

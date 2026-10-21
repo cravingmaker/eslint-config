@@ -3,7 +3,7 @@ import type { Rules } from "../../../types.js";
 import { noUseBeforeDefineOptions } from "../../shared-options.js";
 
 const recommendedRules: Rules = {
-  // --- Rules with default options (38/47) ---------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (37/47) ---------------------------------------------------------------------------------------------------------.
   "constructor-super": "error",
   "for-direction": "error",
   "no-async-promise-executor": "error",
@@ -16,7 +16,6 @@ const recommendedRules: Rules = {
     { checkRelationalComparisons: false },
   ],
   "no-constant-condition": ["error", { checkLoops: "allExceptWhileTrue" }],
-  "no-control-regex": "error",
   "no-debugger": "error",
   "no-dupe-args": "error",
   "no-dupe-class-members": "error",
@@ -82,7 +81,8 @@ const recommendedRules: Rules = {
     { disallowArithmeticOperators: true },
   ],
 
-  // --- Turned off rules (5/47) --------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (6/47) --------------------------------------------------------------------------------------------------------------------.
+  "no-control-regex": "off", // Handled by `regexp/no-control-character`; intentional constructor control escapes are allowed.
   "no-empty-character-class": "off", // Handled by `regexp/no-empty-character-class`.
   "no-invalid-regexp": "off", // Handled by `regexp/no-invalid-regexp`.
   "no-unexpected-multiline": "off", // Handled by `prettier`.

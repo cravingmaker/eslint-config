@@ -71,6 +71,7 @@ const otherRules: Rules = {
   "regexp/no-octal": "error", // Manually fixable by editor suggestions.
   "regexp/no-standalone-backslash": "error",
   "regexp/prefer-quantifier": ["error", { allows: [] }], // Automatically fixable by the --fix command.
+  // Unknown flags can cause false positives; preserve global-match semantics during manual fixes.
   "regexp/prefer-regexp-exec": "error",
   "regexp/prefer-regexp-test": "error", // Automatically fixable by the --fix command.
   "regexp/sort-alternatives": "error", // Automatically fixable by the --fix command.

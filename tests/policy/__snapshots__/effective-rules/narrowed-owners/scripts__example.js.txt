@@ -12,7 +12,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 748 (error 375, off 321, warn 52)
+rules: 748 (error 374, off 324, warn 50)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/svelte-function-variable-padding: error
@@ -261,7 +261,7 @@ no-constant-binary-expression: error [{"checkRelationalComparisons":false}]
 no-constant-condition: error [{"checkLoops":"allExceptWhileTrue"}]
 no-constructor-return: error
 no-continue: off
-no-control-regex: error
+no-control-regex: off
 no-debugger: error
 no-delete-var: error
 no-div-regex: off
@@ -277,7 +277,7 @@ no-empty-character-class: off
 no-empty-function: error [{"allow":[]}]
 no-empty-pattern: error [{"allowObjectPatternsAsParameters":false}]
 no-empty-static-block: error
-no-eq-null: error
+no-eq-null: off
 no-eval: error [{"allowIndirect":false}]
 no-ex-assign: error
 no-extend-native: error [{"exceptions":[]}]
@@ -329,7 +329,7 @@ no-restricted-exports: off [{}]
 no-restricted-globals: error [{"checkGlobalObject":true,"globalObjects":["global"],"globals":[{"message":"Use Uint8Array instead.","name":"Buffer"}]}]
 no-restricted-imports: error [{"message":"Use Uint8Array instead.","name":"buffer"},{"message":"Use Uint8Array instead.","name":"node:buffer"}]
 no-restricted-properties: off
-no-restricted-syntax: off
+no-restricted-syntax: error [{"message":"Use Uint8Array instead.","selector":"NewExpression[callee.type='Identifier'][callee.name='Buffer']"}]
 no-return-assign: error ["always"]
 no-script-url: error
 no-self-assign: error [{"props":true}]
@@ -446,9 +446,9 @@ security/detect-bidi-characters: warn
 security/detect-buffer-noassert: warn
 security/detect-child-process: warn
 security/detect-disable-mustache-escape: warn
-security/detect-eval-with-expression: warn
+security/detect-eval-with-expression: off
 security/detect-invisible-characters: warn
-security/detect-new-buffer: warn
+security/detect-new-buffer: off
 security/detect-no-csrf-before-method-override: warn
 security/detect-non-literal-fs-filename: warn
 security/detect-non-literal-regexp: warn

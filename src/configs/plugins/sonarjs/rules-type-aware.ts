@@ -61,7 +61,7 @@ const typeAwareRulesOff: Rules = {
   "sonarjs/post-message": "off", // Requires type information; enabled only in the type-aware scope.
   "sonarjs/prefer-immediate-return": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
   "sonarjs/prefer-read-only-props": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/prefer-regexp-exec": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
+  "sonarjs/prefer-regexp-exec": "off", // Prefer `regexp/prefer-regexp-exec` for manual review; consumer enablement requires type information. Manually fixable by editor suggestions.
   "sonarjs/reduce-initial-value": "off", // Requires type information; enabled only in the type-aware scope.
   "sonarjs/regex-complexity": "off", // Requires type information; enabled only in the type-aware scope.
   "sonarjs/single-char-in-character-classes": "off", // Requires type information; enabled only in the type-aware scope.

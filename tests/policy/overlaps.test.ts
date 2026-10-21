@@ -47,11 +47,19 @@ const pairs = [
   ["perfectionist", "import-x/order", ["perfectionist/sort-imports"]],
   ["perfectionist", "sort-imports", ["perfectionist/sort-imports"]],
   ["perfectionist", "sort-keys", ["perfectionist/sort-objects"]],
+  // D8.5 and D8.10 include approved coverage trade-offs; these assertions verify static settings.
+  [
+    "regexp",
+    "@typescript-eslint/prefer-regexp-exec",
+    ["regexp/prefer-regexp-exec"],
+  ],
+  ["regexp", "no-control-regex", ["regexp/no-control-character"]],
   ["regexp", "no-empty-character-class", ["regexp/no-empty-character-class"]],
   ["regexp", "no-invalid-regexp", ["regexp/no-invalid-regexp"]],
   ["regexp", "no-useless-backreference", ["regexp/no-useless-backreference"]],
   ["regexp", "sonarjs/no-empty-group", ["regexp/no-empty-group"]],
   ["regexp", "sonarjs/no-invalid-regexp", ["regexp/no-invalid-regexp"]],
+  ["regexp", "sonarjs/prefer-regexp-exec", ["regexp/prefer-regexp-exec"]],
   [
     "sonarjs",
     "unicorn/no-duplicate-if-branches",
@@ -90,7 +98,7 @@ const getRules = async (
 };
 
 // Each assertion checks effective settings through the public factory, including feature scopes.
-describe.each(pairs)("%s: %s is handled by %s", (owner, loser, winners) => {
+describe.each(pairs)("%s: %s stays off with %s", (owner, loser, winners) => {
   const filePath = loser.startsWith("@typescript-eslint/")
     ? "src/example.ts"
     : "src/example.js";

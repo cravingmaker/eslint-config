@@ -128,7 +128,7 @@ migrations and supplies a verified baseline for each refactor.
 | 2     | Escape-case and import-spacing convergence                                | D1, D2                           | 1          | Complete    |
 | 3     | Arrow functions, starred documentation, function spacing                  | D3                               | 2          | Complete    |
 | 4     | Passing configurations, conditional peer metadata, typed TSX names        | D4–D7 and D7 AST follow-up       | 3          | Complete    |
-| 5     | Verified ownership, complementary checks, safe execution preference       | D8.1–D8.12                       | 4          | Not started |
+| 5     | Verified ownership, complementary checks, safe execution preference       | D8.1–D8.12                       | 4          | Complete    |
 | 6     | Retained review signals and known parser/fix failures                     | D9, D10.1–D10.2, D11.1–D11.3     | 5          | Not started |
 | 7     | Severity, deprecated entries/options, generated ignores, explicit updates | D12, D13.1–D13.2, D14, D19       | 6          | Not started |
 | 8     | Source-map-free package                                                   | D15, R7                          | 7          | Not started |
@@ -1440,5 +1440,110 @@ Do not continue to Stage <N+1> or publish/merge/release without my instruction.
   follows this validation record.
 - **Next stage:** Stage 5, D8.1–D8.12: verified ownership, complementary checks,
   and safe execution preference. No Stage 5 policy is implemented here.
+- **PR/CI:** Commit and PR requested after local completion; remote CI has not
+  been evaluated in this record.
+
+#### Stage 5 — rule ownership, complementary checks, and safe fixes
+
+- **Status/date:** Complete, 21 October 2026.
+- **Stage-entry commit:** `90a360aed94bd2b006b6b21463002cf611b830a4`.
+  The worktree was clean on `cravingmaker/implement-stage-5`; a fresh fetch
+  confirmed that `origin/main` still matched this completed Stage 4 baseline.
+- **Implementation commit(s):** Uncommitted at validation; the implementation
+  and this handoff are delivered together.
+- **Decisions/findings covered:** D8.1–D8.12, following every final choice.
+- **Changes and rationale:**
+  - D8.1–D8.3 give strict equality (including null), direct/optional/indirect
+    eval, and nested result branches their retained core owners. The redundant
+    null, Security eval, and Unicorn simplification entries are explicitly off.
+    Indirect eval remains prohibited; conditional-position ternary nesting is
+    outside the selected rule's coverage, and simplification is manual.
+  - D8.4, D8.6, D8.8, D8.9, D8.11, and D8.12 preserve all complementary rules,
+    severities, options, type-aware scopes, and reciprocal explanation comments.
+    Unique cases and shared reports are tested rather than inferred from names.
+    Exact lowercase switch omission markers, non-union defaults, and union/enum
+    exhaustiveness remain distinct requirements. Await, comparator, and Unicode
+    preferences do not authorize behavior-changing mechanical migrations.
+  - D8.5 disables core control-regex checking in favor of RegExp's static pattern
+    analysis and explicitly accepts intentional constructor tab/newline escapes.
+  - D8.7 enables the existing core syntax rule with the approved direct-Identifier
+    Buffer constructor selector. Stage 3 uses the internal arrow owner, so there
+    were no existing syntax selectors to overwrite. It preserves global/import/type restrictions
+    and Node deprecation checking, without reviving either old constructor rule.
+    Diagnostics have no fix or suggestion toward restricted Buffer APIs. Local
+    classes still match by name; dynamic aliases and global-property calls are
+    outside this selector. Encoding, coercion, and shared memory need manual
+    consideration when converting code. No production Buffer call required
+    conversion in this checkout.
+  - D8.10 keeps the RegExp execution preference for manual review and makes the
+    TypeScript entry scalar off in both active and fallback maps. SonarJS stays
+    off with comments naming the active manual-review policy. The inherited
+    global-match sample retains both matches through repeated composed fixes;
+    the accepted computed-access diagnostic gap is explicit.
+  - The Stage 1 equality assertion now verifies its single owner. A separate
+    synthetic overlap control preserves the harness's nested-range detector.
+    README/contributor guidance distinguishes replacements from complementary
+    coverage and records all accepted boundaries and upstream conditions.
+- **Runtime/dependencies:** Node.js `24.22.0` from `.nvmrc`, npm `11.19.1`,
+  ESLint `10.12.0`, TypeScript `6.0.3`, typescript-eslint `8.70.0`, RegExp `3.3.1`,
+  Unicorn `77.0.0`, Security `4.2.0`, Promise `7.3.0`, SonarJS `4.2.2`, Node
+  plugin `18.4.1`, and Vitest `5.0.3`. Commands use
+  `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16`. Dependencies, peer ranges, and compiler contracts
+  are unchanged.
+- **Tests/commands and development evidence:**
+  - `npm ci`, `npm run prepare`, and the stage-entry `npm run build` passed;
+    npm reported zero vulnerabilities.
+  - The new regression matrix failed before the policy changes, including
+    duplicate equality/eval/ternary reports, constructor fixes to restricted
+    Buffer APIs, and the inherited-global-flags rewrite. Existing per-quantifier
+    movement reports and type-service boundaries were checked against installed
+    implementations when calibrating the sample expectations; retained rule
+    settings were not changed to satisfy those expectations.
+  - The five-suite targeted run passed **5 files / 813 tests**. Subsequent
+    coverage adds null inequality, enum exhaustiveness, retained Buffer API
+    restrictions, and a Unicode runtime control showing why adding `u` needs
+    review. The Node deprecation control uses an explicit `node:buffer` import:
+    default environments do not supply Node global bindings.
+  - `npm run typecheck` and explicit changed-file ESLint checks passed during
+    development. The supported `npx vitest run tests/policy -u` process updated
+    **16 snapshots**; its first run found the deprecation-control fixture issue
+    above, which was corrected without changing production policy.
+  - The selected new ownership and packed-consumer regressions passed **2 files /
+    472 tests**. The full gate below runs every test without filters.
+- **Final validation:** `npm run validate` passed **67 files / 2,455 tests**,
+  formatting, build/generation, TypeScript, Knip, zero-warning repository lint,
+  README and packed-consumer/minimum-peer suites, Publint, and ATTW's ESM profile.
+  Explicit ESLint checks passed all **17 changed source/test/documentation files**;
+  `git diff --check` passed.
+  No coverage, timeout, assertion, or hook was weakened.
+- **Policy/snapshot delta:** Every changed snapshot line is one of exactly
+  eight approved IDs, or a derived severity total: `no-eq-null`,
+  `security/detect-eval-with-expression`, `unicorn/no-unnecessary-nested-ternary`,
+  `no-control-regex`, `no-restricted-syntax`, `unicorn/no-new-buffer`,
+  `security/detect-new-buffer`, and `@typescript-eslint/prefer-regexp-exec`.
+  All other entries, including the six complementary groups, are unchanged.
+  `npm run policy:diff -- --base 90a360aed94bd2b006b6b21463002cf611b830a4`
+  passed: **16 changed / 17 unchanged**. The cumulative
+  `node scripts/policy-diff.ts --base 008a08207f28441297a2476b4798136aeb1023de`
+  also passed: **25 changed / 8 unchanged**.
+  Neither report has new, removed, or failed snapshots or locked-package changes.
+- **Artifacts/consumer compatibility:** The new packed no-optional-peer case
+  checks selected owners, the active RegExp report, stable repeated fixes, and
+  actual global/non-global match arrays. Full package validation passed.
+  Public options/exports, ESM output, optional-peer loading, config block order,
+  compatibility filtering, file scopes, and override precedence are preserved.
+  Generated `dist/` and `src/typegen.d.ts` remain excluded from the commit.
+- **Retained exceptions/upstream conditions:** TypeScript execution preference
+  remains off until an actually corrected dependency combination passes inherited
+  flags, match/exec result arrays, computed access, repeated-fix, and restored
+  unique-diagnostic checks. RegExp can report unknown flags without proving a
+  safe rewrite. Stage 3's module-spacing and Svelte-padding conditions remain.
+- **Unrelated work preserved:** The initial tree was clean; all changes belong
+  to Stage 5 policy, regressions, affected documentation, or this handoff.
+- **Remaining work:** None within Stage 5; requested commit/push/PR delivery
+  follows this validation record.
+- **Next stage:** Stage 6, D9, D10.1–D10.2, and D11.1–D11.3: retained review
+  signals and known parser/fix failures. No Stage 6 policy is implemented here.
 - **PR/CI:** Commit and PR requested after local completion; remote CI has not
   been evaluated in this record.
