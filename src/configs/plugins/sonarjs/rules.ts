@@ -2,6 +2,7 @@ import type { Rules } from "../../../types.js";
 
 // Rules: https://github.com/SonarSource/SonarJS/blob/master/packages/analysis/src/jsts/rules/README.md.
 // Recommended and other rules are inventoried explicitly; the upstream preset never selects policy.
+// Keep test checks in their current scope: runners also support filenames outside .test/.spec.
 const recommendedRules: Rules = {
   // --- Rules with default options (132/230) -------------------------------------------------------------------------------------------------------.
   "sonarjs/anchor-precedence": "error",
@@ -9,6 +10,7 @@ const recommendedRules: Rules = {
   "sonarjs/assertions-in-test-cases": "error",
   "sonarjs/assertions-in-tests": "warn",
   "sonarjs/async-test-assertions": "error",
+  // Keep AWS CDK checks active: a root manifest may omit workspace or optional dependencies.
   "sonarjs/aws-apigateway-public-api": "error",
   "sonarjs/aws-ec2-rds-dms-public": "error",
   "sonarjs/aws-ec2-unencrypted-ebs-volume": "error",
@@ -249,6 +251,7 @@ const recommendedRules: Rules = {
 
 const otherRules: Rules = {
   // --- Rules with default options (11/65) ---------------------------------------------------------------------------------------------------------.
+  // Keep this AWS CDK check active even when the root manifest omits CDK.
   "sonarjs/aws-iam-all-resources-accessible": "error",
   "sonarjs/class-prototype": "error",
   "sonarjs/composite-assertions": "error",
@@ -259,6 +262,7 @@ const otherRules: Rules = {
   "sonarjs/no-nested-switch": "error",
   "sonarjs/no-networkidle-wait": "error",
   "sonarjs/no-sonar-comments": "error",
+  // Complemented by `require-unicode-regexp` for general flag enforcement on regex literals and constructors.
   "sonarjs/unicode-aware-regex": "error",
 
   // --- Turned off rules (54/65) -------------------------------------------------------------------------------------------------------------------.

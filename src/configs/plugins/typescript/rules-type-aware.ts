@@ -193,6 +193,7 @@ const otherTypeAwareRules: Rules = {
   "@typescript-eslint/no-unnecessary-qualifier": "error", // Automatically fixable by the --fix command.
   "@typescript-eslint/no-unsafe-type-assertion": "error",
   "@typescript-eslint/prefer-readonly": ["error", { onlyInlineLambdas: false }], // Automatically fixable by the --fix command.
+  // Complemented by `unicorn/require-array-sort-compare` for string arrays, explicit undefined comparators, and untyped files.
   "@typescript-eslint/require-array-sort-compare": [
     "error",
     { ignoreStringArrays: true },
@@ -223,6 +224,7 @@ const otherTypeAwareRules: Rules = {
   "@typescript-eslint/promise-function-async": [
     "error",
     {
+      // Treat opaque any/unknown returns as potentially asynchronous and require explicit review.
       allowAny: false,
       allowedPromiseNames: [],
       checkArrowFunctions: true,
@@ -231,6 +233,7 @@ const otherTypeAwareRules: Rules = {
       checkMethodDeclarations: true,
     },
   ], // Automatically fixable by the --fix command.
+  // Complemented by `default-case` for untyped switches and general default-or-comment enforcement.
   "@typescript-eslint/switch-exhaustiveness-check": [
     "error",
     {

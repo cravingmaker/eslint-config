@@ -28,6 +28,7 @@ const recommendedRules: Rules = {
   "no-shadow-restricted-names": ["error", { reportGlobalThis: true }],
   "no-unused-labels": "error", // Automatically fixable by the --fix command.
   "no-useless-catch": "error",
+  // Complemented by `regexp/no-useless-escape` for RegExp constructor patterns.
   "no-useless-escape": ["error", { allowRegexCharacters: [] }], // Manually fixable by editor suggestions.
   "no-with": "error",
   "preserve-caught-error": [
@@ -67,6 +68,7 @@ const otherRules: Rules = {
     },
   ],
   curly: "error", // Override `eslint-config-prettier`. Automatically fixable by the --fix command.
+  // Complemented by `@typescript-eslint/switch-exhaustiveness-check` for missing typed literal and enum cases.
   "default-case": ["error", { commentPattern: undefined }],
   "default-case-last": "error",
   "default-param-last": "error",
@@ -292,6 +294,7 @@ const otherRules: Rules = {
     { ...preferDestructuring2ndOptions },
   ], // Automatically fixable by the --fix command.
   "prefer-regex-literals": ["error", { disallowRedundantWrapping: true }], // Manually fixable by editor suggestions.
+  // Complemented by `sonarjs/unicode-aware-regex` for implicit string patterns when type information is available.
   "require-unicode-regexp": ["error", { requireFlag: undefined }], // Adding either flag can change matching behavior, so review existing patterns. Manually fixable by editor suggestions.
 
   // --- Turned off rules (28/122) ------------------------------------------------------------------------------------------------------------------.

@@ -325,6 +325,7 @@ const recommendedRules: Rules = {
     "error",
     { checkAllIndexAccess: false, getLastElementFunctions: [] },
   ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+  // Complemented by `promise/prefer-await-to-then` for void-discarded chains inside functions.
   "unicorn/prefer-await": "error", // Manually fixable by editor suggestions.
   "unicorn/prefer-bigint-literals": "error", // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "unicorn/prefer-blob-reading-methods": "error",
@@ -469,6 +470,7 @@ const recommendedRules: Rules = {
   "unicorn/prefer-while-loop-condition": "error", // Automatically fixable by the --fix command.
   "unicorn/relative-url-style": ["error", "never"], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "unicorn/require-array-join-separator": "error", // Automatically fixable by the --fix command.
+  // Complemented by `@typescript-eslint/require-array-sort-compare` for computed access and optional calls with type information.
   "unicorn/require-array-sort-compare": "error", // Manually fixable by editor suggestions.
   "unicorn/require-css-escape": ["error", { checkAllSelectors: false }], // Automatically fixable by the --fix command.
   "unicorn/require-module-attributes": "error", // Automatically fixable by the --fix command.

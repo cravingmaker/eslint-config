@@ -77,8 +77,8 @@ const otherRules: Rules = {
 
   // --- Turned off rules (3/9) ---------------------------------------------------------------------------------------------------------------------.
   "regexp/prefer-escape-replacement-dollar-char": "off", // Prefer WYSIWYG style.
-  "regexp/require-unicode-regexp": "off", // Prefer freedom with unicode regexes. Automatically fixable by the --fix command.
-  "regexp/require-unicode-sets-regexp": "off", // Prefer freedom with unicode sets regexes. Automatically fixable by the --fix command.
+  "regexp/require-unicode-regexp": "off", // Prefer core `require-unicode-regexp` for reviewed Unicode-mode suggestions. Automatically fixable by the --fix command.
+  "regexp/require-unicode-sets-regexp": "off", // Allow either `u` or `v` through core `require-unicode-regexp`. Automatically fixable by the --fix command.
 } as const;
 
 const bestPracticesRules: Rules = {

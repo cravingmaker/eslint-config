@@ -28,6 +28,7 @@ const recommendedRules: Rules = {
   "regexp/no-missing-g-flag": ["error", { strictTypes: true }], // Automatically fixable by the --fix command.
   "regexp/no-optional-assertion": "error",
   "regexp/no-potentially-useless-backreference": "error",
+  // Complemented by `regexp/no-super-linear-move` for repeated starting positions and `security/detect-unsafe-regex` for heuristic warnings.
   "regexp/no-super-linear-backtracking": ["error", { report: "certain" }], // Automatically fixable by the --fix command.
   "regexp/no-useless-assertions": "error", // Manually fixable by editor suggestions.
   "regexp/no-useless-backreference": "error",
@@ -38,6 +39,7 @@ const recommendedRules: Rules = {
 const otherRules: Rules = {
   // --- Rules with default options (2/2) -----------------------------------------------------------------------------------------------------------.
   "regexp/no-control-character": "error", // Manually fixable by editor suggestions.
+  // Complemented by `regexp/no-super-linear-backtracking` for backtracking paths and `security/detect-unsafe-regex` for heuristic warnings.
   "regexp/no-super-linear-move": [
     "error",
     { ignorePartial: true, ignoreSticky: true, report: "certain" },
