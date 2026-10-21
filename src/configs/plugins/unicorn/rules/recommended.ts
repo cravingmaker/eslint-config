@@ -104,7 +104,7 @@ const recommendedRules: Rules = {
       selectors: [],
     },
   ],
-  "unicorn/max-nested-calls": ["error", { max: 3 }],
+  "unicorn/max-nested-calls": ["warn", { max: 3 }],
   "unicorn/new-for-builtins": "error", // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "unicorn/no-abusive-eslint-disable": "error",
   "unicorn/no-accessor-recursion": "error",

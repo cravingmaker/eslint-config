@@ -242,8 +242,8 @@ describe("TypeScript replacements", () => {
         return [rules[core]?.[0], rules[extension]?.[0]];
       }),
     ).toEqual(
-      replacements.map(() => {
-        return [0, 2];
+      replacements.map(([core]) => {
+        return [0, core === "max-params" ? 1 : 2];
       }),
     );
   });

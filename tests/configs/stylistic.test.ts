@@ -126,7 +126,7 @@ const prettierConfigs = new Map<string, PrettierOptions>([
 ]);
 
 describe("stylistic rules", () => {
-  it("explicitly classifies every bundled rule, including deprecated and experimental rules", async () => {
+  it("explicitly classifies every non-deprecated bundled rule, including experimental rules", async () => {
     const config = await createConfig();
     const rules = config.find((entry) => {
       return entry.name === "@cravingmaker/eslint-config/stylistic/rules";
@@ -140,9 +140,16 @@ describe("stylistic rules", () => {
       ),
     ).toEqual(
       new Set([
-        ...Object.keys(pluginStylistic.rules).map((name) => {
-          return `@stylistic/${name}`;
-        }),
+        ...Object.entries(pluginStylistic.rules)
+          .filter(([, rule]) => {
+            return (
+              typeof rule.meta?.deprecated === "undefined" ||
+              rule.meta.deprecated === false
+            );
+          })
+          .map(([name]) => {
+            return `@stylistic/${name}`;
+          }),
         "@cravingmaker/svelte-function-variable-padding",
       ]),
     );
@@ -159,9 +166,6 @@ describe("stylistic rules", () => {
     expect(rules).toMatchObject({
       "@stylistic/exp-jsx-props-style": "off",
       "@stylistic/exp-list-style": "off",
-      "@stylistic/jsx-indent": "off",
-      "@stylistic/jsx-props-no-multi-spaces": "off",
-      "@stylistic/jsx-sort-props": "off",
     });
   });
 

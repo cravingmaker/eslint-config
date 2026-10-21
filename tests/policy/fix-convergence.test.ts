@@ -121,6 +121,11 @@ const sources = new Map([
       .replace(" *\n", "\n")
       .replace(" */", "*/"),
   ],
+  ["D13.2-Stage-7", "export type Mapper = (value: number) => number;\n"],
+  [
+    "D19-Stage-7",
+    "export const counter = { value: 1 };\ncounter.value++;\ncounter.value += 2;\n",
+  ],
   ["escapes", `${String.raw`export const pattern = /\a/;`}\n`],
   [
     "exports",
@@ -215,7 +220,9 @@ const samples: readonly Sample[] = [
   ...["js", "ts"].flatMap((extension) => {
     return [...sources]
       .filter(([name]) => {
-        return name !== "switch" || extension === "ts";
+        return (
+          !["D13.2-Stage-7", "switch"].includes(name) || extension === "ts"
+        );
       })
       .map(([name, text]) => {
         return {
@@ -404,6 +411,35 @@ const unapprovedOverlaps = (
 };
 
 describe("combined ESLint fixes and the package formatter", () => {
+  it("D13.2: preserves the annotation-spacing arrow compatibility guard", () => {
+    const trace = getTrace("D13.2-Stage-7.ts");
+    expect(
+      selectReports(trace, [
+        "@stylistic/type-annotation-spacing",
+        "@stylistic/arrow-spacing",
+      ]),
+    ).toEqual([]);
+    expect(trace[1].formatted.text).toBe(
+      "export type Mapper = (value: number) => number;\n",
+    );
+    expect(convergenceProblems(trace)).toEqual([]);
+  });
+  it.each(["js", "ts"])(
+    "D19: keeps explicit assignments stable and leaves ++ for manual review in %s",
+    (extension) => {
+      const trace = getTrace(`D19-Stage-7.${extension}`);
+      expect(selectReports(trace, ["no-plusplus"])).toHaveLength(1);
+      expect(selectReports(trace, ["operator-assignment"])).toHaveLength(1);
+      expect(trace[1].formatted.text).toContain(
+        "counter.value = counter.value + 2;",
+      );
+      expect(trace[1].formatted.text).toContain("counter.value++;");
+      expect(trace[1].formatted.messages).toContainEqual(
+        expect.objectContaining({ ruleId: "no-plusplus", severity: 2 }),
+      );
+      expect(convergenceProblems(trace)).toEqual([]);
+    },
+  );
   it.each(["js", "ts"])(
     "D3: converges on function padding and documentation in a Svelte %s script",
     (language) => {

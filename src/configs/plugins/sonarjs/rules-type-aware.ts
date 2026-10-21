@@ -5,7 +5,7 @@ import { sonarjsRules } from "./rules.js";
 // Rules requiring type information stay off outside typed linting, including disabled alternatives
 // that a consumer may choose through overrides. The list is fixed rather than discovered at runtime.
 const typeAwareRulesOff: Rules = {
-  // --- Turned off rules (71/71) -------------------------------------------------------------------------------------------------------------------.
+  // --- Turned off rules (69/69) -------------------------------------------------------------------------------------------------------------------.
   "sonarjs/anchor-precedence": "off", // Requires type information; enabled only in the type-aware scope.
   "sonarjs/argument-type": "off", // Requires type information; enabled only in the type-aware scope.
   "sonarjs/arguments-order": "off", // Requires type information; enabled only in the type-aware scope.
@@ -73,13 +73,16 @@ const typeAwareRulesOff: Rules = {
   "sonarjs/unicode-aware-regex": "off", // Requires type information; enabled only in the type-aware scope.
   "sonarjs/unused-import": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
   "sonarjs/unused-named-groups": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/useless-string-operation": "off", // Requires type information; enabled only in the type-aware scope.
   "sonarjs/values-not-convertible-to-numbers": "off", // Requires type information; enabled only in the type-aware scope.
   "sonarjs/void-use": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/web-sql-database": "off", // Requires type information; enabled only in the type-aware scope.
 } as const;
 
-const typeAwareRuleIds = Object.keys(typeAwareRulesOff);
+const typeAwareRuleIds = [
+  ...Object.keys(typeAwareRulesOff),
+  // Deprecated rules are omitted from policy maps; explicit consumer overrides still need typed scope.
+  "sonarjs/useless-string-operation",
+  "sonarjs/web-sql-database",
+];
 
 // The policy for the rules that need type information.
 const typeAwareRules: Rules = Object.fromEntries(

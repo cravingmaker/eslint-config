@@ -6,6 +6,7 @@ import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import process from "node:process";
+import { runInNewContext } from "node:vm";
 
 import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
@@ -221,7 +222,7 @@ which no feature lints. A directory pattern such as `app/**` matches them all.
 */
 const appFiles = {
   "app/Component.svelte":
-    '<script lang="ts">\n  let count: number = $state(0);\n</script>\n\n<button onclick={() => count++}>{count}</button>\n',
+    '<script lang="ts">\n  let count: number = $state(0);\n</script>\n\n<button onclick={() => { const previousCount = count; count = count + 1; return previousCount; }}>{count}</button>\n',
   "app/Component.tsx":
     "export function Component() {\n  return <p>example</p>;\n}\n",
   "app/data.json": '{ "name": "example" }\n',
@@ -241,6 +242,22 @@ const appFiles = {
   "app/state.svelte.ts": "export const state = $state({ count: 0 });\n",
 } as const;
 const appPaths = Object.keys(appFiles);
+it.each([0, 41, Number.MAX_SAFE_INTEGER + 1, NaN])(
+  "preserves the migrated Svelte postfix result and counter state from %s",
+  (initial) => {
+    const handler = /onclick=\{(?<handler>\(\) => \{[^}]+\})\}/u.exec(
+      appFiles["app/Component.svelte"],
+    )?.groups?.handler;
+    expect(handler).toBeDefined();
+    const state = { count: initial };
+    const returned: unknown = runInNewContext(
+      `(${handler ?? expect.fail("Missing fixture click handler")})()`,
+      state,
+    );
+    expect(returned).toBe(initial);
+    expect(state.count).toBe(initial + 1);
+  },
+);
 const createdDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-feature-toggles-"),
 );

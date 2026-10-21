@@ -11,7 +11,7 @@ languageOptions:
 linterOptions:
   reportUnusedDisableDirectives: 1
 settings: null
-rules: 65 (error 52, off 9, warn 4)
+rules: 65 (error 51, off 9, warn 5)
 
 @html-eslint/attrs-newline: off
 @html-eslint/class-spacing: off
@@ -21,7 +21,7 @@ rules: 65 (error 52, off 9, warn 4)
 @html-eslint/id-naming-convention: error ["kebab-case",{}]
 @html-eslint/indent: off
 @html-eslint/lowercase: error
-@html-eslint/max-element-depth: error [{"max":6}]
+@html-eslint/max-element-depth: warn [{"max":6}]
 @html-eslint/no-abstract-roles: error
 @html-eslint/no-accesskey-attrs: error
 @html-eslint/no-aria-hidden-body: error
