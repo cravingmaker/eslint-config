@@ -4,6 +4,7 @@ import type { Context, FeatureOptions } from "../../types.js";
 import { defaultContext } from "../../context.js";
 import { jsxFiles, sourceFiles, withSvelteComponents } from "../../globs.js";
 import { supportedCoreRules } from "./rules.js";
+import { internalPlugin } from "../../rules/index.js";
 import { narrowFiles } from "../../utilities/file-scope.js";
 
 const core = (
@@ -23,7 +24,11 @@ const core = (
         sourceType: "module",
       },
       name: "@cravingmaker/eslint-config/javascript/rules",
-      rules: { ...supportedCoreRules, ...overrides },
+      plugins: { "@cravingmaker": internalPlugin },
+      rules: {
+        ...supportedCoreRules,
+        ...overrides,
+      },
     },
     {
       files: [...jsxFiles],

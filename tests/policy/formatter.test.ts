@@ -257,6 +257,7 @@ const htmlPluginFiles = new Map([
 const compareText = (left: string, right: string): number => {
   return left.localeCompare(right);
 };
+
 // Every feature and framework is on, so that every rule the configuration sets is checked.
 const createFullConfig = async (
   isTypeChecked: boolean,
@@ -269,16 +270,19 @@ const createFullConfig = async (
     typescript: { tsconfigRootDir: rootDirectory, typeChecked: isTypeChecked },
   });
 };
+
 const createEslint = async (isTypeChecked: boolean): Promise<ESLint> => {
   return new ESLint({
     overrideConfig: await createFullConfig(isTypeChecked),
     overrideConfigFile: true,
   });
 };
+
 // The plugin prefix of `ruleId`.
 const getPluginName = (ruleId: string): string => {
   return ruleId.slice(0, ruleId.lastIndexOf("/"));
 };
+
 // The rules that ESLint resolves for `filePath`.
 const getRules = async (
   eslint: ESLint,
@@ -292,6 +296,7 @@ const getRules = async (
     | undefined;
   return new Map(Object.entries(config?.rules ?? {}));
 };
+
 // The rules that are on in at least one of `filePaths`.
 const getEnabledRuleIds = async (
   eslint: ESLint,
@@ -313,15 +318,18 @@ const getEnabledRuleIds = async (
     }),
   );
 };
+
 const isDeprecated = (rule: PluginRule): boolean => {
   return (
     typeof rule.meta?.deprecated !== "undefined" &&
     rule.meta.deprecated !== false
   );
 };
+
 const isPluginRule = (value: unknown): value is PluginRule => {
   return typeof value === "object" && value !== null;
 };
+
 // Whether the plugin files `rule` under style, or its type is `layout`.
 const isStyleRule = (rule: PluginRule): boolean => {
   const category = rule.meta?.docs?.category;
@@ -331,6 +339,7 @@ const isStyleRule = (rule: PluginRule): boolean => {
     category === "Stylistic Issues"
   );
 };
+
 describe.each([false, true])(
   "rules that eslint-config-prettier turns off, with typed linting %s",
   (typeChecked) => {

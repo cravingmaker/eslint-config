@@ -4,8 +4,8 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 });
 
 /**
-Formats `date` as a long date in UTC, such as "October 7, 2026".
-*/
+ * Formats `date` as a long date in UTC, such as "October 7, 2026".
+ */
 export const formatDate = (date) => {
   return formatter.format(date);
 };

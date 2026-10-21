@@ -6,6 +6,7 @@ import pluginUnicorn from "eslint-plugin-unicorn";
 import { defaultContext } from "../../../context.js";
 import { sourceFiles, withSvelteComponents } from "../../../globs.js";
 import { unicornRules } from "./rules.js";
+import { internalPlugin } from "../../../rules/index.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 
 // Builds the flat config for eslint-plugin-unicorn.
@@ -16,7 +17,7 @@ const unicorn = (
   return [
     {
       name: "@cravingmaker/eslint-config/unicorn/setup",
-      plugins: { unicorn: pluginUnicorn },
+      plugins: { "@cravingmaker": internalPlugin, unicorn: pluginUnicorn },
     },
     {
       files: narrowFiles(
@@ -25,7 +26,10 @@ const unicorn = (
       ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/unicorn/rules",
-      rules: { ...unicornRules, ...overrides },
+      rules: {
+        ...unicornRules,
+        ...overrides,
+      },
     },
   ];
 };

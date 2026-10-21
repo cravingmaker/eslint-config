@@ -34,6 +34,7 @@ const getEffectiveConfig = async (
     EffectiveConfig | undefined;
   return config ?? {};
 };
+
 const isDeprecated = (rule: RuleDefinition | undefined): boolean => {
   return (
     typeof rule?.meta?.deprecated !== "undefined" &&
@@ -98,7 +99,7 @@ describe("rule coverage", () => {
         return left.localeCompare(right);
       });
 
-    expect(plugins.size).toBe(23);
+    expect(plugins.size).toBe(24);
     expect(unclassified).toEqual([]);
   });
 });

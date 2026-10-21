@@ -372,11 +372,41 @@ export default createConfig({
 });
 ```
 
-The core policy also requires braces around branches, block bodies for arrows,
+The core policy also requires braces around branches, arrow expressions with block bodies for ordinary functions,
 and expanded assignments (`value = value + amount` and
 `value = value || fallback`). Prettier preserves those syntax choices; it
 continues to decide indentation, quotes, and wrapping. The formatter tests check
 that its output agrees with the enabled Stylistic rules across supported layouts.
+
+`@cravingmaker/prefer-arrow-functions` owns function style in the `javascript`
+feature. It replaces `func-style` and `prefer-arrow-callback` so declarations,
+initializers, assignments, return values, exports, and callbacks share one
+diagnostic owner. Methods, accessors, generators, overload signatures and their
+implementations, named recursive function expressions, and functions using their
+own `this`, `arguments`, or `new.target` retain their semantics. Local constructor
+uses through `new`, `extends`, `Reflect.construct`, and `.prototype` are preserved.
+The rule reports without fixes or suggestions: review hoisting and function
+identity when converting, and use a scoped override for constructor contracts
+that are only visible outside the defining file.
+
+The `unicorn` feature enables `@cravingmaker/starred-documentation` for multiline
+`/** ... */` comments. It preserves paragraph breaks and ordinary line/block
+comments; `unicorn/no-asterisk-prefix-in-documentation-comments` stays off.
+These rules are bundled internally and need no additional installation.
+Stylistic requires a blank line after a direct function-valued variable
+declaration, including named exports, multiple declarators, and transparent
+TypeScript assertion wrappers, before a following statement and its leading
+documentation. Ordinary data variables, object properties, closing braces, and
+EOF gain no padding requirement. Perfectionist still orders module declarations,
+but its module-member blank-line checks are disabled because the installed
+fixer miscounts documentation paragraphs. Other Perfectionist spacing policies
+are unchanged.
+
+`@cravingmaker/svelte-function-variable-padding` complements Stylistic only
+for top-level Svelte script statements, which the installed Stylistic rule skips.
+Nested statements retain the Stylistic owner. The companion follows the
+`stylistic` feature's files, ignores, and overrides; use its rule ID when
+overriding top-level Svelte padding. It loads no optional peer itself.
 
 Hexadecimal and Unicode escapes use uppercase letters in regular expressions and
 strings. Comments do not partition import sorting groups:
@@ -530,7 +560,6 @@ These are open, and each needs a decision in this package or a fix upstream:
 - **`.svelte.mjs` and `.svelte.mts` files do not parse.** The Svelte feature includes them, but svelte-eslint-parser reads them as components and fails with `Parsing error: Expected token }`. Name rune modules `.svelte.js` or `.svelte.ts`.
 - **Legacy Svelte types.** In legacy mode, `unicorn/name-replacements` asks to rename the `$$Props` interface, which Svelte's tooling reads by that name, and `unused-imports/no-unused-vars` reports `$$Events` and `$$Slots`. `import-x/no-duplicates` reports `svelte/animate` and `svelte/transition` imported in one file, because both resolve to one declaration file.
 - **Global declaration files.** A declaration file without imports or exports, such as the `vite-env.d.ts` that Vite generates, is reported by `import-x/unambiguous`, and its `/// <reference types="vite/client" />` by `@typescript-eslint/triple-slash-reference`. Add the types to `compilerOptions.types` in the tsconfig instead, and write declarations as a module, with `declare global` and `export {}`.
-- **A paragraph break in a doc comment between functions.** `perfectionist/sort-modules` counts a blank line inside the doc comment of a function that follows another function as spacing between the two, and `eslint --fix` cannot remove it. Write such doc comments without an empty line.
 
 ## Migrating from 0.1.0
 

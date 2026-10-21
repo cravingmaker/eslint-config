@@ -8,9 +8,10 @@ import { suggestionRules } from "./rules/suggestions.js";
 import { supportedRuleOptions } from "../../utilities/plugin-policy.js";
 
 const coreRules: Rules = {
-  ...possibleProblemRules, // 59/199 rules, 0 automatically fixable, 10 editor suggestions fixable.
-  ...suggestionRules, // 139/199 rules, 37 automatically fixable, 19 editor suggestions fixable.
-  ...layoutAndFormattingRules, // 1/199 rules, 1 automatically fixable, 0 editor suggestions fixable.
+  ...possibleProblemRules, // 59/200 rules, 0 automatically fixable, 10 editor suggestions fixable.
+  ...suggestionRules, // 139/200 rules, 37 automatically fixable, 19 editor suggestions fixable.
+  ...layoutAndFormattingRules, // 1/200 rules, 1 automatically fixable, 0 editor suggestions fixable.
+  "@cravingmaker/prefer-arrow-functions": "error", // Internal policy: 1/200 rules, no automatic fixes or editor suggestions.
 } as const;
 
 // Earlier supported ESLint versions can predate a declared option.

@@ -77,6 +77,7 @@ const createConsumer = async (
   });
   return directory;
 };
+
 // The package as published: `npm pack` of the current build, in `destination`.
 const createTarball = async (destination: string): Promise<string> => {
   const { stdout } = await execute(
@@ -90,6 +91,7 @@ const createTarball = async (destination: string): Promise<string> => {
   ];
   return path.join(destination, filename);
 };
+
 /*
 A new directory in the system's temporary directory, with a name that starts with `prefix`, as its
 real path. The temporary directory can be a symbolic link, as it is on macOS, and a child process
@@ -99,6 +101,7 @@ const createTemporaryDirectory = async (prefix: string): Promise<string> => {
   const directory = await mkdtemp(path.join(os.tmpdir(), prefix));
   return await realpath(directory);
 };
+
 /*
 Runs a command and returns what it prints, also when it exits with an error, as ESLint does when it reports a problem and TypeScript does when it finds one.
 */
@@ -121,6 +124,7 @@ const getOutput = async (
     return typeof output === "string" ? output : String(error);
   }
 };
+
 /*
 Runs a command and returns its exit code and what it prints. A command that cannot start, or
 that a signal stops, has no exit code, which reads as `NaN`.

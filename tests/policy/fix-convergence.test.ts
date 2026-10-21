@@ -40,14 +40,14 @@ const importSource = [
   "",
 ].join("\n");
 const moduleSource = [
-  "function first() { return 1; }",
+  "const first = () => { return 1; };",
   "",
   "/**",
   " * Describe the second function.",
   " *",
   " * Explain a detail.",
   " */",
-  "function second() { return 2; }",
+  "const second = () => { return 2; };",
   "",
   "export { first, second };",
   "",
@@ -63,7 +63,10 @@ const sources = new Map([
     "awaits",
     "export const load = (task) => { return task.then((value) => { return value; }); };\n",
   ],
-  ["D1-D2-D3-Stages-2-3", `${importSource}\n${escapeSource}\n${moduleSource}`],
+  [
+    "D1-D2-D3-Stages-2-3",
+    `${importSource.replace("export const", "const")}\n${escapeSource.replace("export const", "const")}\n${moduleSource.replace("export { first, second };", "export { directories, first, pattern, second };")}`,
+  ],
   [
     "D1-D2-Stage-2",
     `${importSource.replace("export const", "const")}\n${escapeSource.replace("export const", "const")}\nexport { directories, pattern };\n`,
@@ -93,14 +96,31 @@ const sources = new Map([
       'import os from "node:os";',
       "",
       "/**",
-      "Read the temporary directory.",
-      "*/",
+      " * Read the temporary directory.",
+      " */",
       "export const directory = os.tmpdir();",
       "",
     ].join("\n"),
   ],
   ["D2-Stage-2", importSource],
+  [
+    "D3-original-Stage-3",
+    moduleSource
+      .replace("const first = () =>", "function first()")
+      .replace("const second = () =>", "function second()")
+      .replaceAll("};", "}"),
+  ],
   ["D3-Stage-3", moduleSource],
+  [
+    "D3-unstarred-Stage-3",
+    moduleSource
+      .replace("const first = () =>", "function first()")
+      .replace("const second = () =>", "function second()")
+      .replaceAll("};", "}")
+      .replaceAll(" * ", "")
+      .replace(" *\n", "\n")
+      .replace(" */", "*/"),
+  ],
   ["escapes", `${String.raw`export const pattern = /\a/;`}\n`],
   [
     "exports",
@@ -174,6 +194,23 @@ const approvedOverlaps: readonly ApprovedOverlap[] = [
     sample: "exports",
   },
 ];
+const sampleText = (name: string, text: string, extension: string): string => {
+  if (extension !== "ts") {
+    return text;
+  }
+  if (name.includes("D3")) {
+    return text
+      .replaceAll("= () =>", "= (value: number) =>")
+      .replaceAll("function first()", "function first(value: number)")
+      .replaceAll("function second()", "function second(value: number)")
+      .replaceAll("return 1;", "return value;")
+      .replaceAll("return 2;", "return value;");
+  }
+  return name === "awaits"
+    ? text.replace("(task)", "(task: Promise<string>)")
+    : text;
+};
+
 const samples: readonly Sample[] = [
   ...["js", "ts"].flatMap((extension) => {
     return [...sources]
@@ -184,10 +221,7 @@ const samples: readonly Sample[] = [
         return {
           fileName: `${name.toLowerCase()}.${extension}`,
           name: `${name}.${extension}`,
-          text:
-            extension === "ts" && name === "awaits"
-              ? text.replace("(task)", "(task: Promise<string>)")
-              : text,
+          text: sampleText(name, text, extension),
         };
       });
   }),
@@ -203,6 +237,23 @@ const samples: readonly Sample[] = [
   },
   ...["js", "ts"].flatMap((language) => {
     return [
+      {
+        fileName: `functions-${language}.svelte`,
+        name: `D3-Stage-3.${language}.svelte`,
+        text: [
+          `<script${language === "ts" ? ' lang="ts"' : ""}>`,
+          `const first = (value${language === "ts" ? ": number" : ""}) => { return value; };`,
+          "/**",
+          "Describe the second function.",
+          "",
+          "Keep the paragraph.",
+          "*/",
+          `const second = (value${language === "ts" ? ": number" : ""}) => { return value; };`,
+          "</script>",
+          "<p>{first(1)} {second(2)}</p>",
+          "",
+        ].join("\n"),
+      },
       {
         fileName: `escape-${language}.svelte`,
         name: `D1-Stage-2.${language}.svelte`,
@@ -313,6 +364,7 @@ const runSamples = async (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- The isolated runner serializes SampleResult entries.
   return JSON.parse(stdout) as readonly SampleResult[];
 };
+
 const results: SampleResult[] = [];
 beforeAll(async () => {
   // eslint-disable-next-line functional/immutable-data -- The suite stores its isolated runner's results once during setup.
@@ -325,6 +377,7 @@ const getTrace = (name: string): FixTrace => {
     })?.trace ?? expect.fail(`Missing sample ${name}`)
   );
 };
+
 const selectReports = (
   trace: FixTrace,
   rules: readonly string[],
@@ -333,6 +386,7 @@ const selectReports = (
     return typeof ruleId === "string" && rules.includes(ruleId);
   });
 };
+
 const unapprovedOverlaps = (
   sample: string,
   overlaps: readonly ReportOverlap[],
@@ -350,6 +404,23 @@ const unapprovedOverlaps = (
 };
 
 describe("combined ESLint fixes and the package formatter", () => {
+  it.each(["js", "ts"])(
+    "D3: converges on function padding and documentation in a Svelte %s script",
+    (language) => {
+      const trace = getTrace(`D3-Stage-3.${language}.svelte`);
+      expect(
+        selectReports(trace, ["@cravingmaker/starred-documentation"]),
+      ).toHaveLength(1);
+      expect(
+        selectReports(trace, [
+          "@cravingmaker/svelte-function-variable-padding",
+        ]),
+      ).toHaveLength(1);
+      expect(trace[1].formatted.text).toContain(" * Keep the paragraph.");
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
+    },
+  );
   it.each(["js", "ts"])(
     "applies real fixes and formatting before converging in %s",
     (extension) => {
@@ -487,96 +558,62 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D3 / Stage 3: characterizes the module-spacing loop in %s",
+    "D3: converges on arrow variables and starred documentation in %s",
     (extension) => {
       const trace = getTrace(`D3-Stage-3.${extension}`);
-      const output = [
-        "function first() {",
-        "  return 1;",
-        "}",
-        "/**",
-        "Describe the second function.",
-        "",
-        "Explain a detail.",
-        "*/",
-        "function second() {",
-        "  return 2;",
-        "}",
-        "",
-        "export { first, second };",
-        "",
-      ].join("\n");
-      expect(
-        trace.map(({ formatted, warnings }) => {
-          return { text: formatted.text, warnings };
-        }),
-      ).toEqual(
-        [0, 1].map(() => {
-          return {
-            text: output,
-            warnings: [{ name: "ESLintCircularFixesWarning" }],
-          };
-        }),
+      expect(trace[1].formatted.text).toBe(
+        [
+          `const first = ${extension === "ts" ? "(value: number)" : "()"} => {`,
+          extension === "ts" ? "  return value;" : "  return 1;",
+          "};",
+          "",
+          "/**",
+          " * Describe the second function.",
+          " *",
+          " * Explain a detail.",
+          " */",
+          `const second = ${extension === "ts" ? "(value: number)" : "()"} => {`,
+          extension === "ts" ? "  return value;" : "  return 2;",
+          "};",
+          "",
+          "export { first, second };",
+          "",
+        ].join("\n"),
       );
-      expect(trace[1].formatted).toEqual(trace[0].formatted);
-      expect(
-        trace[1].formatted.messages
-          .filter(({ fix }) => {
-            return typeof fix !== "undefined";
-          })
-          .map(({ fix, ruleId }) => {
-            return { fix, ruleId };
-          }),
-      ).toEqual([
-        {
-          fix: { range: [32, 33], text: "\n" },
-          ruleId: "perfectionist/sort-modules",
-        },
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
+    },
+  );
+  it.each(
+    ["js", "ts"].flatMap((extension) => {
+      return ["D3-original-Stage-3", "D3-unstarred-Stage-3"].map((name) => {
+        return { extension, name };
+      });
+    }),
+  )(
+    "D3: converges on the original declaration layout in $name.$extension",
+    ({ extension, name }) => {
+      const trace = getTrace(`${name}.${extension}`);
+      expect(trace[1].formatted.text).toContain(" * Explain a detail.");
+      expect(trace[1].formatted.messages).toEqual([
+        expect.objectContaining({
+          ruleId: "@cravingmaker/prefer-arrow-functions",
+        }),
+        expect.objectContaining({
+          ruleId: "@cravingmaker/prefer-arrow-functions",
+        }),
       ]);
-      expect(convergenceProblems(trace)).toEqual([
-        "warning:ESLintCircularFixesWarning",
-        "warning:ESLintCircularFixesWarning",
-        "fixable-reports",
-      ]);
+      expect(convergenceProblems(trace)).toEqual([]);
     },
   );
   it.each(["js", "ts"])(
-    "D3 / Stage 3: retains only the module-spacing loop in mixed %s",
+    "D1/D2/D3: converges on mixed escapes, imports, arrows and documentation in %s",
     (extension) => {
       const trace = getTrace(`D1-D2-D3-Stages-2-3.${extension}`);
-      expect(trace[1].formatted).toEqual(trace[0].formatted);
-      expect(
-        trace.map(({ warnings }) => {
-          return warnings;
-        }),
-      ).toEqual([
-        [{ name: "ESLintCircularFixesWarning" }],
-        [{ name: "ESLintCircularFixesWarning" }],
-      ]);
-      expect(
-        trace[1].formatted.messages
-          .filter(({ fix }) => {
-            return typeof fix !== "undefined";
-          })
-          .map(({ ruleId }) => {
-            return ruleId;
-          }),
-      ).toEqual(["perfectionist/sort-modules"]);
       expect(trace[1].formatted.text).toContain(String.raw`/\u{E9}/u`);
-      expect(
-        trace[1].formatted.messages.filter(({ ruleId }) => {
-          return (
-            typeof ruleId === "string" &&
-            [
-              "import-x/newline-after-import",
-              "perfectionist/sort-imports",
-              "regexp/letter-case",
-              "unicorn/escape-case",
-            ].includes(ruleId)
-          );
-        }),
-      ).toEqual([]);
-      expect(convergenceProblems(trace)).toContain("fixable-reports");
+      expect(trace[1].formatted.text).toContain(" * Explain a detail.");
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(convergenceProblems(trace)).toEqual([]);
     },
   );
   it.each(["js", "ts"])(

@@ -131,6 +131,20 @@ Every block is named `@cravingmaker/eslint-config/<feature>/<part>`, and
 feature's rule map and its `overrides`, and a `rules-type-aware` block
 holds the rules that need type information, over the type-aware scope.
 
+The internal `@cravingmaker` plugin in `src/rules/` supplies the policies
+that installed rules cannot express safely. The existing JavaScript rules block
+registers and enables `@cravingmaker/prefer-arrow-functions`; Unicorn's existing
+setup/rules blocks register the same plugin and enable
+`@cravingmaker/starred-documentation`. Their scopes and overrides follow their
+owning features, without adding public options or config blocks. Type generation
+loads these rule definitions from source before the build; include internal
+rules in inventory, consumer, scope, and generated-type checks.
+Stylistic's existing setup/rules blocks also register the plugin and enable
+`@cravingmaker/svelte-function-variable-padding` only for the top-level Svelte
+script statements that the installed native padding rule cannot visit. The
+companion has its own override ID; it never duplicates native nested-statement
+diagnostics or loads an optional peer.
+
 The builders share these modules:
 
 | Module                           | Holds                                                                                                        |
@@ -750,9 +764,11 @@ The reference that the recipes link to, grouped by topic.
   Approved complementary overlaps name a sample, rule IDs, and distinct concerns;
   a shared location or plugin namespace is not an automatic exception. D1/D2
   assert uppercase escapes and import-comment convergence, separately and
-  together. Only D3's module-spacing characterization, including its mixed
-  sample, remains for Stage 3 of the audit follow-up to replace with positive
-  convergence assertions.
+  together. D3 checks arrow-variable separation, starred documentation, the
+  original declaration-spacing failure with and without asterisks, and the
+  mixed D1/D2/D3 sample through positive convergence assertions. No temporary
+  loop characterizations remain. Typed passing samples take a parameter to
+  satisfy the independently retained Functional policy.
 - **Import comments keep their documentation layout.**
   `import-x/newline-after-import` uses `considerComments: false` and
   `exactCount: false`, with `count: 1` as a minimum. The rule counts intervening
@@ -948,11 +964,19 @@ The reference that the recipes link to, grouped by topic.
 - **`eslint --fix` reorders literals.** Perfectionist sorts object keys
   and some arrays. Do not encode meaning in the order of an array literal
   that a fix may sort.
-- **Doc comments between module members.** `perfectionist/sort-modules`
-  counts a blank line inside a documentation comment as spacing between
-  the members around it, and its fix cannot remove it. A function that
-  follows another function in the same group needs a doc comment without
-  a paragraph break.
+- **Functions and documentation have separate owners.**
+  `@cravingmaker/prefer-arrow-functions` requires arrow expressions with semantic
+  exceptions; it never converts functions automatically. Keep its constructor,
+  scope, recursion, and overload regressions when extending it. Core
+  `arrow-body-style` still requires block bodies. The documentation-only internal
+  rule requires leading asterisks in multiline `/** ... */` comments and preserves
+  paragraph breaks, code indentation, ordinary grouped `//` comments, and ordinary
+  blocks. Stylistic's selector-based padding rule separates direct function
+  variables and named exports, including multiple declarators and transparent
+  TypeScript wrappers. Its selectors must reject functions nested inside data
+  objects or calls. Perfectionist retains declaration ordering with module-member
+  spacing ignored until its documentation-paragraph fixer is corrected. Do not
+  restore that spacing without the original and mixed convergence regressions.
 - **The tsconfig is the one that the README asks for.** `tsconfig.json`
   and `tests/fixtures/tsconfig.json` set `strict`, `noImplicitReturns`,
   and `allowUnreachableCode: false`, and `tests/package/readme.test.ts`

@@ -1,7 +1,7 @@
 import type { Rules } from "../../../../types.js";
 
 const otherRules: Rules = {
-  // --- Rules with default options (22/36) ---------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (21/36) ---------------------------------------------------------------------------------------------------------.
   "unicorn/consistent-function-style": [
     "error",
     {
@@ -30,7 +30,6 @@ const otherRules: Rules = {
   ],
   "unicorn/iteration-fallback-style": ["error", "guard"], // Automatically fixable by the --fix command.
   "unicorn/no-array-front-mutation": "error",
-  "unicorn/no-asterisk-prefix-in-documentation-comments": "error", // Automatically fixable by the --fix command.
   "unicorn/no-barrel-files": "error",
   "unicorn/no-invalid-file-input-accept": "error", // Automatically fixable by the --fix command.
   "unicorn/no-manually-wrapped-comments": "error", // Automatically fixable by the --fix command.
@@ -64,13 +63,14 @@ const otherRules: Rules = {
     },
   ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
 
-  // --- Turned off rules (14/36) -------------------------------------------------------------------------------------------------------------------.
   "unicorn/comma-spacing": "off", // JSON-only formatting; preserve language ownership and Prettier formatting. Automatically fixable by the --fix command.
   "unicorn/comment-content": "off", // Avoid enforcing terminology and brand-name wording in comments. Automatically fixable by the --fix command.
   "unicorn/consistent-arrow-return-style": "off", // Handled by `arrow-body-style`. Automatically fixable by the --fix command.
   "unicorn/consistent-destructuring": "off", // Prefer freedom with variable accessing patterns. Manually fixable by editor suggestions.
   "unicorn/indent": "off", // JSON/CSS-only formatting; preserve language ownership and Prettier formatting. Automatically fixable by the --fix command.
   "unicorn/key-name-casing": "off", // Data-language policy is outside this feature's source scope.
+  // --- Turned off rules (15/36) -------------------------------------------------------------------------------------------------------------------.
+  "unicorn/no-asterisk-prefix-in-documentation-comments": "off", // Handled by `@cravingmaker/starred-documentation`, which preserves documentation stars and paragraphs. Automatically fixable by the --fix command.
   "unicorn/no-javascript-url": "off", // Markdown-only rule; preserve the existing Markdown policy.
   "unicorn/no-keyword-prefix": "off", // Prefer freedom with keywords / names.
   "unicorn/no-loss-of-precision": "off", // Its supported languages exclude JavaScript; preserve existing language owners.

@@ -48,6 +48,7 @@ const createEslint = async (
     overrideConfigFile: true,
   });
 };
+
 // The language that ESLint resolves for `filePath`, such as "json/jsonc".
 const getLanguage = async (
   eslint: ESLint,
@@ -58,6 +59,7 @@ const getLanguage = async (
     { readonly toJSON: () => { readonly language?: unknown } } | undefined;
   return config?.toJSON().language;
 };
+
 // The plugin of each rule in `rules`, or "core" for ESLint's own rules, without repeats.
 const getRulePlugins = (rules: RuleEntries): readonly string[] => {
   return [
@@ -72,6 +74,7 @@ const getRulePlugins = (rules: RuleEntries): readonly string[] => {
     return left.localeCompare(right);
   });
 };
+
 // The rules that ESLint resolves for `filePath`.
 const getRules = async (
   eslint: ESLint,
@@ -82,6 +85,7 @@ const getRules = async (
     { readonly rules?: RuleEntries } | undefined;
   return config?.rules ?? {};
 };
+
 // The ID of the rule behind each message that ESLint reports for `code`, linted as `filePath`.
 const lintRuleIds = async (
   eslint: ESLint,

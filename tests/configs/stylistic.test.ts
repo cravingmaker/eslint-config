@@ -139,11 +139,12 @@ describe("stylistic rules", () => {
         }),
       ),
     ).toEqual(
-      new Set(
-        Object.keys(pluginStylistic.rules).map((name) => {
+      new Set([
+        ...Object.keys(pluginStylistic.rules).map((name) => {
           return `@stylistic/${name}`;
         }),
-      ),
+        "@cravingmaker/svelte-function-variable-padding",
+      ]),
     );
     expect(entries).not.toHaveLength(0);
     expect(

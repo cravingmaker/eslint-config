@@ -16,8 +16,8 @@ import { supportedPluginPolicy } from "../../../utilities/plugin-policy.js";
 
 type ReactFeatureOptions = FeatureOptions & {
   /**
-    The React Refresh variant, or `false` for no React Refresh rule.
-  */
+   * The React Refresh variant, or `false` for no React Refresh rule.
+   */
   readonly refresh?: ReactRefreshVariant | false;
 };
 // The overrides of the rules of one plugin, which are the ones that its block takes.
@@ -28,6 +28,7 @@ const overridesOf = (overrides: Readonly<Rules>, pluginName: string): Rules => {
     }),
   );
 };
+
 const loadReactPlugins = async (refresh: ReactRefreshVariant | false) => {
   return await Promise.all([
     importPeer<{
@@ -138,4 +139,5 @@ const react = async ({
     ...reactRefreshConfigs(scope, refresh, refreshModule, refreshOverrides),
   ];
 };
+
 export { react };

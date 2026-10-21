@@ -126,7 +126,7 @@ migrations and supplies a verified baseline for each refactor.
 | ----- | ------------------------------------------------------------------------- | -------------------------------- | ---------- | ----------- |
 | 1     | Baseline and combined-rule regression harness                             | P1–P3; guard against regressions | None       | Complete    |
 | 2     | Escape-case and import-spacing convergence                                | D1, D2                           | 1          | Complete    |
-| 3     | Arrow functions, starred documentation, function spacing                  | D3                               | 2          | Not started |
+| 3     | Arrow functions, starred documentation, function spacing                  | D3                               | 2          | Complete    |
 | 4     | Passing configurations, conditional peer metadata, typed TSX names        | D4–D7 and D7 AST follow-up       | 3          | Not started |
 | 5     | Verified ownership, complementary checks, safe execution preference       | D8.1–D8.12                       | 4          | Not started |
 | 6     | Retained review signals and known parser/fix failures                     | D9, D10.1–D10.2, D11.1–D11.3     | 5          | Not started |
@@ -1179,5 +1179,149 @@ Do not continue to Stage <N+1> or publish/merge/release without my instruction.
   Perfectionist module sorting, Unicorn documentation-comment policy, and
   `tests/policy/fix-convergence.test.ts`. Read the complete D3 decision before
   replacing the remaining characterizations; no Stage 3 work is included here.
+- **PR/CI:** Commit and PR requested after local completion; remote CI has not
+  been evaluated in this record.
+
+#### Stage 3 — arrows, starred documentation, and function spacing
+
+- **Status/date:** Complete, 21 October 2026.
+- **Stage-entry commit:** `e4325397d3ee57c150114d523536da643afcb4f1`.
+  The worktree was clean on `cravingmaker/implement-audit-stage-3`, matching
+  `origin/main` and containing the completed Stage 2 handoff.
+- **Implementation commit(s):** Uncommitted at validation; the implementation
+  and this handoff are delivered together.
+- **Decisions/findings covered:** D3, the confirmed custom policy.
+- **Changes and rationale:** The bundled internal
+  `@cravingmaker/prefer-arrow-functions` rule owns ordinary function style in
+  the JavaScript feature, including declarations, expressions, assignments,
+  returns, exports, callbacks, async functions, and TypeScript wrappers.
+  Native `func-style` and `prefer-arrow-callback` stay off because they cannot
+  jointly express the approved exceptions without duplicate or unsafe reports.
+  Expression style remains enforced by the internal owner, and core
+  `arrow-body-style: ["error", "always"]` is unchanged. The new owner has no
+  automatic fixes or editor suggestions: hoisting and function identity need
+  review when converting.
+- **Semantic exceptions:** Methods, accessors, constructors, generators,
+  functions using their own `this`, `arguments`, or `new.target`, named
+  recursive function expressions, and overload signatures/implementations retain
+  their semantics. Constructor detection follows local identifier assignments
+  and aliases, stops cycles, and recognizes `new`, inheritance, prototype access,
+  and `Reflect.construct`. Only the defining function's names/bindings establish
+  constructibility; constructing a parameter does not exempt the enclosing
+  ordinary function. Nested arrows retain lexical ownership; nested
+  ordinary functions, class fields, and static blocks have their own ownership,
+  while computed field keys retain the enclosing receiver. Constructor contracts
+  visible only outside the defining file require review and a scoped override.
+- **Documentation and spacing owners:** Unicorn disables its asterisk-removal
+  rule and enables `@cravingmaker/starred-documentation`, which fixes only
+  multiline `/** ... */` comments, preserving paragraphs, relative example
+  indentation, and CRLF. Ordinary grouped line comments and block comments
+  remain unchanged. Stylistic's existing selector-based padding rule handles
+  direct function variables, including any declarator, named exports, and
+  transparent TypeScript wrappers. It excludes destructuring metadata, ordinary
+  data, objects, and calls containing callbacks, and adds nothing at EOF or a
+  closing brace. The installed rule skips `SvelteScriptElement` parents, so the
+  internal `@cravingmaker/svelte-function-variable-padding` companion covers
+  only those top-level script pairs, within the Stylistic feature's existing
+  scope and override conventions. Native Stylistic owns nested statements;
+  the companion has its own override ID and loads no optional peer.
+- **Module spacing:** `perfectionist/sort-modules` retains ordering, groups,
+  dependency detection, the overload-adjacency option, and all other options, while
+  `newlinesBetween: "ignore"` also makes inherited `newlinesInside` ignore
+  module-member gaps. This resolves the original no-op/circular fix, including
+  its unstarred-comment variant. Import sorting/spacing remains unchanged.
+  A direct TypeScript overload/documentation-paragraph probe retained
+  `newlinesBetweenOverloadSignatures: 0` with no fixable report or warning.
+- **Integration and migration:** Existing block names/order and feature scopes
+  are preserved. The three internal policies live in their owning rule maps;
+  existing JavaScript, Unicorn, and Stylistic blocks register the shared plugin.
+  Rule generation loads its source before building, and inventory/generated-type
+  checks include all three IDs. Category totals and capability comments,
+  README/contributor guidance, repository documentation/function spacing, and
+  eight fixtures are updated. A TypeScript AST-token comparison verified that
+  all 55 checked migration-only files preserve their non-comment tokens.
+- **Runtime/dependencies:** Node.js `24.22.0` from `.nvmrc`, npm `11.19.1`,
+  ESLint `10.12.0`, TypeScript `6.0.3`, typescript-eslint `8.70.0`, Stylistic
+  `5.10.0`, Unicorn `77.0.0`, Perfectionist `5.12.1`, Prettier `3.9.10`, and
+  Vitest `5.0.3`. Dependency versions, peer ranges, and the lockfile are unchanged.
+  Test commands use `NODE_OPTIONS=--max-old-space-size=4096`,
+  `VITEST_MAX_WORKERS=1`, and `UV_THREADPOOL_SIZE=16` on this host.
+- **Tests/commands and development evidence:**
+  - `npm ci` and `npm run prepare`: passed; npm reported zero vulnerabilities.
+    Stage-entry build and the existing convergence suite passed all **43 tests**.
+  - Before policy edits, the new function-style/layout regressions failed
+    **21 of 35 tests**, reproducing the missing arrow, documentation, and spacing
+    coverage. Controls prove that native expression mode rejects semantic
+    exceptions, the audit selector misses expression positions and rejects
+    receivers, and global starred-block style also converts ordinary comments.
+  - Targeted function/layout/convergence checks passed **97 tests** before the
+    Svelte extension. A subsequent five-file component/policy run passed
+    **195 tests**. Additional regressions cover feature-disabled, narrowed,
+    ignored, and consumer-override cases, multiple/typed declarators,
+    destructuring metadata, nested statements, EOF, documentation paragraphs,
+    CRLF, module ordering, and an actual Unicorn comparator suggestion.
+  - The runtime control evaluates receiver, arguments, constructor/new.target,
+    and named-recursion examples before and after linting; both return
+    `[3,2,true,6]` with no function rewrite.
+  - `npx vitest run tests/policy -u` passed **13 files / 1,158 tests** after
+    replacing every D3 loop characterization with positive convergence checks,
+    including typed TypeScript, JSX/TSX controls, Svelte scripts, the original
+    declaration cases, and the mixed D1/D2/D3 sample. Snapshots were updated only
+    through the supported process and checked against the intended D3 entries.
+  - An intermediate full `npm run validate` passed every static gate and
+    **1,905 tests**; the new consumer sample needed multiline function bodies
+    for the retained `max-statements-per-line` policy, and the existing regular
+    UI watcher assertion failed on `tests/fixtures/sample.ts`. The sample was
+    corrected; watcher code/assertions/timeouts were unchanged.
+    `npx vitest run tests/package/install.test.ts tests/vitest-watch.test.ts --maxWorkers=1`
+    then passed **2 files / 20 tests**. The final full gate is recorded below.
+  - A subsequent full `npm run validate` passed **65 files / 1,909 tests** and
+    every static/package gate. Final source review then found that constructor
+    detection also considered parameter bindings. New JavaScript/TypeScript
+    regressions failed both selected owner tests against that build. Filtering
+    the function's declared variables to its own function-name definitions fixes
+    the exemption in declarations, initializers, callbacks, and default exports.
+    `npx vitest run tests/configs/core/function-style.test.ts tests/configs/function-layout.test.ts tests/policy/fix-convergence.test.ts`
+    then passed **3 files / 117 tests**, retaining every semantic exception.
+  - Explicit ESLint checks passed all **74 changed source/test/documentation
+    files** outside the separately checked fixture project. Internal callback
+    exceptions are limited to the operations/visitors that require them.
+    A separate composed-fixer runtime probe returned `[3,2,true,6]` before and
+    after all enabled fixes, emitted no arrow diagnostic, and had no second fix.
+- **Final validation:** The full `npm run validate` rerun after the
+  constructor-parameter regression fix passed **65 files / 1,909 tests**,
+  formatting, build/generation, TypeScript, Knip, zero-warning repository lint,
+  packed-consumer/minimum-peer checks, Publint, and ATTW's ESM profile.
+- **Policy/snapshot delta:**
+  `npm run policy:diff -- --base e4325397d3ee57c150114d523536da643afcb4f1`
+  and the cumulative
+  `node scripts/policy-diff.ts --base 008a08207f28441297a2476b4798136aeb1023de`
+  both passed: **25 changed / 8 unchanged** snapshots, with no additions,
+  removals, failures, or dependency changes. The stage delta consists only of
+  the three internal rule IDs, their plugin registration and derived counts,
+  the native function-style/asterisk owners becoming off, Stylistic's targeted
+  padding options, and the module newline option becoming ignore. Core
+  expression/callback options remain in the effective off entries. Every
+  unrelated entry is preserved. The cumulative delta also retains Stage 2's
+  four approved escape/import-spacing option changes.
+- **Artifacts/consumer compatibility:** Public options/exports, ESM packaging,
+  and optional-peer behavior retain their contracts. The installed-package
+  regression runs JavaScript and TypeScript without optional peers and verifies
+  the arrow diagnostic owner, starred documentation, function-variable padding,
+  and stable second fixes. Generated `dist/` and `src/typegen.d.ts` are excluded
+  from the commit; final package/minimum-peer checks are recorded with validation.
+- **Retained exceptions/upstream conditions:** The module newline workaround
+  remains until the upstream documentation-paragraph fixer is corrected. The
+  Svelte companion remains until Stylistic supports script-element parents.
+  All Stage 1 temporary loop characterizations are replaced. D8 overlaps and
+  later-stage decisions remain unchanged.
+- **Unrelated work preserved:** The initial tree was clean. No dependency,
+  compiler contract, public feature option, config block, release, or other
+  implementation stage is changed.
+- **Remaining work:** None within Stage 3; requested commit/PR delivery follows
+  this validation record.
+- **Next stage:** Stage 4, D4–D7 and the D7 AST-name follow-up: shared config-file
+  exceptions, conditional Package JSON peer metadata, Functional tacit ownership,
+  and typed TSX names. No Stage 4 work is included here.
 - **PR/CI:** Commit and PR requested after local completion; remote CI has not
   been evaluated in this record.

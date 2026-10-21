@@ -18,7 +18,7 @@ const getRules = async (
 };
 
 describe("core builder", () => {
-  it("contains only ESLint core rules in one named block without plugins", async () => {
+  it("keeps the core blocks and registers the internal arrow policy", async () => {
     const configs = core();
     const eslint = new ESLint({
       overrideConfig: configs,
@@ -30,7 +30,7 @@ describe("core builder", () => {
       return !builtinRules.has(ruleId);
     });
 
-    expect(unknownRules).toEqual([]);
+    expect(unknownRules).toEqual(["@cravingmaker/prefer-arrow-functions"]);
     expect(
       configs.map((entry) => {
         return entry.name;
@@ -43,7 +43,7 @@ describe("core builder", () => {
       configs.flatMap((entry) => {
         return Object.keys(entry.plugins ?? {});
       }),
-    ).toEqual([]);
+    ).toEqual(["@cravingmaker"]);
   });
 
   it("lints the Svelte components of the context that its files match", async () => {

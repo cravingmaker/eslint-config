@@ -5,9 +5,11 @@ type UnknownRecord = Readonly<Record<string, unknown>>;
 const isRecord = (value: unknown): value is UnknownRecord => {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 };
+
 const isUnknownArray = (value: unknown): value is readonly unknown[] => {
   return Array.isArray(value);
 };
+
 const arraySchemaOf = (rule: unknown): readonly unknown[] | undefined => {
   if (
     isRecord(rule) &&
@@ -18,6 +20,7 @@ const arraySchemaOf = (rule: unknown): readonly unknown[] | undefined => {
   }
   return;
 };
+
 // Scalar/object unions can wrap the properties that an older peer supports.
 // Multiple object forms stay unchanged so ESLint can validate the selected form.
 const objectSchemasOf = (schema: unknown): readonly UnknownRecord[] => {
@@ -36,6 +39,7 @@ const objectSchemasOf = (schema: unknown): readonly UnknownRecord[] => {
   }
   return schema.type === "object" ? [schema] : [];
 };
+
 const supportedRuleOptions = (
   entry: Readonly<Linter.RuleEntry> | undefined,
   rule: unknown,
@@ -71,6 +75,7 @@ const supportedRuleOptions = (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Filtering option properties preserves the declared severity and tuple positions.
   return values as Linter.RuleEntry;
 };
+
 // Older optional peers can lack a rule or an option that the current policy declares.
 // Only the declared policy is considered: upstream additions never become settings.
 const supportedPluginPolicy = (
@@ -97,4 +102,5 @@ const supportedPluginPolicy = (
       }),
   );
 };
+
 export { supportedPluginPolicy, supportedRuleOptions };

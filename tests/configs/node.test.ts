@@ -28,6 +28,7 @@ const getRules = async (
     { readonly rules?: RuleEntries } | undefined;
   return config?.rules;
 };
+
 // The severity of a rule in the configuration for a file, or `undefined` when it is not set.
 const getSeverity = async (
   eslint: ESLint,

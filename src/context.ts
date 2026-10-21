@@ -12,8 +12,8 @@ type PreparedConfig = {
   readonly resolved: ResolvedOptions;
 };
 /**
-Derives the shared context from the completed options and the project's declared dependencies.
-*/
+ * Derives the shared context from the completed options and the project's declared dependencies.
+ */
 const buildContext = (
   {
     globals,
@@ -33,10 +33,11 @@ const buildContext = (
     typeAware,
   };
 };
+
 /**
-Picks the React Refresh variant for the declared dependencies: Next.js first, then Vite.
-Without either, React Refresh is off.
-*/
+ * Picks the React Refresh variant for the declared dependencies: Next.js first, then Vite.
+ * Without either, React Refresh is off.
+ */
 const detectReactRefreshVariant = (
   dependencies: ReadonlySet<string>,
 ): ReactRefreshVariant | false => {
@@ -45,11 +46,12 @@ const detectReactRefreshVariant = (
   }
   return dependencies.has("vite") ? "vite" : false;
 };
+
 /**
-Detects what the `"auto"` defaults of `react`, `svelte`, and `express` turn on from the package
-names that the project declares: a framework is detected when the project declares its package,
-whatever plugins are installed, and React Refresh follows the bundler that the project declares.
-*/
+ * Detects what the `"auto"` defaults of `react`, `svelte`, and `express` turn on from the package
+ * names that the project declares: a framework is detected when the project declares its package,
+ * whatever plugins are installed, and React Refresh follows the bundler that the project declares.
+ */
 const detectFeatures = (dependencies: ReadonlySet<string>): Detection => {
   return {
     express: dependencies.has("express"),
@@ -58,16 +60,18 @@ const detectFeatures = (dependencies: ReadonlySet<string>): Detection => {
     svelte: dependencies.has("svelte"),
   };
 };
+
 const isRecord = (
   value: unknown,
 ): value is Readonly<Record<string, unknown>> => {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 };
+
 /**
-Reads the package names that the manifest at the project root declares in `dependencies`,
-`devDependencies`, and `peerDependencies`. Like 0.1.0, a manifest that is missing, unreadable,
-or not valid JSON declares none.
-*/
+ * Reads the package names that the manifest at the project root declares in `dependencies`,
+ * `devDependencies`, and `peerDependencies`. Like 0.1.0, a manifest that is missing, unreadable,
+ * or not valid JSON declares none.
+ */
 const readDependencies = async (
   projectRootDirectory: string,
 ): Promise<ReadonlySet<string>> => {
@@ -91,9 +95,10 @@ const readDependencies = async (
     return new Set();
   }
 };
+
 /**
-Rejects unknown options before locating the manifest, detects the declared frameworks, and applies defaults once. The factory and its builders share these resolved options and context.
-*/
+ * Rejects unknown options before locating the manifest, detects the declared frameworks, and applies defaults once. The factory and its builders share these resolved options and context.
+ */
 const prepareConfig = async (
   options: Options = {},
 ): Promise<PreparedConfig> => {
@@ -109,17 +114,19 @@ const prepareConfig = async (
   );
   return { context: buildContext(resolved, dependencies), resolved };
 };
+
 /**
-Builds the context that every feature builder receives: the project root, the package names that its manifest declares, the resolved globals, the Svelte components, the tsconfig directory, and the type-aware scope.
-*/
+ * Builds the context that every feature builder receives: the project root, the package names that its manifest declares, the resolved globals, the Svelte components, the tsconfig directory, and the type-aware scope.
+ */
 const createContext = async (options: Options = {}): Promise<Context> => {
   const { context } = await prepareConfig(options);
   return context;
 };
+
 /**
-The context of `createConfig()` without options in a project that declares no dependencies.
-Feature builders fall back to it when they are called on their own, as in tests.
-*/
+ * The context of `createConfig()` without options in a project that declares no dependencies.
+ * Feature builders fall back to it when they are called on their own, as in tests.
+ */
 const defaultContext: Context = buildContext(resolveOptions());
 export {
   createContext,

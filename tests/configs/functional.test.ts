@@ -35,6 +35,7 @@ const getRules = async (
     { readonly rules?: RuleEntries } | undefined;
   return config?.rules;
 };
+
 // The readonly-type severity for a file, or `undefined` when it is not set.
 const getReadonlyTypeSeverity = async (
   eslint: ESLint,

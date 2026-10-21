@@ -57,15 +57,15 @@ describe("core suggestion rules", () => {
     },
   );
 
-  it("func-style: requires expressions instead of declarations", async () => {
+  it("the internal function-style owner requires arrow expressions instead of declarations", async () => {
     await expectLintError(
       `function declared() {\n\treturn 'declared';\n}\nconst expressed = () => 'expressed';\nconsole.log(declared(), expressed());\n`,
-      "func-style",
+      "@cravingmaker/prefer-arrow-functions",
       { filePath: "test.js" },
     );
     await expectNoLintError(
       `export const expressed = () => { return 'expressed'; };\n`,
-      "func-style",
+      "@cravingmaker/prefer-arrow-functions",
       { filePath: "test.js" },
     );
   });

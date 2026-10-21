@@ -3,102 +3,102 @@ import type globalVariables from "globals";
 import type { RuleOptions } from "./typegen.js";
 
 /**
-Information every feature builder receives, resolved once per `createConfig` call.
-*/
+ * Information every feature builder receives, resolved once per `createConfig` call.
+ */
 type Context = {
   /**
-  Package names declared in the manifest at the project root.
-  */
+   * Package names declared in the manifest at the project root.
+   */
   readonly dependencies: ReadonlySet<string>;
   /**
-  Globals for JavaScript, TypeScript, and Svelte files, from `environments` and `globals`.
-  */
+   * Globals for JavaScript, TypeScript, and Svelte files, from `environments` and `globals`.
+   */
   readonly globals: Readonly<Linter.Globals>;
   /**
-  The directory that holds the consumer's `package.json`, as an absolute path.
-  */
+   * The directory that holds the consumer's `package.json`, as an absolute path.
+   */
   readonly projectRootDirectory: string;
   /**
-  Svelte components whose scripts the JavaScript, code-quality, and TypeScript features lint: the components that the Svelte feature parses, or none while it is off. Each nested array is a set of patterns that a file must all match.
-  */
+   * Svelte components whose scripts the JavaScript, code-quality, and TypeScript features lint: the components that the Svelte feature parses, or none while it is off. Each nested array is a set of patterns that a file must all match.
+   */
   readonly svelteComponents: ReadonlyArray<string | readonly string[]>;
   /**
-  The directory that holds `tsconfig.json`, as an absolute path: `typescript.tsconfigRootDir`, or
-  the project root.
-  */
+   * The directory that holds `tsconfig.json`, as an absolute path: `typescript.tsconfigRootDir`, or
+   * the project root.
+   */
   readonly tsconfigRootDir: string;
   /**
-  Files that the parser reads with type information and that receive type-aware rules, or
-  `undefined` when typed linting is off.
-  */
+   * Files that the parser reads with type information and that receive type-aware rules, or
+   * `undefined` when typed linting is off.
+   */
   readonly typeAware: TypeAwareScope | undefined;
 };
 /**
-A feature that is off (`false`), on with its defaults (`true`), or on with options.
-*/
+ * A feature that is off (`false`), on with its defaults (`true`), or on with options.
+ */
 type Feature<Settings extends FeatureOptions = FeatureOptions> =
   boolean | Settings;
 /**
-Options that every feature accepts.
-*/
+ * Options that every feature accepts.
+ */
 type FeatureOptions = {
   /**
-  File patterns that limit the feature to some of its default files, such as `src/**`: it lints a
-  file that matches one of its default patterns and one of these. They cannot add a file type.
-  */
+   * File patterns that limit the feature to some of its default files, such as `src/**`: it lints a
+   * file that matches one of its default patterns and one of these. They cannot add a file type.
+   */
   readonly files?: readonly string[];
   /**
-  File patterns to exclude from the feature without ignoring them globally.
-  */
+   * File patterns to exclude from the feature without ignoring them globally.
+   */
   readonly ignores?: readonly string[];
   /**
-  Rule settings applied after the feature's own rules. Settings that turn on a rule that needs type information apply only in the files that typed linting covers.
-  */
+   * Rule settings applied after the feature's own rules. Settings that turn on a rule that needs type information apply only in the files that typed linting covers.
+   */
   readonly overrides?: Rules;
 };
 /**
-A runtime environment from the `globals` package, such as `"browser"` or `"node"`.
-*/
+ * A runtime environment from the `globals` package, such as `"browser"` or `"node"`.
+ */
 type GlobalEnvironment = keyof typeof globalVariables;
 /**
-Options of the `json` feature.
-*/
+ * Options of the `json` feature.
+ */
 type JsonOptions = FeatureOptions & {
   /**
-  Rule settings for JSON5 files.
-  */
+   * Rule settings for JSON5 files.
+   */
   readonly overridesJson5?: Rules;
   /**
-  Rule settings for JSONC files.
-  */
+   * Rule settings for JSONC files.
+   */
   readonly overridesJsonc?: Rules;
 };
 /**
-Options for `createConfig`. A feature defaults to `true`, except `react`, `svelte`, and
-`express`, which default to `"auto"`: on when the manifest at the project root declares the
-`react`, `svelte`, or `express` package.
-*/
+ * Options for `createConfig`. A feature defaults to `true`, except `react`, `svelte`, and
+ * `express`, which default to `"auto"`: on when the manifest at the project root declares the
+ * `react`, `svelte`, or `express` package.
+ */
 type Options = {
   readonly comments?: Feature;
   /**
-  Runtime environments whose globals are available.
-  */
+   * Runtime environments whose globals are available.
+   */
   readonly environments?: readonly GlobalEnvironment[];
   readonly express?: Feature | "auto";
   readonly functional?: Feature;
   /**
-  Extra globals, or overrides for the ones from `environments`.
-  */
+   * Extra globals, or overrides for the ones from `environments`.
+   */
   readonly globals?: Readonly<Linter.Globals>;
   readonly html?: Feature;
   /**
-  Extra global ignore patterns.
-  */
+   * Extra global ignore patterns.
+   */
   readonly ignores?: readonly string[];
   readonly imports?: Feature;
   /**
-  ESLint's core rules. Always on.
-  */
+   * ESLint's core rules. Always on.
+   */
   readonly javascript?: FeatureOptions;
   readonly json?: Feature<JsonOptions>;
   readonly markdown?: Feature;
@@ -106,10 +106,10 @@ type Options = {
   readonly packageJson?: Feature;
   readonly perfectionist?: Feature;
   /**
-  The directory that holds the consumer's `package.json`, whose `dependencies`,
-  `devDependencies`, and `peerDependencies` decide the `"auto"` features. Defaults to
-  `process.cwd()`. A relative path is resolved from the working directory.
-  */
+   * The directory that holds the consumer's `package.json`, whose `dependencies`,
+   * `devDependencies`, and `peerDependencies` decide the `"auto"` features. Defaults to
+   * `process.cwd()`. A relative path is resolved from the working directory.
+   */
   readonly projectRootDirectory?: string;
   readonly promise?: Feature;
   readonly react?: Feature<ReactOptions> | "auto";
@@ -118,83 +118,83 @@ type Options = {
   readonly sonarjs?: Feature;
   readonly stylistic?: Feature;
   /**
-  Svelte components and rune modules. While it is on, the features for JavaScript and TypeScript sources also lint the scripts of the components that it parses, without type information.
-  */
+   * Svelte components and rune modules. While it is on, the features for JavaScript and TypeScript sources also lint the scripts of the components that it parses, without type information.
+   */
   readonly svelte?: Feature | "auto";
   /**
-  TypeScript files, linted with typescript-eslint's strict rules and, unless `typeChecked` is
-  `false`, with type information from the nearest `tsconfig.json` of each file.
-  */
+   * TypeScript files, linted with typescript-eslint's strict rules and, unless `typeChecked` is
+   * `false`, with type information from the nearest `tsconfig.json` of each file.
+   */
   readonly typescript?: Feature<TypeScriptOptions>;
   readonly unicorn?: Feature;
   readonly unusedImports?: Feature;
 };
 /**
-Options of the `react` feature. By default, the hooks rules apply to every JavaScript and
-TypeScript file, where custom hooks also live, and the other React rules to JSX and TSX files.
-`files` limits both to the files that match one of its patterns. Overrides of hooks rules apply
-wherever the hooks rules do, and other overrides where the other React rules do. While React
-Refresh is off, overrides of its rule apply nowhere.
-*/
+ * Options of the `react` feature. By default, the hooks rules apply to every JavaScript and
+ * TypeScript file, where custom hooks also live, and the other React rules to JSX and TSX files.
+ * `files` limits both to the files that match one of its patterns. Overrides of hooks rules apply
+ * wherever the hooks rules do, and other overrides where the other React rules do. While React
+ * Refresh is off, overrides of its rule apply nowhere.
+ */
 type ReactOptions = FeatureOptions & {
   /**
-  The React Refresh rule variant. `"auto"`, the default, uses `"next"` when the project declares
-  Next.js and `"vite"` when it declares Vite, and turns the rule off without either.
-  */
+   * The React Refresh rule variant. `"auto"`, the default, uses `"next"` when the project declares
+   * Next.js and `"vite"` when it declares Vite, and turns the rule off without either.
+   */
   readonly refresh?: ReactRefreshVariant | "auto" | false;
 };
 /**
-A React Refresh rule variant, which decides the exports that are allowed next to components.
-*/
+ * A React Refresh rule variant, which decides the exports that are allowed next to components.
+ */
 type ReactRefreshVariant = "generic" | "next" | "vite";
 /**
-An option of a rule with generated types: its options object, or one entry of a rule that accepts a list of options objects.
-*/
+ * An option of a rule with generated types: its options object, or one entry of a rule that accepts a list of options objects.
+ */
 type RuleOptionOf<RuleId extends keyof RuleOptions> =
   RuleOptionsOf<RuleId>[number];
 /**
-The options that follow the severity in the settings of a rule with generated types.
-*/
+ * The options that follow the severity in the settings of a rule with generated types.
+ */
 type RuleOptionsOf<RuleId extends keyof RuleOptions> =
   NonNullable<RuleOptions[RuleId]> extends Linter.RuleEntry<infer OptionList>
     ? OptionList
     : never;
 /**
-Rule settings by rule ID. Rules of the bundled plugins are checked against their option schemas; any other rule ID is accepted, for plugins added in user configs.
-*/
+ * Rule settings by rule ID. Rules of the bundled plugins are checked against their option schemas; any other rule ID is accepted, for plugins added in user configs.
+ */
 type Rules = Record<string, Linter.RuleEntry | undefined> & RuleOptions;
 /**
-Files that the parser reads with type information and that receive type-aware rules, within the files that the TypeScript feature parses and without Svelte components. Each nested array is a set of patterns that a file must all match. The scope has no ignore list: ESLint reads one in order, so the ignores of a block that takes the scope could bring back a file that it leaves out.
-*/
+ * Files that the parser reads with type information and that receive type-aware rules, within the files that the TypeScript feature parses and without Svelte components. Each nested array is a set of patterns that a file must all match. The scope has no ignore list: ESLint reads one in order, so the ignores of a block that takes the scope could bring back a file that it leaves out.
+ */
 type TypeAwareScope = ReadonlyArray<string | readonly string[]>;
 /**
-Options of the `typescript` feature.
-*/
+ * Options of the `typescript` feature.
+ */
 type TypeScriptOptions = FeatureOptions & {
   /**
-  File patterns to lint with type information and type-aware rules, instead of every file of the
-  feature. They match only TypeScript files that the feature lints, so a directory such as
-  `src/**` is enough. Other TypeScript files are linted without type information.
-  */
+   * File patterns to lint with type information and type-aware rules, instead of every file of the
+   * feature. They match only TypeScript files that the feature lints, so a directory such as
+   * `src/**` is enough. Other TypeScript files are linted without type information.
+   */
   readonly filesTypeAware?: readonly string[];
   /**
-  File patterns to lint without type information and type-aware rules, such as scripts that no tsconfig includes.
-  */
+   * File patterns to lint without type information and type-aware rules, such as scripts that no tsconfig includes.
+   */
   readonly ignoresTypeAware?: readonly string[];
   /**
-  Rule settings for the files that typed linting covers, applied after the type-aware rules and
-  after `overrides`.
-  */
+   * Rule settings for the files that typed linting covers, applied after the type-aware rules and
+   * after `overrides`.
+   */
   readonly overridesTypeAware?: Rules;
   /**
-  The directory that holds `tsconfig.json`. Defaults to `projectRootDirectory`. A relative path
-  is resolved from the working directory, not from `projectRootDirectory`.
-  */
+   * The directory that holds `tsconfig.json`. Defaults to `projectRootDirectory`. A relative path
+   * is resolved from the working directory, not from `projectRootDirectory`.
+   */
   readonly tsconfigRootDir?: string;
   /**
-  Whether to lint with type information, which typescript-eslint reads from the nearest
-  `tsconfig.json` of each file. Defaults to `true`. `false` turns off the rules that need it.
-  */
+   * Whether to lint with type information, which typescript-eslint reads from the nearest
+   * `tsconfig.json` of each file. Defaults to `true`. `false` turns off the rules that need it.
+   */
   readonly typeChecked?: boolean;
 };
 

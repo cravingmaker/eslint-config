@@ -21,9 +21,11 @@ const compareText = (left: string, right: string): number => {
   }
   return left > right ? 1 : 0;
 };
+
 const isRecord = (value: unknown): value is UnknownRecord => {
   return typeof value === "object" && value !== null;
 };
+
 const describeGlobals = (globals: unknown): string => {
   if (!isRecord(globals)) {
     return String(globals);
@@ -37,6 +39,7 @@ const describeGlobals = (globals: unknown): string => {
     })
     .join(" ");
 };
+
 const describeParser = (parser: unknown): string => {
   if (!isRecord(parser)) {
     return "[Parser unnamed]";
@@ -45,6 +48,7 @@ const describeParser = (parser: unknown): string => {
   const name = isRecord(parser.meta) ? parser.meta.name : parser.name;
   return `[Parser ${typeof name === "string" ? name : "unnamed"}]`;
 };
+
 const isParser = (value: unknown): boolean => {
   return (
     isRecord(value) &&
@@ -52,6 +56,7 @@ const isParser = (value: unknown): boolean => {
       typeof value.parse === "function")
   );
 };
+
 const stringifyPrimitive = (
   value: unknown,
   rootDirectory: string,
@@ -75,9 +80,10 @@ const stringifyPrimitive = (
   }
   return typeof value === "undefined" ? "null" : false;
 };
+
 /**
-Serializes a config value as stable JSON text, retaining non-JSON values and sorted keys.
-*/
+ * Serializes a config value as stable JSON text, retaining non-JSON values and sorted keys.
+ */
 const stringify = (
   value: unknown,
   rootDirectory: string,
@@ -118,6 +124,7 @@ const stringify = (
     });
   return `{${properties.join(",")}}`;
 };
+
 const describeRule = (
   ruleId: string,
   entry: readonly unknown[],
@@ -132,6 +139,7 @@ const describeRule = (
     ? description
     : `${description} ${stringify(options, rootDirectory)}`;
 };
+
 const describeSection = (
   title: string,
   value: unknown,
@@ -151,10 +159,11 @@ const describeSection = (
       }),
   ];
 };
+
 /**
-Describes the configuration ESLint resolves for `filePath` as reviewable text:
-one line per rule with its severity and options, preceded by the language settings that decide how the file is parsed.
-*/
+ * Describes the configuration ESLint resolves for `filePath` as reviewable text:
+ * one line per rule with its severity and options, preceded by the language settings that decide how the file is parsed.
+ */
 const describeEffectiveConfig = async (
   eslint: ESLint,
   filePath: string,
@@ -203,4 +212,5 @@ const describeEffectiveConfig = async (
     "",
   ].join("\n");
 };
+
 export { describeEffectiveConfig };
