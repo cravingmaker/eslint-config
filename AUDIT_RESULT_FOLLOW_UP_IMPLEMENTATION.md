@@ -1924,6 +1924,8 @@ contracts still require preservation and later review.
   lockfile match the entry commit exactly. CI's separate `release:check`
   audit gate may fail for these findings; dependency upgrades are outside
   Stage 8. This does not change the passing `npm run validate` result.
+  The subsequent maintainer-requested CI follow-up below resolves this audit
+  limitation with a separate dependency commit.
 - **Retained exceptions/upstream conditions:** Earlier stages' temporary
   exclusions, compatibility guards, and Security suppression inventory remain
   unchanged. Source-map omission is the final D15 choice, with no upstream
@@ -1940,3 +1942,59 @@ contracts still require preservation and later review.
 - **PR/CI:** Commit and PR requested after local completion; remote CI has not
   been evaluated in this record. The unchanged dependency-audit limitation
   above must be distinguished from local Stage 8 validation.
+
+##### Stage 8 CI follow-up — patched Vitest
+
+- **Status/date:** Local remediation validated, 22 October 2026; the new remote
+  CI run remains to be verified after pushing the follow-up commit.
+- **Entry commit:** `fe5fa5243c9c70fc2a5533750492448a57bbd0ae`; the worktree
+  was clean. The maintainer requested investigation and repair of PR #134's
+  failed CI after the original Stage 8 delivery. This follow-up extends that
+  request to the two affected development dependencies; no Stage 9 work is
+  included. The dependency fix and this record are uncommitted at validation.
+- **Failure and fix:** Both Node jobs in
+  [CI run 39693715028](https://github.com/cravingmaker/eslint-config/actions/runs/39693715028)
+  stopped at `npm audit --audit-level=low`, before tests, for
+  [GHSA-p458-7748-mcp3](https://github.com/advisories/GHSA-p458-7748-mcp3).
+  `npm run release:check` reproduced the same two moderate findings locally.
+  Exact `vitest` and `@vitest/ui` pins move together from 5.0.3 to the patched
+  5.0.5. Four internal Vitest packages follow that version, and the required
+  `obug` 3.0.0 is deduplicated with the existing build-tool copies. All nine
+  changed lockfile paths belong to development packages. Runtime dependencies,
+  public peers/exports, rules, source-map settings, tests, scripts, workflows,
+  hooks, and audit thresholds remain unchanged.
+- **Compatibility/cooldown review:**
+  [DEPENDENCY_REVIEW.md](DEPENDENCY_REVIEW.md) records applied versions, the
+  intervening release changes, supported Node/Vite ranges, and the reviewed
+  security exception. An ordinary temporary install first reproduced the
+  seven-day cutoff's `ETARGET`. A one-time command-line release-age exclusion
+  selected exactly the six Vitest package names for the reviewed 5.0.5 update;
+  `.npmrc` remains `min-release-age=7` with no persistent exclusions. Fresh
+  `npm ci --ignore-scripts` installations of the resulting lockfile passed
+  without exceptions on Node 24.15.0/npm 11.12.1 and Node 26.12.0/npm 11.20.0,
+  each with zero audit findings. The project install and
+  `npm audit --audit-level=low` also passed normally on Node 24.22.0/npm 11.19.1.
+- **Targeted verification:**
+  `npx vitest run tests/vitest-watch.test.ts tests/package/contract.test.ts`
+  passed **2 files / 8 tests** on each CI runtime (24.15.0 and 26.12.0).
+  A temporary localhost UI probe using `createVitest()` authenticated normally,
+  served the UI with HTTP 200, and rejected synthetic `.env` and
+  `.vitest-secret-token` files with HTTP 403 without returning their fixture
+  contents. The server and fixture directory were closed/removed afterward.
+- **Release validation:** On Node 24.22.0, `npm run release:check` passed its
+  unchanged low-threshold audit with **zero findings**, full validation with
+  **71 files / 2,715 tests**, Publint, ATTW's ESM profile, and dry-run packing
+  of the expected five package files. The test phase took **438.13 seconds**.
+  Commands retain `NODE_OPTIONS=--max-old-space-size=4096`,
+  `VITEST_MAX_WORKERS=1`, and `UV_THREADPOOL_SIZE=16`. No test assertion or
+  timeout was changed. Final documentation/manifest lint follows this record.
+- **Policy/artifacts:**
+  `npm run policy:diff -- --base fe5fa5243c9c70fc2a5533750492448a57bbd0ae`
+  reports **all 33 snapshots unchanged** and exactly the nine reviewed
+  development-package path changes. An independent scope check rejects any
+  other manifest/lockfile change. Both emitted bundles match the captured
+  pre-fix build byte for byte, with only `index.mjs` and `index.d.mts` in
+  `dist/` and no map reference. The accepted Stage 8 artifact policy is intact.
+- **Delivery/CI:** The fix is delivered as a separate dependency commit on
+  PR #134. Local release readiness is green; the previous failed run is not
+  treated as evidence for the new commit. Remote CI must be reported separately.
