@@ -144,11 +144,10 @@ const strictTypeAwareRules: Rules = {
 
 // Typescript-eslint's stylistic rules that need type information.
 const stylisticTypeAwareRules: Rules = {
-  // --- Rules with default options (5/7) -----------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (4/7) -----------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/non-nullable-type-assertion-style": "error", // Automatically fixable by the --fix command.
   "@typescript-eslint/prefer-find": "error", // Manually fixable by editor suggestions.
   "@typescript-eslint/prefer-includes": "error", // Automatically fixable by the --fix command.
-  "@typescript-eslint/prefer-regexp-exec": "error", // Automatically fixable by the --fix command.
   "@typescript-eslint/prefer-string-starts-ends-with": [
     "error",
     { allowSingleElementEquality: "never" },
@@ -185,6 +184,11 @@ const stylisticTypeAwareRules: Rules = {
       requireNullish: true,
     },
   ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
+
+  // --- Turned off rules (1/7) ---------------------------------------------------------------------------------------------------------------------.
+  // Temporarily disabled: this autofix can change results when RegExp inherits global flags.
+  // Prefer manual review with `regexp/prefer-regexp-exec`; computed-access reports are not fully covered.
+  "@typescript-eslint/prefer-regexp-exec": "off", // Automatically fixable by the --fix command.
 } as const;
 
 // The other typescript-eslint rules that need type information.
@@ -307,7 +311,9 @@ const typescriptTypeAwareRulesOff: Rules = {
   "@typescript-eslint/prefer-readonly": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
   "@typescript-eslint/prefer-readonly-parameter-types": "off", // Requires type information; enabled only in the type-aware scope.
   "@typescript-eslint/prefer-reduce-type-parameter": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/prefer-regexp-exec": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
+  // Temporarily disabled: this autofix can change results when RegExp inherits global flags.
+  // Prefer manual review with `regexp/prefer-regexp-exec`; computed-access reports are not fully covered.
+  "@typescript-eslint/prefer-regexp-exec": "off", // Consumer enablement requires type information. Automatically fixable by the --fix command.
   "@typescript-eslint/prefer-return-this-type": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
   "@typescript-eslint/prefer-string-starts-ends-with": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
   "@typescript-eslint/promise-function-async": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.

@@ -821,12 +821,20 @@ The reference that the recipes link to, grouped by topic.
   object spread replaces the whole entry instead. This is why moving a
   rule between blocks can change a snapshot line even when the rule stays
   off.
-- **Rule ownership is static.** Every overlap has an enabled winner and an
+- **Rule ownership is static.** Every replacement has an enabled winner and an
   explicitly disabled alternative in the owning rule maps. A `Handled by`
-  comment names the winner. Disabling or narrowing a feature never enables
-  an alternative. A consumer can still explicitly enable one through its
-  feature overrides or a user config. Tests in `tests/policy/overlaps.test.ts`
+  comment names the winner; reviewed complementary checks retain reciprocal
+  `Complemented by` comments and their distinct coverage. Disabling or narrowing
+  a feature never enables an alternative. A consumer can still explicitly enable
+  one through its feature overrides or a user config. Tests in `tests/policy/overlaps.test.ts`
   verify enabled, disabled, narrowed, ignored, Svelte, and override cases.
+  `tests/policy/rule-ownership.test.ts` also checks D8's unique cases, overlaps,
+  negative controls, typed guards, and manual-fix boundaries through the public
+  factory. Buffer constructor conversion must preserve encoding, coercion, and
+  shared memory. Keep TypeScript's execution preference scalar off in both
+  maps until inherited global flags, match/exec arrays, computed access, and
+  repeated fixes are verified against a corrected dependency combination.
+  RegExp preference reports still require manual review of unknown flags.
 - **The formatter test guards layout.**
   `tests/policy/formatter.test.ts` fails when a rule that
   `eslint-config-prettier` turns off is on, apart from its listed

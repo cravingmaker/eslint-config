@@ -353,7 +353,7 @@ semicolon rules, so consumers can choose Prettier options such as `useTabs`,
 rules are explicitly off. Other disabled layout rules include:
 
 - `no-unexpected-multiline`.
-- `unicorn/empty-brace-spaces`, `unicorn/number-literal-case`, and `unicorn/no-nested-ternary`. Core `no-nested-ternary` is on instead: it reports every nested ternary, and it has no fix for Prettier to undo.
+- `unicorn/empty-brace-spaces`, `unicorn/number-literal-case`, and `unicorn/no-nested-ternary`. Core `no-nested-ternary` reports directly nested result branches and has no fix for Prettier to undo. Conditional-position nesting is outside its coverage.
 - The layout rules of @html-eslint: `attrs-newline`, `class-spacing`, `element-newline`, `indent`, `no-extra-spacing-tags`, `no-extra-spacing-text`, `no-multiple-empty-lines`, `no-trailing-spaces`, and `quotes`.
 
 `unicorn/template-indent` checks templates tagged `outdent`, `dedent`, `sql`, or `styled`, the arguments of `dedent` and `stripIndent`, and templates after an `/* indent */` comment. It leaves out `gql` and `html` templates and those after an `/* HTML */` comment, which Prettier formats.
@@ -425,15 +425,17 @@ multiline documentation after the imports is accepted.
 
 ## Rules that replace other rules
 
-Each overlapping check has a fixed owner. The winning rule is enabled in its
-own rule map, and its alternatives are explicitly `"off"`, with a `Handled by`
-comment naming the winner. There are no dynamic overlap or fallback blocks.
+Each replacement has a fixed owner. The winning rule is enabled in its own
+rule map, and its alternatives are explicitly `"off"`, with a `Handled by`
+comment naming the winner. Reviewed complementary checks remain enabled when
+their coverage differs, even where both report. There are no dynamic overlap
+or fallback blocks.
 
 | Winning feature | Rules left off in other features                                                                                                                                                                                                                         |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `imports`       | `no-duplicate-imports`, `n/file-extension-in-import`, `n/no-extraneous-import`, `n/no-missing-import`                                                                                                                                                    |
 | `perfectionist` | `sort-imports`, `sort-keys`, `import-x/first`, `import-x/order`, `@typescript-eslint/adjacent-overload-signatures`, `@typescript-eslint/member-ordering`                                                                                                 |
-| `regexp`        | `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                                                                                                                                                                              |
+| `regexp`        | `no-control-regex`, `no-empty-character-class`, `no-invalid-regexp`, `no-useless-backreference`                                                                                                                                                          |
 | `unicorn`       | `no-negated-condition`, `no-warning-comments`, `n/no-process-exit`, `n/prefer-node-protocol`                                                                                                                                                             |
 | `unusedImports` | `no-unused-vars`, `@typescript-eslint/no-unused-vars`                                                                                                                                                                                                    |
 | `javascript`    | `perfectionist/sort-variable-declarations`, `regexp/prefer-named-capture-group`, `unicorn/consistent-arrow-return-style`, `unicorn/logical-assignment-operators`, `unicorn/no-typeof-undefined`, `unicorn/operator-assignment`, `unicorn/try-complexity` |
@@ -443,6 +445,48 @@ its alternatives off. The check is absent in those files unless a consumer
 explicitly enables another rule through the owning feature's overrides or a
 user config. Disabled rules do not need options; provide the desired options
 when enabling one. Type-aware overrides still apply only in the typed scope.
+
+Core `eqeqeq` owns strict comparisons, including null, so `no-eq-null` is off.
+Core `no-eval` retains `allowIndirect: false`, including optional and indirect
+eval calls; `security/detect-eval-with-expression` is off. Core
+`no-nested-ternary` owns nested result branches, including irreducible ones;
+`unicorn/no-unnecessary-nested-ternary` is off and its automatic simplification
+is no longer offered. Neither rule covered every conditional-position nesting.
+
+`no-restricted-syntax` rejects direct `new Buffer(...)` with `Use Uint8Array
+instead.`, including nonliteral arguments and dynamically imported bindings named
+`Buffer`. The global, static-import, TypeScript-type, and Node deprecation checks
+remain enabled. Unicorn's constructor autofixes conflict with the Uint8Array
+policy, so `unicorn/no-new-buffer` and `security/detect-new-buffer` are off.
+The selector matches the callee name, including local classes; aliases and
+global-property constructors are outside this selector. Convert manually to
+preserve encoding, coercion, and shared-memory behavior.
+
+These complementary checks retain their existing severities, options, and
+typed scopes:
+
+| Checks                                                          | Distinct coverage                                                                                                                                                                        |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Core and RegExp `no-useless-escape`                             | Strings, templates, and additional literals complement RegExp constructor patterns.                                                                                                      |
+| RegExp backtracking and movement; Security unsafe-regex warning | Specific analyses complement heuristic warnings, including bounded nested repetitions. A report is a review signal, not proof of vulnerability.                                          |
+| Unicorn and Promise await preferences                           | Awaited, yielded, constructor, top-level, and computed chains complement void-discarded function chains and method-name heuristics. Promise keeps `strict: false`.                       |
+| Unicorn and TypeScript sort comparators                         | String arrays, explicit undefined comparators, and untyped files complement typed computed and optional calls. TypeScript keeps `ignoreStringArrays: true`; typed arrays remain allowed. |
+| Core Unicode flags and SonarJS Unicode analysis                 | General literal/constructor flag enforcement complements typed implicit string patterns. Either `u` or `v` is allowed.                                                                   |
+| Core default branches and TypeScript exhaustiveness             | Untyped fallback intent complements typed empty switches, missing union/enum cases, and exact lowercase `no default` markers. A default does not excuse missing union cases.             |
+
+RegExp owns control-character checking. Turning off core `no-control-regex`
+intentionally permits constructor string escapes such as `"\t"` and `"\n"`;
+the RegExp rule still reports disallowed control patterns and constant expressions.
+
+`regexp/prefer-regexp-exec` remains active for manual review.
+`@typescript-eslint/prefer-regexp-exec` is temporarily off in both typed and
+untyped maps: its autofix can change all-match arrays when `new RegExp(source)`
+inherits `g`. SonarJS's counterpart stays off. Computed-access preference reports
+are intentionally lost until a corrected TypeScript rule is verified against
+inherited flags, match/exec arrays, computed access, and repeated fixes. RegExp
+can report unknown flags without a safe rewrite; preserve intentional global
+matches. Await preferences also require review of detached work and constructor
+initialization, and adding Unicode flags can change matching semantics.
 
 TypeScript compiler checks and extension rules keep their language-specific
 ownership in the TypeScript rule maps. These entries apply only in TypeScript
@@ -634,7 +678,7 @@ export default createConfig({
 - **React Refresh.** In 0.1.0, React Refresh used the generic variant without Next.js or Vite. Now it is off; `react: { refresh: "generic" }` turns it back on.
 - **React hooks.** In 0.1.0, the hooks rules applied to JSX and TSX files only. Now they apply to every source, so a custom hook in a `.js` or `.ts` file is checked, and so is any function there whose name makes it a hook.
 - **Svelte components.** In 0.1.0, components got only the rules of @html-eslint/eslint-plugin-svelte. Now their scripts get the rules of TypeScript sources, as described in [Svelte](#svelte).
-- **Formatting.** The nine HTML layout rules and `unicorn/empty-brace-spaces`, `unicorn/number-literal-case`, and `unicorn/no-nested-ternary` are off. Core `no-nested-ternary` is on, and reports every nested ternary, also those that unicorn allowed with parentheses. `unicorn/template-indent` no longer checks `gql` and `html` templates, or those after an `/* HTML */` comment.
+- **Formatting.** The nine HTML layout rules and `unicorn/empty-brace-spaces`, `unicorn/number-literal-case`, and `unicorn/no-nested-ternary` are off. Core `no-nested-ternary` reports directly nested result branches, including chained ternaries; it does not cover conditional-position nesting. `unicorn/template-indent` no longer checks `gql` and `html` templates, or those after an `/* HTML */` comment.
 - **Exceptions.** The [file-role exceptions](#file-role-exceptions) are new.
 - **Parameter immutability.** With typed linting, `functional/prefer-immutable-types` now requires parameters to be shallowly readonly instead of deeply readonly.
 - **Block names.** The config is made of more blocks than before, named `@cravingmaker/eslint-config/<feature>/<part>`. Code that finds blocks in the returned array by name needs the new names.

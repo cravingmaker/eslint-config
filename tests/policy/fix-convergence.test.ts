@@ -669,12 +669,27 @@ describe("harness controls", () => {
     },
     30_000,
   );
-  it("D8.1 / Stage 5: detects unapproved equality reports with nested, unequal ranges", () => {
+  it("D8.1: gives strict null comparisons one diagnostic owner", () => {
     const messages = selectReports(getTrace("unapproved-equality.js"), [
       "eqeqeq",
       "no-eq-null",
     ]);
     const overlaps = reportOverlaps(messages);
+    expect(messages).toEqual([expect.objectContaining({ ruleId: "eqeqeq" })]);
+    expect(overlaps).toEqual([]);
+    expect(convergenceProblems(getTrace("unapproved-equality.js"))).toEqual([]);
+  });
+  it("detects unapproved nested, unequal ranges independently of resolved ownership", () => {
+    const [message] = selectReports(getTrace("unapproved-equality.js"), [
+      "eqeqeq",
+    ]);
+    const nested = {
+      ...message,
+      column: message.column - 1,
+      endColumn: (message.endColumn ?? message.column + 2) + 1,
+      ruleId: "control/nested",
+    };
+    const overlaps = reportOverlaps([message, nested]);
     expect(overlaps).toHaveLength(1);
     expect(overlaps[0]?.ranges[0]).not.toEqual(overlaps[0]?.ranges[1]);
     expect(unapprovedOverlaps("unapproved-equality", overlaps)).toEqual(
