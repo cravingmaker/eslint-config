@@ -20,9 +20,9 @@
     "type": "git",
     "url": "git+https://github.com/cravingmaker/eslint-config.git"
   },
+  "funding": "https://github.com/sponsors/cravingmaker",
   "license": "MIT",
   "author": "cravingmaker (https://github.com/cravingmaker)",
-  "funding": "https://github.com/sponsors/cravingmaker",
   "sideEffects": false,
   "type": "module",
   "exports": {
