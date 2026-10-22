@@ -108,20 +108,4 @@ const nodeRules: Rules = {
   ...otherRules, // 29/43 rules, 3 automatically fixable, 0 editor suggestions fixable.
 } as const;
 
-// Rules requiring type information stay off in TypeScript files outside typed linting.
-const typescriptRulesOff: Rules = {
-  // --- Turned off rules (1/1) ---------------------------------------------------------------------------------------------------------------------.
-  "n/no-sync": "off", // Requires type information; enabled only in the type-aware scope.
-} as const;
-
-// The rules that need type information in TypeScript files.
-const typeAwareRules: Rules = {
-  // --- Rules with overridden options (1/1) --------------------------------------------------------------------------------------------------------.
-  "n/no-sync": nodeRules["n/no-sync"],
-} as const;
-
-export {
-  nodeRules,
-  typeAwareRules, // 1 rule, 0 automatically fixable, 0 editor suggestions fixable.
-  typescriptRulesOff, // 1 rule, 0 automatically fixable, 0 editor suggestions fixable.
-};
+export { nodeRules };

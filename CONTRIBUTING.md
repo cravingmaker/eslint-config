@@ -85,15 +85,21 @@ Use a conventional pull request title, such as `fix: ...`, `test: ...`, or
 `docs: ...`. Describe the problem and resulting behavior, including
 before/after examples when lint diagnostics or fixes change.
 
-Add relevant regression tests for behavior changes. The tests for a
-feature live in `tests/configs/`, in the file named after its module in
-`src/configs/`. For configuration or plugin changes, exercise packed
-consumers in `tests/package/` as well.
+Add relevant regression tests for behavior changes. A feature's builder suite
+follows its source path, such as `tests/configs/plugins/node/index.test.ts`
+for `src/configs/plugins/node/index.ts`. For configuration or plugin changes,
+exercise packed consumers in `tests/package/` as well.
 
 ## How the configuration is built
 
 `src/index.ts` exports `createConfig()` from `src/factory.ts` and the
 public types from `src/types.ts`. Everything else is internal.
+Authored dependency declarations belong in `src/ambient/`, separate from those
+public types and the generated rule-option declarations in `src/typegen.d.ts`.
+Keep an ambient module declaration free of top-level imports and exports so it
+declares the dependency rather than augmenting an existing module. The recursive
+TypeScript include discovers these files without a custom `typeRoots` setting.
+
 `createConfig(options, ...userConfigs)` works in this order:
 
 1. `src/unknown-options.ts` rejects an option name that it does not
@@ -116,6 +122,9 @@ public types from `src/types.ts`. Everything else is internal.
    owning rule module. Upstream categories have named modules under `rules/`,
    as in `core/rules/possible-problems.ts`;
    features without official categories keep their policy in `rules.ts`.
+   Feature folders use the feature-facing name, such as `imports/`, while
+   dependency names, plugin namespaces, and rule IDs retain `import-x`.
+   The established `core/` owner of `javascript` remains deliberate.
    A categorized feature's `rules.ts` composes its category maps. Rule maps
    use the `Rules` type, `as const` for object literals, and named exports.
    The `packageJson` option composes two plugin builders, in separate
@@ -172,12 +181,19 @@ The builders share these modules:
 | `src/utilities/plugin-policy.ts` | Limits the explicit framework policy to rules and option fields supported by an installed optional peer      |
 | `src/typegen.d.ts`               | The rule option types, which `npm run gen` generates and which are not committed                             |
 
-The tests follow the sources: `tests/configs/` has a file for each
-module of `src/configs/`, `tests/factory/` tests `createConfig()` and
-its options, `tests/policy/` the effective policy, `tests/scripts/` the
-scripts in `scripts/`, and `tests/package/` the packed package in
-temporary consumers. Many of them load the build, so build first, as
-[Builds and tests](#builds-and-tests) explains.
+Dedicated suites follow their source owners: feature builders have
+`tests/configs/plugins/<feature>/index.test.ts`, core category suites live in
+`tests/configs/core/rules/`, and production utility suites live in
+`tests/utilities/`. Purpose-named feature integration suites, such as Svelte's
+`scripts.test.ts`, stay with their feature. `tests/factory/` tests `createConfig()`
+and its options; `tests/policy/` owns cross-feature behavior, including the shared
+twelve-feature builder contract and typed-scope integration. `tests/scripts/`
+tests scripts, including type generation, and `tests/package/` exercises the
+packed package in temporary consumers. Shared lint assertions and effective-file
+descriptions belong in `tests/support/`.
+Add tests for behavior rather than requiring one suite for every source leaf.
+Many suites load the build, so build first, as [Builds and tests](#builds-and-tests)
+explains.
 
 ### Where a rule is declared
 
@@ -199,7 +215,16 @@ End comment text, including headings and directive explanations, with a period.
 Review these comments when updating dependencies. Compatibility filtering,
 typed-rule suppression, and user overrides do not choose the authored groups.
 The package-json feature follows the upstream README's Require Properties
-and Valid Properties categories; its remaining rules are in `other-rules.ts`.
+and Valid Properties categories; its remaining rules are in `rules/other.ts`,
+as Unicorn's are. Keep official category names such as `no-other-paradigms.ts`.
+React deliberately treats the upstream `Best Practice` and `Best Practices`
+labels as one local category in `html-best-practice.ts`. Its nine entries keep
+the original composition order, with duplicate-classname first; the stylistic,
+Hooks, and Refresh policies remain separate.
+Node's `rules-type-aware.ts` owns the TypeScript-specific off and typed
+reactivation maps, referencing the single `n/no-sync` tuple in `rules.ts`.
+JavaScript keeps that base policy; untyped TypeScript and components keep the
+guard that turns it off.
 The table lists each feature's policy entry points:
 
 | Rule ID prefix                                          | Feature         | Policy modules                                                                                                           |
@@ -207,10 +232,10 @@ The table lists each feature's policy entry points:
 | None: ESLint core rules                                 | `javascript`    | `src/configs/core/rules.ts`, its category modules in `core/rules/`, and `src/configs/plugins/typescript/replacements.ts` |
 | `@typescript-eslint/`                                   | `typescript`    | `src/configs/plugins/typescript/rules.ts`, `rules-type-aware.ts`, and `replacements.ts`                                  |
 | `@eslint-community/eslint-comments/`                    | `comments`      | `src/configs/plugins/comments/rules.ts`                                                                                  |
-| `n/`                                                    | `node`          | `src/configs/plugins/node/rules.ts`                                                                                      |
+| `n/`                                                    | `node`          | `src/configs/plugins/node/rules.ts` and `rules-type-aware.ts`                                                            |
 | `security/`                                             | `security`      | `src/configs/plugins/security/rules.ts`                                                                                  |
 | `sonarjs/`                                              | `sonarjs`       | `src/configs/plugins/sonarjs/rules.ts` and `rules-type-aware.ts`                                                         |
-| `import-x/`                                             | `imports`       | `src/configs/plugins/import-x/rules.ts`                                                                                  |
+| `import-x/`                                             | `imports`       | `src/configs/plugins/imports/rules.ts`                                                                                   |
 | `unused-imports/`                                       | `unusedImports` | `src/configs/plugins/unused-imports/rules.ts`                                                                            |
 | `promise/`                                              | `promise`       | `src/configs/plugins/promise/rules.ts`                                                                                   |
 | `regexp/`                                               | `regexp`        | `src/configs/plugins/regexp/rules.ts`                                                                                    |
@@ -338,7 +363,7 @@ points of the order:
   turn back on a rule that a file-role exception turns off.
 
 `tests/factory/factory.test.ts` checks that user configs come last, and
-`tests/configs/exceptions.test.ts` that they can turn a rule back on.
+`tests/configs/exceptions/index.test.ts` that they can turn a rule back on.
 The README describes both to consumers, in "Feature values" and "User
 configs".
 
@@ -546,7 +571,7 @@ pull request, run the full [validation](#validation) as well.
 
    ```bash
    npm run build
-   npx vitest run tests/configs/unicorn.test.ts tests/policy
+   npx vitest run tests/configs/plugins/unicorn/index.test.ts tests/policy
    ```
 
 5. **Review the snapshots.** Without update mode, the snapshot test
@@ -740,7 +765,7 @@ Review each finding before removing code or adding an exception.
    which files `eslint .` lints" under [Files and blocks](#files-and-blocks).
 
 3. **Find the tests that prove its scope.**
-   `tests/configs/exceptions.test.ts` lists the paths that each role
+   `tests/configs/exceptions/index.test.ts` lists the paths that each role
    reaches and some that it leaves alone, and checks that the blocks
    make ESLint lint no other file, apply only while their feature is on,
    and come before the user configs. `tests/factory/factory.test.ts`
@@ -798,7 +823,7 @@ The reference that the recipes link to, grouped by topic.
   test needs a sample that the rule reports when it is on, or it cannot
   fail.
 - **Known parser and fix workarounds need composed regressions.**
-  `tests/configs/html.test.ts` preserves custom-element end tags and manual
+  `tests/configs/plugins/html/index.test.ts` preserves custom-element end tags and manual
   correction boundaries while keeping void-element fixes. The Markdown suite
   lints bracketed URL/email and shorthand-autolink cases through the public
   config, retaining unrelated diagnostics, GFM, front matter, math, and explicit
@@ -959,8 +984,8 @@ The reference that the recipes link to, grouped by topic.
   rules that need no type information sets
   `typescript: { typeChecked: false }`, or gives a builder a context with
   `typeAware: undefined`. A test of typed linting lints a file on disk,
-  as `tests/configs/typescript/rules.test.ts` does with
-  `tests/utilities.ts`.
+  as `tests/configs/plugins/typescript/rules.test.ts` does with
+  `tests/support/lint.ts`.
 - **Type information follows the type-aware scope.** Only
   `typescript/parser-type-aware` sets `projectService`, over
   `context.typeAware`, which stays within the files that
@@ -1138,7 +1163,7 @@ npm run test:package:ui -- --api.port=51205
 File and test-name filters also work with the UI:
 
 ```bash
-npm run test:ui -- tests/configs/unicorn.test.ts -t "filename-case"
+npm run test:ui -- tests/configs/plugins/unicorn/index.test.ts -t "filename-case"
 ```
 
 After editing `src/`, run `npm run build` in another terminal. The tests that

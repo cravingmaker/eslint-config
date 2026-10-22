@@ -132,7 +132,7 @@ migrations and supplies a verified baseline for each refactor.
 | 6     | Retained review signals and known parser/fix failures                     | D9, D10.1–D10.2, D11.1–D11.3     | 5          | Complete    |
 | 7     | Severity, deprecated entries/options, generated ignores, explicit updates | D12, D13.1–D13.2, D14, D19       | 6          | Complete    |
 | 8     | Source-map-free package                                                   | D15, R7                          | 7          | Complete    |
-| 9     | Source, test, and ambient declaration ownership                           | D18.1–D18.6, R11                 | 8          | Not started |
+| 9     | Source, test, and ambient declaration ownership                           | D18.1–D18.6, R11                 | 8          | Complete    |
 | 10    | Production utility/builder consolidation and Svelte negations             | R1, R2                           | 9          | Not started |
 | 11    | Derived disabled maps, shared test boundaries, local suppressions         | R3–R5                            | 10         | Not started |
 | 12    | Dead entries and consistent scripts/hooks                                 | R6, R8                           | 11         | Not started |
@@ -1998,3 +1998,129 @@ contracts still require preservation and later review.
 - **Delivery/CI:** The fix is delivered as a separate dependency commit on
   PR #134. Local release readiness is green; the previous failed run is not
   treated as evidence for the new commit. Remote CI must be reported separately.
+
+#### Stage 9 — source, test, and ambient declaration ownership
+
+- **Status/date:** Complete, 22 October 2026.
+- **Stage-entry commit:** `e82000143424c9fb4a513d30b058ce530492fbcc`.
+  The tree was clean on `cravingmaker/implement-stage-9`; a fresh fetch
+  confirmed that `origin/main` matched the completed Stage 8 baseline,
+  including its separately approved Vitest security follow-up.
+- **Implementation commit(s):** Uncommitted at validation; this implementation
+  and its handoff are delivered together.
+- **Decisions/findings covered:** D18.1–D18.6 = A; R11.
+- **Source ownership:** The six `import-x/` modules moved byte for byte to
+  `src/configs/plugins/imports/`; the factory and direct test imports now use
+  that feature-facing path. The dependency, plugin namespace, resolver settings,
+  public option, and rule IDs retain their existing names. Package JSON's
+  fallback map moved byte for byte to `rules/other.ts`. React's two upstream
+  best-practice label spellings now share the documented singular category,
+  retaining all nine entries, duplicate-classname's position, and both fixability
+  annotations. Its ten-entry composed HTML map keeps its original key order.
+  Node's two TypeScript-specific maps now live in `rules-type-aware.ts`,
+  importing the single base `n/no-sync` tuple from `rules.ts`. Builder imports
+  changed without changing JavaScript activation, the untyped TypeScript/
+  component guard, typed reactivation, overrides, or block order.
+- **Ambient ownership:** The Promise declaration moved to
+  `src/ambient/eslint-plugin-promise.d.ts`; its complete bytes, non-module
+  semantics, package name, and targeted suppression match the entry file.
+  Recursive compiler discovery, public `src/types.ts`, generated
+  `src/typegen.d.ts`, and package exports keep their existing contracts.
+- **Test ownership and current-tree adjustments:** Moved **37 existing suites**
+  and both shared helpers. This includes the nineteen flat plugin suites,
+  all four current TypeScript suites, the Svelte script suite, core category
+  suites, exceptions/ignores, utility/script suites, and policy integrations.
+  Compared with the audit's original thirty-three-suite proposal, the current
+  tree also has two later TypeScript regressions, Stage 7's ignore suite, and
+  the cross-feature function-layout suite; these follow their respective
+  plugin, ignore, and policy owners. The twelve-feature builder contract stays
+  together in `tests/policy/code-quality.test.ts`. Pure override-filter cases
+  and their three constants moved to `tests/utilities/type-aware.test.ts`;
+  temporary project creation and cleanup remain solely with the policy
+  integration. Both original describe bodies were compared exactly. An AST
+  comparison also preserved the other 36 moved suite bodies after accounting
+  only for physical imports, generated-file URLs, and disk-backed typed inputs.
+  Shared lint assertions retain their signatures, defaults, and implementation.
+- **Meaningful coverage:** The new Comments suite has three cases checking
+  missing explanations, unlimited disables, actual suppression, and an explained
+  next-line control that leaves a later debugger violation visible. Stage 7's
+  existing four ignore cases moved without duplication: they already exercise
+  root/nested outputs, retained sources, framework toggles, caller additions,
+  directory negation ordering, and the descendant re-inclusion boundary.
+- **Typed-input drift resolved:** An early four-suite run reproduced **22
+  parsing failures** because some `tests/utilities.ts` inputs actually depended
+  on that file's membership in the repository TypeScript project. Those
+  disk-backed inputs in six suites now use the moved `tests/support/lint.ts`.
+  Configuration-only virtual `tests/utilities.ts` samples remain unchanged.
+  No default-project fallback, compiler relaxation, placeholder source, or helper
+  API redesign was added.
+- **Watcher verification and retry:** Generated-type mappings and expectations
+  now target `tests/scripts/typegen.test.ts`; rebuilt-output discovery also
+  exercises a nested plugin suite and the moved support suite. Recursive
+  discovery, the five-package-suite classification, UI filters, fixture paths,
+  Knip entries, and existing timeouts remain intact. The first full validation
+  passed 72 suites but failed the regular watcher case. A focused repeat
+  reproduced delayed setup notifications being mixed into the first fixture
+  edit; diagnostic tracing identified a setup policy-report input as the
+  unexpected trigger. The isolated test server now uses polling to separate
+  setup from measured edits. Original EventTarget reporting, exact expected
+  file sets, rebuild checks, filters, and assertions remain in place; temporary
+  tracing was removed. Formatting/lint and **three consecutive two-test watcher
+  runs** passed before rerunning the complete validation.
+- **Runtime/setup:** Node.js **24.22.0**, npm **11.19.1**, ESLint **10.12.0**,
+  TypeScript **6.0.3**, and Vitest **5.0.5**. `npm ci`, `npm run prepare`, and
+  the entry build passed; installation reported zero vulnerabilities. Commands
+  used `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16`. No dependency, peer, compiler, build, script, hook,
+  or package-consumer fixture setting changed.
+- **Tests/commands:**
+  - Entry Node/React/ignore/watcher checks passed **4 files / 47 tests**.
+  - The post-migration targeted run passed **17 files / 883 tests**, covering
+    the owning features, Comments/ignores, typed scopes, source utilities,
+    shared assertions, type generation, and actual watcher cycles.
+  - The final `npm run validate` passed **73 files / 2,717 tests**; its test
+    phase took **620.03 seconds**. Formatting, build/generation, typecheck,
+    Knip, zero-warning repository lint, real/packed README and optional-peer
+    consumers, Publint, and ATTW's ESM profile passed. Broken-optional-peer
+    stderr is an intentional passing negative fixture. The count includes
+    three new Comments cases and one fewer generated deprecation-inventory
+    case because React's two category maps now have one owner; no rule
+    coverage or assertion was removed.
+  - Explicit changed-file ESLint initially found five import-order errors
+    caused by the new helper depths; automatic import sorting corrected them.
+    Final changed-file/documentation checks and `git diff --check` accompany
+    this handoff before the requested commit.
+- **Policy/snapshot delta:**
+  `npm run policy:diff -- --base e82000143424c9fb4a513d30b058ce530492fbcc`
+  reports **all 33 snapshots unchanged**, with unchanged locked packages.
+  Authored map/value/key-order comparisons passed for imports, Package JSON,
+  Node, and React; Node retains strict tuple identity. Default and all-feature
+  factory block orders match the captured entry build. Entry/current lint
+  probes retained Node's JavaScript, untyped TypeScript, and typed TypeScript
+  outcomes, plus React JSX/TSX duplicate-class diagnostics and fixes. The
+  cumulative report against `008a08207f28441297a2476b4798136aeb1023de` retains
+  **25 changed / 8 unchanged**, with no new, removed, or failed snapshots.
+  Its nine dependency-path differences are solely the Stage 8 Vitest follow-up;
+  Stage 9 adds no cumulative policy or dependency difference.
+- **Artifacts/consumer compatibility:** The emitted public declaration matches
+  the entry build byte for byte. Full consumer tests verify public imports,
+  generated rule types, optional-peer behavior, the five-file tarball, and the
+  source-map-free two-file dist inventory. Consumer policy, public options,
+  scopes, settings, namespace registration, and effective ordering are unchanged.
+  The dedicated advertised-minimum-peer CI matrix has not been run locally.
+- **Documentation/retained boundaries:** Contributor guidance now describes
+  source/test/support/ambient owners, the category alias/order exception,
+  typed Node ownership, and current commands/links. Historical audit evidence,
+  existing upstream workarounds and suppressions, fixtures, all snapshots,
+  and core/javascript versus packageJson/enforce-package-type ownership are
+  preserved. R4 helper redesign remains assigned to Stage 11.
+- **Unrelated work preserved:** The entry tree was clean; every changed file is
+  within this stage. Generated `dist/` and `src/typegen.d.ts` are excluded from
+  the commit. Temporary inspection artifacts stay outside the repository.
+- **Remaining work:** None within Stage 9; requested commit/push/PR delivery
+  follows this validation record.
+- **Next stage:** Stage 10, R1/R2: production utilities/builders and ordered
+  Svelte ignore negations, using the new imports/Node policy and utility/test
+  support paths. No Stage 10 behavior or consolidation is implemented here.
+- **PR/CI:** Local validation is complete; remote CI is not evaluated in this
+  record. The requested PR is created after committing and pushing this stage.

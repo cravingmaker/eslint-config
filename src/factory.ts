@@ -11,7 +11,7 @@ import { enforcePackageType } from "./configs/plugins/enforce-package-type/index
 import { express } from "./configs/plugins/express/index.js";
 import { functional } from "./configs/plugins/functional/index.js";
 import { html } from "./configs/plugins/html/index.js";
-import { imports } from "./configs/plugins/import-x/index.js";
+import { imports } from "./configs/plugins/imports/index.js";
 import { json } from "./configs/plugins/json/index.js";
 import { markdown } from "./configs/plugins/markdown/index.js";
 import { node } from "./configs/plugins/node/index.js";

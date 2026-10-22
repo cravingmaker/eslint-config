@@ -91,7 +91,7 @@ const samples = [
   },
   {
     at: "export const sum = (a: number, b: number, c: number, d: number) => { return a + b + c + d; };",
-    filePath: "tests/utilities.ts",
+    filePath: "tests/support/lint.ts",
     id: "@typescript-eslint/max-params",
     over: "export const sum = (a: number, b: number, c: number, d: number, e: number) => { return a + b + c + d + e; };",
   },
@@ -147,7 +147,7 @@ describe("quantitative maintainability limits", () => {
         engine.calculateConfigForFile("tests/utilities.ts"),
       ).resolves.toHaveProperty(["rules", "max-params", 0], 0);
       const [result] = await engine.lintText(samples[2].over, {
-        filePath: "tests/utilities.ts",
+        filePath: "tests/support/lint.ts",
       });
       expect(result.fatalErrorCount).toBe(0);
       expect(
@@ -180,7 +180,7 @@ describe("quantitative maintainability limits", () => {
     async ({ count, text }) => {
       const messages = await reports(
         text,
-        "tests/utilities.ts",
+        "tests/support/lint.ts",
         "@typescript-eslint/max-params",
       );
       expect(messages).toHaveLength(count);

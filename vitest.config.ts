@@ -35,7 +35,7 @@ export default defineConfig({
       {
         pattern: /(?:^|\/)src\/typegen\.d\.ts$/u,
         testsToRun: (_filename) => {
-          return "tests/typegen.test.ts";
+          return "tests/scripts/typegen.test.ts";
         },
       },
       {
