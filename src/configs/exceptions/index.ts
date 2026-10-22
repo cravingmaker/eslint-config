@@ -9,19 +9,12 @@ import { fileRoles } from "./rules.js";
 const exceptions = (
   options: ResolvedOptions = resolveOptions(),
 ): Linter.Config[] => {
+  const features = new Map(Object.entries(options));
   return Object.entries(fileRoles(options)).flatMap(
     ([role, { files, rules }]) => {
-      const ruleIds = [
-        ...(typeof options.functional === "undefined"
-          ? []
-          : (rules.functional ?? [])),
-        ...(typeof options.imports === "undefined"
-          ? []
-          : (rules.imports ?? [])),
-        ...(typeof options.unicorn === "undefined"
-          ? []
-          : (rules.unicorn ?? [])),
-      ];
+      const ruleIds = Object.entries(rules).flatMap(([feature, entries]) => {
+        return typeof features.get(feature) === "undefined" ? [] : entries;
+      });
 
       if (files.length === 0 || ruleIds.length === 0) {
         return [];

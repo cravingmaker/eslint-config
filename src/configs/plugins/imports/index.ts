@@ -5,38 +5,32 @@ import { createTypeScriptImportResolver } from "eslint-import-resolver-typescrip
 import pluginImportX, { createNodeResolver } from "eslint-plugin-import-x";
 
 import { defaultContext } from "../../../context.js";
-import {
-  sourceFiles,
-  typescriptFiles,
-  withSvelteComponents,
-} from "../../../globs.js";
+import { typescriptFiles, withSvelteComponents } from "../../../globs.js";
 import { importsRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
+import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
 // Builds the flat config for eslint-plugin-import-x. TypeScript files and Svelte components
 // within the feature's files resolve imports through the TypeScript resolver first, with the
 // project's tsconfig.
 const imports = (
   options: FeatureOptions = {},
-  { svelteComponents, tsconfigRootDir }: Context = defaultContext,
+  context: Context = defaultContext,
 ): Linter.Config[] => {
-  const { files, ignores = [], overrides = {} } = options;
+  const { files, ignores = [] } = options;
+  const { svelteComponents, tsconfigRootDir } = context;
   const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
 
   return [
-    {
-      name: "@cravingmaker/eslint-config/imports/setup",
-      plugins: { "import-x": pluginImportX },
-    },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/imports/rules",
-      rules: { ...importsRules, ...overrides },
-    },
+    ...sourcePluginConfigs(
+      {
+        name: "imports",
+        plugins: { "import-x": pluginImportX },
+        rules: importsRules,
+      },
+      options,
+      context,
+    ),
     {
       files: narrowFiles(
         withSvelteComponents(typescriptFiles, svelteComponents),

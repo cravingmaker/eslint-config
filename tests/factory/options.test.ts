@@ -311,12 +311,41 @@ describe("resolveOptions", () => {
         "!app/legacy/**",
       ],
     ]);
-    // A negated pattern cannot unignore a file, so such an ignore is left out.
+  });
+
+  it("restores Svelte components through ordered ignore negations", () => {
     expect(
       resolveOptions({
-        svelte: { ignores: ["**/generated/**", "!**/generated/Kept.svelte"] },
+        svelte: {
+          files: ["app/**", "shared/**"],
+          ignores: [
+            "**/generated/**",
+            "!**/generated/Kept*.svelte",
+            "**/KeptIgnored.svelte",
+          ],
+        },
       }).svelteComponents,
-    ).toEqual([["**/*.svelte", "!**/generated/**"]]);
+    ).toEqual([
+      ["**/*.svelte", "app/**", "!**/generated/**", "!**/KeptIgnored.svelte"],
+      [
+        "**/*.svelte",
+        "app/**",
+        "**/generated/Kept*.svelte",
+        "!**/KeptIgnored.svelte",
+      ],
+      [
+        "**/*.svelte",
+        "shared/**",
+        "!**/generated/**",
+        "!**/KeptIgnored.svelte",
+      ],
+      [
+        "**/*.svelte",
+        "shared/**",
+        "**/generated/Kept*.svelte",
+        "!**/KeptIgnored.svelte",
+      ],
+    ]);
   });
 
   it("has no TypeScript options or type-aware scope when TypeScript is off", () => {

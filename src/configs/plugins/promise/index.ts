@@ -3,34 +3,26 @@ import type { Context, FeatureOptions } from "../../../types.js";
 
 import pluginPromise from "eslint-plugin-promise";
 
-import { defaultContext } from "../../../context.js";
-import { sourceFiles, withSvelteComponents } from "../../../globs.js";
 import { promiseRules } from "./rules.js";
-import { narrowFiles } from "../../../utilities/file-scope.js";
+import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
 // Builds the flat config for eslint-plugin-promise.
 const promise = (
-  { files, ignores = [], overrides = {} }: FeatureOptions = {},
-  { svelteComponents }: Context = defaultContext,
+  options: FeatureOptions = {},
+  context?: Context,
 ): Linter.Config[] => {
-  return [
+  return sourcePluginConfigs(
     {
-      name: "@cravingmaker/eslint-config/promise/setup",
+      name: "promise",
       plugins: {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- eslint-plugin-promise does not have types.
         promise: pluginPromise,
       },
+      rules: promiseRules,
     },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/promise/rules",
-      rules: { ...promiseRules, ...overrides },
-    },
-  ];
+    options,
+    context,
+  );
 };
 
 export { promise };

@@ -271,6 +271,11 @@ Rune modules keep all four: their top level is module state that every importer 
 
 `svelte.files` and `svelte.ignores` also decide which components the other features lint. Only svelte-eslint-parser can read a component, so a component that the Svelte feature leaves out is not linted at all. Typed linting leaves components out too: they get neither type information nor the rules that need it.
 
+Ignore patterns apply in order. A negated pattern such as `!**/generated/Kept.svelte`
+restores the component's script rules and Svelte exceptions too, within
+`svelte.files` and each source feature's own scope. A later positive pattern can
+exclude it again.
+
 Prettier formats `.svelte` files only with [prettier-plugin-svelte](https://www.npmjs.com/package/prettier-plugin-svelte).
 
 ### Express

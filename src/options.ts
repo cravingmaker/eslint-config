@@ -145,21 +145,7 @@ const resolveSvelteComponents = (
     return [];
   }
   const { files, ignores = [] } = svelte;
-  // A file matches a negated pattern when it does not match the pattern. An ignore that starts
-  // with `!` unignores files, which an AND pattern cannot express, so it is left out, and the
-  // files that it unignores keep only the Svelte rules.
-  const excluded = ignores
-    .filter((pattern) => {
-      return !pattern.startsWith("!");
-    })
-    .map((pattern) => {
-      return `!${pattern}`;
-    });
-  return narrowFiles(svelteComponentFiles, files).map((entry) => {
-    return excluded.length === 0
-      ? entry
-      : [...(typeof entry === "string" ? [entry] : entry), ...excluded];
-  });
+  return withoutIgnores(narrowFiles(svelteComponentFiles, files), ignores);
 };
 
 /**

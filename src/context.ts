@@ -6,6 +6,7 @@ import path from "node:path";
 
 import { resolveOptions, resolveProjectRootDirectory } from "./options.js";
 import { rejectUnknownOptions } from "./unknown-options.js";
+import { isRecord } from "./utilities/is-record.js";
 
 type PreparedConfig = {
   readonly context: Context;
@@ -59,12 +60,6 @@ const detectFeatures = (dependencies: ReadonlySet<string>): Detection => {
     reactRefresh: detectReactRefreshVariant(dependencies),
     svelte: dependencies.has("svelte"),
   };
-};
-
-const isRecord = (
-  value: unknown,
-): value is Readonly<Record<string, unknown>> => {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 };
 
 /**

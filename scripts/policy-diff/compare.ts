@@ -1,5 +1,7 @@
 import { isDeepStrictEqual } from "node:util";
 
+import { isRecord } from "../../src/utilities/is-record.js";
+
 /**
  * A change between two descriptions: a setting, by its name, or a rule, by its ID. A side without a value has no such setting or rule.
  */
@@ -139,12 +141,6 @@ const isJsonList = (text: string): boolean => {
   } catch {
     return false;
   }
-};
-
-const isRecord = (
-  value: unknown,
-): value is Readonly<Record<string, unknown>> => {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 };
 
 /**
@@ -551,7 +547,6 @@ export {
   compareSnapshots,
   compareText,
   formatChanges,
-  isRecord,
   parseDescription,
   unionOfKeys,
 };

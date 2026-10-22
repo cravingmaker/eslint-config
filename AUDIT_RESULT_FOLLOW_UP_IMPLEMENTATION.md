@@ -133,7 +133,7 @@ migrations and supplies a verified baseline for each refactor.
 | 7     | Severity, deprecated entries/options, generated ignores, explicit updates | D12, D13.1–D13.2, D14, D19       | 6          | Complete    |
 | 8     | Source-map-free package                                                   | D15, R7                          | 7          | Complete    |
 | 9     | Source, test, and ambient declaration ownership                           | D18.1–D18.6, R11                 | 8          | Complete    |
-| 10    | Production utility/builder consolidation and Svelte negations             | R1, R2                           | 9          | Not started |
+| 10    | Production utility/builder consolidation and Svelte negations             | R1, R2                           | 9          | Complete    |
 | 11    | Derived disabled maps, shared test boundaries, local suppressions         | R3–R5                            | 10         | Not started |
 | 12    | Dead entries and consistent scripts/hooks                                 | R6, R8                           | 11         | Not started |
 | 13    | Documentation and source conventions                                      | R9, R10; D16, D17 retention      | 12         | Not started |
@@ -2122,5 +2122,115 @@ contracts still require preservation and later review.
 - **Next stage:** Stage 10, R1/R2: production utilities/builders and ordered
   Svelte ignore negations, using the new imports/Node policy and utility/test
   support paths. No Stage 10 behavior or consolidation is implemented here.
+- **PR/CI:** Local validation is complete; remote CI is not evaluated in this
+  record. The requested PR is created after committing and pushing this stage.
+
+#### Stage 10 — production utilities, builders, and Svelte ignore negations
+
+- **Status/date:** Complete, 22 October 2026.
+- **Stage-entry commit:** `cba23af137a75d901e564ba28367d4e21a8559cd`.
+  The tree was clean on `cravingmaker/implement-stage-10`; a fresh fetch
+  confirmed that `origin/main` matched the completed Stage 9 baseline.
+- **Implementation commit(s):** Uncommitted at validation; this implementation
+  and its handoff are delivered together.
+- **Decisions/findings covered:** R1, R2.
+- **Intentional behavior correction:** `resolveSvelteComponents` now uses
+  `withoutIgnores(narrowFiles(svelteComponentFiles, files), ignores)`.
+  A component restored by an ordered Svelte ignore negation receives the
+  JavaScript, TypeScript, and twelve source-plugin features again, within each
+  feature's own files/ignores, plus the existing component exceptions.
+  The parser still comes from the Svelte feature. Component scripts receive no
+  type information; their typed-only guards remain off. Later positive patterns
+  exclude a restored component again. The union of caller file patterns still
+  intersects the component extension; files outside that scope, genuinely
+  ignored components, rune modules, and unsupported suffix routes are preserved.
+- **Regression and corrected baseline:** The pre-change run failed the new
+  option-scope regression and both restored-component cases: only Svelte's ten
+  markup rules reached the restored files. After the correction, **3 files /
+  69 tests** passed. Coverage checks both caller directories, all twelve source
+  features, core/TypeScript policy and typed guards, component exceptions,
+  actual equality diagnostics, fix output versus an ordinary component, later
+  exclusions, unsupported `.svelte.mjs`/`.svelte.mts` parsers, narrower source
+  features, and a following consumer override. No expected-failure test or
+  snapshot update hides the original defect.
+- **Production consolidation:** `sourcePluginConfigs` owns the global setup
+  and scoped rules pair for Comments, Security, Unused Imports, Promise, RegExp,
+  Unicorn, Perfectionist, and Stylistic. Functional, SonarJS, Node, and Imports
+  use the same pair while retaining explicit typed guards/blocks and resolver
+  settings in their builders. Authored rule maps, internal plugin registration,
+  override filtering, block names/order, and optional-peer loading retain their
+  owners. Exceptions now iterate each role's existing feature map in declared
+  order, retaining enabled-owner guards, file intersections, and rule order.
+- **Guard comparison and retained boundary:** The current tree has seven
+  `isRecord` definitions versus the audit's historical six: Stage 7 also added
+  the deprecation inventory guard. The six guards in context, plugin policy,
+  policy comparison, README consumers, rule-option coverage, and deprecation
+  coverage share the dependency-free `src/utilities/is-record.ts`; the report
+  imports it directly rather than through the comparison module. The effective
+  serializer's existing guard also accepts arrays for section descriptions and
+  remains local, with an explanatory comment. Production imports no script,
+  test module, or optional peer through either new utility.
+- **Registration boundary retained:** Package JSON still registers
+  `package-json` and the internal plugin globally, while `enforce-package-type`
+  registers in its scoped rules block. These registrations differ outside the
+  feature, so they were not relocated for uniformity.
+- **Runtime/setup:** Node.js **24.22.0**, npm **11.19.1**; `npm ci`,
+  `npm run prepare`, the entry build, and type checking passed. Installation
+  reported zero vulnerabilities. Commands use
+  `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16`. Dependencies, peers, scripts, hooks, compiler
+  settings, generated types, and authored rule maps are unchanged.
+- **Tests/commands:** The post-consolidation targeted command covering
+  `tests/factory`, exceptions, Svelte, the twelve-feature contract, effective
+  policy, typed scopes, utilities, policy-report units/subprocesses, option
+  coverage, and deprecated rules passed **22 files / 612 tests** in
+  **84.85 seconds**. Explicit changed-file ESLint passed after import sorting,
+  ordinary automatic fixes, and an operation-level explanation for reading
+  calculated rules through fixed fixture IDs. Full `npm run validate` then
+  passed **73 files / 2,722 tests**; its test phase took **980.88 seconds**.
+  Formatting, build/generation, typecheck, Knip, zero-warning repository lint,
+  packed/installed README and optional-peer consumers, Publint, and ATTW's ESM
+  profile passed. Broken-optional-peer stderr is an intentional negative fixture.
+- **Final watcher follow-up:** The new guard is also read by the policy-report
+  subprocess. After full validation, an added filesystem-input case reproduced
+  the missing regular-UI rerun. Its explicit watch mapping now includes
+  `src/utilities/is-record.ts`. `npx vitest run tests/vitest-watch.test.ts`
+  passed **2 tests** in **8.80 seconds**, covering both UI scopes with the
+  original timeouts and exact expected rerun sets. Final formatting, typecheck,
+  Knip, whole-repository and changed-file lint accompany this handoff; the
+  pre-push hook reruns the complete test suite with the final mapping.
+- **Policy/snapshot delta:**
+  `npm run policy:diff -- --base cba23af137a75d901e564ba28367d4e21a8559cd`
+  reports **all 33 snapshots unchanged**, with unchanged locked packages.
+  Separate entry/corrected captures of five scenarios show changed effective
+  policy only for `app/generated/Kept.svelte` and
+  `shared/generated/Kept.svelte` under the ordered-negation scenario; all
+  other sampled routes retain their policy and lint/fix outcomes. The corrected
+  baseline was established before consolidation. Corrected/consolidated captures
+  then match exactly across **90 effective configurations, 20 lint/fix probes**,
+  and all five scenarios' block names/order, files, ignores, and registrations.
+  The public declaration matches the entry build byte for byte. The cumulative
+  report against `008a08207f28441297a2476b4798136aeb1023de` retains **25 changed /
+  8 unchanged**, with no new, removed, or failed snapshots. Its dependency
+  differences remain solely the Stage 8 Vitest follow-up. No snapshot was
+  edited or regenerated; these existing scenarios do not contain Svelte ignore
+  re-inclusion, which the new direct regressions cover instead.
+- **Artifacts/consumer compatibility:** The full gate verified public imports,
+  generated option types, real and linked optional-peer consumers, the five-file
+  tarball, and the source-map-free two-file dist inventory. No public option,
+  export, dependency range, compiler contract, or optional-peer loading path
+  changed. Existing upstream workarounds retain their approved conditions.
+- **Documentation:** README and contributor guidance describe ordered Svelte
+  negations, shared builder/guard ownership, explicit specialized blocks, and
+  retained registration/serializer boundaries. The historical rewrite record
+  now links the resolved Svelte-negation finding to this stage.
+- **Unrelated work preserved:** The entry tree was clean; every changed file
+  belongs to Stage 10. Generated `dist/`, `src/typegen.d.ts`, and disposable
+  comparison artifacts remain outside the commit.
+- **Remaining work:** None within Stage 10; requested commit/push/PR delivery
+  follows this validation record.
+- **Next stage:** Stage 11, R3–R5: derived typed-off maps, shared test result
+  boundaries/helper vocabulary, and local suppressions. Existing helper APIs,
+  typed-off maps, and unrelated suppressions remain unchanged here.
 - **PR/CI:** Local validation is complete; remote CI is not evaluated in this
   record. The requested PR is created after committing and pushing this stage.

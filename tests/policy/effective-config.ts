@@ -22,6 +22,7 @@ const compareText = (left: string, right: string): number => {
   return left > right ? 1 : 0;
 };
 
+// Serialization also describes arrays as sections; this boundary deliberately accepts them.
 const isRecord = (value: unknown): value is UnknownRecord => {
   return typeof value === "object" && value !== null;
 };

@@ -141,6 +141,18 @@ Every block is named `@cravingmaker/eslint-config/<feature>/<part>`, and
 feature's rule map and its `overrides`, and a `rules-type-aware` block
 holds the rules that need type information, over the type-aware scope.
 
+Source-plugin builders use `sourcePluginConfigs()` from
+`src/utilities/source-plugin.ts` for their setup and rules blocks. Pass the
+feature's explicit name, plugin registrations, and named authored rule map,
+followed by its options and context. The helper keeps registration global and
+applies `withSvelteComponents`, file narrowing, ignores, and overrides to rules.
+Functional, SonarJS, Node, and Imports keep their typed or resolver blocks
+explicit after those shared blocks; typed override filtering stays with its
+owning builder. Framework builders retain lazy optional-peer loading.
+Package JSON deliberately registers `package-json` globally, while
+`enforce-package-type` registers only in its Package JSON rules block; retain
+that difference for files outside the feature.
+
 The internal `@cravingmaker` plugin in `src/rules/` supplies the policies
 that installed rules cannot express safely. The existing JavaScript rules block
 registers and enables `@cravingmaker/prefer-arrow-functions`; Unicorn's existing
@@ -177,10 +189,18 @@ The builders share these modules:
 | `src/globs.ts`                   | The default files of the features                                                                            |
 | `src/configs/shared-options.ts`  | Rule options that more than one rule map uses, such as those of a core rule and of the rule that replaces it |
 | `src/utilities/file-scope.ts`    | `narrowFiles()` and `withoutIgnores()`, which limit `files` patterns by other patterns and by an ignore list |
+| `src/utilities/source-plugin.ts` | Shared source-plugin setup and rule blocks, with explicit policy and specialized blocks kept in each builder |
+| `src/utilities/is-record.ts`     | Dependency-free object guard shared by production, scripts, and tests; excludes arrays                       |
 | `src/utilities/type-aware.ts`    | The helpers of the type-aware scope, such as `typeAwareConfig()`                                             |
 | `src/utilities/import-peer.ts`   | `importPeer()`, which loads an optional peer or fails with a message that names it                           |
 | `src/utilities/plugin-policy.ts` | Limits the explicit framework policy to rules and option fields supported by an installed optional peer      |
 | `src/typegen.d.ts`               | The rule option types, which `npm run gen` generates and which are not committed                             |
+
+The effective-config serializer keeps its local object guard because its
+section descriptions also accept arrays. Do not replace it with the stricter
+record guard. File-role exceptions iterate each role's feature map in declared
+order and emit rules only for enabled owners.
+The policy-report subprocess's watch mapping also covers the shared record guard.
 
 Dedicated suites follow their source owners: feature builders have
 `tests/configs/plugins/<feature>/index.test.ts`, core category suites live in
@@ -958,11 +978,15 @@ The reference that the recipes link to, grouped by topic.
 - **Svelte components are sources too.** While the Svelte feature is on,
   the features for JavaScript and TypeScript sources take
   `withSvelteComponents(sourceFiles, context.svelteComponents)`, or
-  `typescriptFiles` for the TypeScript scopes, as their default files. A
-  new block for sources must do the same: with `sourceFiles` alone it
+  `typescriptFiles` for the TypeScript scopes, as their default files. The
+  shared source-plugin builder supplies this for setup/rules pairs; other
+  source blocks must do the same: with `sourceFiles` alone it
   misses components, and with `**/*.svelte` alone it reaches components
   that svelte-eslint-parser does not read, which espree then fails to
   parse.
+  The resolved component scope uses `withoutIgnores(narrowFiles(...), ignores)`
+  so ordered Svelte ignore negations restore the same script rules and component
+  exceptions as ordinary components, within every feature's own scope.
 - **A rule that is on needs its plugin in every file it reaches.** ESLint
   rejects the configuration of a file where a rule is on but no block
   registers its plugin, with `Could not find plugin`; a rule that is only

@@ -3,38 +3,27 @@ import type { Context, FeatureOptions } from "../../../types.js";
 
 import pluginStylistic from "@stylistic/eslint-plugin";
 
-import { defaultContext } from "../../../context.js";
-import { sourceFiles, withSvelteComponents } from "../../../globs.js";
 import { stylisticRules } from "./rules.js";
 import { internalPlugin } from "../../../rules/index.js";
-import { narrowFiles } from "../../../utilities/file-scope.js";
+import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
 // Builds the flat config for @stylistic/eslint-plugin.
 const stylistic = (
-  { files, ignores = [], overrides = {} }: FeatureOptions = {},
-  { svelteComponents }: Context = defaultContext,
+  options: FeatureOptions = {},
+  context?: Context,
 ): Linter.Config[] => {
-  return [
+  return sourcePluginConfigs(
     {
-      name: "@cravingmaker/eslint-config/stylistic/setup",
+      name: "stylistic",
       plugins: {
         "@cravingmaker": internalPlugin,
         "@stylistic": pluginStylistic,
       },
+      rules: stylisticRules,
     },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/stylistic/rules",
-      rules: {
-        ...stylisticRules,
-        ...overrides,
-      },
-    },
-  ];
+    options,
+    context,
+  );
 };
 
 export { stylistic };

@@ -3,31 +3,23 @@ import type { Context, FeatureOptions } from "../../../types.js";
 
 import pluginSecurity from "eslint-plugin-security";
 
-import { defaultContext } from "../../../context.js";
-import { sourceFiles, withSvelteComponents } from "../../../globs.js";
 import { securityRules } from "./rules.js";
-import { narrowFiles } from "../../../utilities/file-scope.js";
+import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
 // Builds the flat config for eslint-plugin-security.
 const security = (
-  { files, ignores = [], overrides = {} }: FeatureOptions = {},
-  { svelteComponents }: Context = defaultContext,
+  options: FeatureOptions = {},
+  context?: Context,
 ): Linter.Config[] => {
-  return [
+  return sourcePluginConfigs(
     {
-      name: "@cravingmaker/eslint-config/security/setup",
+      name: "security",
       plugins: { security: pluginSecurity },
+      rules: securityRules,
     },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/security/rules",
-      rules: { ...securityRules, ...overrides },
-    },
-  ];
+    options,
+    context,
+  );
 };
 
 export { security };

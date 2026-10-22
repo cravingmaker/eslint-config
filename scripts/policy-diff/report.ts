@@ -19,9 +19,9 @@ import {
   compareSnapshots,
   compareText,
   formatChanges,
-  isRecord,
   unionOfKeys,
 } from "./compare.js";
+import { isRecord } from "../../src/utilities/is-record.js";
 
 /**
  * What the baseline commit holds: its snapshots by path below the snapshot directory, and its lockfile, which an old commit may not have.

@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
 import { replacementRules } from "../../src/configs/plugins/typescript/replacements.js";
+import { isRecord } from "../../src/utilities/is-record.js";
 
 type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
 type RulePlugin = {
@@ -38,10 +39,6 @@ const filePaths = [
   "src/example.tsx",
   "src/state.svelte.ts",
 ] as const;
-const isRecord = (value: unknown): value is UnknownRecord => {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-};
-
 const isObjectOptionExplicit = (
   schema: UnknownRecord,
   value: UnknownRecord,
