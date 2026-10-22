@@ -5,13 +5,11 @@ import type {
 } from "../../../types.js";
 
 import { bestPracticeRules } from "./rules/html-best-practice.js";
-import { bestPracticesRules } from "./rules/html-best-practices.js";
 import { stylisticIssuesRules } from "./rules/html-stylistic-issues.js";
 
 const htmlReactRules: Rules = {
   ...stylisticIssuesRules, // 1/10 rules, 1 automatically fixable, 0 editor suggestions fixable.
-  ...bestPracticesRules, // 1/10 rules, 1 automatically fixable, 0 editor suggestions fixable.
-  ...bestPracticeRules, // 8/10 rules, 1 automatically fixable, 0 editor suggestions fixable.
+  ...bestPracticeRules, // 9/10 rules, 2 automatically fixable, 0 editor suggestions fixable.
 } as const;
 
 const recommendedHooksRules: Rules = {

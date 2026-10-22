@@ -23,8 +23,9 @@ const testFiles = [
   "tests/policy/fixtures.test.ts",
   "tests/policy/formatting.test.ts",
   "tests/scripts/policy-diff.test.ts",
-  "tests/typegen.test.ts",
-  "tests/utilities.test.ts",
+  "tests/configs/plugins/node/index.test.ts",
+  "tests/scripts/typegen.test.ts",
+  "tests/support/lint.test.ts",
   ...packageTests,
 ];
 const changes = [
@@ -41,7 +42,7 @@ const changes = [
   { filename: "dist/index.mjs", tests: testFiles },
   { filename: "dist/index.d.mts", tests: testFiles },
   { filename: "dist/index.mjs", rebuild: true, tests: testFiles },
-  { filename: "src/typegen.d.ts", tests: ["tests/typegen.test.ts"] },
+  { filename: "src/typegen.d.ts", tests: ["tests/scripts/typegen.test.ts"] },
   { filename: "README.md", tests: ["tests/package/readme.test.ts"] },
   {
     filename: "package-lock.json",
@@ -111,34 +112,42 @@ describe("Vitest watch dependencies", () => {
           }),
         );
 
-        const runner = await createVitest({
-          ...options,
-          config: path.join(workspace, "vitest.config.ts"),
-          maxWorkers: 1,
-          open: false,
-          reporters: [
-            {
-              onTestRunEnd(modules, errors, reason) {
-                const files = new Set(
-                  modules.map((module) => {
-                    return path.relative(workspace, module.moduleId);
-                  }),
-                );
-                reports.dispatchEvent(
-                  new CustomEvent("complete", {
-                    detail: {
-                      errors,
-                      files,
-                      reason,
-                    },
-                  }),
-                );
+        const runner = await createVitest(
+          {
+            ...options,
+            config: path.join(workspace, "vitest.config.ts"),
+            maxWorkers: 1,
+            open: false,
+            reporters: [
+              {
+                onTestRunEnd(modules, errors, reason) {
+                  const files = new Set(
+                    modules.map((module) => {
+                      return path.relative(workspace, module.moduleId);
+                    }),
+                  );
+                  reports.dispatchEvent(
+                    new CustomEvent("complete", {
+                      detail: {
+                        errors,
+                        files,
+                        reason,
+                      },
+                    }),
+                  );
+                },
               },
+            ],
+            root: workspace,
+            ui: false,
+          },
+          {
+            server: {
+              // Poll isolated inputs so queued setup events cannot masquerade as later edits.
+              watch: { usePolling: true },
             },
-          ],
-          root: workspace,
-          ui: false,
-        });
+          },
+        );
 
         try {
           const initial = once(reports, "complete", {

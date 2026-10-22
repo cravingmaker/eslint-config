@@ -151,7 +151,7 @@ describe("deprecated rule handling", () => {
       overrideConfig: [earlier, ...config],
       overrideConfigFile: true,
     });
-    const filePath = "tests/utilities.ts";
+    const filePath = "tests/support/lint.ts";
     await expect(
       eslint.calculateConfigForFile(filePath),
     ).resolves.toHaveProperty(

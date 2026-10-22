@@ -1,6 +1,6 @@
 import type { Rules } from "../../../types.js";
 
-import { otherRules } from "./rules/other-rules.js";
+import { otherRules } from "./rules/other.js";
 import { requirePropertiesRules } from "./rules/require-properties.js";
 import { validPropertiesRules } from "./rules/valid-properties.js";
 

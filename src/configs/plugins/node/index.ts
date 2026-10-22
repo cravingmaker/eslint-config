@@ -9,7 +9,8 @@ import {
   typescriptFiles,
   withSvelteComponents,
 } from "../../../globs.js";
-import { nodeRules, typeAwareRules, typescriptRulesOff } from "./rules.js";
+import { typeAwareRules, typescriptRulesOff } from "./rules-type-aware.js";
+import { nodeRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 import { typeAwareConfig } from "../../../utilities/type-aware.js";
 
