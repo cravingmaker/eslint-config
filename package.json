@@ -40,7 +40,6 @@
   ],
   "scripts": {
     "build": "npm run gen && npm run clean && tsdown",
-    "check:commit": "npm run lint:staged",
     "clean": "node --input-type=module --eval \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\"",
     "deps:inspect": "node-modules-inspector --no-open",
     "deps:report-duplicates": "node-modules-inspector report duplicates",
@@ -48,20 +47,19 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "gen": "node scripts/typegen.ts",
-    "inspect": "npm run build && eslint-config-inspector --no-open",
-    "inspect:build": "npm run build && eslint-config-inspector build --outDir node_modules/.cache/eslint-config-inspector",
-    "knip": "knip",
     "lint": "npm run build && npm run lint:built",
     "lint:built": "eslint . --max-warnings 0",
+    "lint:inspect": "npm run build && eslint-config-inspector --no-open",
+    "lint:inspect:build": "npm run build && eslint-config-inspector build --outDir node_modules/.cache/eslint-config-inspector",
     "lint:package": "npm run build && npm run lint:package:built",
     "lint:package:built": "publint --strict",
     "lint:staged": "npm run build && lint-staged",
+    "lint:unused": "knip",
     "policy:diff": "npm run build && node scripts/policy-diff.ts",
     "prepare": "husky",
     "prepublishOnly": "npm run release:check",
     "release:check": "npm audit --audit-level=low && npm run validate && npm pack --dry-run --ignore-scripts",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
     "test:package": "npm run build && npm run test:package:built",
     "test:package:built": "vitest run tests/package",
     "test:package:ui": "npm run build && vitest --ui --watch tests/package",
@@ -69,24 +67,18 @@
     "test:unit": "npm run build && npm run test:unit:built",
     "test:unit:built": "vitest run --exclude \"tests/package/**\"",
     "test:watch": "vitest",
-    "typecheck": "npm run gen && tsc --noEmit",
+    "typecheck": "npm run gen && npm run typecheck:built",
+    "typecheck:built": "tsc --noEmit",
     "typecheck:package": "npm run build && npm run typecheck:package:built",
     "typecheck:package:built": "attw --pack . --profile esm-only",
-    "validate": "npm run format:check && npm run build && npm run typecheck && npm run knip && npm run lint:built && npm test && npm run lint:package:built && npm run typecheck:package:built"
+    "validate": "npm run format:check && npm run build && npm run typecheck:built && npm run lint:unused && npm run lint:built && npm test && npm run lint:package:built && npm run typecheck:package:built"
   },
   "lint-staged": {
-    "*.{ts,mts,tsx,js,mjs,jsx}": [
-      "prettier --write",
-      "eslint --fix"
+    "*.{js,mjs,cjs,jsx,mjsx,ts,mts,tsx,mtsx,svelte,html,md,json,jsonc,json5}": [
+      "eslint --fix --max-warnings 0 --no-warn-ignored",
+      "prettier --ignore-unknown --write"
     ],
-    "package.json": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "*.md": [
-      "prettier --write",
-      "eslint --fix"
-    ]
+    "!(*.js|*.mjs|*.cjs|*.jsx|*.mjsx|*.ts|*.mts|*.tsx|*.mtsx|*.svelte|*.html|*.md|*.json|*.jsonc|*.json5)": "prettier --ignore-unknown --write"
   },
   "prettier": "@cravingmaker/prettier-config",
   "overrides": {
@@ -194,7 +186,7 @@
     "runtime": {
       "name": "node",
       "version": ">=24.15.0",
-      "onFail": "warn"
+      "onFail": "error"
     }
   },
   "publishConfig": {

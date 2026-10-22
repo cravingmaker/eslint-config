@@ -128,7 +128,7 @@ describe("package contract", () => {
     expect(packageManifest.devEngines).toEqual({
       runtime: {
         name: "node",
-        onFail: "warn",
+        onFail: "error",
         version: ">=24.15.0",
       },
     });
