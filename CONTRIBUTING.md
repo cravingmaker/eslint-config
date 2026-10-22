@@ -1,7 +1,8 @@
 # Contributing
 
-Please follow the [Code of Conduct](CODE_OF_CONDUCT.md) in all project
-interactions.
+Please follow the
+[Code of Conduct](https://github.com/cravingmaker/.github/blob/main/CODE_OF_CONDUCT.md)
+in all project interactions.
 
 This guide starts with setup, a map of the code, and recipes for the
 common maintenance tasks. The recipes link to the detailed reference,
@@ -1209,4 +1210,5 @@ For linting bugs, open a
 minimal input, the configuration used, actual and expected diagnostics or
 fixes, and the package, Node.js, ESLint, and optional plugin versions.
 
-Report vulnerabilities privately using [SECURITY.md](SECURITY.md).
+Report vulnerabilities privately as described in the
+[security policy](https://github.com/cravingmaker/.github/blob/main/SECURITY.md).
