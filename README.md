@@ -741,9 +741,9 @@ A disable comment for a rule that is now off, such as `// eslint-disable-next-li
 
 See [CONTRIBUTING.md](https://github.com/cravingmaker/eslint-config/blob/main/CONTRIBUTING.md)
 for contribution and pull request guidance, and follow the
-[Code of Conduct](https://github.com/cravingmaker/eslint-config/blob/main/CODE_OF_CONDUCT.md)
+[Code of Conduct](https://github.com/cravingmaker/.github/blob/main/CODE_OF_CONDUCT.md)
 when participating in the project. Report vulnerabilities privately
-as described in [SECURITY.md](https://github.com/cravingmaker/eslint-config/blob/main/SECURITY.md).
+as described in the [security policy](https://github.com/cravingmaker/.github/blob/main/SECURITY.md).
 
 ## License
 
