@@ -3,35 +3,24 @@ import type { Context, FeatureOptions } from "../../../types.js";
 
 import pluginUnicorn from "eslint-plugin-unicorn";
 
-import { defaultContext } from "../../../context.js";
-import { sourceFiles, withSvelteComponents } from "../../../globs.js";
 import { unicornRules } from "./rules.js";
 import { internalPlugin } from "../../../rules/index.js";
-import { narrowFiles } from "../../../utilities/file-scope.js";
+import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
 // Builds the flat config for eslint-plugin-unicorn.
 const unicorn = (
-  { files, ignores = [], overrides = {} }: FeatureOptions = {},
-  { svelteComponents }: Context = defaultContext,
+  options: FeatureOptions = {},
+  context?: Context,
 ): Linter.Config[] => {
-  return [
+  return sourcePluginConfigs(
     {
-      name: "@cravingmaker/eslint-config/unicorn/setup",
+      name: "unicorn",
       plugins: { "@cravingmaker": internalPlugin, unicorn: pluginUnicorn },
+      rules: unicornRules,
     },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/unicorn/rules",
-      rules: {
-        ...unicornRules,
-        ...overrides,
-      },
-    },
-  ];
+    options,
+    context,
+  );
 };
 
 export { unicorn };

@@ -3,31 +3,23 @@ import type { Context, FeatureOptions } from "../../../types.js";
 
 import pluginRegexp from "eslint-plugin-regexp";
 
-import { defaultContext } from "../../../context.js";
-import { sourceFiles, withSvelteComponents } from "../../../globs.js";
 import { regexpRules } from "./rules.js";
-import { narrowFiles } from "../../../utilities/file-scope.js";
+import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
 // Builds the flat config for eslint-plugin-regexp.
 const regexp = (
-  { files, ignores = [], overrides = {} }: FeatureOptions = {},
-  { svelteComponents }: Context = defaultContext,
+  options: FeatureOptions = {},
+  context?: Context,
 ): Linter.Config[] => {
-  return [
+  return sourcePluginConfigs(
     {
-      name: "@cravingmaker/eslint-config/regexp/setup",
+      name: "regexp",
       plugins: { regexp: pluginRegexp },
+      rules: regexpRules,
     },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/regexp/rules",
-      rules: { ...regexpRules, ...overrides },
-    },
-  ];
+    options,
+    context,
+  );
 };
 
 export { regexp };

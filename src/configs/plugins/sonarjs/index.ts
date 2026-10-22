@@ -4,14 +4,13 @@ import type { Context, FeatureOptions } from "../../../types.js";
 import pluginSonarjs from "eslint-plugin-sonarjs";
 
 import { defaultContext } from "../../../context.js";
-import { sourceFiles, withSvelteComponents } from "../../../globs.js";
 import {
   typeAwareRuleIds,
   typeAwareRules,
   typeAwareRulesOff,
 } from "./rules-type-aware.js";
 import { sonarjsRules } from "./rules.js";
-import { narrowFiles } from "../../../utilities/file-scope.js";
+import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 import {
   overridesWithoutTypeInformation,
   typeAwareConfig,
@@ -21,28 +20,24 @@ import {
 // information apply only within the shared type-aware scope and the feature's own files.
 const sonarjs = (
   options: FeatureOptions = {},
-  { svelteComponents, typeAware }: Context = defaultContext,
+  context: Context = defaultContext,
 ): Linter.Config[] => {
-  const { files, ignores = [], overrides = {} } = options;
+  const { overrides = {} } = options;
+  const { typeAware } = context;
 
   return [
-    {
-      name: "@cravingmaker/eslint-config/sonarjs/setup",
-      plugins: { sonarjs: pluginSonarjs },
-    },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/sonarjs/rules",
-      rules: {
-        ...sonarjsRules,
-        ...typeAwareRulesOff,
-        ...overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
+    ...sourcePluginConfigs(
+      {
+        name: "sonarjs",
+        plugins: { sonarjs: pluginSonarjs },
+        rules: { ...sonarjsRules, ...typeAwareRulesOff },
       },
-    },
+      {
+        ...options,
+        overrides: overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
+      },
+      context,
+    ),
     ...(typeof typeAware === "undefined"
       ? []
       : [

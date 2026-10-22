@@ -56,6 +56,10 @@ const changes = [
     filename: "tests/policy/effective-scenarios.ts",
     tests: ["tests/scripts/policy-diff.test.ts"],
   },
+  {
+    filename: "src/utilities/is-record.ts",
+    tests: ["tests/scripts/policy-diff.test.ts"],
+  },
   { filename: "package.json", tests: testFiles },
 ];
 

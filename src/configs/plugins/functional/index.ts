@@ -4,14 +4,13 @@ import type { Context, FeatureOptions } from "../../../types.js";
 import pluginFunctional from "eslint-plugin-functional";
 
 import { defaultContext } from "../../../context.js";
-import { sourceFiles, withSvelteComponents } from "../../../globs.js";
 import {
   typeAwareRuleIds,
   typeAwareRules,
   typeAwareRulesOff,
 } from "./rules-type-aware.js";
 import { functionalRules } from "./rules.js";
-import { narrowFiles } from "../../../utilities/file-scope.js";
+import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 import {
   overridesWithoutTypeInformation,
   typeAwareConfig,
@@ -22,28 +21,24 @@ import {
 // that turns such a rule on applies in that scope only.
 const functional = (
   options: FeatureOptions = {},
-  { svelteComponents, typeAware }: Context = defaultContext,
+  context: Context = defaultContext,
 ): Linter.Config[] => {
-  const { files, ignores = [], overrides = {} } = options;
+  const { overrides = {} } = options;
+  const { typeAware } = context;
 
   return [
-    {
-      name: "@cravingmaker/eslint-config/functional/setup",
-      plugins: { functional: pluginFunctional },
-    },
-    {
-      files: narrowFiles(
-        withSvelteComponents(sourceFiles, svelteComponents),
-        files,
-      ),
-      ignores: [...ignores],
-      name: "@cravingmaker/eslint-config/functional/rules",
-      rules: {
-        ...functionalRules,
-        ...typeAwareRulesOff,
-        ...overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
+    ...sourcePluginConfigs(
+      {
+        name: "functional",
+        plugins: { functional: pluginFunctional },
+        rules: { ...functionalRules, ...typeAwareRulesOff },
       },
-    },
+      {
+        ...options,
+        overrides: overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
+      },
+      context,
+    ),
     ...(typeof typeAware === "undefined"
       ? []
       : [

@@ -18,6 +18,7 @@ import {
   manifest,
   runCommand,
 } from "./consumers.js";
+import { isRecord } from "../../src/utilities/is-record.js";
 
 type CodeBlock = {
   readonly index: number;
@@ -112,12 +113,6 @@ afterAll(async () => {
 
 const compareText = (left: string, right: string): number => {
   return left.localeCompare(right);
-};
-
-const isRecord = (
-  value: unknown,
-): value is Readonly<Record<string, unknown>> => {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 };
 
 // The compiler options of a tsconfig, read from `text` as the compiler reads them, comments included.

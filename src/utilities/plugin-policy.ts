@@ -1,10 +1,9 @@
 import type { Linter } from "eslint";
 import type { Rules } from "../types.js";
 
+import { isRecord } from "./is-record.js";
+
 type UnknownRecord = Readonly<Record<string, unknown>>;
-const isRecord = (value: unknown): value is UnknownRecord => {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-};
 
 const isUnknownArray = (value: unknown): value is readonly unknown[] => {
   return Array.isArray(value);

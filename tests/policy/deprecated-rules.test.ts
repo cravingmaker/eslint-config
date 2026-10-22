@@ -11,17 +11,12 @@ import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
 import { refreshRules } from "../../src/configs/plugins/react/rules.js";
+import { isRecord } from "../../src/utilities/is-record.js";
 import { supportedPluginPolicy } from "../../src/utilities/plugin-policy.js";
 
 type RuleDefinition = {
   readonly meta?: { readonly deprecated?: unknown };
 };
-const isRecord = (
-  value: unknown,
-): value is Readonly<Record<string, unknown>> => {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-};
-
 // Read the authored maps themselves: optional-peer filtering must not hide a deprecated key.
 const files = await Array.fromAsync(glob("src/configs/**/*.ts"));
 const authoredMaps = await Promise.all(
