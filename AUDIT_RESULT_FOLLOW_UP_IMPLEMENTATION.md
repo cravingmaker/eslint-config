@@ -734,6 +734,14 @@ boundary-local duplication retained after review.
 
 **Findings:** R6, R8. D13 already owns deprecated entries and the maximum alias.
 
+**Implemented early (items 3 to 7):** At the maintainer's request on
+23 October 2026, #142 made the scripts and hooks consistent with
+`@cravingmaker/prettier-config` ahead of Stages 10 and 11. The hook calls
+`lint:staged`, lint-staged covers every format without overlapping globs,
+`validate` generates once, `test:coverage` is removed, and `prepublishOnly`
+is retained for an `npm publish` that turns lifecycle scripts back on. The
+pull request records the evidence. Items 1 and 2 remain for this stage.
+
 **Primary locations:** `src/globs.ts`, imports resolver setup, TypeScript
 replacements, `package.json`, Husky hooks, CI/publish workflows, contributor
 commands, and script/watch/package tests.

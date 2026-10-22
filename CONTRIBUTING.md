@@ -408,27 +408,27 @@ Three tools show what ESLint resolves:
   ESLint resolves for one path, as JSON. The file need not exist. It
   prints `undefined` when ESLint ignores the path or no block matches
   it.
-- **`npm run inspect`** builds the package and starts
+- **`npm run lint:inspect`** builds the package and starts
   [ESLint Config Inspector](https://github.com/eslint/config-inspector),
   which lists every block with its files and rules. Its "Test matching
   with filepath" field shows the blocks that match a path.
 
 The last two load `eslint.config.js`, which imports `dist/index.mjs`.
-`npm run inspect` builds first, but `--print-config` shows the previous
-build until you run `npm run build`.
+`npm run lint:inspect` builds first, but `--print-config` shows the
+previous build until you run `npm run build`.
 
 ### Interactive Config Inspector
 
 Start the inspector from the repository root:
 
 ```bash
-npm run inspect
+npm run lint:inspect
 ```
 
 Open the URL printed in the terminal, normally <http://localhost:7777/>.
 The command keeps running until you press Ctrl+C. It does not open a
-browser automatically; use `npm run inspect -- --open` to do so, or
-`npm run inspect -- --port=7778` to choose another port.
+browser automatically; use `npm run lint:inspect -- --open` to do so, or
+`npm run lint:inspect -- --port=7778` to choose another port.
 
 Try paths such as `src/factory.ts`, `eslint.config.js`, and `package.json`
 to see which named blocks apply and how their rules combine. The Rules
@@ -442,13 +442,13 @@ filepath field to see those blocks, and confirm their final rules with
 merged view shows it off. This limitation also affects static snapshots.
 
 The inspector reloads edits to `eslint.config.js`. After editing `src/`,
-restart `npm run inspect` so it rebuilds `dist/index.mjs` before loading
-the config; the command builds only once at startup.
+restart `npm run lint:inspect` so it rebuilds `dist/index.mjs` before
+loading the config; the command builds only once at startup.
 
 To save a static snapshot of the current configuration:
 
 ```bash
-npm run inspect:build
+npm run lint:inspect:build
 ```
 
 This builds the package and writes a standalone inspector to
@@ -457,7 +457,8 @@ a static HTTP server to browse it. The snapshot stays outside the
 published `dist/` directory, is ignored by Git and the repository checks,
 and is removed by `npm ci`. Run the command again after config changes.
 Inspector options can be forwarded with `--`, for example
-`npm run inspect:build -- --base /eslint-config/` for hosting at a subpath.
+`npm run lint:inspect:build -- --base /eslint-config/` for hosting at a
+subpath.
 
 ### This repository's options are not the defaults
 
@@ -494,7 +495,7 @@ directory, and the inspector from the directory of the config, unless
 ```bash
 npm run build
 npx eslint --config node_modules/.cache/consumer.config.js --print-config src/example.ts
-npm run inspect -- --config node_modules/.cache/consumer.config.js --basePath .
+npm run lint:inspect -- --config node_modules/.cache/consumer.config.js --basePath .
 ```
 
 ### The blocks that set a rule
@@ -716,7 +717,7 @@ Run [Knip](https://knip.dev/) to check for unused files, exports, types,
 and dependencies, as well as missing dependencies and unresolved imports:
 
 ```bash
-npm run knip
+npm run lint:unused
 ```
 
 Knip discovers the build entry point, scripts, tool configurations, and
@@ -1154,10 +1155,13 @@ For faster feedback, run `npm run test:unit` for unit tests or
 `npm run test:package` for package consumer tests. Both commands build the
 package first; their `:built` variants reuse an existing build.
 
-The pre-commit hook runs `npm run check:commit`, which invokes
-`npm run lint:staged` to build the package and apply Prettier and ESLint
-fixes to staged files. The pre-push hook runs the full test suite through
-`npm test`. Full validation runs through `npm run validate` and in CI.
+The pre-commit hook runs `npm run lint:staged`, which builds the package
+and runs lint-staged. It applies ESLint fixes and then Prettier to the
+staged files of the formats that ESLint lints, and Prettier alone to every
+other staged file that Prettier can format. A remaining ESLint warning
+fails the commit, as it fails validation. The pre-push hook runs the full
+test suite through `npm test`. Full validation runs through
+`npm run validate` and in CI.
 
 ### Interactive test UI
 
@@ -1214,7 +1218,10 @@ npm run release:check
 ```
 
 This runs a dependency security audit, full validation, and a dry run of the
-package tarball.
+package tarball. `prepublishOnly` runs the same check, but npm runs it only
+when lifecycle scripts are enabled: `.npmrc` disables them, so it guards an
+`npm publish --ignore-scripts=false`, and the publishing workflow runs the
+check as its own step.
 
 Update `package.json` and `package-lock.json` to the intended version.
 Include consumer-facing migration guidance when rule defaults or
