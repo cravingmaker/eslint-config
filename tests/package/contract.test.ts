@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-unsafe-type-assertion, functional/prefer-immutable-types, perfectionist/sort-arrays, perfectionist/sort-modules, perfectionist/sort-objects, security/detect-non-literal-fs-filename, security/detect-object-injection -- Package contract tests intentionally inspect dynamic repository manifest data and assert its published shape. */
 
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 
 import { describe, expect, it } from "vitest";
 
@@ -89,6 +89,28 @@ const packageLock = await readJson<PackageLock>(
 const packageLockRoot = packageLock.packages[""];
 
 describe("package contract", () => {
+  it("builds only the runtime and declaration bundles without hidden maps", async () => {
+    const files = await readdir(new URL("../../dist/", import.meta.url));
+
+    expect(
+      files.toSorted((left, right) => {
+        return left.localeCompare(right);
+      }),
+    ).toEqual(["index.d.mts", "index.mjs"]);
+  });
+
+  it.each(["index.d.mts", "index.mjs"])(
+    "builds %s without external or inline source-map references",
+    async (filename) => {
+      const content = await readFile(
+        new URL(`../../dist/${filename}`, import.meta.url),
+        "utf8",
+      );
+
+      expect(content).not.toContain("sourceMappingURL");
+    },
+  );
+
   it("publishes an ESM-only dist package with explicit support floors", () => {
     expect(packageManifest.private).toBe(false);
     expect(packageManifest.sideEffects).toBe(false);

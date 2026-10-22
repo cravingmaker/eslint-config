@@ -645,6 +645,12 @@ CommonJS is not supported, and `.cjs` and `.cts` files get no rules:
 - `eslint .` skips `.cts` files. A `.cts` path passed explicitly, as lint-staged and editors do, gets the warning "File ignored because no matching configuration was supplied."
 - A feature's `files` does not bring them in. It only limits the feature's default files, and no CommonJS file is among them.
 
+### Package debugging
+
+The package ships `dist/index.mjs` and `dist/index.d.mts` without source maps or the original `src/` tree. Runtime stack frames in this package point to the emitted JavaScript; `--enable-source-maps` cannot recover its original TypeScript locations from the package. Consumer lint diagnostics still identify consumer source files.
+
+Omitting maps limits disclosure of embedded original source. Emitted JavaScript remains inspectable, so keep secrets out of bundled code.
+
 ### Known issues
 
 These limitations and temporary upstream workarounds remain:
@@ -727,6 +733,7 @@ export default createConfig({
 - **Exceptions.** The [file-role exceptions](#file-role-exceptions) are new.
 - **Parameter immutability.** With typed linting, `functional/prefer-immutable-types` now requires parameters to be shallowly readonly instead of deeply readonly.
 - **Block names.** The config is made of more blocks than before, named `@cravingmaker/eslint-config/<feature>/<part>`. Code that finds blocks in the returned array by name needs the new names.
+- **Package artifacts.** JavaScript and declaration source maps are no longer included. Runtime exports and TypeScript declarations remain available; see [Package debugging](#package-debugging) for the accepted debugging trade-off.
 
 A disable comment for a rule that is now off, such as `// eslint-disable-next-line import-x/no-default-export` in a config file or any rule in a `.cjs` file, becomes an "Unused eslint-disable directive" warning, which ESLint reports by default. With `--max-warnings 0`, the run fails. `eslint --fix` removes such comments, but can leave a line with only spaces, which Prettier then removes.
 

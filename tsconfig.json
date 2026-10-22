@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowUnreachableCode": false,
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "module": "NodeNext",

@@ -125,7 +125,7 @@
     "@html-eslint/eslint-plugin-react": "0.66.1",
     "@html-eslint/eslint-plugin-svelte": "0.66.1",
     "@types/node": "24.19.0",
-    "@vitest/ui": "5.0.3",
+    "@vitest/ui": "5.0.5",
     "eslint": "10.12.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-express-security": "3.2.4",
@@ -144,7 +144,7 @@
     "svelte-eslint-parser": "1.9.0",
     "tsdown": "0.23.1",
     "typescript": "6.0.3",
-    "vitest": "5.0.3"
+    "vitest": "5.0.5"
   },
   "peerDependencies": {
     "@html-eslint/eslint-plugin-react": ">=0.60.0 <1",
