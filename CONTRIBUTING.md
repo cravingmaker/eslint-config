@@ -71,7 +71,7 @@ curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux
 ```
 
 The script does not change the default `node`, which stays first on
-`PATH`, so [CLAUDE.md](CLAUDE.md) tells Claude to put `/opt/node24/bin`
+`PATH`, so [AGENTS.md](AGENTS.md) tells Claude to put `/opt/node24/bin`
 first on `PATH` in every command. Without the script, Claude installs
 Node.js 24 itself at the start of each session.
 
