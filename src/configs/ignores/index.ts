@@ -2,6 +2,9 @@ import type { Linter } from "eslint";
 
 import { globalIgnores } from "eslint/config";
 
+/**
+ * Builds global generated-output ignores, followed by caller patterns in their supplied order.
+ */
 const ignores = (patterns: readonly string[] = []): Linter.Config[] => {
   return [
     globalIgnores(

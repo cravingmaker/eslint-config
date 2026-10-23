@@ -16,9 +16,9 @@ import {
   typeAwareConfig,
 } from "../../../utilities/type-aware.js";
 
-// Builds the flat config for eslint-plugin-functional. The rules that need type information
-// are off, and turned on again for the type-aware scope when typed linting is on. An override
-// that turns such a rule on applies in that scope only.
+/**
+ * Builds the flat config for eslint-plugin-functional. The rules that need type information are off, and turned on again for the type-aware scope when typed linting is on. An override that turns such a rule on applies in that scope only.
+ */
 const functional = (
   options: FeatureOptions = {},
   context: Context = defaultContext,

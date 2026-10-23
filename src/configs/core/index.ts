@@ -7,6 +7,9 @@ import { supportedCoreRules } from "./rules.js";
 import { internalPlugin } from "../../rules/index.js";
 import { narrowFiles } from "../../utilities/file-scope.js";
 
+/**
+ * Builds the core source rules and JSX parser options, including supported Svelte scripts.
+ */
 const core = (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { globals, svelteComponents }: Context = defaultContext,

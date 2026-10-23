@@ -7,8 +7,9 @@ import { narrowFiles } from "../../../utilities/file-scope.js";
 import { importPeer } from "../../../utilities/import-peer.js";
 import { supportedPluginPolicy } from "../../../utilities/plugin-policy.js";
 
-// Builds the flat config for Express apps. A missing eslint-plugin-express-security fails with a
-// message that names it.
+/**
+ * Builds the flat config for Express apps. A missing eslint-plugin-express-security fails with a message that names it.
+ */
 const express = async ({
   files,
   ignores = [],

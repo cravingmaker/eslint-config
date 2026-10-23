@@ -4,8 +4,9 @@ import type { ResolvedOptions } from "../../options.js";
 import { resolveOptions } from "../../options.js";
 import { fileRoles } from "./rules.js";
 
-// Builds one block per file role that turns its rules off, limited to the rules whose feature is on.
-// The blocks come after every feature, so a user config is the way to turn a rule back on.
+/**
+ * Builds one block per file role that turns its rules off, limited to the rules whose feature is on. The blocks come after every feature, so a user config is the way to turn a rule back on.
+ */
 const exceptions = (
   options: ResolvedOptions = resolveOptions(),
 ): Linter.Config[] => {

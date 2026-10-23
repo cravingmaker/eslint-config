@@ -136,7 +136,7 @@ migrations and supplies a verified baseline for each refactor.
 | 10    | Production utility/builder consolidation and Svelte negations             | R1, R2                           | 9          | Complete    |
 | 11    | Derived disabled maps, shared test boundaries, local suppressions         | R3–R5                            | 10         | Complete    |
 | 12    | Dead entries and consistent scripts/hooks                                 | R6, R8                           | 11         | Complete    |
-| 13    | Documentation and source conventions                                      | R9, R10; D16, D17 retention      | 12         | Not started |
+| 13    | Documentation and source conventions                                      | R9, R10; D16, D17 retention      | 12         | Complete    |
 | 14    | Final consumer verification and audit closure                             | All decisions/findings           | 13         | Not started |
 
 ## Stage 1: baseline and combined-rule regression harness
@@ -2445,5 +2445,89 @@ contracts still require preservation and later review.
   follows this validation record.
 - **Next stage:** Stage 13, documentation and source conventions, remains
   unstarted. Existing upstream workaround conditions remain unchanged.
+- **PR/CI:** Local validation is complete. The requested PR follows commit and
+  push; remote CI has not been evaluated in this record.
+
+#### Stage 13 — documentation and source conventions
+
+- **Status/date:** Complete, 23 October 2026.
+- **Stage-entry commit:** `e350a69e55843d3acb931d0b6886d11de794e4cb`.
+  The worktree was clean on `cravingmaker/stage-13-audit-implementation`;
+  `origin/main` matched this commit. Stage 12 is part of the baseline.
+- **Implementation commit(s):** Uncommitted at validation; implementation and
+  handoff are delivered together.
+- **Decisions/findings covered:** R9, R10, D16 = B, and D17 = B.
+- **Changes:** Reconcile README ownership, complementary checks, warning limits,
+  compiler contract, generated ignores, metadata, function conventions, supported
+  Svelte filenames, and source-map documentation. Remove stale deprecated-rule
+  language and the broad React-component warning; preserve the tested examples
+  and minimum-peer instructions. Align the cloud Node version with `.nvmrc`,
+  use `npm run prepare`, name the repository-wide typed naming scope, and mark
+  the historical replacement fallback as superseded in the existing rewrite
+  record. Preserve the D18 layout, category exceptions, local suppression
+  boundaries, and fixed/complementary ownership guidance.
+- **Source conventions:** Builder descriptions consistently use starred
+  documentation; implementation/group reasons remain line comments. Normalize
+  API paragraphs without changing their words, preserving paragraphs and
+  respecting `unicorn/no-manually-wrapped-comments`. Add missing directive
+  periods. Clarify TypeScript compiler ownership with TS2300/TS2393, TS2451,
+  and strict noImplicitThis's TS2683, retaining overload, declaration-merging,
+  and receiver exceptions. Compiler probes confirm the representative errors
+  and accept valid declaration merging.
+- **Options:** Shared core/extension objects satisfy both supported generated
+  schemas, with positional checks for the two destructuring objects and literal
+  inference retained. Ordinary option keys, including explicit undefined, now
+  form one sorted group. Keep meaningful commented categories and shared-spread
+  boundaries, preserving values, array order, and spread precedence. Native-only
+  options and Stylistic's annotation-spacing compatibility guard remain intact.
+- **D16/D17 regression evidence:** The initial 20-case suite passed against the
+  stage-entry build before source changes. The expanded 26-case SonarJS scope suite
+  covers all eighteen AWS error entries and twenty reviewed test-rule severities,
+  real workspace/optional-dependency manifests, insecure versus secure/unrelated
+  constructors, alternate test filenames, exclusive tests, typed missing
+  assertions with asserted and ordinary-source controls, and feature/file/typed
+  boundaries and consumer overrides. The shared test role is unchanged.
+- **Preparation/current checks:** Node.js 24.22.0, npm 11.19.1; `npm ci`
+  (zero vulnerabilities), `npm run prepare`, build, and type checking pass.
+  The initial type check identified missing handling of the shared resolved-rule
+  helper's undefined result in the new test; the test was corrected without
+  weakening inventory assertions. Changed-file lint rejected new imperative
+  test loops; these now use mapped assertions and awaited independent operations.
+- **Policy delta:** The current policy report against the stage-entry SHA reports
+  all 33 snapshots unchanged and identical locked packages. The cumulative
+  report against `008a08207f28441297a2476b4798136aeb1023de` remains 25 changed /
+  8 unchanged, with no new, removed, or failed snapshots. No snapshot was edited
+  or regenerated.
+- **Retained conditions:** AWS checks retain their existing SonarJS scope without
+  manifest gating; assertions-in-tests retains its typed guard. All previously
+  documented HTML, Markdown, RegExp execution, and module-spacing restoration
+  conditions remain unchanged. No dependency, compiler setting, feature scope,
+  public option/export, script/hook, or publishing contract is changed.
+- **Unrelated work:** The entry tree was clean. Generated output, comparison
+  artifacts, and disposable consumer projects remain outside the commit;
+  `CODING_PRINCIPLES.md` is unchanged.
+- **Focused/full validation:**
+  `npx vitest run tests/configs/plugins/sonarjs tests/policy/rule-options.test.ts`
+  passed 3 files / 67 tests. `npm run validate` passed 75 files / 2,765 tests;
+  its test phase took 768.74 seconds. Formatting, generation/build, type checking,
+  Knip, zero-warning repository lint, linked/installed package and README
+  consumers, Publint, and ATTW's ESM-only profile passed. The full gate used
+  `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16`, without retries or reduced coverage. Intentional
+  broken-optional-peer stderr is from the negative consumer fixture. Final
+  manifest-builder descriptions and this handoff were checked separately after
+  the gate; the commit builds again and the pre-push hook reruns all tests.
+- **Artifact review:** Stage-entry and current source/build comparisons preserve
+  executable structure after normalizing ordinary option-object property order.
+  Array order, spread precedence, and control flow are unchanged. Public
+  declaration structure is unchanged; documentation is reviewed separately.
+  Generated rule types and `CODING_PRINCIPLES.md` are byte-identical. Package
+  checks retain ESM exports, optional-peer behavior, and the five-file,
+  source-map-free tarball. New starred builder documentation increases emitted
+  JavaScript comments; API paragraph normalization changes declaration comments
+  without changing public signatures.
+- **Remaining work:** None within Stage 13; requested commit/push/PR delivery
+  follows the completed local validation.
+- **Next stage:** Stage 14 remains unstarted and requires a separate instruction.
 - **PR/CI:** Local validation is complete. The requested PR follows commit and
   push; remote CI has not been evaluated in this record.

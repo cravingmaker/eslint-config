@@ -23,13 +23,11 @@ type Context = {
    */
   readonly svelteComponents: ReadonlyArray<string | readonly string[]>;
   /**
-   * The directory that holds `tsconfig.json`, as an absolute path: `typescript.tsconfigRootDir`, or
-   * the project root.
+   * The directory that holds `tsconfig.json`, as an absolute path: `typescript.tsconfigRootDir`, or the project root.
    */
   readonly tsconfigRootDir: string;
   /**
-   * Files that the parser reads with type information and that receive type-aware rules, or
-   * `undefined` when typed linting is off.
+   * Files that the parser reads with type information and that receive type-aware rules, or `undefined` when typed linting is off.
    */
   readonly typeAware: TypeAwareScope | undefined;
 };
@@ -43,8 +41,7 @@ type Feature<Settings extends FeatureOptions = FeatureOptions> =
  */
 type FeatureOptions = {
   /**
-   * File patterns that limit the feature to some of its default files, such as `src/**`: it lints a
-   * file that matches one of its default patterns and one of these. They cannot add a file type.
+   * File patterns that limit the feature to some of its default files, such as `src/**`: it lints a file that matches one of its default patterns and one of these. They cannot add a file type.
    */
   readonly files?: readonly string[];
   /**
@@ -74,9 +71,7 @@ type JsonOptions = FeatureOptions & {
   readonly overridesJsonc?: Rules;
 };
 /**
- * Options for `createConfig`. A feature defaults to `true`, except `react`, `svelte`, and
- * `express`, which default to `"auto"`: on when the manifest at the project root declares the
- * `react`, `svelte`, or `express` package.
+ * Options for `createConfig`. A feature defaults to `true`, except `react`, `svelte`, and `express`, which default to `"auto"`: on when the manifest at the project root declares the `react`, `svelte`, or `express` package.
  */
 type Options = {
   readonly comments?: Feature;
@@ -106,9 +101,7 @@ type Options = {
   readonly packageJson?: Feature;
   readonly perfectionist?: Feature;
   /**
-   * The directory that holds the consumer's `package.json`, whose `dependencies`,
-   * `devDependencies`, and `peerDependencies` decide the `"auto"` features. Defaults to
-   * `process.cwd()`. A relative path is resolved from the working directory.
+   * The directory that holds the consumer's `package.json`, whose `dependencies`, `devDependencies`, and `peerDependencies` decide the `"auto"` features. Defaults to `process.cwd()`. A relative path is resolved from the working directory.
    */
   readonly projectRootDirectory?: string;
   readonly promise?: Feature;
@@ -122,24 +115,18 @@ type Options = {
    */
   readonly svelte?: Feature | "auto";
   /**
-   * TypeScript files, linted with typescript-eslint's strict rules and, unless `typeChecked` is
-   * `false`, with type information from the nearest `tsconfig.json` of each file.
+   * TypeScript files, linted with typescript-eslint's strict rules and, unless `typeChecked` is `false`, with type information from the nearest `tsconfig.json` of each file.
    */
   readonly typescript?: Feature<TypeScriptOptions>;
   readonly unicorn?: Feature;
   readonly unusedImports?: Feature;
 };
 /**
- * Options of the `react` feature. By default, the hooks rules apply to every JavaScript and
- * TypeScript file, where custom hooks also live, and the other React rules to JSX and TSX files.
- * `files` limits both to the files that match one of its patterns. Overrides of hooks rules apply
- * wherever the hooks rules do, and other overrides where the other React rules do. While React
- * Refresh is off, overrides of its rule apply nowhere.
+ * Options of the `react` feature. By default, the hooks rules apply to every JavaScript and TypeScript file, where custom hooks also live, and the other React rules to JSX and TSX files. `files` limits both to the files that match one of its patterns. Overrides of hooks rules apply wherever the hooks rules do, and other overrides where the other React rules do. While React Refresh is off, overrides of its rule apply nowhere.
  */
 type ReactOptions = FeatureOptions & {
   /**
-   * The React Refresh rule variant. `"auto"`, the default, uses `"next"` when the project declares
-   * Next.js and `"vite"` when it declares Vite, and turns the rule off without either.
+   * The React Refresh rule variant. `"auto"`, the default, uses `"next"` when the project declares Next.js and `"vite"` when it declares Vite, and turns the rule off without either.
    */
   readonly refresh?: ReactRefreshVariant | "auto" | false;
 };
@@ -172,9 +159,7 @@ type TypeAwareScope = ReadonlyArray<string | readonly string[]>;
  */
 type TypeScriptOptions = FeatureOptions & {
   /**
-   * File patterns to lint with type information and type-aware rules, instead of every file of the
-   * feature. They match only TypeScript files that the feature lints, so a directory such as
-   * `src/**` is enough. Other TypeScript files are linted without type information.
+   * File patterns to lint with type information and type-aware rules, instead of every file of the feature. They match only TypeScript files that the feature lints, so a directory such as `src/**` is enough. Other TypeScript files are linted without type information.
    */
   readonly filesTypeAware?: readonly string[];
   /**
@@ -182,18 +167,15 @@ type TypeScriptOptions = FeatureOptions & {
    */
   readonly ignoresTypeAware?: readonly string[];
   /**
-   * Rule settings for the files that typed linting covers, applied after the type-aware rules and
-   * after `overrides`.
+   * Rule settings for the files that typed linting covers, applied after the type-aware rules and after `overrides`.
    */
   readonly overridesTypeAware?: Rules;
   /**
-   * The directory that holds `tsconfig.json`. Defaults to `projectRootDirectory`. A relative path
-   * is resolved from the working directory, not from `projectRootDirectory`.
+   * The directory that holds `tsconfig.json`. Defaults to `projectRootDirectory`. A relative path is resolved from the working directory, not from `projectRootDirectory`.
    */
   readonly tsconfigRootDir?: string;
   /**
-   * Whether to lint with type information, which typescript-eslint reads from the nearest
-   * `tsconfig.json` of each file. Defaults to `true`. `false` turns off the rules that need it.
+   * Whether to lint with type information, which typescript-eslint reads from the nearest `tsconfig.json` of each file. Defaults to `true`. `false` turns off the rules that need it.
    */
   readonly typeChecked?: boolean;
 };

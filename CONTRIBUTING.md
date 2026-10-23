@@ -46,8 +46,8 @@ integrations.
 
 ### Claude Code cloud sessions
 
-The cloud image of Claude Code ships Node.js 20, 21, and 22. To install
-Node.js 24 next to them, paste this into the **Setup script** field of
+To install the contributor Node.js version in a Claude Code cloud environment,
+paste this into the **Setup script** field of
 the environment at [claude.ai/code](https://claude.ai/code). It runs as
 root before Claude Code starts, and its result is cached for later
 sessions:
@@ -57,7 +57,7 @@ sessions:
 set -euo pipefail
 
 # Keep in sync with .nvmrc.
-NODE_VERSION=24.21.0
+NODE_VERSION=24.22.0
 
 case "$(uname -m)" in
   x86_64) NODE_ARCH=x64 ;;
@@ -74,6 +74,9 @@ The script does not change the default `node`, which stays first on
 `PATH`, so [CLAUDE.md](CLAUDE.md) tells Claude to put `/opt/node24/bin`
 first on `PATH` in every command. Without the script, Claude installs
 Node.js 24 itself at the start of each session.
+
+After dependency installation, run `npm run prepare` in the checkout to enable
+the hooks; installation scripts are disabled here as in local setup.
 
 ## Making changes
 
@@ -356,6 +359,32 @@ severity then declares no restrictions. `import-x/no-unused-modules` takes
 no options while off because its schema requires an active export check
 whenever options are supplied. Suppression blocks use severity-only
 entries to retain the owning map's options when ESLint merges the blocks.
+
+Keep a single option object's ordinary keys in one sorted group, including
+explicitly unset keys. A blank line is a sorting partition because
+`perfectionist/sort-objects` uses `partitionByNewLine: true`; use one only for
+a meaningful, commented category or a shared-options spread boundary. Preserve
+spread precedence, matcher/group arrays, and other semantically ordered values.
+Unset values alone do not justify a separate group. Check the effective policy
+after changing partitions; do not change the Perfectionist setting to format a map.
+
+Shared option objects use `satisfies RuleOptionOf<...>` against each consuming
+schema when both support the same fields. Use intersections for core/extension
+options and the specific tuple position for multi-object rules, retaining
+`as const` when literal inference matters. Keep native-only options at their
+native entry and extension-only options at their extension entry. A type check
+does not replace installed-schema validation or the annotation-spacing guard.
+
+The eighteen AWS CDK checks, including the separately grouped IAM resource
+check, remain errors independently of the root manifest. Workspace and optional
+dependencies need the same security coverage. The twenty reviewed test-rule
+entries also retain the current SonarJS scope, with `assertions-in-tests` warned
+only in the typed scope. Do not restrict them to the shared `.test`/`.spec`
+exception role or broaden that role: runners recognize alternate names such as
+`__tests__/check.*` and `test/check.*`. Their own API recognizers, feature
+filters, typed guards, and later overrides still apply.
+`tests/configs/plugins/sonarjs/scope.test.ts` checks these manifest, filename,
+diagnostic, negative-control, and boundary cases through the public factory.
 
 ### The `javascript` option and the `core` module
 
@@ -648,8 +677,10 @@ pull request, run the full [validation](#validation) as well.
    - A new core or plugin rule stays unconfigured and fails
      `tests/policy/rule-coverage.test.ts` until its rule map has an explicit
      enabled or disabled entry and its options are reviewed.
-   - Remove a rule that becomes deprecated from its map.
-     `tests/policy/deprecated-rules.test.ts` rejects deprecated plugin rules.
+   - Remove a rule that becomes deprecated from its map at every severity,
+     including `off`. `tests/policy/deprecated-rules.test.ts` rejects authored
+     deprecated core and plugin entries before compatibility filtering.
+     Review inherited consumer settings as well as the default configuration.
    - A removed rule that a rule map turns on stops ESLint with
      `Could not find "<rule>" in plugin "<plugin>"`. An `"off"` entry
      for it passes without a message, so search the rule maps for each
@@ -1144,6 +1175,21 @@ The reference that the recipes link to, grouped by topic.
   objects or calls. Perfectionist retains declaration ordering with module-member
   spacing ignored until its documentation-paragraph fixer is corrected. Do not
   restore that spacing without the original and mixed convergence regressions.
+- **Descriptions use starred documentation; implementation reasons use line comments.**
+  Describe builders and APIs with `/** ... */`, leading asterisks, and prose paragraphs
+  kept intact. Let Prettier and `unicorn/no-manually-wrapped-comments` handle
+  wrapping; preserve paragraph breaks and examples. Use `//` for local
+  implementation explanations and grouped policy reasons, with a final period.
+  Do not convert ordinary grouped line comments merely to normalize their style.
+  tsdown retains documentation in emitted JavaScript and public declarations;
+  review comment-only artifact changes separately from executable code and types.
+- **Compiler ownership names its diagnostic and contract.**
+  State the relevant compiler diagnostic only when the documented compiler
+  options guarantee it. Duplicate declarations and implicit-any `this` checks
+  must retain valid overloads, declaration merging, and explicitly or contextually
+  typed receivers. Keep semantic exceptions and `Complemented by` explanations
+  where rules cover different cases; do not claim compiler equivalence from a
+  rule name alone.
 - **The tsconfig is the one that the README asks for.** `tsconfig.json`
   and `tests/fixtures/tsconfig.json` set `strict`, `noImplicitReturns`,
   and `allowUnreachableCode: false`, and `tests/package/readme.test.ts`
@@ -1151,6 +1197,8 @@ The reference that the recipes link to, grouped by topic.
   that returns a value on some paths ends with `return;` where it would
   otherwise reach its end; `no-useless-return` is off in TypeScript files
   so that it does not remove it.
+  This contract does not add `noUncheckedIndexedAccess`, `verbatimModuleSyntax`,
+  or `noFallthroughCasesInSwitch`; none substitutes for Security trust review.
 
 The repository's own `eslint.config.js` permits explicit unset values in
 rule-option maps. Core and plugin modules follow the same lint rules. Test

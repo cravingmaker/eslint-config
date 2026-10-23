@@ -7,7 +7,9 @@ import { unicornRules } from "./rules.js";
 import { internalPlugin } from "../../../rules/index.js";
 import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
-// Builds the flat config for eslint-plugin-unicorn.
+/**
+ * Builds the flat config for eslint-plugin-unicorn.
+ */
 const unicorn = (
   options: FeatureOptions = {},
   context?: Context,

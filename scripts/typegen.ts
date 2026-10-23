@@ -49,7 +49,7 @@ hooks.deregister();
 // Keep this build-only registry local: runtime features load optional peers lazily, with scoped
 // registration and compatibility adapters. The typegen test checks every registered rule below.
 const plugins: Record<string, ESLint.Plugin> = {
-  // eslint-disable-next-line @typescript-eslint/no-deprecated -- ESLint exposes its core rules only through this registry
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- ESLint exposes its core rules only through this registry.
   "": { rules: Object.fromEntries(builtinRules) },
   "@cravingmaker": internalPlugin,
   "enforce-package-type": pluginEnforcePackageType,
@@ -65,7 +65,7 @@ const plugins: Record<string, ESLint.Plugin> = {
   n: pluginN,
   "package-json": pluginPackageJson,
   perfectionist: pluginPerfectionist,
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- eslint-plugin-promise does not have types
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- eslint-plugin-promise does not have types.
   promise: pluginPromise,
   // Only the rules: the plugin's `configs.flat` does not match ESLint's plugin type.
   "react-hooks": { rules: pluginReactHooks.rules },

@@ -6,7 +6,9 @@ import pluginPerfectionist from "eslint-plugin-perfectionist";
 import { perfectionistRules } from "./rules.js";
 import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
-// Builds the flat config for eslint-plugin-perfectionist.
+/**
+ * Builds the flat config for eslint-plugin-perfectionist.
+ */
 const perfectionist = (
   options: FeatureOptions = {},
   context?: Context,

@@ -81,7 +81,6 @@ const recommendedTypeAwareRules: Rules = {
     "error",
     {
       allow: [{ from: "lib", name: ["Error", "URL", "URLSearchParams"] }],
-
       allowAny: false,
       allowArray: false,
       allowBoolean: false,
@@ -129,10 +128,9 @@ const strictTypeAwareRules: Rules = {
   "@typescript-eslint/no-confusing-void-expression": [
     "error",
     {
-      ignoreVoidReturningFunctions: false,
-
       ignoreArrowShorthand: false,
       ignoreVoidOperator: true,
+      ignoreVoidReturningFunctions: false,
     },
   ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "@typescript-eslint/no-unnecessary-condition": [

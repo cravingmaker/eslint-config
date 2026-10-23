@@ -7,11 +7,10 @@ const recommendedRules: Rules = {
   "n/no-deprecated-api": [
     "error",
     {
-      version: undefined,
-
       ignoreGlobalItems: [],
       ignoreIndirectDependencies: true,
       ignoreModuleItems: [],
+      version: undefined,
     },
   ],
   "n/no-unpublished-import": [
@@ -44,10 +43,8 @@ const recommendedRules: Rules = {
   "n/hashbang": [
     "error",
     {
-      convertPath: undefined,
-
       additionalExecutables: [],
-
+      convertPath: undefined,
       executableMap: {
         ".js": "node",
         ".mjs": "node",

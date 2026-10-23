@@ -6,10 +6,6 @@ const curryingRules: Rules = {
   "functional/functional-parameters": [
     "error",
     {
-      ignoreIdentifierPattern: undefined,
-      ignorePrefixSelector: undefined,
-      overrides: undefined,
-
       allowArgumentsKeyword: false,
       allowRestParameter: false,
       enforceParameterCount: {
@@ -18,6 +14,9 @@ const curryingRules: Rules = {
         ignoreIIFE: true,
         ignoreLambdaExpression: true,
       },
+      ignoreIdentifierPattern: undefined,
+      ignorePrefixSelector: undefined,
+      overrides: undefined,
     },
   ],
 } as const;

@@ -10,9 +10,9 @@ import { importsRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
-// Builds the flat config for eslint-plugin-import-x. TypeScript files and Svelte components
-// within the feature's files resolve imports through the TypeScript resolver first, with the
-// project's tsconfig.
+/**
+ * Builds the flat config for eslint-plugin-import-x. TypeScript files and Svelte components within the feature's files resolve imports through the TypeScript resolver first, with the project's tsconfig.
+ */
 const imports = (
   options: FeatureOptions = {},
   context: Context = defaultContext,

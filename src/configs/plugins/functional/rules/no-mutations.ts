@@ -7,13 +7,12 @@ const noMutationsRules: Rules = {
     "error",
     {
       ignoreAccessorPattern: undefined,
-      ignoreIdentifierPattern: undefined,
-      overrides: undefined,
-
       ignoreClasses: false,
+      ignoreIdentifierPattern: undefined,
       ignoreImmediateMutation: true,
       ignoreMapsAndSets: false,
       ignoreNonConstDeclarations: false,
+      overrides: undefined,
     },
   ],
 
@@ -31,14 +30,17 @@ const noMutationsRules: Rules = {
   "functional/prefer-immutable-types": [
     "error",
     {
+      enforcement: "None",
       fixer: undefined,
+      ignoreClasses: false,
+      ignoreInferredTypes: true,
       ignoreNamePattern: undefined,
       ignoreTypePattern: undefined,
       overrides: undefined,
+      parameters: {
+        enforcement: "ReadonlyShallow",
+      },
       returnTypes: undefined,
-      variables: undefined,
-
-      ignoreClasses: false,
       suggestions: {
         // eslint-disable-next-line @typescript-eslint/naming-convention -- The rule schema names immutability levels in PascalCase.
         ReadonlyShallow: [
@@ -63,22 +65,15 @@ const noMutationsRules: Rules = {
           ],
         ],
       },
-
-      enforcement: "None",
-      ignoreInferredTypes: true,
-      parameters: {
-        enforcement: "ReadonlyShallow",
-      },
+      variables: undefined,
     },
   ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
   "functional/type-declaration-immutability": [
     "error",
     {
       ignoreIdentifierPattern: undefined,
-      ignoreTypePattern: undefined,
-
       ignoreInterfaces: false,
-
+      ignoreTypePattern: undefined,
       rules: [
         {
           comparator: "AtLeast",

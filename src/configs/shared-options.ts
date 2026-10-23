@@ -4,14 +4,19 @@ const classMethodsUseThisOptions = {
   enforceForClassFields: true,
   exceptMethods: [],
   ignoreOverrideMethods: false,
-} satisfies RuleOptionOf<"class-methods-use-this">;
+} satisfies RuleOptionOf<"@typescript-eslint/class-methods-use-this"> &
+  RuleOptionOf<"class-methods-use-this">;
 
 const dotNotationOptions = {
   allowKeywords: true,
-} satisfies RuleOptionOf<"dot-notation">;
+} satisfies RuleOptionOf<"@typescript-eslint/dot-notation"> &
+  RuleOptionOf<"dot-notation">;
 
 // eslint-disable-next-line unicorn/name-replacements -- This mirrors the ESLint `max-params` rule name.
-const maxParamsOptions = { max: 4 } as const;
+const maxParamsOptions = {
+  max: 4,
+} as const satisfies RuleOptionOf<"@typescript-eslint/max-params"> &
+  RuleOptionOf<"max-params">;
 
 const namingConventionOptions = [
   {
@@ -38,7 +43,8 @@ const namingConventionOptions = [
 
 const noEmptyFunctionOptions = {
   allow: [],
-} satisfies RuleOptionOf<"no-empty-function">;
+} satisfies RuleOptionOf<"@typescript-eslint/no-empty-function"> &
+  RuleOptionOf<"no-empty-function">;
 
 const noShadowOptions = {
   allow: [],
@@ -47,7 +53,8 @@ const noShadowOptions = {
   ignoreFunctionTypeParameterNameValueShadow: true,
   ignoreOnInitialization: false,
   ignoreTypeValueShadow: true,
-} satisfies RuleOptionOf<"no-shadow">;
+} satisfies RuleOptionOf<"@typescript-eslint/no-shadow"> &
+  RuleOptionOf<"no-shadow">;
 
 const noUnusedExpressionsOptions = {
   allowShortCircuit: false,
@@ -55,7 +62,8 @@ const noUnusedExpressionsOptions = {
   allowTernary: false,
   enforceForJSX: true,
   ignoreDirectives: false,
-} as const;
+} as const satisfies RuleOptionOf<"@typescript-eslint/no-unused-expressions"> &
+  RuleOptionOf<"no-unused-expressions">;
 
 const noUseBeforeDefineOptions = {
   allowNamedExports: false,
@@ -65,7 +73,8 @@ const noUseBeforeDefineOptions = {
   ignoreTypeReferences: true,
   typedefs: true,
   variables: true,
-} as const;
+} as const satisfies RuleOptionOf<"@typescript-eslint/no-use-before-define"> &
+  RuleOptionOf<"no-use-before-define">;
 
 const preferDestructuring1stOptions = {
   // eslint-disable-next-line @typescript-eslint/naming-convention -- ESLint rule options use PascalCase for AST node names.
@@ -78,13 +87,18 @@ const preferDestructuring1stOptions = {
     array: false,
     object: true,
   },
-} as const;
+} as const satisfies RuleOptionsOf<"@typescript-eslint/prefer-destructuring">[0] &
+  RuleOptionsOf<"prefer-destructuring">[0];
 
 const preferDestructuring2ndOptions = {
   enforceForRenamedProperties: false,
-} as const;
+} as const satisfies RuleOptionsOf<"@typescript-eslint/prefer-destructuring">[1] &
+  RuleOptionsOf<"prefer-destructuring">[1];
 
-const preferPromiseRejectErrorsOptions = { allowEmptyReject: false } as const;
+const preferPromiseRejectErrorsOptions = {
+  allowEmptyReject: false,
+} as const satisfies RuleOptionOf<"@typescript-eslint/prefer-promise-reject-errors"> &
+  RuleOptionOf<"prefer-promise-reject-errors">;
 
 export {
   classMethodsUseThisOptions,

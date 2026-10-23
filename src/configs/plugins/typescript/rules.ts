@@ -169,9 +169,8 @@ const otherRules: Rules = {
   "@typescript-eslint/explicit-member-accessibility": [
     "error",
     {
-      ignoredMethodNames: [],
-
       accessibility: "no-public",
+      ignoredMethodNames: [],
       overrides: {
         constructors: "off",
         parameterProperties: "off",
@@ -196,10 +195,10 @@ const otherRules: Rules = {
   "@typescript-eslint/explicit-module-boundary-types": "off", // Prefer inferred boundary types unless the project requires explicit annotations.
   "@typescript-eslint/init-declarations": "off", // Prefer initialization where values become available over placeholder assignments.
   "@typescript-eslint/member-ordering": "off", // Handled by `perfectionist/sort-classes`.
-  "@typescript-eslint/no-dupe-class-members": "off", // Not recommended to enable this in new TypeScript projects.
-  "@typescript-eslint/no-invalid-this": "off", // Not recommended to enable this in new TypeScript projects.
+  "@typescript-eslint/no-dupe-class-members": "off", // Handled by the TypeScript compiler (`ts(2300)` and `ts(2393)`); valid overload signatures remain allowed.
+  "@typescript-eslint/no-invalid-this": "off", // Implicit-any `this` is checked by `strict`'s `noImplicitThis` (`ts(2683)`); explicit and contextually typed receivers remain valid.
   "@typescript-eslint/no-magic-numbers": "off", // Prefer named constants for meaningful domain values without restricting every numeric literal.
-  "@typescript-eslint/no-redeclare": "off", // Not recommended to enable this in new TypeScript projects.
+  "@typescript-eslint/no-redeclare": "off", // Handled by the TypeScript compiler (`ts(2451)` and `ts(2300)`); valid declaration merging remains allowed.
   "@typescript-eslint/parameter-properties": "off", // Allow constructor parameter properties.
 } as const;
 

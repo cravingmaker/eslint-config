@@ -6,7 +6,9 @@ import pluginComments from "@eslint-community/eslint-plugin-eslint-comments";
 import { commentsRules } from "./rules.js";
 import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
-// Builds the flat config for ESLint directive comments.
+/**
+ * Builds the flat config for ESLint directive comments.
+ */
 const comments = (
   options: FeatureOptions = {},
   context?: Context,
