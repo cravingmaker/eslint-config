@@ -1,0 +1,33 @@
+{
+  "releases": [
+    {
+      "arch": "arm64",
+      "archive": "actionlint_1.7.12_darwin_arm64.tar.gz",
+      "archiveSha256": "aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f",
+      "binarySha256": "8db11704dc296f096216db4db65d86cd7f0ebfdf4c38453a1da276b137b88388",
+      "platform": "darwin"
+    },
+    {
+      "arch": "x64",
+      "archive": "actionlint_1.7.12_darwin_amd64.tar.gz",
+      "archiveSha256": "5b44c3bc2255115c9b69e30efc0fecdf498fdb63c5d58e17084fd5f16324c644",
+      "binarySha256": "d1f7cee75ae2873609bd9567b4600bebc5315a5e733e73202987a44fafdd53b2",
+      "platform": "darwin"
+    },
+    {
+      "arch": "x64",
+      "archive": "actionlint_1.7.12_linux_amd64.tar.gz",
+      "archiveSha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+      "binarySha256": "c872d6db8c6bf83a8eaa704fc93999f027d55dffbc63b8a6abdccb47df5f4cd4",
+      "platform": "linux"
+    },
+    {
+      "arch": "arm64",
+      "archive": "actionlint_1.7.12_linux_arm64.tar.gz",
+      "archiveSha256": "325e971b6ba9bfa504672e29be93c24981eeb1c07576d730e9f7c8805afff0c6",
+      "binarySha256": "ac0323433c2853ec3fb978c611430c5b3dc5d43c58d1a1ec031b00ab572beb60",
+      "platform": "linux"
+    }
+  ],
+  "version": "1.7.12"
+}

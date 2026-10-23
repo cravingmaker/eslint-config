@@ -5,9 +5,7 @@ on:
     types:
       - published
 
-permissions:
-  contents: read
-  id-token: write
+permissions: {}
 
 concurrency:
   group: npm-publish-${{ github.event.release.tag_name }}
@@ -19,10 +17,9 @@ jobs:
     if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
-    env:
-      HUSKY: 0
-
+    permissions:
+      contents: read
+      id-token: write # Authenticate to npm with Trusted Publishing and sign provenance.
     steps:
       - name: Checkout release
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -31,10 +28,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+      # No dependency cache: a release installs from the lockfile alone.
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24.15.0
+          node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org/
           package-manager-cache: false
 
@@ -92,6 +90,9 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      - name: Verify registry signatures and provenance
+        run: npm audit signatures
+
       - name: Verify release readiness
         run: npm run release:check
 
@@ -118,4 +119,6 @@ jobs:
           sha256sum ".release/${TARBALL}"
 
       - name: Publish release artifact
-        run: npm publish "${{ steps.pack.outputs.tarball }}" --access public --ignore-scripts
+        env:
+          TARBALL: ${{ steps.pack.outputs.tarball }}
+        run: npm publish "${TARBALL}" --access public --ignore-scripts

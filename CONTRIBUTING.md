@@ -57,7 +57,7 @@ sessions:
 set -euo pipefail
 
 # Keep in sync with .nvmrc.
-NODE_VERSION=24.22.0
+NODE_VERSION=24.22.1
 
 case "$(uname -m)" in
   x86_64) NODE_ARCH=x64 ;;
@@ -668,7 +668,7 @@ pull request, run the full [validation](#validation) as well.
    (`save-exact`) and installs only releases that are at least seven
    days old (`min-release-age`). For an optional peer, the policy must
    work with every version in its `peerDependencies` range: CI's
-   "Minimum peer compatibility" job installs the lowest ones. For
+   "Minimum peer versions" job installs the lowest ones. For
    typescript-eslint, see "TypeScript support follows typescript-eslint's
    peer range" under [Dependencies and peers](#dependencies-and-peers).
 
@@ -825,7 +825,7 @@ npm run typecheck:package
   package is published as ESM only.
 
 Both build the package first; their `:built` variants reuse an existing
-build. `npm run validate` runs both after the tests.
+build. `npm run validate` runs both before the tests.
 
 ### Explain an unexpected rule
 
@@ -1276,10 +1276,12 @@ Before opening a pull request, run:
 npm run validate
 ```
 
-This runs formatting checks, a build, typechecking, Knip, linting, tests,
-and the [package checks](#check-the-published-package). Package tests
-exercise the tarball in temporary consumer projects. Some install it from
-the npm registry, so the tests need network access.
+This runs `npm run validate:static`, then the tests. The static phase runs
+formatting checks, a build, typechecking, Knip, linting, the
+[workflow checks](#workflow-checks), and the
+[package checks](#check-the-published-package). Package tests exercise the
+tarball in temporary consumer projects. Some install it from the npm
+registry, so the tests need network access.
 
 Vitest runs at most two test files at once to limit memory pressure: each
 worker loads ESLint and TypeScript, and the package tests also start child
@@ -1298,6 +1300,36 @@ other staged file that Prettier can format. A remaining ESLint warning
 fails the commit, as it fails validation. The pre-push hook runs the full
 test suite through `npm test`. Full validation runs through
 `npm run validate` and in CI.
+
+CI runs the static phase once on the development Node.js version in
+`.nvmrc`, after verifying registry signatures and auditing dependencies. The
+tests run on Node.js 24.15.0, the minimum, and on the newest Node.js 26
+release. "Minimum peer versions" installs the packed package with every
+advertised minimum peer, and pull requests also run Dependency Review. All
+jobs run in parallel. The `CI result` job fails unless every one of them
+succeeds, and it is the status that the repository rules require.
+
+### Workflow checks
+
+Check the GitHub Actions workflows locally with:
+
+```bash
+npm run lint:workflows
+```
+
+This installs actionlint from its pinned GitHub release into the ignored
+`.tools/` cache on first use, verifies the archive and binary SHA-256 pins
+in `scripts/actionlint-reference.json`, and rechecks the cached binary on
+each run. It never uses a global actionlint. The first run needs access to
+GitHub releases, and later runs work offline. actionlint also checks `run`
+scripts with ShellCheck when it is installed, as it is in CI. prettier-config
+uses the same pins and checks.
+
+The zizmor workflow audits the workflows and the Dependabot configuration
+for security problems, such as template injection or broad permissions,
+when they change and weekly. It reports findings to code scanning, next to
+CodeQL's analysis of the workflows. Suppress a finding only with an inline
+`zizmor: ignore[...]` comment that explains why the code is safe.
 
 ### Interactive test UI
 
@@ -1367,8 +1399,9 @@ Create a matching `vX.Y.Z` tag from a commit on `main` and publish a GitHub
 Release. The [npm publishing workflow](.github/workflows/publish.yml)
 verifies the tag matches `package.json`, confirms the tagged commit is
 reachable from `main`, and checks that the version has not already been
-published. It then validates and publishes the packed artifact using npm
-Trusted Publishing. Prereleases do not trigger publishing.
+published. It then verifies registry signatures, runs the release check,
+and publishes the packed artifact using npm Trusted Publishing, on the
+Node.js version in `.nvmrc`. Prereleases do not trigger publishing.
 
 ## Reporting issues
 

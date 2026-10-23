@@ -23,6 +23,7 @@ const testFiles = [
   "tests/scripts/policy-diff.test.ts",
   "tests/configs/plugins/node/index.test.ts",
   "tests/scripts/typegen.test.ts",
+  "tests/scripts/workflow-tool.test.ts",
   "tests/support/lint.test.ts",
   ...packageTests,
 ];
@@ -61,6 +62,18 @@ const changes = [
   {
     filename: "tests/support/resolved-config.ts",
     tests: ["tests/scripts/policy-diff.test.ts"],
+  },
+  {
+    filename: "scripts/actionlint.mjs",
+    tests: ["tests/scripts/workflow-tool.test.ts"],
+  },
+  {
+    filename: "scripts/actionlint-reference.json",
+    tests: ["tests/scripts/workflow-tool.test.ts"],
+  },
+  {
+    filename: "scripts/check-workflows.mjs",
+    tests: ["tests/scripts/workflow-tool.test.ts"],
   },
   { filename: "package.json", tests: testFiles },
 ];
