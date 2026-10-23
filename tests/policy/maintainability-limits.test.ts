@@ -9,6 +9,7 @@ import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
 const eslint = new ESLint({
   overrideConfig: await createConfig(),
@@ -120,9 +121,10 @@ describe("quantitative maintainability limits", () => {
   it.each(limits)(
     "warns with the existing options for $id",
     async ({ filePath, id, options }) => {
-      await expect(
-        eslint.calculateConfigForFile(filePath),
-      ).resolves.toHaveProperty(["rules", id], [1, ...options]);
+      await expect(getResolvedConfig(eslint, filePath)).resolves.toHaveProperty(
+        ["rules", id],
+        [1, ...options],
+      );
     },
   );
 
@@ -144,7 +146,7 @@ describe("quantitative maintainability limits", () => {
         overrideConfigFile: true,
       });
       await expect(
-        engine.calculateConfigForFile("tests/utilities.ts"),
+        getResolvedConfig(engine, "tests/utilities.ts"),
       ).resolves.toHaveProperty(["rules", "max-params", 0], 0);
       const [result] = await engine.lintText(samples[2].over, {
         filePath: "tests/support/lint.ts",
@@ -205,22 +207,22 @@ describe("quantitative maintainability limits", () => {
       overrideConfigFile: true,
     });
     await expect(
-      engine.calculateConfigForFile("example.js"),
+      getResolvedConfig(engine, "example.js"),
     ).resolves.toHaveProperty(["rules", "complexity", 0], 2);
     await expect(
-      engine.calculateConfigForFile("example.js"),
+      getResolvedConfig(engine, "example.js"),
     ).resolves.not.toHaveProperty(["rules", "unicorn/max-nested-calls"]);
     await expect(
-      engine.calculateConfigForFile("pages/index.html"),
+      getResolvedConfig(engine, "pages/index.html"),
     ).resolves.toHaveProperty(
       ["rules", "@html-eslint/max-element-depth", 0],
       1,
     );
     await expect(
-      engine.calculateConfigForFile("pages/generated.html"),
+      getResolvedConfig(engine, "pages/generated.html"),
     ).resolves.toBeUndefined();
     await expect(
-      engine.calculateConfigForFile("outside.html"),
+      getResolvedConfig(engine, "outside.html"),
     ).resolves.toBeUndefined();
   });
 });

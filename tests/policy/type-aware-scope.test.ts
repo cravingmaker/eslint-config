@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
-
 import type { TypeScriptOptions } from "../../src/types.js";
 
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
@@ -10,13 +8,8 @@ import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { createConfig } from "../../src/factory.js";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
-type EffectiveConfig = {
-  readonly languageOptions?: {
-    readonly parserOptions?: Readonly<Record<string, unknown>>;
-  };
-  readonly rules?: Readonly<Record<string, readonly unknown[]>>;
-};
 // How a file is linted: whether the parser reads type information, and which of
 // `typeAwareRuleIds` are on.
 type TypeInformation = {
@@ -73,7 +66,9 @@ const projectDirectory = await mkdtemp(
 await Promise.all(
   Object.entries(projectFiles).map(async ([fileName, content]) => {
     const filePath = path.join(projectDirectory, fileName);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The parent path comes from the fixed projectFiles keys under the owned temporary project.
     await mkdir(path.dirname(filePath), { recursive: true });
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The path comes from the fixed projectFiles keys under the owned temporary project.
     await writeFile(filePath, content, "utf8");
   }),
 );
@@ -107,9 +102,7 @@ const describeTypeInformation = async (
     await Promise.all(
       filePaths.map(
         async (filePath): Promise<readonly [string, TypeInformation]> => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-          const config = (await eslint.calculateConfigForFile(filePath)) as
-            EffectiveConfig | undefined;
+          const config = await getResolvedConfig(eslint, filePath);
           const rules = new Map(Object.entries(config?.rules ?? {}));
           return [
             filePath,

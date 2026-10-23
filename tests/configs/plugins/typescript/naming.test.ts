@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- Naming regressions use a real temporary TypeScript project. */
-
 import type { Linter } from "eslint";
 import type { Options, Rules } from "../../../../src/types.js";
 
@@ -16,15 +14,18 @@ const namingRule = "@typescript-eslint/naming-convention";
 const temporaryDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-tsx-names-"),
 );
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Resolve only the temporary directory just created by this suite.
 const directory = await realpath(temporaryDirectory);
 const component =
   "export const Greeting = (name: string) => { return <div>{name}</div>; };";
 const functionValue =
   "export const Greeting = (name: string) => { return name; };";
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Write the fixed package.json fixture inside the owned temporary project.
 await writeFile(
   path.join(directory, "package.json"),
   JSON.stringify({ type: "module" }),
 );
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Write the fixed tsconfig.json fixture inside the owned temporary project.
 await writeFile(
   path.join(directory, "tsconfig.json"),
   JSON.stringify({
@@ -34,6 +35,7 @@ await writeFile(
 );
 await Promise.all(
   ["example.tsx", "ordinary.ts", "module.mts"].map(async (fileName) => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Filenames come from the three literal naming fixtures above, inside the owned project.
     await writeFile(path.join(directory, fileName), "export {};\n");
   }),
 );

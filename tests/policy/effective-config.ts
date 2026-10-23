@@ -1,18 +1,7 @@
 import type { ESLint } from "eslint";
 
-type EffectiveConfig = {
-  readonly languageOptions?: unknown;
-  readonly linterOptions?: unknown;
-  readonly plugins?: UnknownRecord;
-  readonly rules?: Readonly<Record<string, readonly unknown[]>>;
-  readonly settings?: unknown;
-};
-type SerializableConfig = {
-  readonly toJSON: () => {
-    readonly language?: unknown;
-    readonly processor?: unknown;
-  };
-};
+import { getResolvedConfig } from "../support/resolved-config.js";
+
 type UnknownRecord = Readonly<Record<string, unknown>>;
 const severityLevels = { error: 2, off: 0, warn: 1 } as const;
 const compareText = (left: string, right: string): number => {
@@ -171,9 +160,8 @@ const describeEffectiveConfig = async (
   rootDirectory: string,
 ): Promise<string> => {
   const isIgnored = await eslint.isPathIgnored(filePath);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    (EffectiveConfig & SerializableConfig) | undefined;
+
+  const config = await getResolvedConfig(eslint, filePath);
   const header = [`path: ${filePath}`, `ignored: ${String(isIgnored)}`];
   if (typeof config === "undefined") {
     return [...header, "config: none", ""].join("\n");

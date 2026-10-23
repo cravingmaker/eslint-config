@@ -7,10 +7,8 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../../../src/factory.js";
+import { getResolvedConfig } from "../../support/resolved-config.js";
 
-type RuleEntries = Readonly<
-  Record<string, readonly [Linter.Severity, ...unknown[]]>
->;
 type Severities = ReadonlyArray<Linter.Severity | undefined>;
 
 const prefix = "@cravingmaker/eslint-config/exceptions/";
@@ -61,9 +59,7 @@ const getSeverities = async (
   filePath: string,
   ruleIds: readonly string[],
 ): Promise<Severities> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    { readonly rules?: RuleEntries } | undefined;
+  const config = await getResolvedConfig(eslint, filePath);
   const rules = new Map(Object.entries(config?.rules ?? {}));
   return ruleIds.map((ruleId) => {
     return rules.get(ruleId)?.[0];

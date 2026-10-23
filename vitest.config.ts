@@ -53,7 +53,7 @@ export default defineConfig({
       {
         // The policy report runs in a child process, which loads these modules itself.
         pattern:
-          /(?:^|\/)(?:scripts\/policy-diff(?:\.ts$|\/)|src\/utilities\/is-record\.ts$|tests\/policy\/effective-(?:config|scenarios)\.ts$)/u,
+          /(?:^|\/)(?:scripts\/policy-diff(?:\.ts$|\/)|src\/utilities\/is-record\.ts$|tests\/policy\/effective-(?:config|scenarios)\.ts$|tests\/support\/resolved-config\.ts$)/u,
         testsToRun: (_filename) => {
           return "tests/scripts/policy-diff.test.ts";
         },

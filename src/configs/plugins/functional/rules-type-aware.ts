@@ -1,36 +1,38 @@
 import type { Rules } from "../../../types.js";
 
 import { functionalRules } from "./rules.js";
+import { rulesOff } from "../../../utilities/type-aware.js";
 
-// Rules requiring type information stay off outside typed linting.
-const typeAwareRulesOff: Rules = {
-  // --- Turned off rules (12/12) -------------------------------------------------------------------------------------------------------------------.
-  "functional/functional-parameters": "off", // Requires type information; enabled only in the type-aware scope.
-  "functional/immutable-data": "off", // Requires type information; enabled only in the type-aware scope.
-  "functional/no-conditional-statements": "off", // Requires type information; enabled only in the type-aware scope.
-  "functional/no-expression-statements": "off", // Requires type information; enabled only in the type-aware scope.
-  "functional/no-mixed-types": "off", // Requires type information; enabled only in the type-aware scope.
-  "functional/no-return-void": "off", // Requires type information; enabled only in the type-aware scope.
-  "functional/no-throw-statements": "off", // Requires type information; enabled only in the type-aware scope.
-  "functional/prefer-immutable-types": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
-  "functional/prefer-property-signatures": "off", // Requires type information; enabled only in the type-aware scope.
-  "functional/prefer-tacit": "off", // Handled by `unicorn/no-array-callback-reference`; explicit consumer enablement still requires type information. Manually fixable by editor suggestions.
-  "functional/readonly-type": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "functional/type-declaration-immutability": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
-} as const;
-
-const typeAwareRuleIds = [
-  ...Object.keys(typeAwareRulesOff),
-  // A consumer can still override this deprecated rule; it also needs typed scope.
-  "functional/prefer-readonly-type",
-];
+// Explicit typed classification; upstream additions never become policy automatically.
+const typedRuleIds = new Set([
+  "functional/functional-parameters",
+  "functional/immutable-data",
+  "functional/no-conditional-statements",
+  "functional/no-expression-statements",
+  "functional/no-mixed-types",
+  "functional/no-return-void",
+  "functional/no-throw-statements",
+  "functional/prefer-immutable-types",
+  "functional/prefer-property-signatures",
+  "functional/prefer-tacit",
+  "functional/readonly-type",
+  "functional/type-declaration-immutability",
+]);
 
 // The policy for the rules that need type information.
 const typeAwareRules: Rules = Object.fromEntries(
   Object.entries(functionalRules).filter(([ruleId]) => {
-    return Object.hasOwn(typeAwareRulesOff, ruleId);
+    return typedRuleIds.has(ruleId);
   }),
 );
+
+// Only authored typed entries produce off guards, in the existing sorted order.
+const typeAwareRulesOff: Rules = rulesOff(typeAwareRules);
+const typeAwareRuleIds = [
+  ...Object.keys(typeAwareRulesOff),
+  // Explicit consumer overrides of omitted deprecated rules still require typed scope.
+  "functional/prefer-readonly-type",
+];
 
 export {
   typeAwareRuleIds,

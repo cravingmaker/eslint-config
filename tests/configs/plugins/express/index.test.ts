@@ -2,19 +2,7 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { express } from "../../../../src/configs/plugins/express/index.js";
-
-type EffectiveConfig = {
-  readonly rules?: Readonly<Record<string, readonly [number, ...unknown[]]>>;
-};
-
-const getEffectiveConfig = async (
-  eslint: ESLint,
-  filePath: string,
-): Promise<EffectiveConfig | undefined> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  return (await eslint.calculateConfigForFile(filePath)) as
-    EffectiveConfig | undefined;
-};
+import { getResolvedConfig as getEffectiveConfig } from "../../../support/resolved-config.js";
 
 describe("express feature", () => {
   it("lints ES module sources with eslint-plugin-express-security", async () => {

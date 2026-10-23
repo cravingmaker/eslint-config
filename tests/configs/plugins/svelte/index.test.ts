@@ -1,22 +1,12 @@
+import type { ResolvedConfig as EffectiveConfig } from "../../../support/resolved-config.js";
+
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../../../../dist/index.mjs";
 import { svelte } from "../../../../src/configs/plugins/svelte/index.js";
 import { expectLintError } from "../../../support/lint.js";
-
-type EffectiveConfig = {
-  readonly languageOptions?: {
-    readonly parser?: {
-      readonly meta?: { readonly name?: string };
-      readonly name?: string;
-    };
-    readonly parserOptions?: {
-      readonly parser?: { readonly meta?: { readonly name?: string } };
-    };
-  };
-  readonly rules?: Readonly<Record<string, readonly unknown[]>>;
-};
+import { getResolvedConfig as getEffectiveConfig } from "../../../support/resolved-config.js";
 
 const svelteOptions = { filePath: "component.svelte" } as const;
 const componentScope = {
@@ -47,15 +37,6 @@ const restoredSeverities = {
   "unicorn/no-top-level-assignment-in-function": 0,
   "unused-imports/no-unused-imports": 2,
 } as const;
-
-const getEffectiveConfig = async (
-  eslint: ESLint,
-  filePath: string,
-): Promise<EffectiveConfig | undefined> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  return (await eslint.calculateConfigForFile(filePath)) as
-    EffectiveConfig | undefined;
-};
 
 const parserName = (
   config: EffectiveConfig | undefined,

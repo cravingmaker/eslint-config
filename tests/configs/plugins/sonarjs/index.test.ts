@@ -6,6 +6,7 @@ import { createConfig } from "../../../../dist/index.mjs";
 import { typeAwareRuleIds } from "../../../../src/configs/plugins/sonarjs/rules-type-aware.js";
 import { sonarjsRules } from "../../../../src/configs/plugins/sonarjs/rules.js";
 import { expectLintError, expectNoLintError } from "../../../support/lint.js";
+import { getResolvedConfig } from "../../../support/resolved-config.js";
 
 const sortRuleIds = (ids: readonly string[]): readonly string[] => {
   return ids.toSorted((left, right) => {
@@ -112,7 +113,7 @@ describe("SonarJS policy", () => {
     });
 
     await expect(
-      eslint.calculateConfigForFile("src/example.ts"),
+      getResolvedConfig(eslint, "src/example.ts"),
     ).resolves.toHaveProperty(["rules", "sonarjs/deprecation"], [0]);
     const [result] = await eslint.lintText(
       "export const value = Promise.resolve(1);\n",

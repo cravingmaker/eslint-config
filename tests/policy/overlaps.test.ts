@@ -6,6 +6,7 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
 type RuleEntries = Readonly<
   Partial<Record<string, readonly [number, ...unknown[]]>>
@@ -88,11 +89,9 @@ const getRules = async (
     overrideConfig: await createConfig({ ...baseOptions, ...options }),
     overrideConfigFile: true,
   });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types calculated configs as any.
-  const config = (await eslint.calculateConfigForFile(filePath)) as {
-    readonly rules?: RuleEntries;
-  };
-  return config.rules ?? {};
+
+  const config = await getResolvedConfig(eslint, filePath);
+  return config?.rules ?? {};
 };
 
 // Each assertion checks effective settings through the public factory, including feature scopes.

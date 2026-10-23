@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
-
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -23,6 +21,7 @@ const temporaryDirectory = await mkdtemp(
 
 const createDirectory = async (name: string): Promise<string> => {
   const directory = path.join(temporaryDirectory, name);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Names come from this file's fixed fixture cases under the owned temporary directory.
   await mkdir(directory);
   return directory;
 };
@@ -32,6 +31,7 @@ const createProject = async (
   manifest: string,
 ): Promise<string> => {
   const directory = await createDirectory(name);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json in the fixture directory created above.
   await writeFile(path.join(directory, "package.json"), manifest, "utf8");
   return directory;
 };

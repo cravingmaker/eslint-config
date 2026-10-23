@@ -1,5 +1,8 @@
 import type { Rules } from "../../../types.js";
 
+import { typeAwareReplacementRules } from "./replacements.js";
+import { rulesOff } from "../../../utilities/type-aware.js";
+
 // Typescript-eslint's recommended rules that need type information.
 const recommendedTypeAwareRules: Rules = {
   // --- Rules with default options (15/19) ---------------------------------------------------------------------------------------------------------.
@@ -262,73 +265,15 @@ const typescriptTypeAwareRules: Rules = {
 } as const;
 
 // Rules requiring type information stay off outside typed linting.
-const typescriptTypeAwareRulesOff: Rules = {
-  // --- Turned off rules (62/62) -------------------------------------------------------------------------------------------------------------------.
-  "@typescript-eslint/await-thenable": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/consistent-return": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/consistent-type-exports": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/dot-notation": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/naming-convention": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-array-delete": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/no-base-to-string": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-confusing-void-expression": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
-  "@typescript-eslint/no-deprecated": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-duplicate-type-constituents": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/no-floating-promises": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/no-for-in-array": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-generated-empty-object-type": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-implied-eval": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-meaningless-void-operator": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
-  "@typescript-eslint/no-misused-promises": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-misused-spread": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/no-mixed-enums": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-redundant-type-constituents": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-unnecessary-boolean-literal-compare": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/no-unnecessary-condition": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/no-unnecessary-qualifier": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/no-unnecessary-template-expression": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/no-unnecessary-type-arguments": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/no-unnecessary-type-assertion": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/no-unnecessary-type-conversion": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/no-unnecessary-type-parameters": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/no-unsafe-argument": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-unsafe-assignment": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-unsafe-call": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-unsafe-enum-comparison": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/no-unsafe-member-access": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-unsafe-return": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-unsafe-type-assertion": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-unsafe-unary-minus": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/no-useless-default-assignment": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/non-nullable-type-assertion-style": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/only-throw-error": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/prefer-destructuring": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/prefer-find": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/prefer-includes": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/prefer-nullish-coalescing": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/prefer-optional-chain": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
-  "@typescript-eslint/prefer-promise-reject-errors": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/prefer-readonly": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/prefer-readonly-parameter-types": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/prefer-reduce-type-parameter": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  // Temporarily disabled: this autofix can change results when RegExp inherits global flags.
-  // Prefer manual review with `regexp/prefer-regexp-exec`; computed-access reports are not fully covered.
-  "@typescript-eslint/prefer-regexp-exec": "off", // Consumer enablement requires type information. Automatically fixable by the --fix command.
-  "@typescript-eslint/prefer-return-this-type": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/prefer-string-starts-ends-with": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/promise-function-async": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "@typescript-eslint/related-getter-setter-pairs": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/require-array-sort-compare": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/require-await": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/restrict-plus-operands": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/restrict-template-expressions": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/return-await": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command. Manually fixable by editor suggestions.
-  "@typescript-eslint/strict-boolean-expressions": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/strict-void-return": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/switch-exhaustiveness-check": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "@typescript-eslint/unbound-method": "off", // Requires type information; enabled only in the type-aware scope.
-  "@typescript-eslint/use-unknown-in-catch-callback-variable": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-} as const;
+const typescriptTypeAwareRulesOff: Rules = rulesOff({
+  ...typescriptTypeAwareRules,
+  // Core replacement entries stay in their own typed block; this guard covers only the plugin.
+  ...Object.fromEntries(
+    Object.entries(typeAwareReplacementRules).filter(([ruleId]) => {
+      return ruleId.startsWith("@typescript-eslint/");
+    }),
+  ),
+});
 
 export {
   typescriptTypeAwareRules,

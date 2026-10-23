@@ -3,7 +3,36 @@ import type { Rules } from "../../src/types.js";
 
 import { describe, expect, it } from "vitest";
 
-import { overridesWithoutTypeInformation } from "../../src/utilities/type-aware.js";
+import {
+  overridesWithoutTypeInformation,
+  rulesOff,
+} from "../../src/utilities/type-aware.js";
+
+describe("rulesOff", () => {
+  it("guards exactly authored keys, including off and unset entries, without changing policy", () => {
+    const policy: Rules = Object.fromEntries(
+      Object.entries({
+        "example/a": "off",
+        "example/optional": undefined,
+        "example/z": ["error", { option: true }],
+      } satisfies Rules).toReversed(),
+    );
+    const original = structuredClone(policy);
+    const guards = rulesOff(policy);
+    expect(guards).toEqual({
+      "example/a": "off",
+      "example/optional": "off",
+      "example/z": "off",
+    });
+    expect(Object.keys(guards)).toEqual([
+      "example/a",
+      "example/optional",
+      "example/z",
+    ]);
+    expect(policy).toEqual(original);
+    expect(rulesOff({})).toEqual({});
+  });
+});
 
 // `example/typed` stands for a rule that needs type information. The settings below turn a rule
 // off, or on, with the severity alone or first in an array.

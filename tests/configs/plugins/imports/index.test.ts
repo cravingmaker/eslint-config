@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import { imports } from "../../../../src/configs/plugins/imports/index.js";
 import { defaultContext } from "../../../../src/context.js";
 import { expectLintError } from "../../../support/lint.js";
+import { getResolvedConfig } from "../../../support/resolved-config.js";
 
 const svelteContext: Context = {
   ...defaultContext,
@@ -17,9 +18,7 @@ const getSettings = async (
   eslint: ESLint,
   filePath: string,
 ): Promise<Linter.Config["settings"]> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    Pick<Linter.Config, "settings"> | undefined;
+  const config = await getResolvedConfig(eslint, filePath);
   return config?.settings;
 };
 

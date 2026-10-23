@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The project is written to a temporary directory. */
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -7,15 +6,10 @@ import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
+import { getResolvedConfig as getEffectiveConfig } from "../support/resolved-config.js";
 
 type ConfigOptions = NonNullable<Parameters<typeof createConfig>[0]>;
-type EffectiveConfig = {
-  readonly languageOptions?: {
-    readonly parserOptions?: Readonly<Record<string, unknown>>;
-  };
-  readonly plugins?: Readonly<Record<string, Plugin | undefined>>;
-  readonly rules?: Readonly<Record<string, readonly unknown[]>>;
-};
+
 type Plugin = {
   readonly rules?: Readonly<
     Record<
@@ -338,7 +332,9 @@ await Promise.all(
     }),
   }).map(async ([fileName, content]) => {
     const filePath = path.join(projectDirectory, fileName);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The parent path comes from the fixed sources/manifest/tsconfig keys under the owned project.
     await mkdir(path.dirname(filePath), { recursive: true });
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The path comes from the fixed sources/manifest/tsconfig keys under the owned project.
     await writeFile(filePath, content, "utf8");
   }),
 );
@@ -358,15 +354,6 @@ const createEslint = async (options: ConfigOptions): Promise<ESLint> => {
     }),
     overrideConfigFile: true,
   });
-};
-
-const getEffectiveConfig = async (
-  eslint: ESLint,
-  filePath: string,
-): Promise<EffectiveConfig | undefined> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  return (await eslint.calculateConfigForFile(filePath)) as
-    EffectiveConfig | undefined;
 };
 
 // Whether the rule declares that it needs type information.

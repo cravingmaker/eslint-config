@@ -1,5 +1,3 @@
-import type { Linter } from "eslint";
-
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
@@ -7,6 +5,7 @@ import { createConfig } from "../../../../dist/index.mjs";
 import { markdown } from "../../../../src/configs/plugins/markdown/index.js";
 import { describeFile } from "../../../support/describe-file.js";
 import { expectNoLintError } from "../../../support/lint.js";
+import { getResolvedConfig } from "../../../support/resolved-config.js";
 
 const mdOptions = { filePath: "test.md" } as const;
 const temporarilyDisabled = [
@@ -89,15 +88,9 @@ describe("markdown rules", () => {
     );
     expect(result.fatalErrorCount).toBe(0);
     expect(result.messages).toEqual([]);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated configuration as any.
-    const config = (await reporter.calculateConfigForFile(
-      mdOptions.filePath,
-    )) as {
-      readonly rules: Readonly<
-        Record<string, readonly [Linter.Severity, ...unknown[]]>
-      >;
-    };
-    const rules = new Map(Object.entries(config.rules));
+
+    const config = await getResolvedConfig(reporter, mdOptions.filePath);
+    const rules = new Map(Object.entries(config?.rules ?? {}));
     expect(
       temporarilyDisabled.map((ruleId) => {
         return rules.get(ruleId)?.[0];

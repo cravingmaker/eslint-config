@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- Watcher regressions create and edit inputs in an isolated temporary workspace. */
-
 import { once } from "node:events";
 import fs from "node:fs/promises";
 import os from "node:os";
@@ -60,6 +58,10 @@ const changes = [
     filename: "src/utilities/is-record.ts",
     tests: ["tests/scripts/policy-diff.test.ts"],
   },
+  {
+    filename: "tests/support/resolved-config.ts",
+    tests: ["tests/scripts/policy-diff.test.ts"],
+  },
   { filename: "package.json", tests: testFiles },
 ];
 
@@ -70,6 +72,7 @@ describe("Vitest watch dependencies", () => {
       const temporaryDirectory = await fs.mkdtemp(
         path.join(os.tmpdir(), "eslint-config-watch-"),
       );
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- Resolve only the isolated workspace directory just created by this test.
       const workspace = await fs.realpath(temporaryDirectory);
       const selectedTests = testFiles.filter((filename) => {
         return scenario === "package"
@@ -88,6 +91,7 @@ describe("Vitest watch dependencies", () => {
           path.join(directory, "vitest.config.ts"),
           path.join(workspace, "vitest.config.ts"),
         );
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- Link the repository node_modules to the fixed child of the owned watcher workspace.
         await fs.symlink(
           path.join(directory, "node_modules"),
           path.join(workspace, "node_modules"),
@@ -96,7 +100,9 @@ describe("Vitest watch dependencies", () => {
         await Promise.all(
           testFiles.map(async (filename) => {
             const target = path.join(workspace, filename);
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- The parent path comes from the fixed testFiles matrix beneath the owned watcher workspace.
             await fs.mkdir(path.dirname(target), { recursive: true });
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- The path comes from the fixed testFiles matrix beneath the owned watcher workspace.
             await fs.writeFile(
               target,
               'import { expect, it } from "vitest"; it("runs", () => { expect(true).toBe(true); });',
@@ -106,7 +112,9 @@ describe("Vitest watch dependencies", () => {
         await Promise.all(
           changes.map(async ({ filename }) => {
             const target = path.join(workspace, filename);
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- The parent path comes from the fixed changes matrix beneath the owned watcher workspace.
             await fs.mkdir(path.dirname(target), { recursive: true });
+            // eslint-disable-next-line security/detect-non-literal-fs-filename -- The path comes from the fixed changes matrix beneath the owned watcher workspace.
             await fs.writeFile(
               target,
               filename === "package.json"
@@ -188,14 +196,17 @@ describe("Vitest watch dependencies", () => {
               const buildDirectory = path.join(workspace, "dist");
               await fs.rm(buildDirectory, { recursive: true });
               await removed;
+              // eslint-disable-next-line security/detect-non-literal-fs-filename -- Recreate only the dist directory beneath the owned watcher workspace.
               await fs.mkdir(buildDirectory);
               await Promise.all(
                 ["index.mjs", "index.d.mts"].map(async (filename) => {
                   const target = path.join(buildDirectory, filename);
+                  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write one of the two literal build output names beneath the owned workspace dist directory.
                   await fs.writeFile(target, "// rebuilt input\n");
                 }),
               );
             } else {
+              // eslint-disable-next-line security/detect-non-literal-fs-filename -- The path comes from the fixed changes matrix beneath the owned watcher workspace.
               await fs.appendFile(
                 path.join(workspace, change.filename),
                 change.filename === "package.json"

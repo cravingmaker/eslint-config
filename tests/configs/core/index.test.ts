@@ -4,18 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { core } from "../../../src/configs/core/index.js";
 import { defaultContext } from "../../../src/context.js";
-
-type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
-
-const getRules = async (
-  eslint: ESLint,
-  filePath: string,
-): Promise<RuleEntries | undefined> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    { readonly rules?: RuleEntries } | undefined;
-  return config?.rules;
-};
+import { getResolvedRules as getRules } from "../../support/resolved-config.js";
 
 describe("core builder", () => {
   it("keeps the core blocks and registers the internal arrow policy", async () => {

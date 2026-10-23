@@ -246,6 +246,17 @@ Node's `rules-type-aware.ts` owns the TypeScript-specific off and typed
 reactivation maps, referencing the single `n/no-sync` tuple in `rules.ts`.
 JavaScript keeps that base policy; untyped TypeScript and components keep the
 guard that turns it off.
+Functional and SonarJS keep explicit typed-rule classifications beside their
+authored category maps. Their off guards come from the selected authored maps
+through `rulesOff()` in `src/utilities/type-aware.ts`. TypeScript derives its
+guard from its typed map and the plugin entries of its typed replacement map;
+core replacement entries remain in their own block. Upstream metadata never
+adds runtime policy. Omitted deprecated rules retain separate typed override
+guards. Keep fixability and ownership explanations at the authored policy entry.
+Typegen's build-only plugin registry remains local so it can eagerly inspect
+all development plugins without coupling runtime lazy optional-peer loading to
+generation. `tests/scripts/typegen.test.ts` checks configured and registered
+rule IDs against the generated declarations.
 The table lists each feature's policy entry points:
 
 | Rule ID prefix                                          | Feature         | Policy modules                                                                                                           |
@@ -1079,6 +1090,16 @@ The reference that the recipes link to, grouped by topic.
 
 ### Code in this repository
 
+- **Resolved test configurations share one boundary.**
+  `tests/support/resolved-config.ts` owns the assertion around ESLint's untyped
+  `calculateConfigForFile` result. It models normalized rule severities and
+  inspected metadata, leaves rule options unknown, and preserves undefined for
+  ignored or unmatched files. It does not validate plugin metadata or arbitrary
+  option shapes. Use `getResolvedConfig` or `getResolvedRules`; keep specialized
+  description, snapshot, map, and assertion wrappers only for their different
+  responsibilities. `tests/support/lint.ts` accepts `typeChecked` and `refresh`;
+  its typed-linting default remains false and all framework features remain on.
+  Its assertions reject ignored files and fatal parser diagnostics.
 - **Review signals apply to opaque returns and test operations too.**
   Keep `promise-function-async`'s `allowAny: false`, all function-kind checks,
   and the existing typed scope. Clarify return contracts or explain a local
@@ -1086,10 +1107,12 @@ The reference that the recipes link to, grouped by topic.
   convert a synchronous API to async just to satisfy the diagnostic. Keep
   Security's filesystem-path and computed-key warnings in tests as well as
   production. Operation-level comments must state the inspected path or key
-  boundary and leave later unrelated operations visible. Stage 6's handoff in
+  boundary and leave later unrelated operations visible. Stage 11's handoff in
   [the audit implementation guide](AUDIT_RESULT_FOLLOW_UP_IMPLEMENTATION.md)
-  inventories the remaining whole-file directives for Stage 11; preserve
-  unrelated rule tokens when narrowing a combined directive.
+  records the operation-level review of Stage 6's inventory. Contract fixture
+  ordering retains its three file-wide sort exceptions, and smoke subprocesses
+  retain their synchronous-operation exceptions at each call; these do not
+  suppress Security.
 - **`functional/prefer-immutable-types` shares a cache across files.** It
   checks parameters shallowly, which gives the same result whatever files
   are linted together, except for a parameter whose type is a mapped type

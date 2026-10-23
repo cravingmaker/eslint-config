@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The suite owns its temporary consumer project. */
-
 import type { Linter } from "eslint";
 import type { Options } from "../../src/types.js";
 
@@ -14,19 +12,23 @@ import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
 // eslint-disable-next-line @typescript-eslint/strict-void-return -- execFile also returns its child process.
 const execute = promisify(execFile);
 const temporaryPrefix = path.join(os.tmpdir(), "eslint-config-ownership-");
 const temporaryDirectory = await mkdtemp(temporaryPrefix);
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Resolve only the temporary directory just created for this suite.
 const directory = await realpath(temporaryDirectory);
 afterAll(async () => {
   await rm(directory, { force: true, recursive: true });
 });
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json inside this suite's owned temporary project.
 await writeFile(
   path.join(directory, "package.json"),
   JSON.stringify({ engines: { node: ">=24.15.0" }, type: "module" }),
 );
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only tsconfig.json inside this suite's owned temporary project.
 await writeFile(
   path.join(directory, "tsconfig.json"),
   JSON.stringify({
@@ -44,6 +46,7 @@ await writeFile(
     include: ["*.ts", "*.tsx"],
   }),
 );
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Link the repository node_modules to the fixed node_modules child of the owned temporary project.
 await symlink(
   path.join(process.cwd(), "node_modules"),
   path.join(directory, "node_modules"),
@@ -51,6 +54,7 @@ await symlink(
 );
 await Promise.all(
   ["typed.ts", "component.tsx"].map(async (fileName) => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Filenames come from the two literal typed fixtures above inside the owned temporary project.
     await writeFile(path.join(directory, fileName), "export {};\n");
   }),
 );
@@ -731,7 +735,7 @@ describe("effective settings and static ownership", () => {
   });
   it("retains the reviewed complementary settings and typed guards", async () => {
     expect(
-      await typed.calculateConfigForFile(path.join(directory, "typed.ts")),
+      await getResolvedConfig(typed, path.join(directory, "typed.ts")),
     ).toMatchObject({
       rules: {
         "default-case": [2, {}],
@@ -781,7 +785,7 @@ describe("effective settings and static ownership", () => {
       },
     });
     expect(
-      await untyped.calculateConfigForFile(path.join(directory, "sample.ts")),
+      await getResolvedConfig(untyped, path.join(directory, "sample.ts")),
     ).toMatchObject({
       rules: {
         "sonarjs/unicode-aware-regex": [0],

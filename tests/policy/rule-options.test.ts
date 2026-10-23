@@ -9,20 +9,8 @@ import { describe, expect, it } from "vitest";
 import { createConfig } from "../../dist/index.mjs";
 import { replacementRules } from "../../src/configs/plugins/typescript/replacements.js";
 import { isRecord } from "../../src/utilities/is-record.js";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
-type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
-type RulePlugin = {
-  readonly rules?: Readonly<
-    Record<
-      string,
-      {
-        readonly meta?: {
-          readonly languages?: readonly string[];
-        };
-      }
-    >
-  >;
-};
 type UnknownRecord = Readonly<Record<string, unknown>>;
 const rootDirectory = process.cwd();
 const filePaths = [
@@ -322,17 +310,7 @@ const getOffRuleIds = async (
   eslint: ESLint,
   filePath: string,
 ): Promise<readonly string[]> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    | {
-        readonly toJSON: () => {
-          readonly language?: string;
-        };
-
-        readonly plugins?: Readonly<Record<string, RulePlugin>>;
-        readonly rules?: RuleEntries;
-      }
-    | undefined;
+  const config = await getResolvedConfig(eslint, filePath);
   const language = config?.toJSON().language;
   const unsupported = new Set(
     Object.entries(config?.plugins ?? {}).flatMap(([prefix, plugin]) => {
@@ -396,7 +374,7 @@ describe.each([false, true])(
           overrideConfigFile: true,
         });
         await expect(
-          eslint.calculateConfigForFile(filePath),
+          getResolvedConfig(eslint, filePath),
         ).resolves.toBeDefined();
       },
     );
