@@ -19,7 +19,6 @@ const imports = (
 ): Linter.Config[] => {
   const { files, ignores = [] } = options;
   const { svelteComponents, tsconfigRootDir } = context;
-  const resolverProject = tsconfigRootDir ? { project: tsconfigRootDir } : {};
 
   return [
     ...sourcePluginConfigs(
@@ -42,7 +41,7 @@ const imports = (
         "import-x/resolver-next": [
           createTypeScriptImportResolver({
             alwaysTryTypes: true,
-            ...resolverProject,
+            project: tsconfigRootDir,
           }),
           createNodeResolver(),
         ],

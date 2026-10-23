@@ -18,6 +18,44 @@ const describeRule = async (
 };
 
 describe("json feature", () => {
+  it("keeps lockfiles and other extensions outside JSON languages when files names a directory", async () => {
+    const eslint = new ESLint({
+      overrideConfig: json({ files: ["config/**"] }),
+      overrideConfigFile: true,
+    });
+    const descriptions = await Promise.all(
+      [
+        "config/data.json",
+        "config/package.json",
+        "config/package-lock.json",
+        "config/yarn.lock",
+        "config/notes.txt",
+        "config/example.js",
+      ].map(async (filePath) => {
+        return await describeFile(eslint, filePath, "json/no-duplicate-keys");
+      }),
+    );
+    const outside = { language: undefined, plugins: [], severity: undefined };
+    expect(descriptions).toEqual([
+      { language: "json/json", plugins: ["@", "json"], severity: 2 },
+      outside,
+      outside,
+      outside,
+      outside,
+      { language: "@/js", plugins: ["@"], severity: undefined },
+    ]);
+    const [result] = await eslint.lintText('{ "key": 1, "key": 2 }', {
+      filePath: "config/data.json",
+    });
+    expect(result.fatalErrorCount).toBe(0);
+    expect(result.messages).toContainEqual(
+      expect.objectContaining({
+        ruleId: "json/no-duplicate-keys",
+        severity: 2,
+      }),
+    );
+  });
+
   it("keeps each override in its own JSON language", async () => {
     const eslint = new ESLint({
       overrideConfig: json({
