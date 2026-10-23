@@ -5,10 +5,9 @@ const otherRules: Rules = {
   "unicorn/consistent-function-style": [
     "error",
     {
-      defaultExport: undefined,
-
       callbacks: "ignore",
       default: "ignore",
+      defaultExport: undefined,
       namedExports: "ignore",
       namedFunctions: "ignore",
       objectProperties: "ignore",
@@ -51,8 +50,6 @@ const otherRules: Rules = {
   "unicorn/string-content": [
     "error",
     {
-      selectors: [],
-
       patterns: {
         /* eslint-disable unicorn/string-content -- Disable to allow defining the search patterns themselves. */
         "\\.\\.\\.": "…", // Ellipsis: prefer the real Unicode character.
@@ -60,6 +57,7 @@ const otherRules: Rules = {
         "->": "→", // Right arrow: prefer Unicode.
         /* eslint-enable unicorn/string-content -- Disable to allow defining the search patterns themselves. */
       },
+      selectors: [],
     },
   ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
 

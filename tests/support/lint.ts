@@ -35,7 +35,7 @@ const lintRuleIds = async (
         typeChecked,
       },
     }),
-    // True = disable automatic config-file discovery; we supply config entirely via overrideConfig
+    // True = disable automatic config-file discovery; we supply config entirely via overrideConfig.
     overrideConfigFile: true,
   });
   expect(

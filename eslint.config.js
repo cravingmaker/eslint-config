@@ -11,8 +11,8 @@ export default createConfig(
     ],
     typescript: {
       overridesTypeAware: {
-        // Rule definition files use ESLint plugin key notation (e.g. '@typescript-eslint/rule-name','plugin/rule')
-        // which intentionally cannot conform to camelCase naming convention.
+        // All typed repository files allow quoted property names, including ESLint rule IDs.
+        // Other properties and bindings retain the shared naming policy.
         "@typescript-eslint/naming-convention": [
           "error",
           ...namingConventionOptions,

@@ -25,10 +25,9 @@ const recommendedRules: Rules = {
   "promise/catch-or-return": [
     "error",
     {
+      allowFinally: true,
       allowThen: false,
       allowThenStrict: false,
-
-      allowFinally: true,
       terminationMethod: "catch",
     },
   ],

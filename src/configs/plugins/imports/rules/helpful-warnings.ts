@@ -15,13 +15,12 @@ const otherRules: Rules = {
   "import-x/no-extraneous-dependencies": [
     "error",
     {
-      packageDir: undefined,
-
       bundledDependencies: true,
       devDependencies: true,
       includeInternal: false,
       includeTypes: false,
       optionalDependencies: true,
+      packageDir: undefined,
       peerDependencies: true,
       whitelist: [],
     },

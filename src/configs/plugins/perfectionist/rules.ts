@@ -5,7 +5,6 @@ const commonOptions = {
   ignoreCase: true,
   locales: "en-US",
   order: "asc",
-
   specialCharacters: "trim",
   type: "natural",
 } as const;
@@ -80,18 +79,6 @@ const perfectionistRules: Rules = {
     "error",
     {
       alphabet: "",
-      fallbackSort: { type: "unsorted" },
-      ignoreCallbackDependenciesPatterns: [],
-      locales: "en-US",
-      newlinesBetween: "ignore",
-      newlinesBetweenOverloadSignatures: 0,
-      newlinesInside: "newlinesBetween",
-      partitionByComment: false,
-      partitionByNewLine: false,
-      specialCharacters: "keep",
-      useConfigurationIf: {},
-      useExperimentalDependencyDetection: true,
-
       customGroups: [
         // #private static property.
         {
@@ -154,6 +141,7 @@ const perfectionistRules: Rules = {
           selector: "method",
         },
       ],
+      fallbackSort: { type: "unsorted" },
       groups: [
         // Static properties.
         "public-static-property",
@@ -273,9 +261,19 @@ const perfectionistRules: Rules = {
 
         "unknown",
       ],
+      ignoreCallbackDependenciesPatterns: [],
       ignoreCase: true,
+      locales: "en-US",
+      newlinesBetween: "ignore",
+      newlinesBetweenOverloadSignatures: 0,
+      newlinesInside: "newlinesBetween",
       order: "asc",
+      partitionByComment: false,
+      partitionByNewLine: false,
+      specialCharacters: "keep",
       type: "alphabetical",
+      useConfigurationIf: {},
+      useExperimentalDependencyDetection: true,
     },
   ], // Automatically fixable by the --fix command.
   "perfectionist/sort-decorators": [

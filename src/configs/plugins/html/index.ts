@@ -8,7 +8,9 @@ import { htmlFiles } from "../../../globs.js";
 import { htmlRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 
-// Builds the flat config for HTML files.
+/**
+ * Builds the flat config for HTML files.
+ */
 const html = ({
   files,
   ignores = [],

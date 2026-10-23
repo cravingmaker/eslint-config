@@ -17,10 +17,9 @@ const otherRules: Rules = {
     "error",
     "asc",
     {
-      minKeys: 2,
-
       allowLineSeparatedGroups: true,
       caseSensitive: false,
+      minKeys: 2,
       natural: true,
     },
   ], // Automatically fixable by the --fix command.

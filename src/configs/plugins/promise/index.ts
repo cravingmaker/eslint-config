@@ -6,7 +6,9 @@ import pluginPromise from "eslint-plugin-promise";
 import { promiseRules } from "./rules.js";
 import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
-// Builds the flat config for eslint-plugin-promise.
+/**
+ * Builds the flat config for eslint-plugin-promise.
+ */
 const promise = (
   options: FeatureOptions = {},
   context?: Context,

@@ -8,10 +8,9 @@ import { narrowFiles } from "../../../utilities/file-scope.js";
 import { importPeer } from "../../../utilities/import-peer.js";
 import { supportedPluginPolicy } from "../../../utilities/plugin-policy.js";
 
-// Builds the flat config for Svelte components and rune modules. Script blocks are parsed with
-// the typescript-eslint parser, and the features for JavaScript and TypeScript sources lint the
-// scripts of the components that this block parses. A missing @html-eslint/eslint-plugin-svelte
-// or svelte-eslint-parser fails with a message that names it.
+/**
+ * Builds the flat config for Svelte components and rune modules. Script blocks are parsed with the typescript-eslint parser, and the features for JavaScript and TypeScript sources lint the scripts of the components that this block parses. A missing @html-eslint/eslint-plugin-svelte or svelte- eslint-parser fails with a message that names it.
+ */
 const svelte = async (
   { files, ignores = [], overrides = {} }: FeatureOptions = {},
   { globals }: Context = defaultContext,

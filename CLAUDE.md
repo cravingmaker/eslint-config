@@ -15,7 +15,7 @@ A TypeScript-first, shareable ESLint flat config, published to npm as an ESM-onl
 
 ## Environment
 
-Node.js 24.15 or later is required at runtime. Check `node --version` before anything else. In a Claude Code cloud session the default is Node.js 22: if `/opt/node24/bin/node` exists, put `/opt/node24/bin` first on `PATH` for every command; otherwise install the version in `.nvmrc` from `nodejs.org` into `/opt/node24` first.
+Node.js 24.15 or later is required at runtime. Check `node --version` before anything else and use the contributor version in `.nvmrc`. In a Claude Code cloud session, if `/opt/node24/bin/node` matches that version, put `/opt/node24/bin` first on `PATH` for every command; otherwise install the pinned version from `nodejs.org` into `/opt/node24` first. See the setup script in `CONTRIBUTING.md`, then run `npm ci` and `npm run prepare`.
 
 ## Conventions
 
@@ -26,7 +26,9 @@ Node.js 24.15 or later is required at runtime. Check `node --version` before any
 - Never bypass the git hooks with `--no-verify`.
 - `tests/policy/__snapshots__/` records the effective lint policy. A changed line there is a changed policy: update with `npx vitest run tests/policy -u` only when the change is intended, and explain the diff. Never edit those files by hand.
 - `functional/prefer-immutable-types` can give different results depending on which files are linted together when a parameter's type is a mapped type such as `Partial<Readonly<T>>`; write `Readonly<Partial<T>>` instead. Before committing, lint both the whole repository and only the files you changed.
-- Before changing anything under `src/` or `tests/`, read "Things to know" in `CONTRIBUTING.md`. `docs/rewrite/record.md` lists the design decisions and the open questions that wait for the maintainer.
+- Before changing anything under `src/` or `tests/`, read "Things to know" in `CONTRIBUTING.md`. `AUDIT_RESULT.md` records maintainer decisions; `AUDIT_RESULT_FOLLOW_UP_IMPLEMENTATION.md` tracks their stage boundaries and verified handoffs.
+- Builder and API descriptions use starred `/** ... */` documentation, with prose paragraphs kept intact; implementation explanations use `//` and final periods. Preserve ordinary grouped comments and paragraph breaks.
+- Keep option keys, including explicit `undefined`, in one sorted group. Blank lines partition sorting; retain them only for a meaningful commented category or a shared-options spread boundary. Shared core/extension options satisfy both supported schemas without changing values or spread precedence.
 
 ## Releases
 

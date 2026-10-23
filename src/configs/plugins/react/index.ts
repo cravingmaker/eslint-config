@@ -71,12 +71,9 @@ const reactRefreshConfigs = (
   ];
 };
 
-// Builds the flat config for React: one block for the @html-eslint React rules and one for React
-// Refresh, unless `refresh` is `false`, in files that can hold components, and one for the hooks
-// rules in every JavaScript and TypeScript source, where custom hooks also live. `files` limits
-// each of the two scopes to the files in it that match one of its patterns. Each block takes the
-// overrides of its own plugin's rules, and the first one also those of any other rule. A missing
-// plugin fails with a message that names it.
+/**
+ * Builds the flat config for React: one block for the @html-eslint React rules and one for React Refresh, unless `refresh` is `false`, in files that can hold components, and one for the hooks rules in every JavaScript and TypeScript source, where custom hooks also live. `files` limits each of the two scopes to the files in it that match one of its patterns. Each block takes the overrides of its own plugin's rules, and the first one also those of any other rule. A missing plugin fails with a message that names it.
+ */
 const react = async ({
   files,
   ignores = [],

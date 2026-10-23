@@ -41,7 +41,7 @@ const isDeprecated = (rule: RuleDefinition | undefined): boolean => {
 describe("rule coverage", () => {
   it("classifies every current non-deprecated ESLint core rule", async () => {
     const { rules = {} } = await getEffectiveConfig("src/example.js");
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- Coverage audit intentionally inspects ESLint's current builtin rule registry
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- Coverage audit intentionally inspects ESLint's current builtin rule registry.
     const unclassified = Iterator.from(builtinRules)
       .filter(([ruleName, rule]) => {
         return !isDeprecated(rule) && !Object.hasOwn(rules, ruleName);

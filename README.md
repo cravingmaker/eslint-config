@@ -163,6 +163,15 @@ A source is a JavaScript or TypeScript file: `**/*.{js,mjs,jsx,mjsx,ts,mts,tsx,m
 
 SonarJS adds control-flow, security, accessibility, and test checks. Every current non-deprecated rule has an explicit setting; deprecated rule entries are omitted. Disabled overlaps name their owner in the policy. SonarJS owns duplicate-branch checks across conditionals and switches; the overlapping Unicorn rule is off. Checks that need human review, such as complexity thresholds and suspected hardcoded secrets, warn. Rules that require type information run with [typed linting](#typed-linting), which is on by default, within its scope and the SonarJS feature's own `files` and `ignores`.
 
+All eighteen AWS CDK security checks remain errors within that SonarJS scope,
+including when CDK is declared only in a workspace child or as an optional
+dependency. They do not depend on the root manifest's framework detection.
+The twenty reviewed test-rule entries also retain their existing scopes:
+recognized tests in `__tests__/check.*` and `test/check.*` receive checks beyond
+the `.test`/`.spec` file role. `sonarjs/assertions-in-tests` warns only with
+type information. Each rule retains its own test-API recognition; feature
+filters and overrides still apply.
+
 The `packageJson` feature requires `type: "module"`. A package with `exports` or `publishConfig.exports` must also expose `"./package.json": "./package.json"`; use `packageJson.overrides` to change these rules.
 
 Peer dependencies are optional. When `peerDependencies` is declared, every peer needs an entry in nonempty `peerDependenciesMeta` with an explicit boolean `optional`: `true` for an optional peer, `false` for a required peer. A package without peers can omit metadata; an explicitly empty object remains invalid. The bundled `@cravingmaker/require-peer-metadata` rule owns conditional completeness, while Package JSON's shape, relationship, and nonempty-field rules validate metadata that is present. Use `packageJson.overrides` to change this policy.
@@ -245,7 +254,7 @@ export default createConfig({
 });
 ```
 
-The feature has no rules for JSX itself, such as those of eslint-plugin-react, and none for accessibility, such as those of eslint-plugin-jsx-a11y; add them with a [user config](#user-configs). Typed linting, which is on by default, reports React components, as described in [Known issues](#known-issues).
+The feature has no rules for JSX itself, such as those of eslint-plugin-react, and none for accessibility, such as those of eslint-plugin-jsx-a11y; add them with a [user config](#user-configs). Typed TSX permits PascalCase function names. Functional checks can still report handlers and effects, as described in [Known issues](#known-issues).
 
 ### Svelte
 
@@ -315,6 +324,11 @@ Typed linting reads the type information of each TypeScript file through the nea
 
 The core rules whose checks the compiler makes in any case, such as `no-undef`, are off in TypeScript files as well. ESLint does not report the errors of the compiler, so run `tsc --noEmit` too, for example in CI.
 
+The consumer compiler contract remains these three options. It does not require
+`noUncheckedIndexedAccess`, `verbatimModuleSyntax`, or
+`noFallthroughCasesInSwitch`. Their related lint policies retain their own
+coverage; unchecked-index typing does not validate a computed key's trust.
+
 ### Typed linting
 
 Typed linting is on by default. typescript-eslint's project service reads the type information of each TypeScript file through the nearest `tsconfig.json`, and the rules of the `typescript`, `functional`, `node`, and `sonarjs` features that need type information turn on in the same files. A file that no tsconfig includes fails with a parsing error that says it "was not found by the project service". Leave such files out of typed linting with `ignoresTypeAware`, or limit typed linting to your sources with `filesTypeAware`:
@@ -373,7 +387,7 @@ npx prettier --check . && npx eslint .
 
 You do not need eslint-config-prettier. Its disable list does not choose this
 config's policy: `curly` stays on, and the `stylistic` feature explicitly
-classifies all 97 bundled rules. Compatible rules enforce token spacing, spaced
+classifies every current non-deprecated bundled rule. Compatible rules enforce token spacing, spaced
 comments, class member separation, PascalCase JSX components, self-closing JSX,
 and consistent JSX expression braces. Logical and bitwise mixtures require
 parentheses; ordinary arithmetic follows JavaScript precedence.
@@ -381,8 +395,8 @@ parentheses; ordinary arithmetic follows JavaScript precedence.
 Rules with competing layout choices remain off for specific reasons documented
 in their rule maps. These include Stylistic's indentation, wrapping, quote, and
 semicolon rules, so consumers can choose Prettier options such as `useTabs`,
-`printWidth`, `singleQuote`, and `semi`. Deprecated and experimental Stylistic
-rules are explicitly off. Other disabled layout rules include:
+`printWidth`, `singleQuote`, and `semi`. Deprecated Stylistic entries are omitted;
+non-deprecated experimental rules are explicitly off. Other disabled layout rules include:
 
 - `no-unexpected-multiline`.
 - `unicorn/empty-brace-spaces`, `unicorn/number-literal-case`, and `unicorn/no-nested-ternary`. Core `no-nested-ternary` reports directly nested result branches and has no fix for Prettier to undo. Conditional-position nesting is outside its coverage.
@@ -556,7 +570,7 @@ Some files break a rule by design. These rules are off in them:
 | Test files: sources named `*.test.*` or `*.spec.*`                 | `functional/no-expression-statements` and `functional/no-return-void`, because tests and assertions are calls whose results go unused                |
 | Svelte components                                                  | `functional/no-let`, `import-x/no-mutable-exports`, `import-x/unambiguous`, and `unicorn/no-top-level-assignment-in-function`; see [Svelte](#svelte) |
 
-The two rules of test files need type information, so they matter only with typed linting. The exceptions come after every feature, so a feature's `overrides` cannot turn these rules back on in these files. A user config can:
+The two rules of test files need type information, so they matter only with typed linting. This file role governs those Functional exceptions; it does not restrict SonarJS test recognition or disable Security warnings. Alternate test directories keep their normal source policies. The exceptions come after every feature, so a feature's `overrides` cannot turn these rules back on in these files. A user config can:
 
 ```js
 import { createConfig } from "@cravingmaker/eslint-config";

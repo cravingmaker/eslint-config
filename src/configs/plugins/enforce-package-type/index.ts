@@ -8,6 +8,9 @@ import { packageJsonFiles } from "../../../globs.js";
 import { enforcePackageTypeRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 
+/**
+ * Builds the ES module package policy, registering its plugin only within package manifests.
+ */
 const enforcePackageType = ({
   files,
   ignores = [],

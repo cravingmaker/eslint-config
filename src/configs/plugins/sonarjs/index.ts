@@ -16,8 +16,9 @@ import {
   typeAwareConfig,
 } from "../../../utilities/type-aware.js";
 
-// Builds the flat config for eslint-plugin-sonarjs. Rules and overrides that need type
-// information apply only within the shared type-aware scope and the feature's own files.
+/**
+ * Builds the flat config for eslint-plugin-sonarjs. Rules and overrides that need type information apply only within the shared type-aware scope and the feature's own files.
+ */
 const sonarjs = (
   options: FeatureOptions = {},
   context: Context = defaultContext,

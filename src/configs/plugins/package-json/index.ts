@@ -9,6 +9,9 @@ import { packageJsonRules } from "./rules.js";
 import { internalPlugin } from "../../../rules/index.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 
+/**
+ * Registers manifest plugins globally, then applies package metadata rules within package manifests.
+ */
 const packageJson = ({
   files,
   ignores = [],

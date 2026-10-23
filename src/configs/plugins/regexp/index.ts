@@ -6,7 +6,9 @@ import pluginRegexp from "eslint-plugin-regexp";
 import { regexpRules } from "./rules.js";
 import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
-// Builds the flat config for eslint-plugin-regexp.
+/**
+ * Builds the flat config for eslint-plugin-regexp.
+ */
 const regexp = (
   options: FeatureOptions = {},
   context?: Context,

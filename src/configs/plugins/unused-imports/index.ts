@@ -6,6 +6,9 @@ import pluginUnusedImports from "eslint-plugin-unused-imports";
 import { unusedImportsRules } from "./rules.js";
 import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 
+/**
+ * Builds the flat config for unused imports and variables in the shared source/component scope.
+ */
 const unusedImports = (
   options: FeatureOptions = {},
   context?: Context,

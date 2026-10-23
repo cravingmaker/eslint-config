@@ -12,14 +12,13 @@ const recommendedRules: Rules = {
   "unicorn/consistent-boolean-name": [
     "error",
     {
-      prefixes: {},
-
       checkArguments: "always",
       checkFields: "never",
       checkFunctions: "always",
       checkMethods: "never",
       checkVariables: "always",
       ignore: [],
+      prefixes: {},
       wrappers: {},
     },
   ], // Automatically fixable by the --fix command. Manually fixable by editor suggestions.
@@ -73,11 +72,10 @@ const recommendedRules: Rules = {
   "unicorn/expiring-todo-comments": [
     "error",
     {
-      date: undefined,
-
       allowWarningComments: true,
       checkDates: false,
       checkDatesOnPullRequests: false,
+      date: undefined,
       ignore: [],
       terms: ["todo", "fixme", "xxx"],
     },
@@ -491,30 +489,20 @@ const recommendedRules: Rules = {
   "unicorn/filename-case": [
     "error",
     {
-      checkDirectories: true,
-      directoryRoots: [],
-      multipleFileExtensions: true,
-
       cases: {
         kebabCase: true,
         pascalCase: true,
       },
+      checkDirectories: true,
+      directoryRoots: [],
       // @ts-expect-error -- The schema accepts RegExp objects, but the generated type allows only plain objects.
       ignore: [/^\d+_/v], // Migration files like 001_init.js.
+      multipleFileExtensions: true,
     },
   ],
   "unicorn/name-replacements": [
     "error",
     {
-      checkDefaultAndNamespaceImports: "internal",
-      checkFilenames: true,
-      checkProperties: false,
-      checkShorthandImports: "internal",
-      checkShorthandProperties: false,
-      checkVariables: true,
-      extendDefaultAllowList: true,
-      extendDefaultReplacements: true,
-
       allowList: {
         // Common framework/library identifiers that are intentional abbreviations.
         i18n: true,
@@ -523,6 +511,14 @@ const recommendedRules: Rules = {
         // TypeScript.
         tsconfigRootDir: true,
       },
+      checkDefaultAndNamespaceImports: "internal",
+      checkFilenames: true,
+      checkProperties: false,
+      checkShorthandImports: "internal",
+      checkShorthandProperties: false,
+      checkVariables: true,
+      extendDefaultAllowList: true,
+      extendDefaultReplacements: true,
       ignore: [
         // Allow spec/test file patterns.
         String.raw`\.spec$`,
@@ -552,9 +548,8 @@ const recommendedRules: Rules = {
   "unicorn/template-indent": [
     "error",
     {
-      indent: undefined,
-
       functions: ["dedent", "stripIndent"],
+      indent: undefined,
       selectors: [],
 
       // The defaults without `gql`, `html`, and `/* HTML */`: Prettier formats those templates.

@@ -7,8 +7,9 @@ import { markdownFiles } from "../../../globs.js";
 import { markdownRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 
-// Builds the flat config for Markdown files, with GitHub Flavored Markdown, YAML front matter,
-// and math.
+/**
+ * Builds the flat config for Markdown files, with GitHub Flavored Markdown, YAML front matter, and math.
+ */
 const markdown = ({
   files,
   ignores = [],
