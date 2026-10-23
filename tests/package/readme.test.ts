@@ -238,7 +238,7 @@ describe("the README", () => {
     );
   });
 
-  it("asks for the compiler options that the tsconfigs of this repository and of the fixtures set", async () => {
+  it("retains P10's three-option compiler contract in the README and consumer projects", async () => {
     const [tsconfigExample] = tsconfigExamples;
     expect(tsconfigExamples).toHaveLength(1);
     const expected = readCompilerOptions("README.md", tsconfigExample.text);
@@ -247,24 +247,44 @@ describe("the README", () => {
     );
     const fixturesTsconfig = path.join(fixturesDirectory, "tsconfig.json");
 
-    expect(Object.keys(expected)).not.toHaveLength(0);
+    const repositoryOptions = readCompilerOptions(
+      repositoryTsconfig,
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- The repository tsconfig.json path is fixed relative to this test module.
+      await readFile(repositoryTsconfig, "utf8"),
+    );
+    const fixtureOptions = readCompilerOptions(
+      fixturesTsconfig,
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- The fixture tsconfig.json path is fixed relative to the repository fixtures directory.
+      await readFile(fixturesTsconfig, "utf8"),
+    );
+    const reactOptions = readCompilerOptions(
+      "react/tsconfig.json",
+      reactTsconfig,
+    );
+
+    expect(expected).toEqual({
+      allowUnreachableCode: false,
+      noImplicitReturns: true,
+      strict: true,
+    });
+    expect(repositoryOptions).toMatchObject(expected);
+    expect(fixtureOptions).toMatchObject(expected);
+    expect(reactOptions).toMatchObject(expected);
     expect(
-      readCompilerOptions(
-        repositoryTsconfig,
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- The repository tsconfig.json path is fixed relative to this test module.
-        await readFile(repositoryTsconfig, "utf8"),
+      [expected, repositoryOptions, fixtureOptions, reactOptions].map(
+        (options) => {
+          return [
+            options.noUncheckedIndexedAccess === true,
+            options.verbatimModuleSyntax === true,
+            options.noFallthroughCasesInSwitch === true,
+          ];
+        },
       ),
-    ).toMatchObject(expected);
-    expect(
-      readCompilerOptions(
-        fixturesTsconfig,
-        // eslint-disable-next-line security/detect-non-literal-fs-filename -- The fixture tsconfig.json path is fixed relative to the repository fixtures directory.
-        await readFile(fixturesTsconfig, "utf8"),
-      ),
-    ).toMatchObject(expected);
-    expect(
-      readCompilerOptions("react/tsconfig.json", reactTsconfig),
-    ).toMatchObject(expected);
+    ).toEqual(
+      Array.from({ length: 4 }, () => {
+        return [false, false, false];
+      }),
+    );
   });
 
   // Each example starts ESLint and TypeScript processes; serialize them to bound memory use.

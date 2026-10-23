@@ -928,6 +928,12 @@ The reference that the recipes link to, grouped by topic.
   mixed D1/D2/D3 sample through positive convergence assertions. No temporary
   loop characterizations remain. Typed passing samples take a parameter to
   satisfy the independently retained Functional policy.
+  The final acceptance matrix also runs every TypeScript source sample without
+  type information, supported Svelte rune modules and ordinary `.svelte.mjs` /
+  `.svelte.mts` sources, HTML, Markdown, JSON/JSONC/JSON5, and package manifests.
+  Every normal sample must converge without warnings or remaining fixes;
+  separate assertions preserve manual diagnostics, comments, custom-element
+  boundaries, and conditional peer metadata.
 - **Import comments keep their documentation layout.**
   `import-x/newline-after-import` uses `considerComments: false` and
   `exactCount: false`, with `count: 1` as a minimum. The rule counts intervening
