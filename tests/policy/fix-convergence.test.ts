@@ -22,6 +22,8 @@ type Sample = {
   readonly fileName: string;
   readonly name: string;
   readonly text: string;
+
+  readonly typeChecked?: boolean;
 };
 type SampleResult = {
   readonly name: string;
@@ -285,6 +287,63 @@ const samples: readonly Sample[] = [
       },
     ];
   }),
+  ...[...sources].map(([name, text]) => {
+    return {
+      fileName: `${name.toLowerCase()}.untyped.ts`,
+      name: `${name}.untyped.ts`,
+      text: sampleText(name, text, "ts"),
+      typeChecked: false,
+    };
+  }),
+  ...["js", "ts"].map((extension) => {
+    return {
+      fileName: `state.svelte.${extension}`,
+      name: `rune.svelte.${extension}`,
+      text: "export const state = $state({ value: 1 });\n",
+    };
+  }),
+  ...["mjs", "mts"].map((extension) => {
+    return {
+      fileName: `ordinary.svelte.${extension}`,
+      name: `ordinary.svelte.${extension}`,
+      text: stableSource,
+    };
+  }),
+  {
+    fileName: "index.html",
+    name: "custom-element.html",
+    text: "<my-element></my-element><br>\n",
+  },
+  {
+    fileName: "README.md",
+    name: "autolink.md",
+    text: "# Example\n\n[https://example.com]\n\n![](image.png)\n",
+  },
+  ...["json", "jsonc", "json5"].map((extension) => {
+    return {
+      fileName: `data.${extension}`,
+      name: `sort.${extension}`,
+      text: `${extension === "json" ? "" : "// Keep this comment.\n"}{"zeta":1,"alpha":2}\n`,
+    };
+  }),
+  {
+    fileName: "package.json",
+    name: "manifest.json",
+    text: JSON.stringify({
+      author: "cravingmaker",
+      description: "Combined-rule convergence consumer",
+      devDependencies: { eslint: "10.12.0" },
+      devEngines: { runtime: { name: "node", version: ">=24.15.0" } },
+      engines: { node: ">=24.15.0" },
+      name: "convergence-consumer",
+      peerDependencies: { eslint: ">=10.4.0 <11" },
+      peerDependenciesMeta: { eslint: { optional: false } },
+      private: true,
+      scripts: { lint: "eslint ." },
+      type: "module",
+      version: "0.0.0",
+    }),
+  },
   {
     fileName: "warning-control.js",
     name: "warning-control",
@@ -314,28 +373,33 @@ try {
   await writeFile(path.join(directory, "package.json"), JSON.stringify({ type: "module", engines: { node: ">=24.15.0" } }));
   await writeFile(path.join(directory, "tsconfig.json"), JSON.stringify({
     compilerOptions: { allowUnreachableCode: false, jsx: "react-jsx", module: "nodenext", noEmit: true, noImplicitReturns: true, skipLibCheck: true, strict: true, target: "esnext", types: ["node"] },
-    include: ["*.ts", "*.tsx"],
+    include: ["*.ts", "*.tsx", "*.mts"],
   }));
   await symlink(path.join(process.cwd(), "node_modules"), path.join(directory, "node_modules"), "junction");
   await Promise.all(samples.map(({ fileName, text }) => writeFile(path.join(directory, fileName), text)));
-  const config = await createConfig({
-    express: false, projectRootDirectory: directory, react: { refresh: "generic" }, svelte: true,
-    typescript: { tsconfigRootDir: directory },
-  }, {
+  const warningConfig = {
     files: ["warning-control.js"],
     plugins: { control: { rules: { warning: {
       meta: { schema: [] },
       create() { process.emitWarning("Harness control", { type: "ConvergenceControlWarning", code: "HARNESS_CONTROL" }); return {}; },
     } } } },
     rules: { "control/warning": "error" },
-  });
-  const engines = {
-    fixer: new ESLint({ cwd: directory, fix: true, overrideConfig: config, overrideConfigFile: true }),
-    reporter: new ESLint({ cwd: directory, overrideConfig: config, overrideConfigFile: true }),
   };
+  const createEngines = async (typeChecked) => {
+    const config = await createConfig({
+      express: false, projectRootDirectory: directory, react: { refresh: "generic" }, svelte: true,
+      typescript: { tsconfigRootDir: directory, typeChecked },
+    }, warningConfig);
+    return {
+      fixer: new ESLint({ cwd: directory, fix: true, overrideConfig: config, overrideConfigFile: true }),
+      reporter: new ESLint({ cwd: directory, overrideConfig: config, overrideConfigFile: true }),
+    };
+  };
+  const typedEngines = await createEngines(true);
+  const untypedEngines = await createEngines(false);
   const results = [];
-  for (const { fileName, name, text } of samples) {
-    results.push({ name, trace: await traceFixCycles(engines, text, path.join(directory, fileName)) });
+  for (const { fileName, name, text, typeChecked } of samples) {
+    results.push({ name, trace: await traceFixCycles(typeChecked === false ? untypedEngines : typedEngines, text, path.join(directory, fileName)) });
   }
   await setImmediate();
   const assignedWarnings = results.flatMap(({ trace }) => trace.flatMap(({ warnings }) => warnings.map(({ name }) => name)));
@@ -411,6 +475,68 @@ const unapprovedOverlaps = (
 };
 
 describe("combined ESLint fixes and the package formatter", () => {
+  it.each(
+    samples.filter(({ name }) => {
+      return name !== "warning-control";
+    }),
+  )("converges without warnings or remaining fixes in $name", ({ name }) => {
+    expect(convergenceProblems(getTrace(name))).toEqual([]);
+  });
+  it("keeps type-aware comparator checks out of untyped TypeScript", () => {
+    const trace = getTrace("sort.untyped.ts");
+    expect(
+      selectReports(trace, ["@typescript-eslint/require-array-sort-compare"]),
+    ).toEqual([]);
+    expect(
+      selectReports(trace, ["unicorn/require-array-sort-compare"]),
+    ).toHaveLength(1);
+  });
+  it("preserves custom-element boundaries while fixing void elements", () => {
+    const trace = getTrace("custom-element.html");
+    const reports = selectReports(trace, ["@html-eslint/require-closing-tags"]);
+    expect(reports).toEqual([
+      expect.objectContaining({ messageId: "missingSelf" }),
+    ]);
+    expect(reports[0]?.fix).toBeDefined();
+    expect(trace[1].formatted.text).toContain("<my-element></my-element>");
+    expect(trace[1].formatted.text).toContain("<br />");
+    expect(
+      trace[1].formatted.messages.filter(({ ruleId }) => {
+        return ruleId === "@html-eslint/require-closing-tags";
+      }),
+    ).toEqual([]);
+  });
+  it("retains independent Markdown diagnostics alongside GFM autolinks", () => {
+    const trace = getTrace("autolink.md");
+    expect(trace[1].formatted.text).toContain("https://example.com");
+    expect(trace[1].formatted.messages).toEqual([
+      expect.objectContaining({ ruleId: "markdown/require-alt-text" }),
+    ]);
+  });
+  it.each(["json", "jsonc", "json5"])(
+    "fixes and formats sorted keys without crossing the %s language boundary",
+    (extension) => {
+      const trace = getTrace(`sort.${extension}`);
+      expect(selectReports(trace, ["json/sort-keys"])).not.toHaveLength(0);
+      expect(trace[0].fixed.text).not.toBe(trace[0].before.text);
+      expect(trace[1].formatted.text.indexOf("alpha")).toBeLessThan(
+        trace[1].formatted.text.indexOf("zeta"),
+      );
+      expect(trace[1].formatted.messages).toEqual([]);
+      expect(trace[1].formatted.text.includes("// Keep this comment.")).toBe(
+        extension !== "json",
+      );
+    },
+  );
+  it("sorts manifests while preserving explicit conditional peer metadata", () => {
+    const trace = getTrace("manifest.json");
+    expect(
+      selectReports(trace, ["package-json/order-properties"]),
+    ).not.toHaveLength(0);
+    expect(trace[0].fixed.text).not.toBe(trace[0].before.text);
+    expect(trace[1].formatted.text).toContain('"optional": false');
+    expect(trace[1].formatted.messages).toEqual([]);
+  });
   it("D13.2: preserves the annotation-spacing arrow compatibility guard", () => {
     const trace = getTrace("D13.2-Stage-7.ts");
     expect(

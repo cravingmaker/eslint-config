@@ -122,22 +122,22 @@ require direct tests beyond the standard effective-policy scenarios.
 Run stages in order. This keeps behavioral corrections ahead of structural
 migrations and supplies a verified baseline for each refactor.
 
-| Stage | Deliverable                                                               | Decisions/findings               | Depends on | Status      |
-| ----- | ------------------------------------------------------------------------- | -------------------------------- | ---------- | ----------- |
-| 1     | Baseline and combined-rule regression harness                             | P1–P3; guard against regressions | None       | Complete    |
-| 2     | Escape-case and import-spacing convergence                                | D1, D2                           | 1          | Complete    |
-| 3     | Arrow functions, starred documentation, function spacing                  | D3                               | 2          | Complete    |
-| 4     | Passing configurations, conditional peer metadata, typed TSX names        | D4–D7 and D7 AST follow-up       | 3          | Complete    |
-| 5     | Verified ownership, complementary checks, safe execution preference       | D8.1–D8.12                       | 4          | Complete    |
-| 6     | Retained review signals and known parser/fix failures                     | D9, D10.1–D10.2, D11.1–D11.3     | 5          | Complete    |
-| 7     | Severity, deprecated entries/options, generated ignores, explicit updates | D12, D13.1–D13.2, D14, D19       | 6          | Complete    |
-| 8     | Source-map-free package                                                   | D15, R7                          | 7          | Complete    |
-| 9     | Source, test, and ambient declaration ownership                           | D18.1–D18.6, R11                 | 8          | Complete    |
-| 10    | Production utility/builder consolidation and Svelte negations             | R1, R2                           | 9          | Complete    |
-| 11    | Derived disabled maps, shared test boundaries, local suppressions         | R3–R5                            | 10         | Complete    |
-| 12    | Dead entries and consistent scripts/hooks                                 | R6, R8                           | 11         | Complete    |
-| 13    | Documentation and source conventions                                      | R9, R10; D16, D17 retention      | 12         | Complete    |
-| 14    | Final consumer verification and audit closure                             | All decisions/findings           | 13         | Not started |
+| Stage | Deliverable                                                               | Decisions/findings               | Depends on | Status   |
+| ----- | ------------------------------------------------------------------------- | -------------------------------- | ---------- | -------- |
+| 1     | Baseline and combined-rule regression harness                             | P1–P3; guard against regressions | None       | Complete |
+| 2     | Escape-case and import-spacing convergence                                | D1, D2                           | 1          | Complete |
+| 3     | Arrow functions, starred documentation, function spacing                  | D3                               | 2          | Complete |
+| 4     | Passing configurations, conditional peer metadata, typed TSX names        | D4–D7 and D7 AST follow-up       | 3          | Complete |
+| 5     | Verified ownership, complementary checks, safe execution preference       | D8.1–D8.12                       | 4          | Complete |
+| 6     | Retained review signals and known parser/fix failures                     | D9, D10.1–D10.2, D11.1–D11.3     | 5          | Complete |
+| 7     | Severity, deprecated entries/options, generated ignores, explicit updates | D12, D13.1–D13.2, D14, D19       | 6          | Complete |
+| 8     | Source-map-free package                                                   | D15, R7                          | 7          | Complete |
+| 9     | Source, test, and ambient declaration ownership                           | D18.1–D18.6, R11                 | 8          | Complete |
+| 10    | Production utility/builder consolidation and Svelte negations             | R1, R2                           | 9          | Complete |
+| 11    | Derived disabled maps, shared test boundaries, local suppressions         | R3–R5                            | 10         | Complete |
+| 12    | Dead entries and consistent scripts/hooks                                 | R6, R8                           | 11         | Complete |
+| 13    | Documentation and source conventions                                      | R9, R10; D16, D17 retention      | 12         | Complete |
+| 14    | Final consumer verification and audit closure                             | All decisions/findings           | 13         | Complete |
 
 ## Stage 1: baseline and combined-rule regression harness
 
@@ -898,10 +898,11 @@ verified, even when the implementation stages are complete.
 
 ## Temporary upstream restoration conditions
 
-| Condition                                 | Current approved policy                                                           | Evidence required before changing it                                                                                                                                                                                         |
-| ----------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D8.10 TypeScript RegExp-execution autofix | TypeScript rule scalar off; active RegExp owner; Sonar off reason matches reality | Test the actual corrected dependency combination, inherited global flags, match/exec result arrays, computed access, repeated fixes, and restored unique diagnostics; update comments/tests/docs together                    |
-| D11.2 Markdown GFM autolink positions     | Five named explicit scalar-off entries; other Markdown policy retained            | Test the actual corrected dependency combination on every recorded crashing case, including `[https://example.com]`, then each restored rule's unique diagnostics/fixes, GFM/front matter/math, feature scopes and overrides |
+| Condition                                 | Current approved policy                                                                                                   | Evidence required before changing it                                                                                                                                                                                         |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D3 module-member spacing                  | `perfectionist/sort-modules` retains `newlinesBetween: "ignore"`; direct function-variable padding has its separate owner | Verify the corrected dependency combination on original starred/unstarred documentation paragraphs and mixed D1/D2/D3 samples through repeated ESLint/Prettier cycles before restoring module spacing                        |
+| D8.10 TypeScript RegExp-execution autofix | TypeScript rule scalar off; active RegExp owner; Sonar off reason matches reality                                         | Test the actual corrected dependency combination, inherited global flags, match/exec result arrays, computed access, repeated fixes, and restored unique diagnostics; update comments/tests/docs together                    |
+| D11.2 Markdown GFM autolink positions     | Five named explicit scalar-off entries; other Markdown policy retained                                                    | Test the actual corrected dependency combination on every recorded crashing case, including `[https://example.com]`, then each restored rule's unique diagnostics/fixes, GFM/front matter/math, feature scopes and overrides |
 
 A new version number alone is not proof of a fix. These conditions do not
 authorize a dependency upgrade during an unrelated stage. Keep the disabled
@@ -2531,3 +2532,106 @@ contracts still require preservation and later review.
 - **Next stage:** Stage 14 remains unstarted and requires a separate instruction.
 - **PR/CI:** Local validation is complete. The requested PR follows commit and
   push; remote CI has not been evaluated in this record.
+
+#### Stage 14 — final consumer verification and closure
+
+- **Status/date:** Complete, 23 October 2026.
+- **Stage-entry commit:** `da99a5b3f595a684fb767ae1252a9e18034238bc`.
+  The worktree was clean on `cravingmaker/implement-stage-14-audit`.
+- **Implementation commit(s):** Uncommitted at validation; acceptance tests and
+  closure records are delivered together.
+- **Decisions/findings covered:** All D1–D19/subdecisions/follow-ups and
+  P1–P11/R1–R11. The appended
+  [audit completion record](AUDIT_RESULT.md#implementation-acceptance-and-closure--23-october-2026)
+  links the actual Stage 1–13 commits and current owning regressions, maps the
+  cumulative delta, and distinguishes retained boundaries from implementation
+  gaps. The original dated audit/decision discussion is preserved.
+- **Acceptance changes:** Run every source sample without type information as
+  well as the existing JavaScript/typed TypeScript corpus; add supported Svelte
+  rune modules, ordinary `.svelte.mjs`/`.svelte.mts`, HTML, Markdown, JSON/JSONC/
+  JSON5, and a manifest with explicit peer metadata to the combined harness.
+  Every normal sample must satisfy all second-cycle transition, stable-report,
+  warning, and remaining-fix checks. Explicit assertions verify actual JSON/
+  manifest fixes, comment retention, custom-element boundaries, surviving
+  Markdown alt-text reports, and the untyped comparator guard. Preserve the
+  sample/rule-specific complementary-overlap approvals and independent controls.
+  No temporary Stage 1 loop characterization remains.
+- **P10:** Pin the README's exact three-option compiler contract and verify that
+  README, repository, fixture, and React consumer configurations do not enable
+  `noUncheckedIndexedAccess`, `verbatimModuleSyntax`, or
+  `noFallthroughCasesInSwitch`. Retain `strict`, `noImplicitReturns`, and
+  `allowUnreachableCode: false`; Security remains responsible for trust review.
+- **Preparation/focused checks:** Node.js 24.22.0/npm 11.19.1; `npm ci`
+  reports zero vulnerabilities, and `npm run prepare`, clean build, and
+  `npm run typecheck:built` pass. The expanded convergence suite passes
+  **1 file / 145 tests**. Initial changed-file lint found an unsafe `expect.any`
+  matcher assignment and an imperative branch in new assertions; use a direct
+  defined-fix assertion and an unconditional boolean check instead, without
+  suppressions. Changed-file zero-warning lint then passes.
+- **Additional runtime/peer verification:**
+  - Node.js **24.15.0/npm 11.12.1**, the runtime floor: pack the current build,
+    install all nine advertised minimum peers in an external temporary consumer,
+    run `npm ls --all`, and execute CI's explicit Express/React-Vite/Svelte
+    integration checks. All integrations load and JSX, TypeScript-in-Svelte,
+    and JavaScript samples lint without fatal/ignored-file results on ESLint
+    **10.4.0**. The exact optional pins are HTML React/Svelte **0.60.0**,
+    Express Security **1.2.0**, React Hooks **7.1.0**, React Refresh **0.5.0**,
+    React **19.0.0**, Svelte **5.0.0**, and Svelte ESLint Parser **1.6.0**.
+    Compatibility passes; the independent consumer audit remains seven entries
+    (three high, one moderate, three low), reproducing the existing separate
+    dependency-review finding rather than a clean security audit.
+  - Node.js **26.12.0/npm 11.20.0**:
+    `npx vitest run tests/policy/fix-convergence.test.ts tests/package/contract.test.ts tests/package/smoke.test.ts`
+    passes **3 files / 160 tests**, including external-cwd runtime loading and
+    linked absent/partial/full/broken optional-peer cases. The broken-peer
+    exception is intentional fixture stderr. This is focused runtime coverage,
+    not a full Node 26 validation or registry-installed peer matrix.
+- **Policy/snapshot review:** The current report against the stage-entry SHA
+  has **33 unchanged snapshots** and identical locked packages. The cumulative
+  report against `008a08207f28441297a2476b4798136aeb1023de` has **25 changed /
+  8 unchanged**, no new/removed/failed snapshots. Every changed rule ID/option
+  and the nine historical package-path differences is decision-mapped in the
+  audit completion record. Git confirms zero snapshot changes in Stages 1 and
+  9–13; Stage 10's intentional ordered-Svelte-negation correction has direct
+  public-factory regressions. No snapshot is edited or regenerated here.
+- **Retained conditions:** D3 module spacing, D8.10 TypeScript RegExp execution,
+  and D11.2 Markdown restoration require the recorded dependency-combination
+  proof before policy changes. HTML manual boundaries, accepted complementary
+  diagnostics, opaque-return review, Security test coverage, AWS checks, and
+  alternate-filename test coverage remain intentional. Minimum-peer audit
+  remediation remains separate dependency work. No dependency/peer range,
+  compiler option, production source, public API, hook, or CI change is made.
+- **Full gate:** `npm run release:check` passes on Node.js 24.22.0 with
+  `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16`. Its `npm run validate` passes **75 files / 2,857 tests**
+  in **517.60 seconds** for the test phase, with no retries or skipped coverage.
+  This includes the expanded harness, root/nested discovery and caller global
+  negations, feature/file/typed/override boundaries, inherited deprecated rules,
+  authored inventory/options/type generation, alternate test filenames, and
+  external-cwd installed/README consumers. Formatting, clean build, type checking,
+  Knip, zero-warning repository lint, Publint, and ATTW's ESM-only profile pass.
+  The repository dependency audit has **zero findings**. The intentional
+  broken-peer fixture stderr does not indicate a failed test.
+- **Artifacts:** Actual packing and the release dry run contain exactly
+  `LICENSE`, `README.md`, `dist/index.d.mts`, `dist/index.mjs`, and `package.json`.
+  Package tests inspect both tarball and installed bytes, source-map references,
+  runtime exports/deep-import restrictions, and consumer declarations without
+  `skipLibCheck`. Runtime/declaration bundles and generated rule types are
+  byte-identical to the stage-entry build; `CODING_PRINCIPLES.md`, manifests,
+  lockfile, and compiler configuration are unchanged. The original audit and
+  previous Stage 1–13 execution records remain byte-identical.
+- **Final review:**
+  `npm run policy:diff -- --base da99a5b3f595a684fb767ae1252a9e18034238bc`
+  and `npm run policy:diff -- --base 008a08207f28441297a2476b4798136aeb1023de`
+  both pass with the entry/cumulative results above. Final closure text passes
+  separate formatting and changed-file zero-warning lint checks after recording
+  the full-gate results; `git diff --check` passes.
+- **Unrelated work:** The entry tree was clean; build output, generated types,
+  reports, logs, tarballs, and minimum-peer consumers stay outside the commit.
+- **Remaining work:** None within Stage 14; requested commit/push/PR delivery
+  follows the completed local acceptance gate, with hooks enabled.
+- **Next stage:** None; this is the final implementation acceptance stage.
+  Restoration/dependency work requires its own scope and evidence.
+- **PR/CI:** Remote CI has not been evaluated; full CI on Node 24.15.0 and
+  Node 26 and the dedicated minimum-peer job remain distinct from these local
+  runtime checks. Do not infer remote success from local validation.

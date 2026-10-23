@@ -2260,3 +2260,133 @@ for (let index = 0; index < limit; index = index + 1) {
 **Focused verification:** Thirty isolated checks used ESLint 10.12.0. Twenty-one rejected forms covered four prefix/postfix updates, two `for`-loop updates, twelve arithmetic/bitwise compound assignment operators, and three logical compound assignment operators. Nine accepted forms covered explicit arithmetic assignments, an explicit `for` update, conditional logical assignments, and a BigInt update using `1n`. All assertions passed. These probes verify the three-rule combination, not full repository or consumer validation. See the official [increment/decrement rule](https://eslint.org/docs/latest/rules/no-plusplus), [operator-assignment rule](https://eslint.org/docs/latest/rules/operator-assignment), and [logical-assignment rule](https://eslint.org/docs/latest/rules/logical-assignment-operators) documentation.
 
 **Maintainer choice:** Confirmed by direct instruction on 20 October 2026. This section records the added audit finding and approved policy; runtime configuration changes and code migration remain part of the implementation phase.
+
+## Implementation acceptance and closure — 23 October 2026
+
+**Status:** Implementation complete through Stage 14. The original dated findings, isolated
+probes, and decision-review status above remain historical evidence. The final
+implementation record is maintained in
+[the execution guide](AUDIT_RESULT_FOLLOW_UP_IMPLEMENTATION.md#stage-14--final-consumer-verification-and-closure).
+Implementation began at `008a08207f28441297a2476b4798136aeb1023de`;
+Stage 14 began at `da99a5b3f595a684fb767ae1252a9e18034238bc` with a clean tree.
+
+### Reconciled implementation evidence
+
+These are actual commits in the current branch's ancestry. Their current
+regressions are rerun by the final validation gate; the earlier handoffs alone
+are not acceptance evidence.
+
+| Stage | Implementation commit                                                                                      | Decisions/findings and current verification                                                                                                                                                                                                                                                                                                    |
+| ----- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | [`48ed7d1`](https://github.com/cravingmaker/eslint-config/commit/48ed7d1548a79465b0bd70d048ccf187c1d049e7) | P1–P3 harness: [combined fixes](tests/policy/fix-convergence.test.ts), overlap controls, real typed projects, and isolated warning capture. All temporary defect characterizations are gone.                                                                                                                                                   |
+| 2     | [`e432539`](https://github.com/cravingmaker/eslint-config/commit/e4325397d3ee57c150114d523536da643afcb4f1) | D1/D2: uppercase escapes and minimum import spacing; original and mixed convergence cases.                                                                                                                                                                                                                                                     |
+| 3     | [`311598b`](https://github.com/cravingmaker/eslint-config/commit/311598b92d56630842fa0b4056f0b6741ae77dc0) | D3: [function semantics](tests/configs/core/function-style.test.ts), [padding/documentation](tests/policy/function-layout.test.ts), and repeated fixes.                                                                                                                                                                                        |
+| 4     | [`90a360a`](https://github.com/cravingmaker/eslint-config/commit/90a360aed94bd2b006b6b21463002cf611b830a4) | D4–D7 and AST follow-up/P2: passing configuration files, conditional metadata, callbacks, [typed TSX names](tests/configs/plugins/typescript/naming.test.ts), negative controls, and installed consumers.                                                                                                                                      |
+| 5     | [`ae66847`](https://github.com/cravingmaker/eslint-config/commit/ae66847b3ceaa1da85100c1c0c444dc9fbf85a39) | D8.1–D8.12/P3/P5: [ownership, unique coverage, and safe fixes](tests/policy/rule-ownership.test.ts), [feature/override boundaries](tests/policy/overlaps.test.ts), and packed Buffer/RegExp regressions.                                                                                                                                       |
+| 6     | [`d1fb5e3`](https://github.com/cravingmaker/eslint-config/commit/d1fb5e3edba78e918fb8e81871ebfc84c0010588) | D9–D11/P4/P5: [opaque-return review](tests/configs/plugins/typescript/promise-function-async.test.ts), Security in tests, HTML boundaries, Markdown trigger corpus, and supported Svelte routing.                                                                                                                                              |
+| 7     | [`8273526`](https://github.com/cravingmaker/eslint-config/commit/8273526416e19aa001fa73250e217aa1f8c971a1) | D12–D14/D19/P6–P8/P11: [limits](tests/policy/maintainability-limits.test.ts), [deprecated inheritance](tests/policy/deprecated-rules.test.ts), [explicit options](tests/policy/rule-options.test.ts), [generated directories and caller negations](tests/configs/ignores/index.test.ts), and [updates](tests/policy/explicit-updates.test.ts). |
+| 8     | [`e820001`](https://github.com/cravingmaker/eslint-config/commit/e82000143424c9fb4a513d30b058ce530492fbcc) | D15/R7: [build contract](tests/package/contract.test.ts), five-file tarball/installed contents, and declarations. Includes the separately recorded Vitest security patch.                                                                                                                                                                      |
+| 9     | [`cba23af`](https://github.com/cravingmaker/eslint-config/commit/cba23af137a75d901e564ba28367d4e21a8559cd) | D18.1–D18.6/R11: source/test/ambient ownership, [Node tuple identity](tests/configs/plugins/node/index.test.ts), Comments scope, ignores discovery, type checking, Knip, and watch mappings.                                                                                                                                                   |
+| 10    | [`10405a6`](https://github.com/cravingmaker/eslint-config/commit/10405a60a3a9f6be868d72bc25a6af106b4bc5cc) | R1/R2: record guard/shared builders and [ordered Svelte negations](tests/configs/plugins/svelte/scripts.test.ts). Negations are an intentional scoped correction beyond snapshot scenarios.                                                                                                                                                    |
+| 11    | [`abf27fe`](https://github.com/cravingmaker/eslint-config/commit/abf27fe77c21dd54a371e051508fa17266c64244) | R3–R5: authored typed guards, [shared result boundary](tests/support/resolved-config.test.ts), [lint helper](tests/support/lint.test.ts), and operation-level suppression review.                                                                                                                                                              |
+| 12    | [`e350a69`](https://github.com/cravingmaker/eslint-config/commit/e350a69e55843d3acb931d0b6886d11de794e4cb) | R6/R8: dead entries removed, Knip, release/script composition, and mandatory hooks. Script alignment also landed in [`f30fa41`](https://github.com/cravingmaker/eslint-config/commit/f30fa41363f4a278a686998d8f1c91107939cc07).                                                                                                                |
+| 13    | [`da99a5b`](https://github.com/cravingmaker/eslint-config/commit/da99a5b3f595a684fb767ae1252a9e18034238bc) | R9/R10/D16/D17/P9: current documentation, [all eighteen AWS checks and twenty test checks](tests/configs/plugins/sonarjs/scope.test.ts), workspace/optional dependencies, alternate filenames, negative controls, typed guards, and overrides.                                                                                                 |
+| 14    | This change                                                                                                | Final all-language convergence matrix, packed/external-cwd consumers, optional-peer absence, minimum peers, cumulative review, P10 compiler-contract guard, and this closure record.                                                                                                                                                           |
+
+### Cumulative policy, scopes, and artifacts
+
+The report against the implementation starting SHA contains **25 changed and
+8 unchanged snapshots**, with no new, removed, or failed snapshots. The report
+against Stage 14's entry SHA contains **33 unchanged snapshots** and identical
+locked packages. No snapshot is edited or regenerated in Stage 14.
+
+The following groups account for all **52 changed rule IDs** and options in the
+cumulative report. Plugin registration/count summaries follow these entries;
+the private plugin adds no public feature option or export.
+
+| Decision            | Reviewed cumulative change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1/D2               | `regexp/letter-case` hexadecimal/Unicode escapes become uppercase; `import-x/newline-after-import` sets `considerComments: false`, `exactCount: false`, retaining `count: 1` and import ordering.                                                                                                                                                                                                                                                                                                           |
+| D3                  | Private arrow/starred-documentation/Svelte-padding owners and native selector padding replace `func-style`, `prefer-arrow-callback`, and Unicorn's no-asterisk rule. `perfectionist/sort-modules` retains sorting with module spacing ignored pending restoration evidence.                                                                                                                                                                                                                                 |
+| D4/D5/D6            | Disable `unicorn/no-top-level-side-effects` and `functional/prefer-tacit`; private conditional peer metadata replaces unconditional `package-json/require-peerDependenciesMeta`.                                                                                                                                                                                                                                                                                                                            |
+| D7                  | Typed `.tsx` naming adds PascalCase for function-valued consts/functions within the existing typed scope; data and other extensions retain their naming contract.                                                                                                                                                                                                                                                                                                                                           |
+| D8.1/D8.2/D8.3/D8.5 | Disable `no-eq-null`, `security/detect-eval-with-expression`, `unicorn/no-unnecessary-nested-ternary`, and `no-control-regex` in favor of the confirmed owners. Intentional constructor control escapes remain accepted.                                                                                                                                                                                                                                                                                    |
+| D8.7/D8.10          | Native direct-Buffer syntax restriction replaces `security/detect-new-buffer` and `unicorn/no-new-buffer`, preserving global/import/type restrictions. TypeScript's `prefer-regexp-exec` is scalar off to prevent the verified unsafe fix; RegExp remains active.                                                                                                                                                                                                                                           |
+| D11.1/D11.2/D11.3   | HTML closing-tag options preserve custom-element boundaries; the five recorded Markdown crash rules are scalar off; Svelte parsing is limited to supported suffixes while `.svelte.mjs`/`.svelte.mts` remain ordinary modules.                                                                                                                                                                                                                                                                              |
+| D12/D13.2           | The changed limit severities are `complexity`, native/TypeScript `max-params`, `unicorn/max-nested-calls`, and `@html-eslint/max-element-depth`. All twelve reviewed limits are warnings with unchanged thresholds; TypeScript's redundant `maximum` alias is removed and the annotation-spacing guard remains.                                                                                                                                                                                             |
+| D13.1               | Remove deprecated `no-return-await`; Stylistic `jsx-indent`, `jsx-props-no-multi-spaces`, `jsx-sort-props`; SonarJS `conditional-indentation`, `confidential-information-logging`, `frame-ancestors`, `hidden-files`, `no-intrusive-permissions`, `no-ip-forward`, `no-mixed-content`, `no-redundant-parentheses`, `no-tab`, `no-unsafe-unzip`, `os-command`, `useless-string-operation`, and `web-sql-database`. Earlier consumer deprecated entries remain inherited; later explicit overrides still win. |
+| D14/D19             | Root/nested `.next/` and `.svelte-kit/` become default global ignores with caller negations retained; native `no-plusplus` is enabled without a loop exception, beside the existing explicit-assignment policy.                                                                                                                                                                                                                                                                                             |
+| D15/R7              | Clean builds contain only runtime/declaration bundles; published contents add only `LICENSE`, `README.md`, and `package.json`. No maps, map references, or original-source directory.                                                                                                                                                                                                                                                                                                                       |
+| D18/R1–R6/R8–R11    | Ownership, builder/helper/derived-map consolidation, dead-entry cleanup, hooks, documentation, and options retain effective values/order/scopes. Git comparisons confirm no snapshot changes in Stages 1 and 9–13. R1's ordered Svelte-negation correction has direct integration coverage. Stage 13 changes emitted documentation separately from executable/type structure.                                                                                                                               |
+
+D8.4/D8.6/D8.8/D8.9/D8.11/D8.12 retain their complementary checks and distinct
+coverage. D9/D10 retain opaque-return and Security review signals, including
+matching tests. D16/D17 retain broad SonarJS coverage. Current authored-map,
+deprecation, schema/option, generated-type, feature-toggle, narrowed/ignored-file,
+typed/untyped, and consumer-override suites check these boundaries.
+
+The lockfile's nine cumulative package-path differences belong to Stage 8's
+documented security patch: Vitest/UI and four internal Vitest packages move
+5.0.3 → 5.0.5, `obug` moves 2.2.1 → 3.0.0, and two nested `obug@3.0.0`
+copies are deduplicated. Stage 14 changes no dependency or peer range.
+
+### P10 and retained follow-up boundaries
+
+P10 is closed as an explicitly unapproved expansion: the consumer compiler
+contract remains `strict`, `noImplicitReturns`, and
+`allowUnreachableCode: false`. The [README consumer test](tests/package/readme.test.ts)
+pins those three options and checks that README/repository/fixture/React consumer
+configurations do not enable `noUncheckedIndexedAccess`,
+`verbatimModuleSyntax`, or `noFallthroughCasesInSwitch`. Unchecked-index typing
+does not validate a key's trust or replace Security review.
+
+Implementation completion does not restore temporarily excluded behavior:
+
+- D3's module-spacing restoration requires the corrected dependency combination
+  to preserve starred/unstarred paragraphs and mixed fix/format convergence.
+- D8.10's TypeScript RegExp execution preference requires inherited-global-flag,
+  result-array, computed-access, unique-diagnostic, and repeated-fix proof.
+- D11.2's five Markdown rules require every recorded GFM trigger, especially
+  `[https://example.com]`, plus unique diagnostics/fixes and feature/override
+  coverage against the corrected dependency combination.
+- D11.1 preserves manual custom-element boundary review and void-element fixes;
+  it does not promise automatic correction of malformed custom elements.
+- The independent minimum-peer consumer audit still reports **seven vulnerable
+  package entries: three high, one moderate, three low**, including propagated
+  parent entries. The reproduced graph uses `deepmerge-ts@7.1.6`,
+  `katex@0.16.47`, and the deliberately selected `svelte@5.0.0` minimum.
+  [The existing dependency-review finding](DEPENDENCY_REVIEW.md#consumer-audit-findings)
+  remains open for separate dependency work; root overrides do not propagate to
+  installed consumers. Passing compatibility checks is not a clean consumer
+  security audit.
+
+### Final acceptance results
+
+`npm run release:check` passes on Node.js **24.22.0**: the repository audit has
+**zero findings**; full validation passes **75 files / 2,857 tests**, including
+packed external-cwd and README consumers, followed by Publint, ATTW's ESM-only
+profile, and the five-file dry-run tarball. The test phase takes **517.60 seconds**
+with a 4 GiB Node heap, one Vitest worker, and `UV_THREADPOOL_SIZE=16`, without
+retries or skipped coverage. Runtime/declaration bundles, generated rule types,
+manifests, lockfile, compiler configuration, and coding principles match Stage
+14's entry bytes.
+
+Node.js **24.15.0** runs the advertised minimum-peer CI consumer protocol locally:
+ESLint **10.4.0**, HTML React/Svelte **0.60.0**, Express Security **1.2.0**, React
+Hooks **7.1.0**, React Refresh **0.5.0**, React **19.0.0**, Svelte **5.0.0**, and
+Svelte ESLint Parser **1.6.0**. `npm ls --all`, optional integration loading, and
+JSX/Svelte/JavaScript parsing pass; the separate seven-entry consumer security
+finding above remains open. Node.js **26.12.0** passes the convergence, package
+contract, and external-cwd linked-consumer smoke suites: **3 files / 160 tests**.
+These focused runtime checks do not substitute for full validation of those
+two runtime matrices.
+
+Every confirmed decision has an implemented, currently tested disposition;
+every finding has a resolved implementation or an explicit retained/out-of-scope
+boundary above. Stage 14 adds acceptance coverage and closure records, with
+**zero production-policy, dependency, compiler-contract, or emitted-bundle
+changes**. The Stage 14 handoff records the commands and full scope. Final
+closure text is formatted/linted separately after recording these results.
+Full remote CI on Node 24.15.0 and Node 26, including its minimum-peer job, has
+not been evaluated in this record. Requested commit/push/PR delivery does not
+authorize a release or merge.
