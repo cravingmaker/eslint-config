@@ -1260,6 +1260,16 @@ The reference that the recipes link to, grouped by topic.
   so that it does not remove it.
   This contract does not add `noUncheckedIndexedAccess`, `verbatimModuleSyntax`,
   or `noFallthroughCasesInSwitch`; none substitutes for Security trust review.
+  The repository's `tsconfig.json` adds only checks that report errors without
+  changing type information, so its lint results still match a consumer's:
+  `erasableSyntaxOnly`, which keeps every file runnable by Node.js type
+  stripping as `npm run gen` and `npm run policy:diff` run the scripts,
+  `isolatedModules`, `moduleDetection: "force"`, `noImplicitOverride`, and
+  `noUncheckedSideEffectImports`. Its `target` and `lib` describe Node.js
+  24.15, the minimum runtime: ES2025 with `Array.fromAsync`, explicit resource
+  management, and `Error.isError`. The compiler therefore rejects APIs that
+  this runtime lacks, such as Temporal. tsdown builds `dist/`, so the
+  compiler only checks (`noEmit`).
 
 The repository's own `eslint.config.js` permits explicit unset values in
 rule-option maps. Core and plugin modules follow the same lint rules. Test
