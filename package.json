@@ -42,6 +42,7 @@
     "build": "npm run gen && npm run clean && tsdown",
     "clean": "node --input-type=module --eval \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\"",
     "deps:inspect": "node-modules-inspector --no-open",
+    "deps:inspect:build": "node-modules-inspector build --outDir node_modules/.cache/node-modules-inspector-build",
     "deps:report-duplicates": "node-modules-inspector report duplicates",
     "deps:report-sizes": "node-modules-inspector report sizes",
     "format": "prettier --write .",

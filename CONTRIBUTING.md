@@ -468,7 +468,15 @@ npm run lint:inspect
 Open the URL printed in the terminal, normally <http://localhost:7777/>.
 The command keeps running until you press Ctrl+C. It does not open a
 browser automatically; use `npm run lint:inspect -- --open` to do so, or
-`npm run lint:inspect -- --port=7778` to choose another port.
+`npm run lint:inspect -- --port=7778` to choose another port. The server
+listens on `127.0.0.1` unless `--host` or the `HOST` environment variable
+selects another address. Keep that default: the inspector serves the
+configuration and the repository's file paths without authentication.
+
+Start it with `npm run lint:inspect` rather than
+`npx eslint --inspect-config`. ESLint's flag runs
+`npx @eslint/config-inspector@latest`, which can download a newer release
+than the version locked in `package-lock.json`.
 
 Try paths such as `src/factory.ts`, `eslint.config.js`, and `package.json`
 to see which named blocks apply and how their rules combine. The Rules
@@ -493,9 +501,11 @@ npm run lint:inspect:build
 
 This builds the package and writes a standalone inspector to
 `node_modules/.cache/eslint-config-inspector/`. Serve that directory with
-a static HTTP server to browse it. The snapshot stays outside the
-published `dist/` directory, is ignored by Git and the repository checks,
-and is removed by `npm ci`. Run the command again after config changes.
+a static HTTP server to browse it. The build deletes its output directory
+before writing, so each run replaces the previous snapshot. The script's
+directory is ignored by Git and the repository checks and is removed by
+`npm ci`; the inspector's default, inside `dist/`, would be published.
+Run the command again after config changes.
 Inspector options can be forwarded with `--`, for example
 `npm run lint:inspect:build -- --base /eslint-config/` for hosting at a
 subpath.
@@ -726,9 +736,12 @@ Start the interactive UI:
 npm run deps:inspect
 ```
 
-Open the URL printed in the terminal, normally `http://localhost:9999/`.
-Use `-- --open` to open it automatically, or select another port with
-`npm run deps:inspect -- --port=10000`.
+Open the URL printed in the terminal, normally <http://localhost:9999/>.
+The command keeps running until you press Ctrl+C. It does not open a
+browser automatically; use `npm run deps:inspect -- --open` to do so, or
+`npm run deps:inspect -- --port=10000` to choose another port. Like the
+config inspector, it listens on `127.0.0.1` unless `--host` or `HOST`
+selects another address; keep that default.
 
 Run reports without starting the UI:
 
@@ -750,6 +763,24 @@ Registry metadata is fetched by default and cached under
 `node_modules/.cache/node-modules-inspector/`. For local analysis without
 metadata requests, supply an inspector configuration with
 `fetchNpmMeta: false` using `-- --config /path/to/config.mjs`.
+Node Modules Inspector 2.7.0 prints `Failed to get npm meta for:` with
+many packages even when their metadata loaded: its vulnerability lookup
+lists every package without a recorded vulnerability. The reports and
+their JSON output are unaffected.
+
+To save a static snapshot of the installed tree:
+
+```bash
+npm run deps:inspect:build
+```
+
+This writes a standalone inspector to
+`node_modules/.cache/node-modules-inspector-build/`. Serve that directory
+with a static HTTP server to browse it. As with the config inspector,
+each run replaces the previous snapshot, and the script avoids the
+default inside `dist/`. The directory is separate from
+`node_modules/.cache/node-modules-inspector/` so that a build keeps the
+metadata cache.
 
 Finish dependency changes with the required [validation](#validation).
 
@@ -771,6 +802,30 @@ intentional, while internal modules are checked for unused exports.
 `npm run validate` includes this check, so it also runs in CI and during
 release checks. Findings and stale configuration hints fail validation.
 Review each finding before removing code or adding an exception.
+
+### Check the published package
+
+Two checks read the package as `npm pack` produces it, so they see only
+the files that npm publishes:
+
+```bash
+npm run lint:package
+npm run typecheck:package
+```
+
+- `lint:package` runs [publint](https://publint.dev/) with `--strict`,
+  which fails on warnings as well as errors. It checks `exports`, `main`,
+  `types`, and the other entry fields against the packed files.
+- `typecheck:package` runs
+  [Are the Types Wrong?](https://arethetypeswrong.github.io/) with the
+  `esm-only` profile. It resolves each `exports` subpath as Node.js and
+  bundlers do and checks that the declarations it finds match the
+  JavaScript they describe. The profile skips the `node10` and
+  `node16-cjs` resolutions, which describe CommonJS consumers: the
+  package is published as ESM only.
+
+Both build the package first; their `:built` variants reuse an existing
+build. `npm run validate` runs both after the tests.
 
 ### Explain an unexpected rule
 
@@ -1222,9 +1277,9 @@ npm run validate
 ```
 
 This runs formatting checks, a build, typechecking, Knip, linting, tests,
-and package integrity checks. Package tests exercise the tarball in temporary
-consumer projects. Some install it from the npm registry, so the tests need
-network access.
+and the [package checks](#check-the-published-package). Package tests
+exercise the tarball in temporary consumer projects. Some install it from
+the npm registry, so the tests need network access.
 
 Vitest runs at most two test files at once to limit memory pressure: each
 worker loads ESLint and TypeScript, and the package tests also start child
