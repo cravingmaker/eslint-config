@@ -149,13 +149,14 @@ const downloadAndExtract = async (staging, release) => {
     release.archiveSha256,
     `Pinned actionlint archive checksum mismatch: ${release.archive}`,
   );
-  const archive = path.join(staging, release.archive);
-  // eslint-disable-next-line security/detect-non-literal-fs-filename -- The archive name comes from the pinned reference, inside the staging directory just created.
-  await fs.writeFile(archive, bytes);
-  await execute("tar", ["-xzf", archive, "-C", staging, "actionlint"], {
-    maxBuffer: 1024 * 1024,
-    timeout,
-  });
+  // Extract the verified archive from standard input, so downloaded data is never written to a file.
+  const extraction = execute(
+    "tar",
+    ["-xzf", "-", "-C", staging, "actionlint"],
+    { maxBuffer: 1024 * 1024, timeout },
+  );
+  extraction.child.stdin?.end(bytes);
+  await extraction;
   const extracted = path.join(staging, "actionlint");
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- The binary was just extracted into the staging directory.
   const extractedBytes = await fs.readFile(extracted);
