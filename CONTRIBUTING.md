@@ -932,7 +932,11 @@ The reference that the recipes link to, grouped by topic.
   an earlier block, and the snapshots record them. Inside one block, an
   object spread replaces the whole entry instead. This is why moving a
   rule between blocks can change a snapshot line even when the rule stays
-  off.
+  off. Keep the explicit core `no-unused-vars` owner and TypeScript's
+  severity-only replacement guard: a `javascript.overrides` entry can enable
+  the native rule before the TypeScript block turns it off again, preserving
+  inherited options. Removing that guard changes TypeScript diagnostics even
+  when the default snapshot is unchanged.
 - **Rule ownership is static.** Every replacement has an enabled winner and an
   explicitly disabled alternative in the owning rule maps. A `Handled by`
   comment names the winner; reviewed complementary checks retain reciprocal

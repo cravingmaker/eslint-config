@@ -97,6 +97,7 @@ const replacementRules: Rules = {
   "no-shadow": "off", // Handled by `@typescript-eslint/no-shadow`.
   "no-unused-expressions": "off", // Handled by `@typescript-eslint/no-unused-expressions`.
   "no-unused-private-class-members": "off", // Handled by `@typescript-eslint/no-unused-private-class-members`. Manually fixable by editor suggestions.
+  // Keep this guard after core overrides; severity-only off preserves inherited options.
   "no-unused-vars": "off", // Handled by `unused-imports/no-unused-vars`. Manually fixable by editor suggestions.
   "no-use-before-define": "off", // Handled by `@typescript-eslint/no-use-before-define`.
   "no-useless-constructor": "off", // Handled by `@typescript-eslint/no-useless-constructor`. Manually fixable by editor suggestions.

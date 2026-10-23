@@ -24,11 +24,7 @@ const packageJsonFiles = ["**/package.json"] as const;
 
 const jsonFiles = ["**/*.json"] as const;
 // JSON files that other features or no feature lint.
-const jsonIgnores = [
-  "**/package-lock.json",
-  "**/package.json",
-  "**/yarn.lock",
-] as const;
+const jsonIgnores = ["**/package-lock.json", "**/package.json"] as const;
 const jsoncFiles = [
   "**/.devcontainer/*.json",
   "**/*.jsonc",

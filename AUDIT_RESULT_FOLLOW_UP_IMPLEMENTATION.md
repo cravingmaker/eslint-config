@@ -135,7 +135,7 @@ migrations and supplies a verified baseline for each refactor.
 | 9     | Source, test, and ambient declaration ownership                           | D18.1–D18.6, R11                 | 8          | Complete    |
 | 10    | Production utility/builder consolidation and Svelte negations             | R1, R2                           | 9          | Complete    |
 | 11    | Derived disabled maps, shared test boundaries, local suppressions         | R3–R5                            | 10         | Complete    |
-| 12    | Dead entries and consistent scripts/hooks                                 | R6, R8                           | 11         | Not started |
+| 12    | Dead entries and consistent scripts/hooks                                 | R6, R8                           | 11         | Complete    |
 | 13    | Documentation and source conventions                                      | R9, R10; D16, D17 retention      | 12         | Not started |
 | 14    | Final consumer verification and audit closure                             | All decisions/findings           | 13         | Not started |
 
@@ -740,7 +740,8 @@ boundary-local duplication retained after review.
 `lint:staged`, lint-staged covers every format without overlapping globs,
 `validate` generates once, `test:coverage` is removed, and `prepublishOnly`
 is retained for an `npm publish` that turns lifecycle scripts back on. The
-pull request records the evidence. Items 1 and 2 remain for this stage.
+pull request records the original evidence. The Stage 12 handoff below records
+the remaining source review and current script/hook validation.
 
 **Primary locations:** `src/globs.ts`, imports resolver setup, TypeScript
 replacements, `package.json`, Husky hooks, CI/publish workflows, contributor
@@ -2353,5 +2354,96 @@ contracts still require preservation and later review.
   contracts. Review the already-merged script/hook changes against the current
   baseline rather than restoring the historical scripts. Stage 12 remains
   unstarted here.
+- **PR/CI:** Local validation is complete. The requested PR follows commit and
+  push; remote CI has not been evaluated in this record.
+
+#### Stage 12 — dead entries and consistent scripts/hooks
+
+- **Status/date:** Complete, 23 October 2026.
+- **Stage-entry commit:** `abf27fe77c21dd54a371e051508fa17266c64244`.
+  The worktree was clean on `cravingmaker/implement-stage-12-audit`; a fresh
+  fetch confirmed that `origin/main` matched this commit. Stage 11 and the
+  script/hook changes merged in #142 are part of this baseline.
+- **Implementation commit(s):** Uncommitted at validation; this change and its
+  handoff are delivered together.
+- **Decisions/findings covered:** R6 and R8. D13's deprecated-entry and option
+  alias decisions remain unchanged.
+- **Removed entries:** `jsonIgnores` no longer lists `**/yarn.lock`: the JSON
+  block intersects the caller's files with `**/*.json`, so the lockfile cannot
+  reach it. Package manifests and npm lockfiles remain excluded, and JSONC/JSON5
+  keep their separate languages. The imports resolver now sets
+  `project: tsconfigRootDir` directly; context preparation always supplies an
+  absolute directory, including when TypeScript is disabled. The TypeScript
+  resolver remains first, followed by the Node resolver, in the existing scope.
+- **Retained native rule guard:** Core's explicit non-deprecated
+  `no-unused-vars: ["off"]` owner and TypeScript's scalar-off replacement both
+  remain. With the installed ESLint, default and preceding-consumer probes keep
+  identical effective options when the replacement is omitted, but a
+  `javascript.overrides` entry then enables the native rule in TypeScript.
+  The retained language-scoped guard disables that earlier override without
+  dropping inherited options. Typed/untyped regressions check both effective
+  options and actual diagnostics, with a JavaScript positive control. The
+  authored replacement inventory remains at 22 entries; no rule count changes.
+- **Regression evidence:** The three affected builder suites pass **23 tests**.
+  The broader focused run, including context, ownership, rule options, and
+  inventory, passed **7 files / 189 tests**. Mutation probes fail when the native
+  replacement or resolver project is removed, and restore the original source
+  afterward. Real alias resolution covers both the fallback project root with
+  TypeScript disabled and an explicit tsconfig directory; a missing alias must
+  still report. JSON tests verify directory narrowing, lockfile exclusions,
+  other extensions, and an active duplicate-key diagnostic. Changed-file ESLint
+  with `--max-warnings 0` passes without weakening policy.
+- **Script/hook verification:** The supported script composition and hooks from
+  #142 remain unchanged. A temporary clone with this stage's source changes
+  enabled Husky with `npm run prepare` and exercised real commits for nine
+  formats: JSON, JSONC, JSON5, HTML, Markdown, `package.json`, Svelte, TypeScript,
+  and YAML. Eight files ran ESLint fixes followed by Prettier; YAML ran only
+  Prettier. A native `let` to `const` fix and final formatting passed. A partially
+  staged Markdown file committed only its staged content and preserved the
+  unstaged addition. An unfixable `eval` error rejected the commit with exit 1,
+  left HEAD unchanged, and restored staged and working contents. Unrelated
+  source edits survived; the temporary clone was removed.
+- **Generation/publication defenses:** Standalone `npm run build` generated the
+  initially absent declarations. Deleting only generated `src/typegen.d.ts`
+  before `npm run typecheck` also regenerated it successfully. Validation's log
+  contains one generation invocation. `test:coverage` remains absent, with no
+  coverage provider added. `prepublishOnly` still invokes `release:check`, and
+  the publishing workflow still runs that gate explicitly before publishing its
+  checked tarball with scripts disabled. Isolated lifecycle probes copied the
+  current `.npmrc` and exact prepublish hook: `npm publish --dry-run` skipped
+  the marker release gate by default; both `--ignore-scripts=false` and
+  `npm_config_ignore_scripts=false` ran it. These were dry runs of a disposable
+  probe package; no package was published.
+- **Runtime/full gate:** Node.js **24.22.0**, npm **11.19.1**; `npm ci` and
+  `npm run prepare` passed, with zero installation vulnerabilities. With
+  `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16`, `npm run validate` passed **74 files /
+  2,739 tests**; its test phase took **759.57 seconds**. Formatting,
+  generation/build, type checking, Knip, zero-warning whole-repository lint,
+  linked/installed package and README consumers, Publint, and ATTW's ESM-only
+  profile passed. The final documentation handoff is checked separately before
+  commit. Broken-optional-peer stderr is an intentional negative fixture.
+- **Policy/artifact delta:**
+  `npm run policy:diff -- --base abf27fe77c21dd54a371e051508fa17266c64244`
+  reports **all 33 snapshots unchanged**, with unchanged locked packages.
+  Entry/current builds also match across **48 serialized effective
+  configurations and 12 lint/fix probes**, including typed/untyped, disabled,
+  narrowed/ignored, core and TypeScript override, and preceding-consumer cases.
+  Public and generated rule declarations match the entry build byte for byte.
+  The cumulative report against `008a08207f28441297a2476b4798136aeb1023de`
+  remains **25 changed / 8 unchanged**, with no new, removed, or failed
+  snapshots. No snapshot was edited or regenerated. Consumer checks preserve
+  optional-peer behavior, ESM exports, and the five-file source-map-free tarball.
+- **Documentation/unrelated work:** Contributor guidance and the replacement
+  comment explain the retained native-rule guard. This handoff closes the
+  remaining source review and records current script/hook evidence. The entry
+  tree was clean; only Stage 12 source, regression, and documentation files are
+  changed. Dependencies, scripts/hooks/workflows, public options, compiler
+  settings, and `CODING_PRINCIPLES.md` are unchanged. Generated output and
+  disposable probes remain outside the commit.
+- **Remaining work:** None within Stage 12; requested commit/push/PR delivery
+  follows this validation record.
+- **Next stage:** Stage 13, documentation and source conventions, remains
+  unstarted. Existing upstream workaround conditions remain unchanged.
 - **PR/CI:** Local validation is complete. The requested PR follows commit and
   push; remote CI has not been evaluated in this record.

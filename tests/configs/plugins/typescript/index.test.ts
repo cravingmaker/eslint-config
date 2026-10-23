@@ -3,6 +3,7 @@ import type { Context } from "../../../../src/types.js";
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
+import { core } from "../../../../src/configs/core/index.js";
 import { typescript } from "../../../../src/configs/plugins/typescript/index.js";
 import { defaultContext } from "../../../../src/context.js";
 import { getResolvedConfig as getEffectiveConfig } from "../../../support/resolved-config.js";
@@ -15,6 +16,72 @@ const typedContext: Context = {
 const untypedContext: Context = { ...defaultContext, typeAware: undefined };
 
 describe("typescript feature", () => {
+  it.each([false, true])(
+    "keeps native unused-variable checks off after a core override and preserves inherited options with typed linting %s",
+    async (typeChecked) => {
+      const context = typeChecked ? defaultContext : untypedContext;
+      const eslint = new ESLint({
+        overrideConfig: [
+          {
+            rules: {
+              "no-unused-vars": [
+                "error",
+                { args: "none", vars: "local", varsIgnorePattern: "^saved" },
+              ],
+            },
+          },
+          ...core({ overrides: { "no-unused-vars": "warn" } }),
+          ...(await typescript({}, context)),
+        ],
+        overrideConfigFile: true,
+      });
+      const javascript = await getEffectiveConfig(eslint, "src/example.js");
+      const typed = await getEffectiveConfig(eslint, "tests/support/lint.ts");
+      const inheritedOptions = {
+        args: "none",
+        vars: "local",
+        varsIgnorePattern: "^saved",
+      };
+      const javascriptEntry = javascript?.rules?.["no-unused-vars"];
+      const typedEntry = typed?.rules?.["no-unused-vars"];
+      expect(javascriptEntry).toEqual([
+        1,
+        expect.objectContaining(inheritedOptions),
+      ]);
+      expect(typedEntry).toEqual([
+        0,
+        expect.objectContaining(inheritedOptions),
+      ]);
+      expect(typedEntry?.slice(1)).toEqual(javascriptEntry?.slice(1));
+      const results = await Promise.all(
+        ["src/example.js", "tests/support/lint.ts"].map(async (filePath) => {
+          return await eslint.lintText("const unused = 1;\n", { filePath });
+        }),
+      );
+      const messages = results.map((entries) => {
+        return entries.flatMap((result) => {
+          return result.messages;
+        });
+      });
+      expect(
+        messages.flat().some((message) => {
+          return message.fatal === true;
+        }),
+      ).toBe(false);
+      expect(
+        messages.map((entries) => {
+          return entries
+            .filter((message) => {
+              return message.ruleId === "no-unused-vars";
+            })
+            .map((message) => {
+              return message.severity;
+            });
+        }),
+      ).toEqual([[1], []]);
+    },
+  );
+
   it("parses TypeScript files in a parser block and sets its rules in a rules block, with type information by default", async () => {
     const configs = await typescript();
 
