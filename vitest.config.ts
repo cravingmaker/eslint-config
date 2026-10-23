@@ -1,13 +1,27 @@
 import { globSync } from "node:fs";
 
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
+    // Focused tests fail locally as well as in CI, so a pre-push run cannot skip the suite.
+    allowOnly: false,
+    // Fixtures are lint inputs, never tests.
+    exclude: [...configDefaults.exclude, "tests/fixtures/**"],
+    // A test that asserts nothing would pass vacuously.
+    expect: { requireAssertions: true },
+    // Package-test hooks install and delete consumer projects, as slow as the tests themselves.
+    hookTimeout: 30_000,
     include: ["tests/**/*.test.ts"],
-    // Each worker loads ESLint and TypeScript; package tests also start child processes.
+    // Each worker loads ESLint and TypeScript; package tests also start child processes. Files
+    // stay isolated: plugins cache state across lints, and sharing workers saves only about 6%.
     maxWorkers: 2,
+    // With `unstubEnvs` and `unstubGlobals`, each test starts with the real implementations,
+    // environment variables, and globals. Vitest already clears the calls that mocks recorded.
+    restoreMocks: true,
     testTimeout: 30_000,
+    unstubEnvs: true,
+    unstubGlobals: true,
     // Files read through ESLint, TypeScript, or consumer subprocesses need explicit mappings.
     watchTriggerPatterns: [
       {

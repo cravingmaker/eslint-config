@@ -1299,6 +1299,16 @@ processes. README consumer examples run sequentially within their suite because
 each starts additional TypeScript and ESLint processes. These limits apply to
 local tests, validation, CI, and the pre-push hook.
 
+Focused tests fail locally as well as in CI (`allowOnly: false`), so a
+pre-push run cannot pass by running only one test, and every test needs at
+least one assertion (`expect.requireAssertions`). Before each test, Vitest
+restores spies, stubbed environment variables, and stubbed globals
+(`restoreMocks`, `unstubEnvs`, and `unstubGlobals`), so no test depends on what
+an earlier test replaced. Each test file still runs in its own worker. Plugins
+cache state across the files that they lint, and sharing
+workers (`isolate: false`) would save only about 6% of a full run; most of the
+time goes to typed linting and the package tests' npm installations.
+
 For faster feedback, run `npm run test:unit` for unit tests or
 `npm run test:package` for package consumer tests. Both commands build the
 package first; their `:built` variants reuse an existing build.
