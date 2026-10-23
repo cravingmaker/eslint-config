@@ -1,4 +1,4 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The project is written to a temporary directory. */
+import type { ResolvedConfig as EffectiveConfig } from "../../../support/resolved-config.js";
 
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -10,11 +10,8 @@ import { afterAll, describe, expect, it } from "vitest";
 import { react } from "../../../../src/configs/plugins/react/index.js";
 import { createConfig } from "../../../../src/factory.js";
 import { expectLintError, expectNoLintError } from "../../../support/lint.js";
+import { getResolvedConfig as getEffectiveConfig } from "../../../support/resolved-config.js";
 
-type EffectiveConfig = {
-  readonly plugins?: Readonly<Record<string, unknown>>;
-  readonly rules?: Readonly<Record<string, RuleEntry>>;
-};
 // A rule's settings as ESLint resolves them: the severity as a number, then the options.
 type RuleEntry = readonly [number, ...unknown[]];
 
@@ -52,6 +49,7 @@ const rule = "react-refresh/only-export-components";
 const projectRootDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-react-"),
 );
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- The fixed package.json fixture is inside this suite's newly created temporary project.
 await writeFile(
   path.join(projectRootDirectory, "package.json"),
   JSON.stringify({
@@ -65,15 +63,6 @@ await writeFile(
 afterAll(async () => {
   await rm(projectRootDirectory, { force: true, recursive: true });
 });
-
-const getEffectiveConfig = async (
-  eslint: ESLint,
-  filePath: string,
-): Promise<EffectiveConfig | undefined> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  return (await eslint.calculateConfigForFile(filePath)) as
-    EffectiveConfig | undefined;
-};
 
 // The settings of the eslint-plugin-react-hooks rules in `config`.
 const getHooksRules = (
@@ -447,7 +436,7 @@ describe("react-refresh/only-export-components", () => {
   describe("generic variant (default / strictest)", () => {
     const genericOptions = {
       ...tsxOptions,
-      reactRefreshVariant: "generic" as const,
+      refresh: "generic" as const,
     };
 
     it("does not report a file that only exports components", async () => {
@@ -468,7 +457,7 @@ describe("react-refresh/only-export-components", () => {
   });
 
   describe("vite variant (allowConstantExport: true)", () => {
-    const viteOptions = { ...tsxOptions, reactRefreshVariant: "vite" as const };
+    const viteOptions = { ...tsxOptions, refresh: "vite" as const };
 
     it("does not report a file that only exports components", async () => {
       await expectNoLintError(onlyComponentCode, rule, viteOptions);
@@ -484,7 +473,7 @@ describe("react-refresh/only-export-components", () => {
   });
 
   describe("next variant (allowExportNames includes Next.js page exports)", () => {
-    const nextOptions = { ...tsxOptions, reactRefreshVariant: "next" as const };
+    const nextOptions = { ...tsxOptions, refresh: "next" as const };
 
     it("does not report a file that only exports components", async () => {
       await expectNoLintError(onlyComponentCode, rule, nextOptions);

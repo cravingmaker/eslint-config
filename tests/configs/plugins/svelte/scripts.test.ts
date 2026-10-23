@@ -10,13 +10,8 @@ import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { createConfig } from "../../../../src/factory.js";
+import { getResolvedConfig as getEffectiveConfig } from "../../../support/resolved-config.js";
 
-type EffectiveConfig = {
-  readonly languageOptions?: {
-    readonly parserOptions?: Readonly<Record<string, unknown>>;
-  };
-  readonly rules?: RuleEntries;
-};
 type RuleEntries = Readonly<
   Record<string, readonly [Linter.Severity, ...unknown[]]>
 >;
@@ -189,15 +184,6 @@ const describeMessages = async (
       ];
     }),
   );
-};
-
-const getEffectiveConfig = async (
-  eslint: ESLint,
-  filePath: string,
-): Promise<EffectiveConfig | undefined> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  return (await eslint.calculateConfigForFile(filePath)) as
-    EffectiveConfig | undefined;
 };
 
 // The severity of each of `ruleIds` in `rules`, or `undefined` for a rule that they do not set.

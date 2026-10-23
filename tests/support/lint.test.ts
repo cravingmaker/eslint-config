@@ -27,6 +27,32 @@ const unlintable = [
 ] as const;
 
 describe("lint assertions", () => {
+  it("keeps typed linting opt-in with the public option vocabulary", async () => {
+    const code = "export const value: number = 1;\n";
+    const filePath = "outside-project.ts";
+    await expectNoLintError(code, "no-debugger", { filePath });
+    await expect(
+      expectNoLintError(code, "no-debugger", { filePath, typeChecked: true }),
+    ).rejects.toThrow(`Expected ${filePath} to parse.`);
+  });
+
+  it("selects Refresh variants while keeping all frameworks enabled", async () => {
+    const code =
+      "export const VERSION = 1;\nexport const Component = () => <p />;\n";
+    const ruleId = "react-refresh/only-export-components";
+    await expectLintError(code, ruleId, { filePath: "example.tsx" });
+    await expectNoLintError(code, ruleId, {
+      filePath: "example.tsx",
+      refresh: "vite",
+    });
+  });
+
+  it("uses the active unused-variable owner in its documented example", async () => {
+    await expectLintError("const a = 1;\n", "unused-imports/no-unused-vars", {
+      filePath: "test.js",
+    });
+  });
+
   it("pass when the rule fires and when it does not", async () => {
     await expect(
       expectLintError("debugger;\n", "no-debugger", {

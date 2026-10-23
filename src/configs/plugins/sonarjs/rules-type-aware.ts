@@ -1,94 +1,95 @@
 import type { Rules } from "../../../types.js";
 
 import { sonarjsRules } from "./rules.js";
+import { rulesOff } from "../../../utilities/type-aware.js";
 
-// Rules requiring type information stay off outside typed linting, including disabled alternatives
-// that a consumer may choose through overrides. The list is fixed rather than discovered at runtime.
-const typeAwareRulesOff: Rules = {
-  // --- Turned off rules (69/69) -------------------------------------------------------------------------------------------------------------------.
-  "sonarjs/anchor-precedence": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/argument-type": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/arguments-order": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/array-callback-without-return": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/assertions-in-tests": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/bitwise-operators": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/class-prototype": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/concise-regex": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/deprecation": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/different-types-comparison": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/disabled-auto-escaping": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/disabled-resource-integrity": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/dompurify-unsafe-config": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/duplicates-in-character-class": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/empty-string-repetition": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/existing-groups": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/function-return-type": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/in-operator-type-error": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/index-of-compare-to-positive-number": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/jsx-no-leaked-render": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/new-operator-misuse": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-alphabetical-sort": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/no-array-delete": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-associative-arrays": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-async-constructor": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-collection-size-mischeck": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/no-control-regex": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-empty-after-reluctant": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-empty-alternatives": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-empty-character-class": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-empty-group": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-for-in-iterable": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-ignored-return": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-in-misuse": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/no-incompatible-assertion-types": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-inconsistent-returns": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-incorrect-string-concat": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-invalid-regexp": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-misleading-array-reverse": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/no-misleading-character-class": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/no-redundant-optional": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/no-regex-spaces": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/no-require-or-define": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-return-type-any": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-selector-parameter": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-small-switch": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-try-promise": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/no-undefined-argument": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/no-useless-intersection": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/non-number-in-arithmetic-expression": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/null-dereference": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/operation-returning-nan": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/post-message": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/prefer-immediate-return": "off", // Requires type information; enabled only in the type-aware scope. Automatically fixable by the --fix command.
-  "sonarjs/prefer-read-only-props": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/prefer-regexp-exec": "off", // Prefer `regexp/prefer-regexp-exec` for manual review; consumer enablement requires type information. Manually fixable by editor suggestions.
-  "sonarjs/reduce-initial-value": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/regex-complexity": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/single-char-in-character-classes": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/single-character-alternation": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/slow-regex": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/sql-queries": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/strings-comparison": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/synchronous-exception-assertions": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/unicode-aware-regex": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/unused-import": "off", // Requires type information; enabled only in the type-aware scope. Manually fixable by editor suggestions.
-  "sonarjs/unused-named-groups": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/values-not-convertible-to-numbers": "off", // Requires type information; enabled only in the type-aware scope.
-  "sonarjs/void-use": "off", // Requires type information; enabled only in the type-aware scope.
-} as const;
-
-const typeAwareRuleIds = [
-  ...Object.keys(typeAwareRulesOff),
-  // Deprecated rules are omitted from policy maps; explicit consumer overrides still need typed scope.
-  "sonarjs/useless-string-operation",
-  "sonarjs/web-sql-database",
-];
+// Explicit typed classification; upstream additions never become policy automatically.
+const typedRuleIds = new Set([
+  "sonarjs/anchor-precedence",
+  "sonarjs/argument-type",
+  "sonarjs/arguments-order",
+  "sonarjs/array-callback-without-return",
+  "sonarjs/assertions-in-tests",
+  "sonarjs/bitwise-operators",
+  "sonarjs/class-prototype",
+  "sonarjs/concise-regex",
+  "sonarjs/deprecation",
+  "sonarjs/different-types-comparison",
+  "sonarjs/disabled-auto-escaping",
+  "sonarjs/disabled-resource-integrity",
+  "sonarjs/dompurify-unsafe-config",
+  "sonarjs/duplicates-in-character-class",
+  "sonarjs/empty-string-repetition",
+  "sonarjs/existing-groups",
+  "sonarjs/function-return-type",
+  "sonarjs/in-operator-type-error",
+  "sonarjs/index-of-compare-to-positive-number",
+  "sonarjs/jsx-no-leaked-render",
+  "sonarjs/new-operator-misuse",
+  "sonarjs/no-alphabetical-sort",
+  "sonarjs/no-array-delete",
+  "sonarjs/no-associative-arrays",
+  "sonarjs/no-async-constructor",
+  "sonarjs/no-collection-size-mischeck",
+  "sonarjs/no-control-regex",
+  "sonarjs/no-empty-after-reluctant",
+  "sonarjs/no-empty-alternatives",
+  "sonarjs/no-empty-character-class",
+  "sonarjs/no-empty-group",
+  "sonarjs/no-for-in-iterable",
+  "sonarjs/no-ignored-return",
+  "sonarjs/no-in-misuse",
+  "sonarjs/no-incompatible-assertion-types",
+  "sonarjs/no-inconsistent-returns",
+  "sonarjs/no-incorrect-string-concat",
+  "sonarjs/no-invalid-regexp",
+  "sonarjs/no-misleading-array-reverse",
+  "sonarjs/no-misleading-character-class",
+  "sonarjs/no-redundant-optional",
+  "sonarjs/no-regex-spaces",
+  "sonarjs/no-require-or-define",
+  "sonarjs/no-return-type-any",
+  "sonarjs/no-selector-parameter",
+  "sonarjs/no-small-switch",
+  "sonarjs/no-try-promise",
+  "sonarjs/no-undefined-argument",
+  "sonarjs/no-useless-intersection",
+  "sonarjs/non-number-in-arithmetic-expression",
+  "sonarjs/null-dereference",
+  "sonarjs/operation-returning-nan",
+  "sonarjs/post-message",
+  "sonarjs/prefer-immediate-return",
+  "sonarjs/prefer-read-only-props",
+  "sonarjs/prefer-regexp-exec",
+  "sonarjs/reduce-initial-value",
+  "sonarjs/regex-complexity",
+  "sonarjs/single-char-in-character-classes",
+  "sonarjs/single-character-alternation",
+  "sonarjs/slow-regex",
+  "sonarjs/sql-queries",
+  "sonarjs/strings-comparison",
+  "sonarjs/synchronous-exception-assertions",
+  "sonarjs/unicode-aware-regex",
+  "sonarjs/unused-import",
+  "sonarjs/unused-named-groups",
+  "sonarjs/values-not-convertible-to-numbers",
+  "sonarjs/void-use",
+]);
 
 // The policy for the rules that need type information.
 const typeAwareRules: Rules = Object.fromEntries(
   Object.entries(sonarjsRules).filter(([ruleId]) => {
-    return Object.hasOwn(typeAwareRulesOff, ruleId);
+    return typedRuleIds.has(ruleId);
   }),
 );
+
+// Only authored typed entries produce off guards, in the existing sorted order.
+const typeAwareRulesOff: Rules = rulesOff(typeAwareRules);
+const typeAwareRuleIds = [
+  ...Object.keys(typeAwareRulesOff),
+  // Explicit consumer overrides of omitted deprecated rules still require typed scope.
+  "sonarjs/useless-string-operation",
+  "sonarjs/web-sql-database",
+];
 
 export { typeAwareRuleIds, typeAwareRules, typeAwareRulesOff };

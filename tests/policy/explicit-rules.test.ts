@@ -3,6 +3,8 @@ import type { Linter } from "eslint";
 import { ESLint } from "eslint";
 import { describe, expect, it, vi } from "vitest";
 
+import { getResolvedConfig } from "../support/resolved-config.js";
+
 type PluginModule = {
   readonly default: {
     readonly configs?: Readonly<
@@ -81,10 +83,10 @@ describe("explicit rule policy", () => {
     });
 
     await expect(
-      eslint.calculateConfigForFile("src/example.tsx"),
+      getResolvedConfig(eslint, "src/example.tsx"),
     ).resolves.toHaveProperty(["rules", "@html-eslint/react/future-rule"], [1]);
     await expect(
-      eslint.calculateConfigForFile("src/Component.svelte"),
+      getResolvedConfig(eslint, "src/Component.svelte"),
     ).resolves.toHaveProperty(
       ["rules", "@html-eslint/svelte/future-rule"],
       [1],
@@ -124,10 +126,10 @@ describe("explicit rule policy", () => {
         overrideConfigFile: true,
       });
       await expect(
-        eslint.calculateConfigForFile("src/example.tsx"),
+        getResolvedConfig(eslint, "src/example.tsx"),
       ).resolves.toBeDefined();
       await expect(
-        eslint.calculateConfigForFile("src/Component.svelte"),
+        getResolvedConfig(eslint, "src/Component.svelte"),
       ).resolves.toBeDefined();
     },
   );

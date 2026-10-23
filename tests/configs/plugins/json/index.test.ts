@@ -3,13 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { json } from "../../../../src/configs/plugins/json/index.js";
 import { describeFile } from "../../../support/describe-file.js";
-
-type EffectiveConfig = {
-  readonly rules?: Readonly<Record<string, readonly unknown[]>>;
-};
-type SerializableConfig = {
-  readonly toJSON: () => { readonly language?: unknown };
-};
+import { getResolvedConfig } from "../../../support/resolved-config.js";
 
 // The language that ESLint resolves for a file, and the settings of `ruleId` there: the severity
 // as a number, then the options.
@@ -18,9 +12,7 @@ const describeRule = async (
   filePath: string,
   ruleId: string,
 ): Promise<unknown> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    (EffectiveConfig & SerializableConfig) | undefined;
+  const config = await getResolvedConfig(eslint, filePath);
   const rules = new Map(Object.entries(config?.rules ?? {}));
   return { entry: rules.get(ruleId), language: config?.toJSON().language };
 };

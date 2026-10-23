@@ -1,3 +1,5 @@
+import type { ResolvedConfig } from "../support/resolved-config.js";
+
 import process from "node:process";
 
 import { ESLint } from "eslint";
@@ -5,18 +7,13 @@ import { builtinRules } from "eslint/use-at-your-own-risk";
 import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
-type EffectiveConfig = {
-  readonly plugins?: Readonly<Record<string, RulePlugin | undefined>>;
-  readonly rules?: Readonly<Record<string, unknown>>;
-};
+type EffectiveConfig = Pick<ResolvedConfig, "plugins" | "rules">;
 type RuleDefinition = {
   readonly meta?: {
     readonly deprecated?: unknown;
   };
-};
-type RulePlugin = {
-  readonly rules?: Readonly<Record<string, RuleDefinition | undefined>>;
 };
 
 // The configuration that ESLint resolves for `filePath` with typed linting on.
@@ -29,9 +26,8 @@ const getEffectiveConfig = async (
     }),
     overrideConfigFile: true,
   });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    EffectiveConfig | undefined;
+
+  const config = await getResolvedConfig(eslint, filePath);
   return config ?? {};
 };
 

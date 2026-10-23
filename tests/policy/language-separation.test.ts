@@ -1,12 +1,12 @@
+import type { ResolvedRules as RuleEntries } from "../support/resolved-config.js";
+
 import process from "node:process";
 
 import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
-
-// A rule's settings as ESLint resolves them: the severity as a number, then the options.
-type RuleEntries = Readonly<Record<string, readonly [number, ...unknown[]]>>;
+import { getResolvedConfig } from "../support/resolved-config.js";
 
 const rootDirectory = process.cwd();
 // Files of the languages other than JavaScript and TypeScript, and the plugins of their rules.
@@ -54,9 +54,7 @@ const getLanguage = async (
   eslint: ESLint,
   filePath: string,
 ): Promise<unknown> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    { readonly toJSON: () => { readonly language?: unknown } } | undefined;
+  const config = await getResolvedConfig(eslint, filePath);
   return config?.toJSON().language;
 };
 
@@ -80,9 +78,7 @@ const getRules = async (
   eslint: ESLint,
   filePath: string,
 ): Promise<RuleEntries> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    { readonly rules?: RuleEntries } | undefined;
+  const config = await getResolvedConfig(eslint, filePath);
   return config?.rules ?? {};
 };
 

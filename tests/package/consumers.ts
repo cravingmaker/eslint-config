@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The consumers are created in a temporary directory. */
-
 import { execFile } from "node:child_process";
 import {
   cp,
@@ -32,6 +30,7 @@ const fixturesDirectory = fileURLToPath(
 );
 // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- This repository's manifest has this shape.
 const manifest = JSON.parse(
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- The package.json path is fixed relative to this repository helper.
   await readFile(path.join(projectDirectory, "package.json"), "utf8"),
 ) as Manifest;
 // ESLint and the peers are the versions that this repository tests with.
@@ -49,11 +48,14 @@ const createConsumer = async (
   peers: readonly string[],
 ): Promise<string> => {
   const directory = path.join(parentDirectory, name);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Callers supply literal consumer names beneath their owned temporary roots.
   await mkdir(directory);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json inside the consumer directory just created above.
   await writeFile(
     path.join(directory, "package.json"),
     JSON.stringify({ name: `consumer-${name}`, private: true, type: "module" }),
   );
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only .npmrc inside the consumer directory just created above.
   await writeFile(
     path.join(directory, ".npmrc"),
     "audit=false\nfund=false\nignore-scripts=true\nmin-release-age=7\n",
@@ -99,6 +101,7 @@ reports its working directory, and the files that it resolves from it, by their 
 */
 const createTemporaryDirectory = async (prefix: string): Promise<string> => {
   const directory = await mkdtemp(path.join(os.tmpdir(), prefix));
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Resolve only the directory returned by the preceding mkdtemp call.
   return await realpath(directory);
 };
 

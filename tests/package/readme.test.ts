@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The consumer is created in a temporary directory. */
-
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
@@ -37,6 +35,7 @@ type LintResult = {
   }>;
 };
 
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- The README path is fixed relative to this test module.
 const readme = await readFile(
   fileURLToPath(new URL("../../README.md", import.meta.url)),
   "utf8",
@@ -172,6 +171,7 @@ const createExampleProject = async ({
   text,
 }: CodeBlock): Promise<string> => {
   const directory = path.join(consumer, "examples", String(index));
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- The directory is a numeric README block index beneath the owned consumer examples root.
   await mkdir(directory, { recursive: true });
   await cp(
     path.join(consumer, "package.json"),
@@ -180,10 +180,12 @@ const createExampleProject = async ({
   await cp(fixturesDirectory, path.join(directory, "fixtures"), {
     recursive: true,
   });
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only fixtures/react/tsconfig.json beneath the owned example directory.
   await writeFile(
     path.join(directory, "fixtures", "react", "tsconfig.json"),
     reactTsconfig,
   );
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only eslint.config.js beneath the owned example directory.
   await writeFile(path.join(directory, "eslint.config.js"), text);
   return directory;
 };
@@ -249,12 +251,14 @@ describe("the README", () => {
     expect(
       readCompilerOptions(
         repositoryTsconfig,
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- The repository tsconfig.json path is fixed relative to this test module.
         await readFile(repositoryTsconfig, "utf8"),
       ),
     ).toMatchObject(expected);
     expect(
       readCompilerOptions(
         fixturesTsconfig,
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- The fixture tsconfig.json path is fixed relative to the repository fixtures directory.
         await readFile(fixturesTsconfig, "utf8"),
       ),
     ).toMatchObject(expected);

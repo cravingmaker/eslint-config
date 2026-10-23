@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The repositories and packages are written to temporary directories. */
 import {
   access,
   mkdir,
@@ -80,6 +79,7 @@ const git = async (gitArguments: readonly string[]): Promise<string> => {
 A Git repository with three commits, each tagged: one without snapshots, one with snapshots and without a lockfile, and one with both.
 */
 await git(["init", "--quiet", "--initial-branch=main"]);
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only README.md in this suite's owned temporary repository.
 await writeFile(path.join(exampleProject, "README.md"), "# Example\n");
 const commit = async (tag: string): Promise<void> => {
   await git(["add", "--all"]);
@@ -91,11 +91,14 @@ await commit("without-snapshots");
 await Promise.all(
   Object.entries(snapshots).map(async ([file, text]) => {
     const snapshotPath = path.join(exampleProject, snapshotDirectory, file);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The parent path comes from the fixed snapshot keys beneath the owned repository snapshot root.
     await mkdir(path.dirname(snapshotPath), { recursive: true });
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The path comes from the fixed snapshot keys beneath the owned repository snapshot root.
     await writeFile(snapshotPath, text);
   }),
 );
 await commit("without-lockfile");
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package-lock.json in this suite's owned temporary repository.
 await writeFile(path.join(exampleProject, "package-lock.json"), lockfile);
 await commit("complete");
 afterAll(async () => {
@@ -186,7 +189,9 @@ describe("dependencies", () => {
     const project = await createTemporaryDirectory("eslint-config-installed-");
     const install = async (name: string, version: string): Promise<void> => {
       const directory = path.join(project, "node_modules", name);
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- Package names come from the same/other fixture calls under this test's temporary node_modules.
       await mkdir(directory, { recursive: true });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json inside the package fixture directory created above.
       await writeFile(
         path.join(directory, "package.json"),
         JSON.stringify({ name, version }),
@@ -312,6 +317,7 @@ describe("the current scenarios", () => {
     const directory = fileURLToPath(
       new URL(`../../../${snapshotDirectory}`, import.meta.url),
     );
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Read the fixed repository effective-snapshot directory resolved relative to this module.
     const files = await readdir(directory, { recursive: true });
     const workingTree = new Map(
       await Promise.all(
@@ -322,6 +328,7 @@ describe("the current scenarios", () => {
           .map(async (file): Promise<readonly [string, string]> => {
             return [
               file.split(path.sep).join("/"),
+              // eslint-disable-next-line security/detect-non-literal-fs-filename -- Filenames come from readdir of the repository snapshot directory and are read beneath that root.
               await readFile(path.join(directory, file), "utf8"),
             ];
           }),

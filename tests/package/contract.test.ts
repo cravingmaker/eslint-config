@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-unsafe-type-assertion, functional/prefer-immutable-types, perfectionist/sort-arrays, perfectionist/sort-modules, perfectionist/sort-objects, security/detect-non-literal-fs-filename, security/detect-object-injection -- Package contract tests intentionally inspect dynamic repository manifest data and assert its published shape. */
+/* eslint-disable perfectionist/sort-arrays, perfectionist/sort-modules, perfectionist/sort-objects -- Contract fixtures mirror manifest field order and keep related declarations together. */
 
 import { readdir, readFile } from "node:fs/promises";
 
@@ -76,7 +76,9 @@ const expectedPeerDependencies = {
   "svelte-eslint-parser": ">=1.6.0 <2",
 } as const;
 
+// eslint-disable-next-line functional/prefer-immutable-types -- readFile accepts a URL instance; this helper does not mutate it.
 const readJson = async <T>(url: URL): Promise<T> => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion, security/detect-non-literal-fs-filename -- Only the two fixed repository manifest URLs reach this unvalidated fixture-shape assertion.
   return JSON.parse(await readFile(url, "utf8")) as T;
 };
 
@@ -90,6 +92,7 @@ const packageLockRoot = packageLock.packages[""];
 
 describe("package contract", () => {
   it("builds only the runtime and declaration bundles without hidden maps", async () => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The dist directory is fixed relative to this test module.
     const files = await readdir(new URL("../../dist/", import.meta.url));
 
     expect(
@@ -102,6 +105,7 @@ describe("package contract", () => {
   it.each(["index.d.mts", "index.mjs"])(
     "builds %s without external or inline source-map references",
     async (filename) => {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- The filename comes from the two fixed build artifact names above.
       const content = await readFile(
         new URL(`../../dist/${filename}`, import.meta.url),
         "utf8",
@@ -119,8 +123,11 @@ describe("package contract", () => {
     expect(packageManifest.main).toBe("./dist/index.mjs");
     expect(packageManifest.types).toBe("./dist/index.d.mts");
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- The parsed manifest is asserted, so a missing export must fail the expectation.
     expect(packageManifest.exports["."]?.types).toBe("./dist/index.d.mts");
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- The parsed manifest is asserted, so a missing export must fail the expectation.
     expect(packageManifest.exports["."]?.import).toBe("./dist/index.mjs");
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- The parsed manifest is asserted, so a missing export must fail the expectation.
     expect(packageManifest.exports["."]?.default).toBe("./dist/index.mjs");
     expect(packageManifest.exports["./package.json"]).toBe("./package.json");
 
@@ -153,6 +160,7 @@ describe("package contract", () => {
     expect(
       expectedOptionalPeerDependencies.filter((dependency) => {
         return (
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, security/detect-object-injection -- Keys come from the fixed optional-peer fixture; a missing entry in the asserted manifest must fail the expectation.
           packageManifest.peerDependenciesMeta[dependency]?.optional !== true
         );
       }),
@@ -177,14 +185,19 @@ describe("package contract", () => {
 
   it("keeps the lockfile root contract synchronized with package.json", () => {
     expect(packageLockRoot).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- A missing root in the asserted lockfile must fail the expectation.
     expect(packageLockRoot?.dependencies).toEqual(packageManifest.dependencies);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- A missing root in the asserted lockfile must fail the expectation.
     expect(packageLockRoot?.devDependencies).toEqual(
       packageManifest.devDependencies,
     );
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- A missing root in the asserted lockfile must fail the expectation.
     expect(packageLockRoot?.engines).toEqual(packageManifest.engines);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- A missing root in the asserted lockfile must fail the expectation.
     expect(packageLockRoot?.peerDependencies).toEqual(
       packageManifest.peerDependencies,
     );
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- A missing root in the asserted lockfile must fail the expectation.
     expect(packageLockRoot?.peerDependenciesMeta).toEqual(
       packageManifest.peerDependenciesMeta,
     );

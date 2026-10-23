@@ -5,13 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { typescript } from "../../../../src/configs/plugins/typescript/index.js";
 import { defaultContext } from "../../../../src/context.js";
-
-type EffectiveConfig = {
-  readonly languageOptions?: {
-    readonly parserOptions?: Readonly<Record<string, unknown>>;
-  };
-  readonly rules?: Readonly<Record<string, readonly unknown[]>>;
-};
+import { getResolvedConfig as getEffectiveConfig } from "../../../support/resolved-config.js";
 
 const typedContext: Context = {
   ...defaultContext,
@@ -19,15 +13,6 @@ const typedContext: Context = {
   typeAware: ["**/*.ts"],
 };
 const untypedContext: Context = { ...defaultContext, typeAware: undefined };
-
-const getEffectiveConfig = async (
-  eslint: ESLint,
-  filePath: string,
-): Promise<EffectiveConfig | undefined> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  return (await eslint.calculateConfigForFile(filePath)) as
-    EffectiveConfig | undefined;
-};
 
 describe("typescript feature", () => {
   it("parses TypeScript files in a parser block and sets its rules in a rules block, with type information by default", async () => {

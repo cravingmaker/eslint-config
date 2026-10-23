@@ -3,6 +3,19 @@ import type { FeatureOptions, Rules, TypeAwareScope } from "../types.js";
 
 import { narrowFiles, withoutIgnores } from "./file-scope.js";
 
+// Derive guards only from authored policy keys, including explicitly disabled alternatives.
+const rulesOff = (rules: Readonly<Rules>): Rules => {
+  return Object.fromEntries(
+    Object.keys(rules)
+      .toSorted((left, right) => {
+        return left.localeCompare(right);
+      })
+      .map((ruleId) => {
+        return [ruleId, "off"];
+      }),
+  );
+};
+
 // The severities that turn a rule on. Apart from them, ESLint takes only `"off"` and `0`.
 const severitiesOn: ReadonlySet<unknown> = new Set([1, 2, "error", "warn"]);
 
@@ -64,5 +77,6 @@ const typeAwareConfig = (
 export {
   narrowTypeAwareScope,
   overridesWithoutTypeInformation,
+  rulesOff,
   typeAwareConfig,
 };

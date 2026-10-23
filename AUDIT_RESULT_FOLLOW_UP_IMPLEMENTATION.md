@@ -134,7 +134,7 @@ migrations and supplies a verified baseline for each refactor.
 | 8     | Source-map-free package                                                   | D15, R7                          | 7          | Complete    |
 | 9     | Source, test, and ambient declaration ownership                           | D18.1–D18.6, R11                 | 8          | Complete    |
 | 10    | Production utility/builder consolidation and Svelte negations             | R1, R2                           | 9          | Complete    |
-| 11    | Derived disabled maps, shared test boundaries, local suppressions         | R3–R5                            | 10         | Not started |
+| 11    | Derived disabled maps, shared test boundaries, local suppressions         | R3–R5                            | 10         | Complete    |
 | 12    | Dead entries and consistent scripts/hooks                                 | R6, R8                           | 11         | Not started |
 | 13    | Documentation and source conventions                                      | R9, R10; D16, D17 retention      | 12         | Not started |
 | 14    | Final consumer verification and audit closure                             | All decisions/findings           | 13         | Not started |
@@ -2242,3 +2242,116 @@ contracts still require preservation and later review.
   typed-off maps, and unrelated suppressions remain unchanged here.
 - **PR/CI:** Local validation is complete; remote CI is not evaluated in this
   record. The requested PR is created after committing and pushing this stage.
+
+#### Stage 11 — derived maps, test boundaries, and local suppressions
+
+- **Status/date:** Complete, 23 October 2026.
+- **Stage-entry commit:** `f30fa41363f4a278a686998d8f1c91107939cc07`.
+  The worktree was clean on `cravingmaker/stage-11-audit-implementation`;
+  a fresh fetch confirmed that `origin/main` matched this commit. The script,
+  hook, and install-policy changes merged after Stage 10 are part of this
+  baseline and are preserved.
+- **Implementation commit(s):** Uncommitted at validation; this change and its
+  handoff are delivered together.
+- **Decisions/findings covered:** R3–R5; D7's AST-name comments, D9's synchronous
+  opaque-data exception, and D10's Security review coverage are preserved.
+- **Derived guards:** `rulesOff()` in `src/utilities/type-aware.ts` derives
+  sorted off entries from authored keys, including disabled alternatives.
+  TypeScript's 62 guards come from its typed policy and only the plugin entries
+  of its typed replacement map; core replacement entries stay in their existing
+  block. Functional's 12 and SonarJS's 69 guards come from their selected typed
+  policies. Their explicit classifier sets remain because upstream category
+  ownership and typed scope are different classifications; off values and
+  fixability explanations are no longer independently maintained. Neither
+  upstream presets nor runtime metadata add policy. Deprecated override-only
+  IDs remain separate, and Node's distinct JavaScript/TypeScript `n/no-sync`
+  guard and shared authored tuple are unchanged.
+- **Typegen boundary retained:** The build-only registry still eagerly imports
+  development plugins, with its core, Promise, Hooks, Refresh, and internal-rule
+  adapters. Runtime builders retain lazy optional-peer imports and differing
+  registration scopes. A shared catalog would couple those responsibilities
+  without removing the adapters or feature builders. The existing guarded list
+  therefore remains local; its strengthened test now checks every registered
+  plugin rule as well as every configured rule against generated declarations.
+- **Shared test boundary:** `tests/support/resolved-config.ts` owns the single
+  justified cast of ESLint's untyped result. All repository TypeScript callers
+  use it, including description and policy helpers. It preserves undefined for
+  ignored/unmatched paths, optional rule maps, normalized numeric severities,
+  configuration errors, and unknown rule-option values. The formatter check
+  validates its string-array option shape instead of asserting a stronger
+  unchecked config type. Boundary tests cover these contracts, plugin identity,
+  settings/linter options, and JavaScript/HTML, JSON, and Markdown descriptions.
+- **Semantic wrappers retained:** Snapshot serialization, concise file/rule
+  descriptions, map conversion, fixture-engine construction, and lint assertions
+  keep their distinct responsibilities while sharing resolved access. Standalone
+  JavaScript scripts in packed/installed consumers retain their local ESLint
+  calls so they exercise the installed package without repository test imports.
+  Fatal-parser and ignored-file assertions remain active.
+- **Helper vocabulary:** `typeChecked` and `refresh` replace the two obsolete
+  internal names at every helper call site. Typed linting still defaults to
+  false, Refresh still defaults to generic, and all framework features stay on.
+  The unused-variable example now names `unused-imports/no-unused-vars`, with
+  an executable regression. Legacy public-option rejection fixtures deliberately
+  retain the removed public names.
+- **Suppression review:** All 18 whole-file filesystem directives and the
+  whole-file computed-key directive from Stage 6's inventory are narrowed to
+  86 reviewed filesystem operations and one fixed optional-peer key lookup.
+  Comments identify fixed repository URLs, literal fixture matrices, owned
+  temporary roots, dependency-link endpoints, or installed artifact names.
+  Cleanup continues to use the owned fixture roots. Contract JSON assertions,
+  URL immutability, and optional-chain checks retain local exceptions. Its
+  three file-wide sort exceptions remain because fixtures mirror manifest field
+  order and group related declarations throughout the file. Smoke's three
+  synchronous subprocess exceptions and the policy report's `registerHooks`
+  exception are now local. The only other retained file-wide directives belong
+  to the public re-export entry point and the global ambient declaration; their
+  rules concern the whole module. No Security rule, role, severity, or production
+  AST-key/opaque-return exception changed.
+- **Regression evidence:** The two new helper-option regressions failed before
+  the rename. Adding the shared boundary as a watcher input reproduced the
+  missing regular-UI rerun; its explicit mapping now covers the policy-report
+  subprocess. The focused run covering support, typed guards/scopes, Node,
+  Functional, SonarJS, TypeScript, package contracts, typegen, and both UI scopes
+  passed **15 files / 726 tests** in **61.77 seconds**, with the original watcher
+  timeouts. Existing Security regressions continue to require unrelated dynamic
+  operations to warn after a local exception.
+- **Runtime/setup:** Node.js **24.22.0**, npm **11.19.1**; `npm ci` and
+  `npm run prepare` passed, with zero installation vulnerabilities. Validation
+  uses `NODE_OPTIONS=--max-old-space-size=4096`, `VITEST_MAX_WORKERS=1`, and
+  `UV_THREADPOOL_SIZE=16`. Explicit changed-file ESLint with `--max-warnings 0`,
+  type checking, Knip, and formatting passed before the full gate.
+- **Full gate and consumer compatibility:** `npm run validate` passed
+  **74 files / 2,735 tests**; its test phase took **434.21 seconds**. Formatting,
+  generation/build, type checking, Knip, zero-warning repository lint, all unit
+  and linked/installed consumer tests, Publint, and ATTW's ESM-only profile
+  passed. Package tests verified public imports, optional-peer loading/error
+  behavior, README consumers, the five-file tarball, and the source-map-free
+  runtime/declaration inventory. Broken-optional-peer stderr is an intentional
+  negative fixture. No public option/default, parser route, peer range, or
+  published declaration changed.
+- **Policy/snapshot delta:**
+  `npm run policy:diff -- --base f30fa41363f4a278a686998d8f1c91107939cc07`
+  reports **all 33 snapshots unchanged**, with unchanged locked packages.
+  Direct entry/current-build comparisons also match **90 effective
+  configurations and 20 lint/fix probes** across typed, untyped, scoped,
+  overridden, and disabled scenarios, including block names/order, rule entry
+  order, files/ignores, and plugin registrations. The public declaration and
+  generated rule declarations match the entry build byte for byte. The
+  cumulative report against `008a08207f28441297a2476b4798136aeb1023de` remains
+  **25 changed / 8 unchanged**, with no new, removed, or failed snapshots;
+  dependency differences remain the pre-existing Stage 8 follow-up. No snapshot
+  was edited or regenerated.
+- **Documentation/unrelated work:** Contributor guidance describes derived guard
+  ownership, the retained typegen registry, shared result access, helper defaults,
+  and local review signals. The entry tree was clean; only Stage 11 files are
+  changed. Dependencies, compiler settings, public exports/options, scripts,
+  hooks, and `CODING_PRINCIPLES.md` are unchanged. Generated output and disposable
+  comparisons stay outside the commit.
+- **Remaining work:** None within Stage 11; requested commit/push/PR delivery
+  follows this validation record.
+- **Next stage:** Stage 12, R6/R8: dead-entry review and consistent script/hook
+  contracts. Review the already-merged script/hook changes against the current
+  baseline rather than restoring the historical scripts. Stage 12 remains
+  unstarted here.
+- **PR/CI:** Local validation is complete. The requested PR follows commit and
+  push; remote CI has not been evaluated in this record.

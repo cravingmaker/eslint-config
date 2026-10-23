@@ -1,5 +1,3 @@
-/* eslint-disable n/no-sync, security/detect-non-literal-fs-filename -- Packed-package smoke tests intentionally perform filesystem and process side effects. */
-
 import { execFileSync } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -64,11 +62,14 @@ const linkDependency = async (
   const source = path.join(projectDirectory, "node_modules", dependency);
   const destination = path.join(nodeModulesDirectory, dependency);
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Dependency names come from the fixed runtime/optional peer fixtures under the owned consumer.
   await fs.mkdir(path.dirname(destination), { recursive: true });
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Link only fixed dependency fixture names from repository node_modules into the owned consumer.
   await fs.symlink(source, destination, "junction");
 };
 
 const createPackedPackage = async (baseDirectory: string) => {
+  // eslint-disable-next-line n/no-sync -- Packing must finish before this helper reads the tarball directory.
   execFileSync(
     // eslint-disable-next-line sonarjs/no-os-command-from-path -- Fixture subprocesses resolve contributor-installed npm and tar from PATH.
     "npm",
@@ -79,6 +80,7 @@ const createPackedPackage = async (baseDirectory: string) => {
     },
   );
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Read only the owned temporary directory where this suite just ran npm pack.
   const packedFiles = await fs.readdir(baseDirectory);
   const tarballs = packedFiles.filter((file) => {
     return file.endsWith(".tgz");
@@ -106,8 +108,10 @@ const createConsumer = async ({
     "eslint-config",
   );
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Create the fixed @cravingmaker/eslint-config child beneath the owned consumer node_modules.
   await fs.mkdir(packageDirectory, { recursive: true });
 
+  // eslint-disable-next-line n/no-sync -- Extraction must finish before this helper links and runs the consumer.
   execFileSync(
     // eslint-disable-next-line sonarjs/no-os-command-from-path -- Fixture subprocesses resolve contributor-installed npm and tar from PATH.
     "tar",
@@ -123,6 +127,7 @@ const createConsumer = async ({
     }),
   );
 
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json in the consumer created above from a literal fixture name.
   await fs.writeFile(
     path.join(consumerDirectory, "package.json"),
     JSON.stringify({
@@ -142,7 +147,9 @@ const createProjectRoot = async (
   directory: string,
   developmentDependencies: Readonly<Record<string, string>>,
 ) => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Callers pass fixed project fixture paths beneath their owned consumers.
   await fs.mkdir(directory, { recursive: true });
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json beneath the owned project fixture directory.
   await fs.writeFile(
     path.join(directory, "package.json"),
     JSON.stringify({
@@ -165,7 +172,9 @@ const createBrokenPackage = async (
     "node_modules",
     packageName,
   );
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Package names come from literal broken-peer cases beneath the owned consumer node_modules.
   await fs.mkdir(packageDirectory, { recursive: true });
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json inside the broken-peer fixture directory created above.
   await fs.writeFile(
     path.join(packageDirectory, "package.json"),
     JSON.stringify({
@@ -176,6 +185,7 @@ const createBrokenPackage = async (
     }),
     "utf8",
   );
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only index.mjs inside the broken-peer fixture directory created above.
   await fs.writeFile(
     path.join(packageDirectory, "index.mjs"),
     `throw new Error('broken optional peer');\n`,
@@ -184,6 +194,7 @@ const createBrokenPackage = async (
 };
 
 const runConsumer = (consumerDirectory: string, script: string) => {
+  // eslint-disable-next-line n/no-sync -- Smoke assertions consume the completed child process output synchronously.
   return execFileSync(
     process.execPath,
     ["--input-type=module", "--eval", script],
@@ -513,7 +524,9 @@ describe("published package", () => {
       name: "monorepo-consumer",
     });
     const appDirectory = path.join(consumerDirectory, "apps", "web");
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Create only apps/web/dist beneath the owned monorepo consumer.
     await fs.mkdir(path.join(appDirectory, "dist"), { recursive: true });
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only apps/web/package.json beneath the owned monorepo consumer.
     await fs.writeFile(
       path.join(appDirectory, "package.json"),
       JSON.stringify({
@@ -524,6 +537,7 @@ describe("published package", () => {
       }),
       "utf8",
     );
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only apps/web/dist/ignored.js beneath the owned monorepo consumer.
     await fs.writeFile(
       path.join(appDirectory, "dist", "ignored.js"),
       "const unused = 1;\n",

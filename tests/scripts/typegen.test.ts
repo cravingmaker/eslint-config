@@ -36,7 +36,7 @@ describe("generated rule types", () => {
     expect(errors).toEqual([]);
   });
 
-  it("declare every rule the configuration sets, including optional integrations", async () => {
+  it("declare every configured and registered rule, including optional integrations", async () => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- The generated file has a fixed path.
     const declarations = await readFile(
       new URL("../../src/typegen.d.ts", import.meta.url),
@@ -55,7 +55,16 @@ describe("generated rule types", () => {
     });
     const configuredRuleIds = new Set(
       config.flatMap((entry) => {
-        return Object.keys(entry.rules ?? {});
+        return [
+          ...Object.keys(entry.rules ?? {}),
+          ...Object.entries(entry.plugins ?? {}).flatMap(
+            ([namespace, plugin]) => {
+              return Object.keys(plugin.rules ?? {}).map((name) => {
+                return `${namespace}/${name}`;
+              });
+            },
+          ),
+        ];
       }),
     );
     const undeclaredRuleIds = configuredRuleIds

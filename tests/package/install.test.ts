@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The consumers are created in a temporary directory. */
-
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
@@ -123,7 +121,9 @@ const createProjectRoot = async (
       return [dependency, "1.0.0"];
     }),
   );
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Callers select fixed project fixture names under an owned temporary consumer.
   await mkdir(projectRootDirectory, { recursive: true });
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json inside the fixture project created above.
   await writeFile(
     path.join(projectRootDirectory, "package.json"),
     JSON.stringify({ devDependencies, private: true, type: "module" }),
@@ -140,6 +140,7 @@ const lint = async (
   config: string,
   filePaths: readonly string[],
 ): Promise<Messages> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only eslint.config.js in a consumer created by this suite.
   await writeFile(path.join(directory, "eslint.config.js"), config);
   const output = await getOutput(
     process.execPath,
@@ -249,6 +250,7 @@ describe("the packed package", () => {
       "package/README.md",
     ]);
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Read the fixed installed package dist directory inside the owned withoutPeers consumer.
     const installedFiles = await readdir(
       path.join(
         withoutPeers,
@@ -276,6 +278,7 @@ describe("the packed package", () => {
 
       expect(stdout).not.toContain("sourceMappingURL");
       expect(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- Read one of the two literal artifact names in the owned installed package dist directory.
         await readFile(
           path.join(
             withoutPeers,
@@ -741,6 +744,7 @@ describe("packed consumer policy regressions", () => {
   });
 
   it("stops ESLint before it lints, with a message that names what replaces the options of 0.1.0", async () => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only eslint.config.js in the owned withoutPeers consumer for the migration fixture.
     await writeFile(
       path.join(withoutPeers, "eslint.config.js"),
       `import { createConfig } from "@cravingmaker/eslint-config";
@@ -776,6 +780,7 @@ export default createConfig({
   }, 120_000);
 
   it("compiles a TypeScript example of the options, and rejects invalid ones", async () => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only options-example.ts in the owned withoutPeers consumer.
     await writeFile(
       path.join(withoutPeers, "options-example.ts"),
       `
@@ -844,6 +849,7 @@ export { config, invalidAuto, invalidRuleOptions, invalidSonarjsOptions, invalid
 `,
     );
     // Without optional peers and without ambient types, and with every declaration checked.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only tsconfig.json in the owned withoutPeers consumer.
     await writeFile(
       path.join(withoutPeers, "tsconfig.json"),
       JSON.stringify({
@@ -950,7 +956,9 @@ export default createConfig({
   }, 120_000);
 
   it("lints typed sources with type information and a script outside every tsconfig without it", async () => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Create only the scripts child inside the owned withAllPeers consumer.
     await mkdir(path.join(withAllPeers, "scripts"));
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only scripts/build.ts inside the owned withAllPeers consumer.
     await writeFile(
       path.join(withAllPeers, "scripts", "build.ts"),
       "export const build = (target: string): string => {\n  return target;\n};\n",

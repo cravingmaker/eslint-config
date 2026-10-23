@@ -6,7 +6,7 @@ import { expectLintError, expectNoLintError } from "../../../support/lint.js";
 
 const tsOptions = {
   filePath: "tests/support/lint.ts",
-  tsTypeChecked: true,
+  typeChecked: true,
 } as const;
 
 describe("typescript-eslint rules", () => {

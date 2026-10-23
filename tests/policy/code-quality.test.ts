@@ -16,8 +16,7 @@ import { stylistic } from "../../src/configs/plugins/stylistic/index.js";
 import { unicorn } from "../../src/configs/plugins/unicorn/index.js";
 import { unusedImports } from "../../src/configs/plugins/unused-imports/index.js";
 import { defaultContext } from "../../src/context.js";
-
-type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
+import { getResolvedRules as getRules } from "../support/resolved-config.js";
 
 const svelteContext: Context = {
   ...defaultContext,
@@ -94,16 +93,6 @@ const features = [
     rule: "unused-imports/no-unused-imports",
   },
 ] as const;
-
-const getRules = async (
-  eslint: ESLint,
-  filePath: string,
-): Promise<RuleEntries | undefined> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    { readonly rules?: RuleEntries } | undefined;
-  return config?.rules;
-};
 
 // The severity of a rule in the configuration for a file, or `undefined` when it is not set.
 const getSeverity = async (

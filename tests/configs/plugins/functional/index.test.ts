@@ -12,8 +12,7 @@ import { functional } from "../../../../src/configs/plugins/functional/index.js"
 import { defaultContext } from "../../../../src/context.js";
 import { typescriptFiles } from "../../../../src/globs.js";
 import { expectLintError, expectNoLintError } from "../../../support/lint.js";
-
-type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
+import { getResolvedRules as getRules } from "../../../support/resolved-config.js";
 
 const typedContext: Context = {
   ...defaultContext,
@@ -22,7 +21,7 @@ const typedContext: Context = {
 const untypedContext: Context = { ...defaultContext, typeAware: undefined };
 const tsOptions = {
   filePath: "tests/support/lint.ts",
-  tsTypeChecked: true,
+  typeChecked: true,
 } as const;
 // Options of `functional/prefer-immutable-types` that the policy does not have.
 const deepParameters = {
@@ -30,16 +29,6 @@ const deepParameters = {
   ignoreInferredTypes: true,
   parameters: { enforcement: "ReadonlyDeep" },
 } as const;
-
-const getRules = async (
-  eslint: ESLint,
-  filePath: string,
-): Promise<RuleEntries | undefined> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    { readonly rules?: RuleEntries } | undefined;
-  return config?.rules;
-};
 
 // The readonly-type severity for a file, or `undefined` when it is not set.
 const getReadonlyTypeSeverity = async (

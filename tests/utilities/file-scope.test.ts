@@ -2,10 +2,7 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { withoutIgnores } from "../../src/utilities/file-scope.js";
-
-type EffectiveConfig = {
-  readonly rules?: Readonly<Record<string, readonly unknown[]>>;
-};
+import { getResolvedConfig } from "../support/resolved-config.js";
 
 // Paths that the ignore lists below tell apart.
 const scopedPaths = [
@@ -89,9 +86,7 @@ const describeLeftIn = async (
   });
   const reached = await Promise.all(
     scopedPaths.map(async (filePath) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-      const config = (await eslint.calculateConfigForFile(filePath)) as
-        EffectiveConfig | undefined;
+      const config = await getResolvedConfig(eslint, filePath);
       return { filePath, ruleIds: Object.keys(config?.rules ?? {}) };
     }),
   );

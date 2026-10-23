@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
-
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -8,13 +6,8 @@ import { ESLint } from "eslint";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { createConfig } from "../../src/factory.js";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
-type EffectiveConfig = {
-  readonly languageOptions?: {
-    readonly parserOptions?: Readonly<Record<string, unknown>>;
-  };
-  readonly rules?: Readonly<Record<string, readonly [number, ...unknown[]]>>;
-};
 // Whether the parser reads type information for a file, and which of `ruleIds` are on there.
 type Scope = {
   readonly projectService: boolean;
@@ -69,7 +62,9 @@ const rootDirectory = await mkdtemp(
 await Promise.all(
   Object.entries(monorepoFiles).map(async ([fileName, content]) => {
     const filePath = path.join(rootDirectory, fileName);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The parent path comes from the fixed monorepoFiles keys under this suite's temporary root.
     await mkdir(path.dirname(filePath), { recursive: true });
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The path comes from the fixed monorepoFiles keys under this suite's temporary root.
     await writeFile(filePath, content, "utf8");
   }),
 );
@@ -94,9 +89,7 @@ afterAll(async () => {
 
 // How `filePath` is scoped.
 const describeScope = async (filePath: string): Promise<Scope> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    EffectiveConfig | undefined;
+  const config = await getResolvedConfig(eslint, filePath);
   const rules = new Map(Object.entries(config?.rules ?? {}));
   return {
     projectService:

@@ -46,6 +46,8 @@ const { internalPlugin } = await import("../src/rules/index.js");
 hooks.deregister();
 
 // Keys are the plugin names that createConfig registers. The empty key holds ESLint's core rules.
+// Keep this build-only registry local: runtime features load optional peers lazily, with scoped
+// registration and compatibility adapters. The typegen test checks every registered rule below.
 const plugins: Record<string, ESLint.Plugin> = {
   // eslint-disable-next-line @typescript-eslint/no-deprecated -- ESLint exposes its core rules only through this registry
   "": { rules: Object.fromEntries(builtinRules) },

@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
-
 import type { Linter } from "eslint";
 
 import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
@@ -13,6 +11,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { createConfig } from "../../dist/index.mjs";
 import { describeEffectiveConfig } from "../policy/effective-config.js";
 
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Resolve the system temporary directory before creating this suite's isolated root.
 const temporaryRoot = await realpath(os.tmpdir());
 const temporaryDirectory = await mkdtemp(
   path.join(temporaryRoot, "eslint-config-preparation-"),
@@ -24,6 +23,7 @@ const createProject = async (manifest?: string): Promise<string> => {
   if (typeof manifest === "undefined") {
     return directory;
   }
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json inside the directory just created for this fixture.
   await writeFile(path.join(directory, "package.json"), manifest, "utf8");
   return directory;
 };
@@ -87,6 +87,7 @@ describe("configuration preparation through the built package", () => {
 
   it("detects no frameworks when the manifest cannot be read as a file", async () => {
     const projectRootDirectory = await createProject();
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Create the deliberately unreadable package.json directory inside the owned fixture.
     await mkdir(path.join(projectRootDirectory, "package.json"));
 
     expect(
@@ -97,6 +98,7 @@ describe("configuration preparation through the built package", () => {
   it("reads the manifest again for each call", async () => {
     const projectRootDirectory = await createProject("{}");
     const before = await createConfig({ projectRootDirectory });
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Rewrite only the package.json fixture inside the owned project.
     await writeFile(
       path.join(projectRootDirectory, "package.json"),
       '{"devDependencies":{"svelte":"1.0.0"}}',

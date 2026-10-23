@@ -10,9 +10,9 @@ type LintOptions = {
   readonly filePath: string;
 
   // Override the react-refresh variant (generic if omitted).
-  readonly reactRefreshVariant?: "generic" | "next" | "vite";
+  readonly refresh?: "generic" | "next" | "vite";
   // Whether to enable type-checked rules. Defaults to false for speed in most fixture tests.
-  readonly tsTypeChecked?: boolean;
+  readonly typeChecked?: boolean;
 };
 /**
  * Lints `code` as `filePath` against the full `createConfig` output and returns the ID of the rule
@@ -23,20 +23,16 @@ type LintOptions = {
  */
 const lintRuleIds = async (
   code: string,
-  {
-    filePath,
-    reactRefreshVariant = "generic",
-    tsTypeChecked = false,
-  }: LintOptions,
+  { filePath, refresh = "generic", typeChecked = false }: LintOptions,
 ): Promise<ReadonlyArray<string | null>> => {
   const eslint = new ESLint({
     overrideConfig: await createConfig({
       express: true,
-      react: { refresh: reactRefreshVariant },
+      react: { refresh },
       svelte: true,
       typescript: {
         tsconfigRootDir: process.cwd(),
-        typeChecked: tsTypeChecked,
+        typeChecked,
       },
     }),
     // True = disable automatic config-file discovery; we supply config entirely via overrideConfig
@@ -67,7 +63,7 @@ const lintRuleIds = async (
  * Asserts that linting `code` reports `ruleId`.
  *
  * @example
- * await expectLintError('const a = 1;\n', 'no-unused-vars', { filePath: 'test.js' });
+ * await expectLintError('const a = 1;\n', 'unused-imports/no-unused-vars', { filePath: 'test.js' });
  */
 const expectLintError = async (
   code: string,

@@ -1,13 +1,6 @@
 import type { ESLint } from "eslint";
 
-type EffectiveConfig = {
-  readonly language?: string;
-  readonly plugins?: Readonly<Record<string, unknown>>;
-  readonly rules?: Readonly<Record<string, readonly unknown[]>>;
-};
-type SerializableConfig = {
-  readonly toJSON: () => { readonly language?: unknown };
-};
+import { getResolvedConfig } from "./resolved-config.js";
 
 // The language, the plugin names, and the severity of `ruleId` that ESLint resolves for a file.
 const describeFile = async (
@@ -15,9 +8,7 @@ const describeFile = async (
   filePath: string,
   ruleId: string,
 ): Promise<unknown> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    (EffectiveConfig & SerializableConfig) | undefined;
+  const config = await getResolvedConfig(eslint, filePath);
   const rules = new Map(Object.entries(config?.rules ?? {}));
   return {
     language: config?.toJSON().language,

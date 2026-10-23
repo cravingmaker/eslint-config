@@ -13,6 +13,7 @@ import { createConfig } from "../../dist/index.mjs";
 import { refreshRules } from "../../src/configs/plugins/react/rules.js";
 import { isRecord } from "../../src/utilities/is-record.js";
 import { supportedPluginPolicy } from "../../src/utilities/plugin-policy.js";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
 type RuleDefinition = {
   readonly meta?: { readonly deprecated?: unknown };
@@ -147,9 +148,7 @@ describe("deprecated rule handling", () => {
       overrideConfigFile: true,
     });
     const filePath = "tests/support/lint.ts";
-    await expect(
-      eslint.calculateConfigForFile(filePath),
-    ).resolves.toHaveProperty(
+    await expect(getResolvedConfig(eslint, filePath)).resolves.toHaveProperty(
       ["rules", "@typescript-eslint/return-await"],
       [2, "always"],
     );
@@ -186,10 +185,10 @@ describe("deprecated rule handling", () => {
         overrideConfigFile: true,
       });
       await expect(
-        engine.calculateConfigForFile("tests/utilities.ts"),
+        getResolvedConfig(engine, "tests/utilities.ts"),
       ).resolves.toHaveProperty(["rules", id, 0], 1);
       await expect(
-        engine.calculateConfigForFile("example.js"),
+        getResolvedConfig(engine, "example.js"),
       ).resolves.not.toHaveProperty(["rules", id]);
       const [result] = await engine.lintText("export const value = 1;\n", {
         filePath: "example.js",
@@ -204,7 +203,7 @@ describe("deprecated rule handling", () => {
         overrideConfigFile: true,
       });
       await expect(
-        untyped.calculateConfigForFile("example.ts"),
+        getResolvedConfig(untyped, "example.ts"),
       ).resolves.not.toHaveProperty(["rules", id]);
     },
   );

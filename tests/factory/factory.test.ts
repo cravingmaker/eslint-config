@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
-
 import type { Linter } from "eslint";
 
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
@@ -12,6 +10,7 @@ import { afterAll, describe, expect, it } from "vitest";
 
 import { describeEffectiveConfig } from "../policy/effective-config.js";
 import { createConfig } from "../../src/factory.js";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
 const prefix = "@cravingmaker/eslint-config/";
 const baseOptions = {
@@ -35,7 +34,9 @@ const createProject = async (
       return [dependency, "1.0.0"];
     }),
   );
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Names come from this suite's fixed project cases under its temporary root.
   await mkdir(directory);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json inside the fixture directory created above.
   await writeFile(
     path.join(directory, "package.json"),
     JSON.stringify({ devDependencies }),
@@ -409,10 +410,8 @@ describe("createConfig", () => {
       overrideConfig: configs,
       overrideConfigFile: true,
     });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-    const config = (await eslint.calculateConfigForFile("src/example.js")) as
-      | { readonly rules?: Readonly<Record<string, readonly unknown[]>> }
-      | undefined;
+
+    const config = await getResolvedConfig(eslint, "src/example.js");
 
     expect(configs.at(-1)).toBe(userConfig);
     expect(config?.rules?.["unicorn/no-null"]?.[0]).toBe(0);
@@ -471,10 +470,8 @@ describe("createConfig", () => {
         overrideConfigFile: true,
       });
       const [result] = await eslint.lintFiles([filePath]);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-      const config = (await eslint.calculateConfigForFile(filePath)) as
-        | { readonly languageOptions?: { readonly parserOptions?: unknown } }
-        | undefined;
+
+      const config = await getResolvedConfig(eslint, filePath);
 
       // A message without a rule is a parsing error, or says that ESLint did not lint the file.
       expect(

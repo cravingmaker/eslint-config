@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- The fixtures are written to a temporary directory. */
 import type { Linter } from "eslint";
 import type { Feature, Options } from "../../src/types.js";
 
@@ -13,6 +12,7 @@ import { afterAll, describe, expect, it } from "vitest";
 
 import { describeEffectiveConfig } from "../policy/effective-config.js";
 import { createConfig } from "../../src/factory.js";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
 // What the tests compare between values of a feature: the block names, the resolved configuration
 // of a file that the feature lints, and the severity of its rule there.
@@ -21,7 +21,7 @@ type Resolved = {
   readonly names: ReadonlyArray<string | undefined>;
   readonly severity: unknown;
 };
-type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
+
 // A feature that `false` turns off.
 type ToggledFeature = Exclude<
   keyof Options,
@@ -263,6 +263,7 @@ const createdDirectory = await mkdtemp(
 );
 // ESLint names the files that it lints by their real paths, and the temporary directory can be a
 // symbolic link, as it is on macOS.
+// eslint-disable-next-line security/detect-non-literal-fs-filename -- Resolve only the temporary directory just created by this suite.
 const temporaryDirectory = await realpath(createdDirectory);
 const createEslint = (configs: readonly Linter.Config[]): ESLint => {
   return new ESLint({ overrideConfig: [...configs], overrideConfigFile: true });
@@ -279,7 +280,9 @@ const createProject = async (
       return [dependency, "1.0.0"];
     }),
   );
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Names come from the declared, undeclared, and scoped fixtures under the owned root.
   await mkdir(directory);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only package.json inside the fixture directory created above.
   await writeFile(
     path.join(directory, "package.json"),
     JSON.stringify({ devDependencies }),
@@ -325,7 +328,9 @@ await Promise.all(
     }),
   }).map(async ([fileName, content]) => {
     const filePath = path.join(scopedRoot, fileName);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The parent path comes from the fixed appFiles/tsconfig fixture keys under scopedRoot.
     await mkdir(path.dirname(filePath), { recursive: true });
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- The path comes from the fixed appFiles/tsconfig fixture keys under scopedRoot.
     await writeFile(filePath, content, "utf8");
   }),
 );
@@ -390,12 +395,7 @@ const getSeverity = async (
   filePath: string,
   ruleId: string,
 ): Promise<unknown> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    | {
-        readonly rules?: RuleEntries;
-      }
-    | undefined;
+  const config = await getResolvedConfig(eslint, filePath);
   const rules = new Map(Object.entries(config?.rules ?? {}));
   return rules.get(ruleId)?.[0];
 };
@@ -611,12 +611,7 @@ describe("javascript feature", () => {
     );
     const coreRules = await Promise.all(
       ["lib/example.js", "app/generated/example.js"].map(async (filePath) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-        const config = (await eslint.calculateConfigForFile(filePath)) as
-          | {
-              readonly rules?: RuleEntries;
-            }
-          | undefined;
+        const config = await getResolvedConfig(eslint, filePath);
         return Object.keys(config?.rules ?? {}).filter((ruleId) => {
           return !ruleId.includes("/");
         });

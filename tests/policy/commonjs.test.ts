@@ -1,4 +1,5 @@
 import type { Options } from "../../src/types.js";
+import type { ResolvedConfig as EffectiveConfig } from "../support/resolved-config.js";
 
 import process from "node:process";
 
@@ -6,11 +7,7 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../../src/factory.js";
-
-type EffectiveConfig = {
-  readonly languageOptions?: { readonly sourceType?: string };
-  readonly rules?: Readonly<Record<string, unknown>>;
-};
+import { getResolvedConfig } from "../support/resolved-config.js";
 
 // Every feature on, typed linting included, so that a block of any feature that still matched
 // CommonJS files would show.
@@ -41,9 +38,7 @@ const describeByPath = async <Value>(
   return Object.fromEntries(
     await Promise.all(
       filePaths.map(async (filePath): Promise<readonly [string, Value]> => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-        const config = (await eslint.calculateConfigForFile(filePath)) as
-          EffectiveConfig | undefined;
+        const config = await getResolvedConfig(eslint, filePath);
         return [filePath, select(config)];
       }),
     ),

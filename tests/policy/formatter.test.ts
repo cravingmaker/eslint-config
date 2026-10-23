@@ -1,5 +1,6 @@
 import type { Linter } from "eslint";
 
+import assert from "node:assert/strict";
 import process from "node:process";
 
 import { ESLint } from "eslint";
@@ -7,6 +8,8 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import { describe, expect, it } from "vitest";
 
 import { createConfig } from "../../dist/index.mjs";
+import { isRecord } from "../../src/utilities/is-record.js";
+import { getResolvedConfig } from "../support/resolved-config.js";
 
 type PluginRule = {
   readonly meta?: {
@@ -17,11 +20,16 @@ type PluginRule = {
     readonly type?: unknown;
   };
 };
-type RuleEntries = Readonly<Record<string, readonly unknown[]>>;
-type TemplateIndentOptions = {
-  readonly comments: readonly string[];
-  readonly tags: readonly string[];
+
+const isStringArray = (value: unknown): value is readonly string[] => {
+  return (
+    Array.isArray(value) &&
+    value.every((item: unknown) => {
+      return typeof item === "string";
+    })
+  );
 };
+
 const rootDirectory = process.cwd();
 // One file of each kind that the configuration lints.
 const filePaths = [
@@ -288,12 +296,7 @@ const getRules = async (
   eslint: ESLint,
   filePath: string,
 ): Promise<ReadonlyMap<string, readonly unknown[]>> => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-  const config = (await eslint.calculateConfigForFile(filePath)) as
-    | {
-        readonly rules?: RuleEntries;
-      }
-    | undefined;
+  const config = await getResolvedConfig(eslint, filePath);
   return new Map(Object.entries(config?.rules ?? {}));
 };
 
@@ -370,18 +373,15 @@ describe.each([false, true])(
 describe("unicorn/template-indent", () => {
   it("leaves out the templates whose content Prettier formats", async () => {
     const eslint = await createEslint(false);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- ESLint types the calculated config as `any`.
-    const config = (await eslint.calculateConfigForFile("src/example.js")) as {
-      readonly rules: Readonly<
-        Record<
-          "unicorn/template-indent",
-          readonly [number, TemplateIndentOptions]
-        >
-      >;
-    };
-    const [severity, { comments, tags }] =
-      config.rules["unicorn/template-indent"];
+
+    const config = await getResolvedConfig(eslint, "src/example.js");
+    const [severity, options] =
+      config?.rules?.["unicorn/template-indent"] ?? [];
     expect(severity).toBe(2);
+    assert.ok(isRecord(options));
+    const { comments, tags } = options;
+    assert.ok(isStringArray(comments));
+    assert.ok(isStringArray(tags));
     expect({
       comments: comments.filter((comment) => {
         return prettierTemplateComments.has(comment.toLowerCase());

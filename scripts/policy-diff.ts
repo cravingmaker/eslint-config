@@ -1,6 +1,5 @@
-/* eslint-disable n/no-unsupported-features/node-builtins -- module.registerHooks() is a release candidate since Node.js 24.13.1, older than the supported range. */
-
 import type { ResolveFnOutput, ResolveHookContext } from "node:module";
+// eslint-disable-next-line n/no-unsupported-features/node-builtins -- registerHooks is available throughout the supported Node.js range.
 import { registerHooks } from "node:module";
 import process from "node:process";
 
