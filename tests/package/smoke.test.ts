@@ -283,6 +283,14 @@ describe("published package", () => {
 				const typedTsConfig = await getTypeScriptConfig(typed);
 
 				if (
+					defaultTsConfig.rules?.['@typescript-eslint/no-unsafe-enum-assignment']?.[0] !== 2 ||
+					typedTsConfig.rules?.['@typescript-eslint/no-unsafe-enum-assignment']?.[0] !== 2 ||
+					untypedTsConfig.rules?.['@typescript-eslint/no-unsafe-enum-assignment']?.[0] !== 0
+				) {
+					throw new Error('Enum assignment checks did not follow typed linting in the packed package');
+				}
+
+				if (
 					[defaultTsConfig, untypedTsConfig, typedTsConfig].some(
 						(config) => config?.plugins?.['@typescript-eslint'] === undefined,
 					)

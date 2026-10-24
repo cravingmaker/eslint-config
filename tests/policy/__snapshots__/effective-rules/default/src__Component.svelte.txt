@@ -14,7 +14,7 @@ linterOptions:
 settings:
   import-x/parsers: {"espree":[".js",".mjs",".cjs"]}
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 1343 (error 857, off 433, warn 53)
+rules: 1344 (error 857, off 434, warn 53)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/starred-documentation: error
@@ -208,6 +208,7 @@ rules: 1343 (error 857, off 433, warn 53)
 @typescript-eslint/no-unsafe-assignment: off
 @typescript-eslint/no-unsafe-call: off
 @typescript-eslint/no-unsafe-declaration-merging: error
+@typescript-eslint/no-unsafe-enum-assignment: off
 @typescript-eslint/no-unsafe-enum-comparison: off
 @typescript-eslint/no-unsafe-function-type: error
 @typescript-eslint/no-unsafe-member-access: off

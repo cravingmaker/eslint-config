@@ -94,7 +94,7 @@ const recommendedTypeAwareRules: Rules = {
 
 // The rules that need type information in typescript-eslint's strict config.
 const strictTypeAwareRules: Rules = {
-  // --- Rules with default options (15/17) ---------------------------------------------------------------------------------------------------------.
+  // --- Rules with default options (16/18) ---------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/no-deprecated": ["warn", { allow: [] }],
   "@typescript-eslint/no-generated-empty-object-type": "error",
   "@typescript-eslint/no-meaningless-void-operator": [
@@ -115,6 +115,7 @@ const strictTypeAwareRules: Rules = {
   "@typescript-eslint/no-unnecessary-type-arguments": "error", // Automatically fixable by the --fix command.
   "@typescript-eslint/no-unnecessary-type-conversion": "error", // Manually fixable by editor suggestions.
   "@typescript-eslint/no-unnecessary-type-parameters": "error", // Manually fixable by editor suggestions.
+  "@typescript-eslint/no-unsafe-enum-assignment": "error",
   "@typescript-eslint/no-useless-default-assignment": [
     "error",
     { allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: false },
@@ -124,7 +125,7 @@ const strictTypeAwareRules: Rules = {
   "@typescript-eslint/related-getter-setter-pairs": "error",
   "@typescript-eslint/use-unknown-in-catch-callback-variable": "error", // Manually fixable by editor suggestions.
 
-  // --- Rules with overridden options (2/17) -------------------------------------------------------------------------------------------------------.
+  // --- Rules with overridden options (2/18) -------------------------------------------------------------------------------------------------------.
   "@typescript-eslint/no-confusing-void-expression": [
     "error",
     {
@@ -256,10 +257,10 @@ const otherTypeAwareRules: Rules = {
 
 // Every typescript-eslint rule that needs type information.
 const typescriptTypeAwareRules: Rules = {
-  ...recommendedTypeAwareRules, // 19/54 rules, 2 automatically fixable, 4 editor suggestions fixable.
-  ...strictTypeAwareRules, // 17/54 rules, 8 automatically fixable, 7 editor suggestions fixable.
-  ...stylisticTypeAwareRules, // 7/54 rules, 5 automatically fixable, 3 editor suggestions fixable.
-  ...otherTypeAwareRules, // 11/54 rules, 4 automatically fixable, 3 editor suggestions fixable.
+  ...recommendedTypeAwareRules, // 19/55 rules, 2 automatically fixable, 4 editor suggestions fixable.
+  ...strictTypeAwareRules, // 18/55 rules, 8 automatically fixable, 7 editor suggestions fixable.
+  ...stylisticTypeAwareRules, // 7/55 rules, 5 automatically fixable, 3 editor suggestions fixable.
+  ...otherTypeAwareRules, // 11/55 rules, 4 automatically fixable, 3 editor suggestions fixable.
 } as const;
 
 // Rules requiring type information stay off outside typed linting.
@@ -275,5 +276,5 @@ const typescriptTypeAwareRulesOff: Rules = rulesOff({
 
 export {
   typescriptTypeAwareRules,
-  typescriptTypeAwareRulesOff, // 62 rules, 22 automatically fixable, 19 editor suggestions fixable.
+  typescriptTypeAwareRulesOff, // 63 rules, 22 automatically fixable, 19 editor suggestions fixable.
 };

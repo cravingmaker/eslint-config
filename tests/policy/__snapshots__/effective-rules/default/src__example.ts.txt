@@ -13,7 +13,7 @@ linterOptions:
   reportUnusedDisableDirectives: 1
 settings:
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 1386 (error 953, off 375, warn 58)
+rules: 1387 (error 954, off 375, warn 58)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/starred-documentation: error
@@ -197,6 +197,7 @@ rules: 1386 (error 953, off 375, warn 58)
 @typescript-eslint/no-unsafe-assignment: error
 @typescript-eslint/no-unsafe-call: error
 @typescript-eslint/no-unsafe-declaration-merging: error
+@typescript-eslint/no-unsafe-enum-assignment: error
 @typescript-eslint/no-unsafe-enum-comparison: error
 @typescript-eslint/no-unsafe-function-type: error
 @typescript-eslint/no-unsafe-member-access: error [{"allowOptionalChaining":false}]

@@ -741,6 +741,7 @@ export default createConfig({
 ### Behavior
 
 - **Typed linting.** In 0.1.0, `tsTypeChecked` was `false` by default. Now typed linting is on by default, so each TypeScript file that ESLint lints needs a tsconfig that includes it, with the compiler options in [tsconfig](#tsconfig). `typescript: { typeChecked: false }` turns it off, as in 0.1.0.
+- **Enum assignments.** Typed linting enables `@typescript-eslint/no-unsafe-enum-assignment`. Use enum members, such as `Status.Ready`, instead of their underlying numeric values, such as `0`, when assigning to an enum-typed location. This rule stays off outside typed linting.
 - **Return statements.** `no-useless-return` is off in TypeScript files and Svelte components, where the compiler option `noImplicitReturns` requires the `return;` that it would remove.
 - **CommonJS.** 0.1.0 linted `.cjs` and `.cts` files as CommonJS with the full policy, although `import-x/no-commonjs` reported `require` and `module.exports` in them. Now they get no rules, as described in [CommonJS](#commonjs).
 - **Framework detection.** In 0.1.0, a framework's rules were added when its plugins were installed: each React part when its own plugin was, Svelte when both of its packages were, and Express when its plugin was. Now the `package.json` in `projectRootDirectory` must declare `react`, `svelte`, or `express`. A project that installs the plugins without declaring the framework, such as a monorepo root, sets the feature to `true`, or points `projectRootDirectory` at the package that declares it.
