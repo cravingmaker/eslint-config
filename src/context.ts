@@ -18,6 +18,7 @@ type PreparedConfig = {
 const buildContext = (
   {
     globals,
+    javascriptRuneModules,
     projectRootDirectory,
     svelteComponents,
     typeAware,
@@ -28,6 +29,7 @@ const buildContext = (
   return {
     dependencies,
     globals,
+    javascriptRuneModules,
     projectRootDirectory,
     svelteComponents,
     tsconfigRootDir: typescript?.tsconfigRootDir ?? projectRootDirectory,

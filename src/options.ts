@@ -16,7 +16,11 @@ import process from "node:process";
 
 import globalVariables from "globals";
 
-import { svelteComponentFiles, typescriptFiles } from "./globs.js";
+import {
+  javascriptRuneModuleFiles,
+  svelteComponentFiles,
+  typescriptFiles,
+} from "./globs.js";
 import { narrowFiles, withoutIgnores } from "./utilities/file-scope.js";
 
 /**
@@ -43,6 +47,10 @@ type ResolvedOptions = {
   readonly ignores: readonly string[];
   readonly imports: FeatureOptions | undefined;
   readonly javascript: FeatureOptions;
+  /**
+   * The JavaScript rune modules that the Svelte feature parses, which typescript-eslint's parser reads without type information.
+   */
+  readonly javascriptRuneModules: ReadonlyArray<string | readonly string[]>;
   readonly json: JsonOptions | undefined;
   readonly markdown: FeatureOptions | undefined;
   readonly node: FeatureOptions | undefined;
@@ -136,16 +144,17 @@ const resolveReact = (
 };
 
 /**
- * Resolves the Svelte components whose scripts the features for JavaScript and TypeScript sources lint: the components among the Svelte feature's files, without its ignores, because only svelte-eslint-parser reads them. None while the Svelte feature is off.
+ * Resolves the files among `patterns` that svelte-eslint-parser reads: those among the Svelte feature's files, without its ignores. None while the Svelte feature is off.
  */
-const resolveSvelteComponents = (
+const resolveSvelteScope = (
   svelte: FeatureOptions | undefined,
+  patterns: readonly string[],
 ): ReadonlyArray<string | readonly string[]> => {
   if (typeof svelte === "undefined") {
     return [];
   }
   const { files, ignores = [] } = svelte;
-  return withoutIgnores(narrowFiles(svelteComponentFiles, files), ignores);
+  return withoutIgnores(narrowFiles(patterns, files), ignores);
 };
 
 /**
@@ -226,6 +235,10 @@ const resolveOptions = (
     ignores: options.ignores ?? [],
     imports: resolveFeature(options.imports),
     javascript: options.javascript ?? {},
+    javascriptRuneModules: resolveSvelteScope(
+      svelte,
+      javascriptRuneModuleFiles,
+    ),
     json: resolveFeature(options.json),
     markdown: resolveFeature(options.markdown),
     node: resolveFeature(options.node),
@@ -239,7 +252,7 @@ const resolveOptions = (
     sonarjs: resolveFeature(options.sonarjs),
     stylistic: resolveFeature(options.stylistic),
     svelte,
-    svelteComponents: resolveSvelteComponents(svelte),
+    svelteComponents: resolveSvelteScope(svelte, svelteComponentFiles),
     typeAware: resolveTypeAwareScope(typescript),
     typescript,
     unicorn: resolveFeature(options.unicorn),

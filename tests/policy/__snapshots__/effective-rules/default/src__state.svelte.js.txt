@@ -13,7 +13,7 @@ linterOptions:
   reportUnusedDisableDirectives: 1
 settings:
   import-x/parsers: {"espree":[".js",".mjs",".cjs"]}
-rules: 1270 (error 863, off 354, warn 53)
+rules: 1270 (error 862, off 355, warn 53)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/starred-documentation: error
@@ -276,7 +276,7 @@ n/no-process-env: warn [{"allowedVariables":["NODE_ENV"]}]
 n/no-process-exit: off
 n/no-restricted-import: off
 n/no-restricted-require: off
-n/no-sync: error [{"allowAtRootLevel":true,"ignores":[]}]
+n/no-sync: off [{"allowAtRootLevel":true,"ignores":[]}]
 n/no-top-level-await: off
 n/no-unpublished-bin: error [{}]
 n/no-unpublished-import: error [{"ignorePrivate":true,"ignoreTypeImport":false}]

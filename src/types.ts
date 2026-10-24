@@ -15,6 +15,10 @@ type Context = {
    */
   readonly globals: Readonly<Linter.Globals>;
   /**
+   * JavaScript rune modules that the Svelte feature parses, or none while it is off. svelte-eslint-parser hands them to typescript-eslint's parser, which reads no type information in JavaScript files. Each nested array is a set of patterns that a file must all match.
+   */
+  readonly javascriptRuneModules: ReadonlyArray<string | readonly string[]>;
+  /**
    * The directory that holds the consumer's `package.json`, as an absolute path.
    */
   readonly projectRootDirectory: string;
