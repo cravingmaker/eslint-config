@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 
-import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 
 import {
   createContext,
@@ -38,9 +38,6 @@ const createProject = async (
 
 afterAll(async () => {
   await rm(temporaryDirectory, { force: true, recursive: true });
-});
-afterEach(() => {
-  vi.restoreAllMocks();
 });
 
 describe("createContext", () => {

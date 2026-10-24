@@ -1260,6 +1260,16 @@ The reference that the recipes link to, grouped by topic.
   so that it does not remove it.
   This contract does not add `noUncheckedIndexedAccess`, `verbatimModuleSyntax`,
   or `noFallthroughCasesInSwitch`; none substitutes for Security trust review.
+  The repository's `tsconfig.json` adds only checks that report errors without
+  changing type information, so its lint results still match a consumer's:
+  `erasableSyntaxOnly`, which keeps every file runnable by Node.js type
+  stripping as `npm run gen` and `npm run policy:diff` run the scripts,
+  `isolatedModules`, `moduleDetection: "force"`, `noImplicitOverride`, and
+  `noUncheckedSideEffectImports`. Its `target` and `lib` describe Node.js
+  24.15, the minimum runtime: ES2025 with `Array.fromAsync`, explicit resource
+  management, and `Error.isError`. The compiler therefore rejects APIs that
+  this runtime lacks, such as Temporal. tsdown builds `dist/`, so the
+  compiler only checks (`noEmit`).
 
 The repository's own `eslint.config.js` permits explicit unset values in
 rule-option maps. Core and plugin modules follow the same lint rules. Test
@@ -1288,6 +1298,16 @@ worker loads ESLint and TypeScript, and the package tests also start child
 processes. README consumer examples run sequentially within their suite because
 each starts additional TypeScript and ESLint processes. These limits apply to
 local tests, validation, CI, and the pre-push hook.
+
+Focused tests fail locally as well as in CI (`allowOnly: false`), so a
+pre-push run cannot pass by running only one test, and every test needs at
+least one assertion (`expect.requireAssertions`). Before each test, Vitest
+restores spies, stubbed environment variables, and stubbed globals
+(`restoreMocks`, `unstubEnvs`, and `unstubGlobals`), so no test depends on what
+an earlier test replaced. Each test file still runs in its own worker. Plugins
+cache state across the files that they lint, and sharing
+workers (`isolate: false`) would save only about 6% of a full run; most of the
+time goes to typed linting and the package tests' npm installations.
 
 For faster feedback, run `npm run test:unit` for unit tests or
 `npm run test:package` for package consumer tests. Both commands build the
