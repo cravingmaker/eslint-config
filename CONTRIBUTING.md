@@ -1302,11 +1302,13 @@ test suite through `npm test`. Full validation runs through
 `npm run validate` and in CI.
 
 CI runs the static phase once on the development Node.js version in
-`.nvmrc`, after verifying registry signatures and auditing dependencies. The
-tests run on Node.js 24.15.0, the minimum, and on the newest Node.js 26
-release. "Minimum peer versions" installs the packed package with every
-advertised minimum peer, and pull requests also run Dependency Review. All
-jobs run in parallel. The `CI result` job fails unless every one of them
+`.nvmrc`, after verifying registry signatures. The tests run on Node.js
+24.15.0, the minimum, and on the newest Node.js 26 release. "Minimum peer
+versions" installs the packed package with every advertised minimum peer.
+"Dependency audit" runs `npm audit --audit-level=low` on the lockfile in its
+own job, so an advisory published after the last dependency change does not
+hide the other results. Pull requests also run Dependency Review. All jobs
+run in parallel. The `CI result` job fails unless every one of them
 succeeds, and it is the status that the repository rules require.
 
 ### Workflow checks
