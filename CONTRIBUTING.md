@@ -876,9 +876,8 @@ build. `npm run validate` runs both before the tests.
    the Svelte feature.
 
 2. **State its file-role requirement.** An exception replaces a
-   suppression that every file of the role would need, and the
-   [decisions](docs/rewrite/record.md#decisions) add one only with
-   evidence. Its files must stay JavaScript and TypeScript sources: on
+   suppression that every file of the role would need, and is added only
+   with evidence. Its files must stay JavaScript and TypeScript sources: on
    its own, a name pattern such as `**/*.config.*` makes ESLint lint
    every file that it matches. See "A `files` pattern also decides
    which files `eslint .` lints" under [Files and blocks](#files-and-blocks).
@@ -1203,9 +1202,7 @@ The reference that the recipes link to, grouped by topic.
   convert a synchronous API to async just to satisfy the diagnostic. Keep
   Security's filesystem-path and computed-key warnings in tests as well as
   production. Operation-level comments must state the inspected path or key
-  boundary and leave later unrelated operations visible. Stage 11's handoff in
-  [the audit implementation guide](AUDIT_RESULT_FOLLOW_UP_IMPLEMENTATION.md)
-  records the operation-level review of Stage 6's inventory. Contract fixture
+  boundary and leave later unrelated operations visible. Contract fixture
   ordering retains its three file-wide sort exceptions, and smoke subprocesses
   retain their synchronous-operation exceptions at each call; these do not
   suppress Security.
