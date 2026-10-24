@@ -17,7 +17,7 @@ describe("express feature", () => {
       getEffectiveConfig(eslint, "src/Component.tsx"),
     ]);
 
-    expect(server?.rules?.["express-security/require-helmet"]).toEqual([0]);
+    expect(server?.rules?.["express-security/require-helmet"]?.[0]).toBe(0);
     expect(server?.rules?.["express-security/require-rate-limiting"]).toEqual([
       2,
       {

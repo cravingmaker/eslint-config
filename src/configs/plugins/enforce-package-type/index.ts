@@ -7,6 +7,7 @@ import * as jsoncParser from "jsonc-eslint-parser";
 import { packageJsonFiles } from "../../../globs.js";
 import { enforcePackageTypeRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 
 /**
  * Builds the ES module package policy, registering its plugin only within package manifests.
@@ -23,7 +24,7 @@ const enforcePackageType = ({
       languageOptions: { parser: jsoncParser },
       name: "@cravingmaker/eslint-config/enforce-package-type/rules",
       plugins: { "enforce-package-type": pluginEnforcePackageType },
-      rules: { ...enforcePackageTypeRules, ...overrides },
+      rules: withOverrides(enforcePackageTypeRules, overrides),
     },
   ];
 };

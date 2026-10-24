@@ -6,6 +6,7 @@ import { svelteFiles } from "../../../globs.js";
 import { svelteRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 import { importPeer } from "../../../utilities/import-peer.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 import { supportedPluginPolicy } from "../../../utilities/plugin-policy.js";
 
 /**
@@ -38,14 +39,14 @@ const svelte = async (
       },
       name: "@cravingmaker/eslint-config/svelte/rules",
       plugins: { "@html-eslint/svelte": plugin.default },
-      rules: {
-        ...supportedPluginPolicy(
+      rules: withOverrides(
+        supportedPluginPolicy(
           "@html-eslint/svelte",
           svelteRules,
           plugin.default.rules,
         ),
-        ...overrides,
-      },
+        overrides,
+      ),
       settings: {
         // Import-x parses an imported module with the parser of the importing file, and
         // svelte-eslint-parser reads every file but a rune module as a component. The modules

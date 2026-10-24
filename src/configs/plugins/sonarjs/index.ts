@@ -10,6 +10,7 @@ import {
   typeAwareRulesOff,
 } from "./rules-type-aware.js";
 import { sonarjsRules } from "./rules.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 import {
   overridesWithoutTypeInformation,
@@ -42,10 +43,12 @@ const sonarjs = (
     ...(typeof typeAware === "undefined"
       ? []
       : [
-          typeAwareConfig("sonarjs", typeAware, options, {
-            ...typeAwareRules,
-            ...overrides,
-          }),
+          typeAwareConfig(
+            "sonarjs",
+            typeAware,
+            options,
+            withOverrides(typeAwareRules, overrides),
+          ),
         ]),
   ];
 };

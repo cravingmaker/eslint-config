@@ -193,6 +193,7 @@ The builders share these modules:
 | `src/configs/shared-options.ts`  | Rule options that more than one rule map uses, such as those of a core rule and of the rule that replaces it |
 | `src/utilities/file-scope.ts`    | `narrowFiles()` and `withoutIgnores()`, which limit `files` patterns by other patterns and by an ignore list |
 | `src/utilities/source-plugin.ts` | Shared source-plugin setup and rule blocks, with explicit policy and specialized blocks kept in each builder |
+| `src/utilities/overrides.ts`     | `withOverrides()`, which applies a feature's overrides to a rule map as a later config object would          |
 | `src/utilities/is-record.ts`     | Dependency-free object guard shared by production, scripts, and tests; excludes arrays                       |
 | `src/utilities/type-aware.ts`    | The helpers of the type-aware scope, such as `typeAwareConfig()`                                             |
 | `src/utilities/import-peer.ts`   | `importPeer()`, which loads an optional peer or fails with a message that names it                           |
@@ -406,16 +407,18 @@ A consumer can change a rule in two places, which apply at different
 points of the order:
 
 - **A feature's `overrides`** go into the feature's `rules` block, after
-  its rule map, and reach the feature's files only. An entry replaces
-  the whole entry of the policy, so `"warn"` alone drops the options
-  that the policy gives the rule. Overrides can enable a disabled
-  alternative within its feature's files, but a later file-role exception
-  still turns its rules off. A few features split their overrides: an
-  override that turns on a rule that needs type information applies
-  only where typed linting does, the blocks of the React feature divide
-  the overrides by plugin, and `json.overrides` reach JSON files only,
-  with `overridesJsonc` and `overridesJson5` for the other two
-  languages.
+  its rule map, and reach the feature's files only. `withOverrides()` in
+  `src/utilities/overrides.ts` applies them as ESLint applies a later
+  config object: `"warn"` alone keeps the options that the policy gives
+  the rule, and an entry with options replaces them, without a deep
+  merge. Every block that takes overrides applies them through it, typed
+  blocks included. Overrides can enable a disabled alternative within its
+  feature's files, but a later file-role exception still turns its rules
+  off. A few features split their overrides: an override that turns on a
+  rule that needs type information applies only where typed linting does,
+  the blocks of the React feature divide the overrides by plugin, and
+  `json.overrides` reach JSON files only, with `overridesJsonc` and
+  `overridesJson5` for the other two languages.
 - **User configs** are flat config objects that follow every block of
   this package, in the order given. ESLint merges each of them with the
   blocks before it, so `"warn"` alone keeps the options of the policy,
@@ -425,6 +428,8 @@ points of the order:
 
 `tests/factory/factory.test.ts` checks that user configs come last, and
 `tests/configs/exceptions/index.test.ts` that they can turn a rule back on.
+`tests/factory/overrides.test.ts` checks that every block merges a feature's
+overrides as a user config would.
 The README describes both to consumers, in "Feature values" and "User
 configs".
 
@@ -1022,9 +1027,10 @@ The reference that the recipes link to, grouped by topic.
 - **A severity-only entry keeps earlier options.** When a later block
   sets a rule to only `"off"` or `"error"`, ESLint keeps the options from
   an earlier block, and the snapshots record them. Inside one block, an
-  object spread replaces the whole entry instead. This is why moving a
-  rule between blocks can change a snapshot line even when the rule stays
-  off. Keep the explicit core `no-unused-vars` owner and TypeScript's
+  object spread of two rule maps replaces the whole entry instead, while
+  `withOverrides()` applies a feature's overrides as a later block would.
+  This is why moving a rule between blocks can change a snapshot line even
+  when the rule stays off. Keep the explicit core `no-unused-vars` owner and TypeScript's
   severity-only replacement guard: a `javascript.overrides` entry can enable
   the native rule before the TypeScript block turns it off again, preserving
   inherited options. Removing that guard changes TypeScript diagnostics even

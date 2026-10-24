@@ -11,6 +11,7 @@ import {
 } from "../../../globs.js";
 import { jsonRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 
 /**
  * Builds the flat config for JSON, JSONC, and JSON5 files. `files` and `ignores` limit all three languages. `overrides` apply to JSON files; JSONC and JSON5 files have their own overrides. The JSON block leaves out the files of the JSONC block, some of which its own patterns match: the JSONC block sets most rules with a severity alone, which keeps the options that an earlier block gave them. The patterns that the JSON block leaves out by itself come after `ignores`: ESLint reads an ignore list in order, so a negated pattern brings back only what the patterns before it left out.
@@ -29,7 +30,7 @@ const json = ({
       language: "json/json",
       name: "@cravingmaker/eslint-config/json/rules",
       plugins: { json: pluginJson },
-      rules: { ...jsonRules, ...overrides },
+      rules: withOverrides(jsonRules, overrides),
     },
     {
       files: narrowFiles(jsoncFiles, files),
@@ -37,7 +38,7 @@ const json = ({
       language: "json/jsonc",
       name: "@cravingmaker/eslint-config/json/rules-jsonc",
       plugins: { json: pluginJson },
-      rules: { ...jsonRules, ...overridesJsonc },
+      rules: withOverrides(jsonRules, overridesJsonc),
     },
     {
       files: narrowFiles(json5Files, files),
@@ -45,7 +46,7 @@ const json = ({
       language: "json/json5",
       name: "@cravingmaker/eslint-config/json/rules-json5",
       plugins: { json: pluginJson },
-      rules: { ...jsonRules, ...overridesJson5 },
+      rules: withOverrides(jsonRules, overridesJson5),
     },
   ];
 };

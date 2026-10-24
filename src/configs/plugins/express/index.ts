@@ -5,6 +5,7 @@ import { expressFiles } from "../../../globs.js";
 import { expressRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 import { importPeer } from "../../../utilities/import-peer.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 import { supportedPluginPolicy } from "../../../utilities/plugin-policy.js";
 
 /**
@@ -25,14 +26,14 @@ const express = async ({
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/express/rules",
       plugins: { "express-security": plugin.default },
-      rules: {
-        ...supportedPluginPolicy(
+      rules: withOverrides(
+        supportedPluginPolicy(
           "express-security",
           expressRules,
           plugin.default.rules,
         ),
-        ...overrides,
-      },
+        overrides,
+      ),
     },
   ];
 };

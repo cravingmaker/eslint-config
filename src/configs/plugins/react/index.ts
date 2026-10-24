@@ -12,6 +12,7 @@ import { reactFiles, sourceFiles } from "../../../globs.js";
 import { hooksRules, htmlReactRules, refreshRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
 import { importPeer } from "../../../utilities/import-peer.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 import { supportedPluginPolicy } from "../../../utilities/plugin-policy.js";
 
 type ReactFeatureOptions = FeatureOptions & {
@@ -59,14 +60,14 @@ const reactRefreshConfigs = (
       ...scope,
       name: "@cravingmaker/eslint-config/react/refresh",
       plugins: { "react-refresh": module.reactRefresh.plugin },
-      rules: {
-        ...supportedPluginPolicy(
+      rules: withOverrides(
+        supportedPluginPolicy(
           "react-refresh",
           refreshRules(refresh),
           module.reactRefresh.plugin.rules,
         ),
-        ...overrides,
-      },
+        overrides,
+      ),
     },
   ];
 };
@@ -105,14 +106,14 @@ const react = async ({
       ...scope,
       name: "@cravingmaker/eslint-config/react/html",
       plugins: { "@html-eslint/react": htmlReact.default },
-      rules: {
-        ...supportedPluginPolicy(
+      rules: withOverrides(
+        supportedPluginPolicy(
           "@html-eslint/react",
           htmlReactRules,
           htmlReact.default.rules,
         ),
-        ...otherOverrides,
-      },
+        otherOverrides,
+      ),
     },
     {
       files: narrowFiles(sourceFiles, files),
@@ -124,14 +125,10 @@ const react = async ({
           Linter.Config["plugins"]
         >[string],
       },
-      rules: {
-        ...supportedPluginPolicy(
-          "react-hooks",
-          hooksRules,
-          hooks.default.rules,
-        ),
-        ...hooksOverrides,
-      },
+      rules: withOverrides(
+        supportedPluginPolicy("react-hooks", hooksRules, hooks.default.rules),
+        hooksOverrides,
+      ),
     },
     ...reactRefreshConfigs(scope, refresh, refreshModule, refreshOverrides),
   ];

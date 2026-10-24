@@ -10,6 +10,7 @@ import {
   typeAwareRulesOff,
 } from "./rules-type-aware.js";
 import { functionalRules } from "./rules.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 import {
   overridesWithoutTypeInformation,
@@ -42,10 +43,12 @@ const functional = (
     ...(typeof typeAware === "undefined"
       ? []
       : [
-          typeAwareConfig("functional", typeAware, options, {
-            ...typeAwareRules,
-            ...overrides,
-          }),
+          typeAwareConfig(
+            "functional",
+            typeAware,
+            options,
+            withOverrides(typeAwareRules, overrides),
+          ),
         ]),
   ];
 };

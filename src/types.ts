@@ -53,7 +53,7 @@ type FeatureOptions = {
    */
   readonly ignores?: readonly string[];
   /**
-   * Rule settings applied after the feature's own rules. Settings that turn on a rule that needs type information apply only in the files that typed linting covers.
+   * Rule settings applied after the feature's own rules. They merge as the rules of a later config object do: a severity alone, such as `"warn"`, keeps the options that the policy gives the rule, and settings with options replace them. Settings that turn on a rule that needs type information apply only in the files that typed linting covers.
    */
   readonly overrides?: Rules;
 };
@@ -171,7 +171,7 @@ type TypeScriptOptions = FeatureOptions & {
    */
   readonly ignoresTypeAware?: readonly string[];
   /**
-   * Rule settings for the files that typed linting covers, applied after the type-aware rules and after `overrides`.
+   * Rule settings for the files that typed linting covers, applied after the type-aware rules and after `overrides`, and merged as `overrides` are.
    */
   readonly overridesTypeAware?: Rules;
   /**

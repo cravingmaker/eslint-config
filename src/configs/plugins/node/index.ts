@@ -8,6 +8,7 @@ import { typescriptFiles, withSvelteComponents } from "../../../globs.js";
 import { typeAwareRules, typescriptRulesOff } from "./rules-type-aware.js";
 import { nodeRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 import { typeAwareConfig } from "../../../utilities/type-aware.js";
 
@@ -46,10 +47,12 @@ const node = (
     ...(typeof typeAware === "undefined"
       ? []
       : [
-          typeAwareConfig("node", typeAware, options, {
-            ...typeAwareRules,
-            ...overrides,
-          }),
+          typeAwareConfig(
+            "node",
+            typeAware,
+            options,
+            withOverrides(typeAwareRules, overrides),
+          ),
         ]),
   ];
 };

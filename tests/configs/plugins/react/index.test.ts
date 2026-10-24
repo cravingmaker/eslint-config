@@ -229,8 +229,9 @@ describe("react feature", () => {
       "react-hooks/exhaustive-deps": "warn",
       "react-refresh/only-export-components": "error",
     } as const;
-    // The overrides that each block holds, by the name of the block. Every setting differs from
-    // the one of the feature, so a block holds an override when it has the setting.
+    // The overrides that each block holds, by the name of the block. Every severity differs from
+    // the one of the feature, so a block holds an override when its setting has that severity.
+    // A severity alone keeps the options of the feature.
     const describeBlocks = async (
       refresh: false | "generic",
     ): Promise<Readonly<Record<string, readonly string[]>>> => {
@@ -242,7 +243,10 @@ describe("react feature", () => {
             config.name ?? "",
             Object.entries(overrides)
               .filter(([ruleId, entry]) => {
-                return rules.get(ruleId) === entry;
+                const setting = rules.get(ruleId);
+                return (
+                  (Array.isArray(setting) ? setting[0] : setting) === entry
+                );
               })
               .map(([ruleId]) => {
                 return ruleId;
@@ -307,12 +311,21 @@ describe("react feature", () => {
 // a file where a rule is on without its plugin, so the override must reach a file only with it.
 describe("an override of the React Refresh rule", () => {
   it.each([
-    // The setting of the override replaces the one of the variant, options included.
+    // A severity alone keeps the options of the variant.
     [
       "in component files with a variant",
       { refresh: "vite" },
       ["@html-eslint/react", "react-hooks", "react-refresh"],
-      [2],
+      [
+        2,
+        {
+          allowCompoundComponents: false,
+          allowConstantExport: true,
+          allowExportNames: [],
+          checkJS: false,
+          extraHOCs: [],
+        },
+      ],
     ],
     [
       "nowhere while `refresh` is `false`",

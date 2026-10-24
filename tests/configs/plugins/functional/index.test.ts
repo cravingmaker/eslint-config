@@ -112,7 +112,7 @@ describe("functional feature", () => {
       getRules(eslint, "lib/example.ts"),
     ]);
 
-    expect(inside?.["functional/prefer-immutable-types"]).toEqual([1]);
+    expect(inside?.["functional/prefer-immutable-types"]?.[0]).toBe(1);
     expect(inside?.["functional/readonly-type"]?.[0]).toBe(2);
     expect(outside?.["functional/readonly-type"]).toBeUndefined();
   });

@@ -16,6 +16,7 @@ import {
 } from "./rules-type-aware.js";
 import { typescriptRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 import {
   overridesWithoutTypeInformation,
   typeAwareConfig,
@@ -37,11 +38,11 @@ const typescript = async (
     overridesTypeAware = {},
   } = options;
   const parserConfigs = await typescriptParser(options, context);
-  const tsxRules = {
-    ...tsxTypeAwareReplacementRules,
-    ...overrides,
-    ...overridesTypeAware,
-  };
+  // `overridesTypeAware` apply after `overrides`, as a later config object would.
+  const tsxRules = withOverrides(
+    withOverrides(tsxTypeAwareReplacementRules, overrides),
+    overridesTypeAware,
+  );
 
   return [
     ...parserConfigs,
@@ -52,13 +53,15 @@ const typescript = async (
       ),
       ignores: [...ignores],
       name: "@cravingmaker/eslint-config/typescript/rules",
-      rules: {
-        ...compilerCheckedRules,
-        ...replacementRules,
-        ...typescriptRules,
-        ...typescriptTypeAwareRulesOff,
-        ...overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
-      },
+      rules: withOverrides(
+        {
+          ...compilerCheckedRules,
+          ...replacementRules,
+          ...typescriptRules,
+          ...typescriptTypeAwareRulesOff,
+        },
+        overridesWithoutTypeInformation(overrides, typeAwareRuleIds),
+      ),
     },
     ...(typeof context.typeAware === "undefined"
       ? []
@@ -68,12 +71,13 @@ const typescript = async (
             "typescript",
             context.typeAware,
             {},
-            {
-              ...typeAwareReplacementRules,
-              ...typescriptTypeAwareRules,
-              ...overrides,
-              ...overridesTypeAware,
-            },
+            withOverrides(
+              withOverrides(
+                { ...typeAwareReplacementRules, ...typescriptTypeAwareRules },
+                overrides,
+              ),
+              overridesTypeAware,
+            ),
           ),
           {
             files: narrowFiles(context.typeAware, ["**/*.tsx"]),

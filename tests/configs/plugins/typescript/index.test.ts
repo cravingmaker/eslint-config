@@ -195,9 +195,9 @@ describe("typescript feature", () => {
       getEffectiveConfig(eslint, "scripts/example.ts"),
     ]);
 
-    expect(included?.rules?.["@typescript-eslint/no-explicit-any"]).toEqual([
+    expect(included?.rules?.["@typescript-eslint/no-explicit-any"]?.[0]).toBe(
       0,
-    ]);
+    );
     expect(excluded).toBeUndefined();
     expect(outside).toBeUndefined();
   });
@@ -260,9 +260,9 @@ describe("typescript feature", () => {
       "@cravingmaker/eslint-config/typescript/rules-type-aware",
       "@cravingmaker/eslint-config/typescript/rules-type-aware-tsx",
     ]);
-    expect(inside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual([
-      1,
-    ]);
+    expect(
+      inside?.rules?.["@typescript-eslint/no-floating-promises"]?.[0],
+    ).toBe(1);
     expect(inside?.rules?.["@typescript-eslint/await-thenable"]).toEqual([1]);
     expect(outside?.rules?.["@typescript-eslint/await-thenable"]).toEqual([0]);
   });
@@ -299,14 +299,17 @@ describe("typescript feature", () => {
       },
     });
     // An override of a rule that needs no type information applies in every file.
-    const untypedRules = {
-      rules: {
-        "@typescript-eslint/no-explicit-any": [1],
-        "@typescript-eslint/no-floating-promises": [0],
-      },
-    };
-    expect(outside).toMatchObject(untypedRules);
-    expect(component).toMatchObject(untypedRules);
+    expect(
+      [outside, component].map((config) => {
+        return [
+          config?.rules?.["@typescript-eslint/no-explicit-any"]?.[0],
+          config?.rules?.["@typescript-eslint/no-floating-promises"]?.[0],
+        ];
+      }),
+    ).toEqual([
+      [1, 0],
+      [1, 0],
+    ]);
   });
 
   it("does not apply such an override without typed linting", async () => {
@@ -346,9 +349,9 @@ describe("typescript feature", () => {
     ]);
 
     expect(inside?.rules?.["@typescript-eslint/await-thenable"]).toEqual([0]);
-    expect(inside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual([
-      1,
-    ]);
+    expect(
+      inside?.rules?.["@typescript-eslint/no-floating-promises"]?.[0],
+    ).toBe(1);
     expect(outside?.rules?.["@typescript-eslint/no-floating-promises"]).toEqual(
       [0],
     );
