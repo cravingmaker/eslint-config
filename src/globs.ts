@@ -28,8 +28,13 @@ const packageJsonFiles = ["**/package.json"] as const;
 const jsonFiles = ["**/*.json"] as const;
 // JSON files that other features or no feature lint.
 const jsonIgnores = ["**/package-lock.json", "**/package.json"] as const;
+// JSON with comments, by name or folder. VS Code reads tsconfig and jsconfig files and its own
+// settings as JSONC, and the Dev Container specification allows comments in its files.
 const jsoncFiles = [
+  "**/.devcontainer.json",
   "**/.devcontainer/*.json",
+  "**/.devcontainer/*/devcontainer.json",
+  "**/jsconfig*.json",
   "**/*.jsonc",
   "**/tsconfig*.json",
   "**/.vscode/*.json",
