@@ -1,18 +1,28 @@
 {
   "compilerOptions": {
+    // The compiler contract that the README asks of consumers (P10). The repository lints itself
+    // under the same contract; tests/package/readme.test.ts keeps the two in sync.
     "allowUnreachableCode": false,
-    "declaration": true,
-    "declarationMap": false,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "noImplicitReturns": true,
-    "outDir": "dist",
-    "skipLibCheck": true,
     "strict": true,
-    "target": "ESNext",
-    "types": ["node"]
+
+    // Repository-only checks. They add errors but change no type information, so lint results
+    // still match what consumers get.
+    "erasableSyntaxOnly": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noImplicitOverride": true,
+    "noUncheckedSideEffectImports": true,
+
+    // Node.js 24.15, the minimum runtime: ES2025 and the newer APIs that it ships.
+    "lib": ["ES2025", "ESNext.Array", "ESNext.Disposable", "ESNext.Error"],
+    "module": "NodeNext",
+    "target": "ES2025",
+    "types": ["node"],
+
+    // tsdown builds `dist/`; the compiler only checks.
+    "noEmit": true,
+    "skipLibCheck": true
   },
   "exclude": ["tests/fixtures"],
   "include": [
