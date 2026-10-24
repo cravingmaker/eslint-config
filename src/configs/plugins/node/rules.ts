@@ -83,7 +83,7 @@ const otherRules: Rules = {
 
   // --- Rules with overridden options (4/29) -------------------------------------------------------------------------------------------------------.
   "n/no-process-env": ["warn", { allowedVariables: ["NODE_ENV"] }],
-  "n/no-sync": ["error", { allowAtRootLevel: true, ignores: [] }], // Needs type information in TypeScript files.
+  "n/no-sync": ["error", { allowAtRootLevel: true, ignores: [] }], // Needs type information in the files that typescript-eslint parses.
   "n/prefer-global/crypto": ["error", "never"],
   "n/prefer-global/process": ["error", "never"],
 

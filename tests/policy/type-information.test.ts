@@ -42,9 +42,10 @@ parameter, and a call of a synchronous method in a function. It has no type synt
 const plainModule =
   'import { readFileSync } from "node:fs";\n\nexport const values = [1];\nvalues.push(2);\n\nexport function read(file) {\n  return readFileSync(file, "utf8");\n}\n';
 const jsxModule = "export function Example() {\n  return <p>example</p>;\n}\n";
-// Without a call of a synchronous method: `n/no-sync` is on in a JavaScript rune module, which
-// typescript-eslint parses without type information, so such a call stops ESLint there.
-const runeModule = "export const state = $state({ count: 0 });\n";
+// State and a call of a synchronous method in a function, which `n/no-sync` asks for type
+// information about where typescript-eslint is the parser, as in a JavaScript rune module.
+const runeModule =
+  'import { flushSync } from "svelte";\n\nexport const state = $state({ count: 0 });\n\nexport const flush = () => {\n  flushSync();\n};\n';
 /*
 One file of each kind of source, a script, and two generated files that an option can tell apart.
 The tsconfig of the project includes `src/` only, so the project service cannot find the script.
@@ -308,10 +309,11 @@ const selfCheckingRules = new Map([
 /*
 Rules that need type information without declaring it, each with the files where it does.
 `n/no-sync` asks for it wherever typescript-eslint is the parser, which the node feature takes to
-be the TypeScript files and the Svelte components.
+be the TypeScript files, and the Svelte components and JavaScript rune modules that the Svelte
+feature parses.
 */
 const undeclaredRules = new Map([
-  ["n/no-sync", [".mts", ".svelte", ".ts", ".tsx"]],
+  ["n/no-sync", [".mts", ".svelte", ".svelte.js", ".ts", ".tsx"]],
 ]);
 const projectDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-type-information-"),

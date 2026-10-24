@@ -105,7 +105,7 @@ describe("createContext", () => {
     expect(withoutTypeScript.tsconfigRootDir).toBe(projectRootDirectory);
   });
 
-  it("carries the Svelte components while the Svelte feature is on", async () => {
+  it("carries the Svelte components and JavaScript rune modules while the Svelte feature is on", async () => {
     const declared = await createProject(
       "svelte",
       JSON.stringify({ devDependencies: { svelte: "5.0.0" } }),
@@ -123,6 +123,11 @@ describe("createContext", () => {
         return svelteComponents;
       }),
     ).toEqual([["**/*.svelte"], [], [], ["**/*.svelte"]]);
+    expect(
+      contexts.map(({ javascriptRuneModules }) => {
+        return javascriptRuneModules;
+      }),
+    ).toEqual([["**/*.svelte.js"], [], [], ["**/*.svelte.js"]]);
   });
 
   it("uses the working directory as the default project root", async () => {
@@ -166,6 +171,10 @@ describe("prepareConfig", () => {
     expect(context.svelteComponents).toEqual([
       ["**/*.svelte", "app/**", "!app/legacy/**"],
     ]);
+    expect(context.javascriptRuneModules).toBe(resolved.javascriptRuneModules);
+    expect(context.javascriptRuneModules).toEqual([
+      ["**/*.svelte.js", "app/**", "!app/legacy/**"],
+    ]);
     expect(context.typeAware).toBe(resolved.typeAware);
     expect(context.typeAware).toEqual([
       [...typescriptFiles, "!**/*.svelte", "app/**"],
@@ -206,6 +215,7 @@ describe("defaultContext", () => {
     expect(defaultContext).toEqual({
       ...context,
       dependencies: new Set(),
+      javascriptRuneModules: [],
       svelteComponents: [],
     });
   });

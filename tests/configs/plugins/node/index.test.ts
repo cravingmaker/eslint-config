@@ -13,10 +13,12 @@ const typedContext: Context = {
   typeAware: [[...typescriptFiles, "!**/*.d.ts"]],
 };
 const untypedContext: Context = { ...defaultContext, typeAware: undefined };
-const svelteContext: Context = {
-  ...untypedContext,
+// What a Svelte feature that ignores `generated/` parses.
+const svelteScope = {
+  javascriptRuneModules: [["**/*.svelte.js", "!**/generated/**"]],
   svelteComponents: [["**/*.svelte", "!**/generated/**"]],
-};
+} as const satisfies Partial<Context>;
+const svelteContext: Context = { ...untypedContext, ...svelteScope };
 
 // The severity of a rule in the configuration for a file, or `undefined` when it is not set.
 const getSeverity = async (
@@ -52,16 +54,35 @@ describe("node feature", () => {
 
   it("turns n/no-sync off in Svelte components, which have no type information", async () => {
     const eslint = new ESLint({
-      overrideConfig: node(
-        {},
-        { ...typedContext, svelteComponents: svelteContext.svelteComponents },
-      ),
+      overrideConfig: node({}, { ...typedContext, ...svelteScope }),
       overrideConfigFile: true,
     });
 
     expect(await getSeverity(eslint, "src/Component.svelte", "n/no-sync")).toBe(
       0,
     );
+  });
+
+  it("turns n/no-sync off in the JavaScript rune modules that the Svelte feature parses", async () => {
+    // The Svelte parser hands them to typescript-eslint's parser, which reads no type information
+    // in JavaScript files. Other JavaScript files keep the rule, also a rune module that the
+    // Svelte feature leaves out, or every one while it is off.
+    const svelte = new ESLint({
+      overrideConfig: node({}, { ...typedContext, ...svelteScope }),
+      overrideConfigFile: true,
+    });
+    const withoutSvelte = new ESLint({
+      overrideConfig: node({}, typedContext),
+      overrideConfigFile: true,
+    });
+    const severities = await Promise.all([
+      getSeverity(svelte, "src/state.svelte.js", "n/no-sync"),
+      getSeverity(svelte, "src/generated/state.svelte.js", "n/no-sync"),
+      getSeverity(svelte, "src/example.js", "n/no-sync"),
+      getSeverity(withoutSvelte, "src/state.svelte.js", "n/no-sync"),
+    ]);
+
+    expect(severities).toEqual([0, 2, 2, 2]);
   });
 
   it("keeps the type-aware block within the type-aware scope, whatever its ignores bring back", async () => {
@@ -83,16 +104,18 @@ describe("node feature", () => {
     const eslint = new ESLint({
       overrideConfig: node(
         { overrides: { "n/no-sync": ["error", { allowAtRootLevel: false }] } },
-        { ...typedContext, svelteComponents: svelteContext.svelteComponents },
+        { ...typedContext, ...svelteScope },
       ),
       overrideConfigFile: true,
     });
-    const [script, typed, declaration, component] = await Promise.all([
-      getRules(eslint, "src/example.js"),
-      getRules(eslint, "src/example.ts"),
-      getRules(eslint, "src/example.d.ts"),
-      getRules(eslint, "src/Component.svelte"),
-    ]);
+    const [script, typed, declaration, component, runeModule] =
+      await Promise.all([
+        getRules(eslint, "src/example.js"),
+        getRules(eslint, "src/example.ts"),
+        getRules(eslint, "src/example.d.ts"),
+        getRules(eslint, "src/Component.svelte"),
+        getRules(eslint, "src/state.svelte.js"),
+      ]);
     // ESLint adds the default of `ignores` while the rule is on.
     const overridden = [2, { allowAtRootLevel: false, ignores: [] }];
 
@@ -100,9 +123,10 @@ describe("node feature", () => {
     expect(typed?.["n/no-sync"]).toEqual(overridden);
     expect(declaration?.["n/no-sync"]?.[0]).toBe(0);
     expect(component?.["n/no-sync"]?.[0]).toBe(0);
+    expect(runeModule?.["n/no-sync"]?.[0]).toBe(0);
   });
 
-  it("does not apply such an override in TypeScript files and Svelte components without typed linting", async () => {
+  it("does not apply such an override in TypeScript files, Svelte components, and JavaScript rune modules without typed linting", async () => {
     const eslint = new ESLint({
       overrideConfig: node(
         { overrides: { "n/no-sync": ["error", { allowAtRootLevel: false }] } },
@@ -114,9 +138,10 @@ describe("node feature", () => {
       getSeverity(eslint, "src/example.js", "n/no-sync"),
       getSeverity(eslint, "src/example.ts", "n/no-sync"),
       getSeverity(eslint, "src/Component.svelte", "n/no-sync"),
+      getSeverity(eslint, "src/state.svelte.js", "n/no-sync"),
     ]);
 
-    expect(severities).toEqual([2, 0, 0]);
+    expect(severities).toEqual([2, 0, 0, 0]);
   });
 
   it("leaves import resolution to import-x in every language", async () => {
@@ -148,7 +173,7 @@ describe("node feature", () => {
             "n/no-missing-import": ["warn", { ignoreTypeImport: true }],
           },
         },
-        { ...typedContext, svelteComponents: svelteContext.svelteComponents },
+        { ...typedContext, ...svelteScope },
       ),
       overrideConfigFile: true,
     });

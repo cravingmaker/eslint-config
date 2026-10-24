@@ -12,14 +12,14 @@ import { sourcePluginConfigs } from "../../../utilities/source-plugin.js";
 import { typeAwareConfig } from "../../../utilities/type-aware.js";
 
 /**
- * Builds the flat config for eslint-plugin-n. In TypeScript files and Svelte components, `n/no-sync` is off unless they are in the type-aware scope, also when an override turns it on. The rules block applies the overrides to every file of the feature, so the block that turns the rule off takes none. Import resolution belongs to import-x in every language; `n/no-missing-import` stays off unless a consumer explicitly overrides it.
+ * Builds the flat config for eslint-plugin-n. `n/no-sync` needs type information wherever typescript-eslint's parser reads a file: in TypeScript files, and in the Svelte components and JavaScript rune modules that svelte-eslint-parser hands to it. There the rule is off unless the file is in the type-aware scope, also when an override turns it on. The rules block applies the overrides to every file of the feature, so the block that turns the rule off takes none. Import resolution belongs to import-x in every language; `n/no-missing-import` stays off unless a consumer explicitly overrides it.
  */
 const node = (
   options: FeatureOptions = {},
   context: Context = defaultContext,
 ): Linter.Config[] => {
   const { files, ignores = [], overrides = {} } = options;
-  const { svelteComponents, typeAware } = context;
+  const { javascriptRuneModules, svelteComponents, typeAware } = context;
 
   return [
     ...sourcePluginConfigs(
@@ -33,7 +33,10 @@ const node = (
     ),
     {
       files: narrowFiles(
-        withSvelteComponents(typescriptFiles, svelteComponents),
+        [
+          ...withSvelteComponents(typescriptFiles, svelteComponents),
+          ...javascriptRuneModules,
+        ],
         files,
       ),
       ignores: [...ignores],

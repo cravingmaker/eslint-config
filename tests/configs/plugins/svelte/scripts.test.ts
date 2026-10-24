@@ -37,8 +37,17 @@ A project whose manifest declares Svelte. Its valid files cover both modes of a 
 script languages: a runes component in TypeScript with state, a bound element, and an event
 handler; one in JavaScript; a legacy component with an `export let` prop and a store; a rune
 module that imports from Svelte; and a component that imports them. `Broken.svelte` imports a name
-that the rune module does not export. `node_modules/svelte` links to this repository's copy.
+that the rune module does not export. `flush.js` and `flush.svelte.js` call a synchronous method
+in a function. `node_modules/svelte` links to this repository's copy.
 */
+const flushModule = [
+  'import { flushSync } from "svelte";',
+  "",
+  "export const flush = () => {",
+  "  flushSync();",
+  "};",
+  "",
+].join("\n");
 const projectFiles = {
   "package.json": JSON.stringify({
     devDependencies: { svelte: "5.0.0" },
@@ -85,6 +94,8 @@ const projectFiles = {
     '<button bind:this={button} type="button" onclick={increment}>{count}</button>',
     "",
   ].join("\n"),
+  "src/lib/flush.js": flushModule,
+  "src/lib/flush.svelte.js": flushModule,
   "src/lib/Legacy.svelte": [
     "<script>",
     '  import { visits } from "./visits.svelte.js";',
@@ -161,14 +172,17 @@ const createEslint = async (options: Options): Promise<ESLint> => {
   });
 };
 
-// The messages of each of `filePaths` in the fixture project as `line:column rule`, by path.
+// The messages of each of `filePaths` in the fixture project as `line:column rule`, by path, with
+// the options of `svelte`.
 const describeMessages = async (
   filePaths: readonly string[],
+  svelte: Options["svelte"] = "auto",
 ): Promise<Readonly<Record<string, readonly string[]>>> => {
   const eslint = new ESLint({
     cwd: projectDirectory,
     overrideConfig: await createConfig({
       projectRootDirectory: projectDirectory,
+      svelte,
       typescript: { tsconfigRootDir: projectDirectory },
     }),
     overrideConfigFile: true,
@@ -369,6 +383,23 @@ describe("svelte scripts", () => {
         }),
       ),
     );
+  });
+
+  it("lint JavaScript rune modules without type information, and keep n/no-sync in JavaScript that the Svelte feature does not parse", async () => {
+    // The Svelte parser hands a rune module that it reads to typescript-eslint's parser, without
+    // type information, which `n/no-sync` needs there: the call used to stop ESLint for every file.
+    const [parsed, ignored] = await Promise.all([
+      describeMessages(["src/lib/flush.js", "src/lib/flush.svelte.js"]),
+      describeMessages(["src/lib/flush.svelte.js"], {
+        ignores: ["**/flush.svelte.js"],
+      }),
+    ]);
+
+    expect(parsed).toEqual({
+      "src/lib/flush.js": ["4:3 n/no-sync"],
+      "src/lib/flush.svelte.js": [],
+    });
+    expect(ignored).toEqual({ "src/lib/flush.svelte.js": ["4:3 n/no-sync"] });
   });
 
   it("let import-x read the JavaScript modules that a component imports", async () => {

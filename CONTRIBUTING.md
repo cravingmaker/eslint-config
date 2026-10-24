@@ -247,8 +247,8 @@ the original composition order, with duplicate-classname first; the stylistic,
 Hooks, and Refresh policies remain separate.
 Node's `rules-type-aware.ts` owns the TypeScript-specific off and typed
 reactivation maps, referencing the single `n/no-sync` tuple in `rules.ts`.
-JavaScript keeps that base policy; untyped TypeScript and components keep the
-guard that turns it off.
+JavaScript keeps that base policy; untyped TypeScript, components, and the
+JavaScript rune modules that Svelte parses keep the guard that turns it off.
 Functional and SonarJS keep explicit typed-rule classifications beside their
 authored category maps. Their off guards come from the selected authored maps
 through `rulesOff()` in `src/utilities/type-aware.ts`. TypeScript derives its
@@ -854,7 +854,8 @@ build. `npm run validate` runs both before the tests.
       rule, and then the feature's `overrides`.
    2. The later blocks that change it. `typescript/rules` turns off
       core rules in TypeScript files and Svelte components,
-      `node/rules-typescript` turns off `n/no-sync` there, and the `rules-type-aware` blocks
+      `node/rules-typescript` turns off `n/no-sync` there and in the JavaScript
+      rune modules that the Svelte feature parses, and the `rules-type-aware` blocks
       turn on the rules that need type information where typed linting
       is.
    3. The `exceptions/` blocks, which turn off rules in the files of a

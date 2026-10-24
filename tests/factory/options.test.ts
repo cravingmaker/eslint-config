@@ -294,6 +294,21 @@ describe("resolveOptions", () => {
     ).toEqual([]);
   });
 
+  it("resolves the JavaScript rune modules that the Svelte feature parses", () => {
+    expect(resolveOptions().javascriptRuneModules).toEqual([]);
+    expect(resolveOptions({}, allDetected).javascriptRuneModules).toEqual([
+      "**/*.svelte.js",
+    ]);
+    expect(
+      resolveOptions({ svelte: false }, allDetected).javascriptRuneModules,
+    ).toEqual([]);
+    expect(
+      resolveOptions({
+        svelte: { files: ["app/**"], ignores: ["app/legacy/**"] },
+      }).javascriptRuneModules,
+    ).toEqual([["**/*.svelte.js", "app/**", "!app/legacy/**"]]);
+  });
+
   it("keeps the Svelte components within the files and ignores of the Svelte feature", () => {
     expect(
       resolveOptions({

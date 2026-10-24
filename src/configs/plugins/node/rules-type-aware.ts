@@ -2,8 +2,9 @@ import type { Rules } from "../../../types.js";
 
 import { nodeRules } from "./rules.js";
 
-// TypeScript-specific guards and reactivation; JavaScript keeps the base n/no-sync policy.
-// Rules requiring type information stay off in TypeScript files outside typed linting.
+// Guards for the files that typescript-eslint parses, and reactivation; other JavaScript keeps the
+// base n/no-sync policy. Rules requiring type information stay off in those files outside typed
+// linting.
 const typescriptRulesOff: Rules = {
   // --- Turned off rules (1/1) ---------------------------------------------------------------------------------------------------------------------.
   "n/no-sync": "off", // Requires type information; enabled only in the type-aware scope.
