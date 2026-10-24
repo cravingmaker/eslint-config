@@ -10,6 +10,44 @@ const tsOptions = {
 } as const;
 
 describe("typescript-eslint rules", () => {
+  it.each([
+    {
+      assignment: "0",
+      expected: [{ messageId: "unsafeEnumAssignment", severity: 2 }],
+      typeChecked: true,
+    },
+    { assignment: "Status.Ready", expected: [], typeChecked: true },
+    { assignment: "0", expected: [], typeChecked: false },
+  ])(
+    "@typescript-eslint/no-unsafe-enum-assignment: checks $assignment with typed linting $typeChecked",
+    async ({ assignment, expected, typeChecked }) => {
+      const eslint = new ESLint({
+        overrideConfig: await createConfig({ typescript: { typeChecked } }),
+        overrideConfigFile: true,
+      });
+      const results = await eslint.lintText(
+        `enum Status { Ready = 0 }\nexport const status: Status = ${assignment};\n`,
+        { filePath: tsOptions.filePath },
+      );
+      const messages = results.flatMap((result) => {
+        return result.messages;
+      });
+
+      expect(
+        messages.some((message) => {
+          return message.fatal === true;
+        }),
+      ).toBe(false);
+      expect(
+        messages.filter((message) => {
+          return (
+            message.ruleId === "@typescript-eslint/no-unsafe-enum-assignment"
+          );
+        }),
+      ).toMatchObject(expected);
+    },
+  );
+
   it.each([false, true])(
     "@typescript-eslint/no-restricted-types: suggests Uint8Array for Buffer with typed linting %s",
     async (typeChecked) => {
