@@ -8,7 +8,8 @@ A TypeScript-first, shareable ESLint flat config, published to npm as an ESM-onl
 - `npm run build`: bundle `src/` into `dist/`. Run it before linting or testing, because `eslint.config.js` and most tests import `./dist/index.mjs`.
 - `npm run gen`: generate the rule option types in `src/typegen.d.ts`, which is not committed. `build` and `typecheck` run it first.
 - `npm run lint:unused`: run Knip to check for unused files, exports, types, and dependencies. `knip.json` marks disk-loaded test fixtures as entry points.
-- `npm run validate`: format check, build, typecheck, Knip, lint, tests, and package checks. Run it before pushing. It takes a few minutes and installs the packed package from the npm registry; use a long command timeout.
+- `npm run lint:workflows`: check the GitHub Actions workflows with the pinned actionlint, which it downloads into the ignored `.tools/` on first use.
+- `npm run validate`: `npm run validate:static` (format check, build, typecheck, Knip, lint, workflow lint, and package checks), then the tests. Run it before pushing. It takes a few minutes and installs the packed package from the npm registry; use a long command timeout.
 - `npx vitest run <path>`: run one test file or directory.
 - `npm run policy:diff -- --base <git-ref>`: build, then report how the effective lint policy of the working tree differs from the snapshots at `<git-ref>`, `HEAD` by default. A refactor must report every snapshot unchanged.
 - `npx eslint .`: lint with this package's own config.

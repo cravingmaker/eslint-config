@@ -12,12 +12,13 @@ concurrency:
 
 jobs:
   auto-merge:
+    name: Enable auto-merge
     if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'cravingmaker/eslint-config'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      contents: write
-      pull-requests: write
+      contents: write # Merge the pull request once required checks pass.
+      pull-requests: write # Turn on auto-merge for the pull request.
     steps:
       - name: Read Dependabot metadata
         id: metadata

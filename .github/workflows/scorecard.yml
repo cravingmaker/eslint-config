@@ -22,8 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      actions: read
-      contents: read
+      actions: read # Read workflow runs for the analysis.
+      contents: read # Read the repository for the analysis.
       id-token: write # Publish results to the OpenSSF Scorecard API.
       security-events: write # Upload results to code scanning.
     steps:

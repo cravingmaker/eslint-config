@@ -58,6 +58,14 @@ export default defineConfig({
           return "tests/scripts/policy-diff.test.ts";
         },
       },
+      {
+        // The workflow check runs in a child process, which loads these files itself.
+        pattern:
+          /(?:^|\/)scripts\/(?:actionlint\.mjs|actionlint-reference\.json|check-workflows\.mjs)$/u,
+        testsToRun: (_filename) => {
+          return "tests/scripts/workflow-tool.test.ts";
+        },
+      },
     ],
   },
 });

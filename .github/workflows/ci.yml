@@ -2,69 +2,97 @@ name: CI
 
 on:
   pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
 
-permissions:
-  contents: read
+permissions: {}
 
+# Supersede outdated pull request runs; every main commit keeps its own result.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  validate:
-    name: Node.js ${{ matrix.node-version }}
+  static:
+    name: Static checks
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version:
-          - 24.15.0
-          - 26
-
-    env:
-      HUSKY: 0
-
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+      - name: Set up development Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Verify release readiness
-        run: npm run release:check
+      - name: Verify registry signatures and provenance
+        run: npm audit signatures
 
-  minimum-peers:
-    name: Minimum peer compatibility
+      - name: Run static checks
+        run: npm run validate:static
+
+      - name: List package contents
+        run: npm pack --dry-run --ignore-scripts
+
+  test:
+    name: Node.js ${{ matrix.node-version }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
-    env:
-      HUSKY: 0
-
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        # The minimum supported runtime and the newest release of the current line.
+        node-version:
+          - 24.15.0
+          - 26
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          check-latest: true
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Build package
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+  minimum-peers:
+    name: Minimum peer versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up minimum Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24.15.0
           cache: npm
@@ -74,8 +102,9 @@ jobs:
           npm ci --ignore-scripts
           npm run build
 
+      # Installing the advertised lower bounds outside a lockfile is the point of this job.
       - name: Install advertised minimum peers
-        run: |
+        run: | # zizmor: ignore[adhoc-packages]
           TARBALL="$(npm pack --ignore-scripts --silent)"
           mkdir -p .tmp/minimum-peer-consumer
           cd .tmp/minimum-peer-consumer
@@ -121,3 +150,67 @@ jobs:
             }
           }
           NODE
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up development Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      # npm audit reads the lockfile, so nothing is installed. As its own job, an advisory that
+      # was published after the last dependency change fails CI without hiding other results.
+      - name: Audit dependencies
+        run: npm audit --audit-level=low
+
+  dependency-review:
+    name: Dependency Review
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      # Compares the pull request's base and head dependency graphs; no checkout is needed.
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: low
+
+  # The single status for rulesets: it fails unless every job above succeeded.
+  # Dependency Review is skipped outside pull requests.
+  result:
+    name: CI result
+    if: ${{ always() }}
+    needs:
+      - static
+      - test
+      - minimum-peers
+      - audit
+      - dependency-review
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Require every CI job to succeed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          failed="$(jq --raw-output 'to_entries[]
+            | select(.value.result != "success" and (.key != "dependency-review" or .value.result != "skipped"))
+            | "\(.key)=\(.value.result)"' <<< "${NEEDS}")"
+
+          if [ -n "${failed}" ]; then
+            echo "::error::CI jobs did not succeed: $(echo "${failed}" | tr '\n' ' ')"
+            exit 1
+          fi

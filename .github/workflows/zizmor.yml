@@ -1,0 +1,44 @@
+name: zizmor
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/**
+  pull_request:
+    paths:
+      - .github/**
+  schedule:
+    - cron: "45 1 * * 6" # Weekly, Saturdays 08:45 Asia/Jakarta
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # Audits workflows and the Dependabot configuration. The weekly run also
+  # catches newly published advisories for the pinned actions.
+  analysis:
+    name: zizmor analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write # Upload results to code scanning.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Fork pull requests cannot upload to code scanning; they get annotations instead.
+      - name: Audit GitHub Actions and Dependabot configuration
+        uses: zizmorcore/zizmor-action@85b2b9fb8e3325e7a23d7d0a9d7ba5ae0f999e3e # v0.7.1
+        with:
+          version: 1.31.1
+          advanced-security: ${{ github.event.pull_request.head.repo.fork != true }}
+          annotations: ${{ github.event.pull_request.head.repo.fork == true }}

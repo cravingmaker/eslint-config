@@ -56,6 +56,7 @@
     "lint:package:built": "publint --strict",
     "lint:staged": "npm run build && lint-staged",
     "lint:unused": "knip",
+    "lint:workflows": "node scripts/check-workflows.mjs",
     "policy:diff": "npm run build && node scripts/policy-diff.ts",
     "prepare": "husky",
     "prepublishOnly": "npm run release:check",
@@ -72,7 +73,8 @@
     "typecheck:built": "tsc --noEmit",
     "typecheck:package": "npm run build && npm run typecheck:package:built",
     "typecheck:package:built": "attw --pack . --profile esm-only",
-    "validate": "npm run format:check && npm run build && npm run typecheck:built && npm run lint:unused && npm run lint:built && npm test && npm run lint:package:built && npm run typecheck:package:built"
+    "validate": "npm run validate:static && npm test",
+    "validate:static": "npm run format:check && npm run build && npm run typecheck:built && npm run lint:unused && npm run lint:built && npm run lint:workflows && npm run lint:package:built && npm run typecheck:package:built"
   },
   "lint-staged": {
     "*.{js,mjs,cjs,jsx,mjsx,ts,mts,tsx,mtsx,svelte,html,md,json,jsonc,json5}": [
