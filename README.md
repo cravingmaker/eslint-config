@@ -179,7 +179,7 @@ Peer dependencies are optional. When `peerDependencies` is declared, every peer 
 The `json` feature lints three languages:
 
 - JSON: `**/*.json`, apart from `package.json`, `package-lock.json`, and the JSONC files below.
-- JSONC: `**/*.jsonc`, `**/tsconfig*.json`, `**/.vscode/*.json`, and `**/.devcontainer/*.json`.
+- JSONC: `**/*.jsonc`, `**/tsconfig*.json`, `**/jsconfig*.json`, `**/.vscode/*.json`, `**/.devcontainer.json`, `**/.devcontainer/*.json`, and `**/.devcontainer/*/devcontainer.json`.
 - JSON5: `**/*.json5`.
 
 `json.files` and `json.ignores` apply to all three languages. `json.overrides` apply to JSON files only: JSONC and JSON5 files take their overrides from `json.overridesJsonc` and `json.overridesJson5`.

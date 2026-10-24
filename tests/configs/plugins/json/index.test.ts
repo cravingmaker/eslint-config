@@ -116,8 +116,11 @@ describe("json feature", () => {
           "data.jsonc",
           "data.json5",
           "tsconfig.json",
+          "jsconfig.json",
           ".vscode/settings.json",
+          ".devcontainer.json",
           ".devcontainer/devcontainer.json",
+          ".devcontainer/node/devcontainer.json",
         ].map(async (filePath) => {
           return await describeRule(eslint, filePath, ruleId);
         }),
@@ -126,6 +129,9 @@ describe("json feature", () => {
       { entry: [1], language: "json/json" },
       { entry: undefined, language: "json/jsonc" },
       { entry: undefined, language: "json/json5" },
+      { entry: undefined, language: "json/jsonc" },
+      { entry: undefined, language: "json/jsonc" },
+      { entry: undefined, language: "json/jsonc" },
       { entry: undefined, language: "json/jsonc" },
       { entry: undefined, language: "json/jsonc" },
       { entry: undefined, language: "json/jsonc" },
@@ -213,14 +219,20 @@ describe("json feature", () => {
           "config/data.json",
           "config/data.jsonc",
           "config/tsconfig.base.json",
+          "config/jsconfig.base.json",
           "config/.vscode/settings.json",
+          "config/.devcontainer.json",
           "config/.devcontainer/devcontainer.json",
+          "config/.devcontainer/node/devcontainer.json",
         ].map(async (filePath) => {
           return await describeRule(eslint, filePath, ruleId);
         }),
       ),
     ).toEqual([
       { entry: [2, { form: "NFD" }], language: "json/json" },
+      jsonc,
+      jsonc,
+      jsonc,
       jsonc,
       jsonc,
       jsonc,

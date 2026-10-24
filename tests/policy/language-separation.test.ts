@@ -28,14 +28,20 @@ const otherLanguages = [
   { filePath: "tsconfig.json", plugins: ["json"] },
 ] as const;
 // Files of the JSONC and JSON5 languages. The pattern of JSON files, `**/*.json`, also matches
-// those that are JSONC by their name or their folder.
+// those that are JSONC by their name or their folder: the configuration files of TypeScript,
+// VS Code, and Dev Containers, which allow comments.
 const otherJsonLanguages = [
+  { filePath: ".devcontainer.json", language: "json/jsonc" },
   { filePath: ".devcontainer/devcontainer.json", language: "json/jsonc" },
+  { filePath: ".devcontainer/node/devcontainer.json", language: "json/jsonc" },
   { filePath: ".vscode/settings.json", language: "json/jsonc" },
   { filePath: "data.json5", language: "json/json5" },
+  { filePath: "jsconfig.json", language: "json/jsonc" },
   { filePath: "notes.jsonc", language: "json/jsonc" },
   { filePath: "tsconfig.audit.json", language: "json/jsonc" },
 ] as const;
+// An object with a comment, which JSON does not allow.
+const commentedObject = '{\n  // A comment.\n  "name": "example"\n}\n';
 // An object whose key is a precomposed "é" (U+00E9). The key is normalized as NFC, the default
 // form of `json/no-unnormalized-keys`, and not as NFD.
 const precomposedKey = '{"\u{E9}":1}';
@@ -121,6 +127,29 @@ describe.each([false, true])(
     );
   },
 );
+
+describe("JSON languages with comments", () => {
+  const eslint = createEslint({ projectRootDirectory: rootDirectory });
+
+  it.each(otherJsonLanguages)(
+    "parse a comment in $filePath, which is $language",
+    async ({ filePath, language }) => {
+      expect(await getLanguage(await eslint, filePath)).toBe(language);
+      expect(
+        await lintRuleIds(await eslint, filePath, commentedObject),
+      ).toEqual([]);
+    },
+  );
+
+  it("report a comment in a JSON file as a parsing error", async () => {
+    const linter = await eslint;
+    const [result] = await linter.lintText(commentedObject, {
+      filePath: "data.json",
+    });
+
+    expect(result.fatalErrorCount).toBe(1);
+  });
+});
 
 describe("the overrides of each JSON language", () => {
   it("stay in the files of that language", async () => {
