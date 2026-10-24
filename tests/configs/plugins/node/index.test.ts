@@ -212,8 +212,8 @@ describe("node feature", () => {
 
     expect(
       rules.map((entries) => {
-        return entries?.["n/no-sync"];
+        return entries?.["n/no-sync"]?.[0];
       }),
-    ).toEqual([[0], [0], [0]]);
+    ).toEqual([0, 0, 0]);
   });
 });

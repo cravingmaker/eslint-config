@@ -6,6 +6,7 @@ import { jsxFiles, sourceFiles, withSvelteComponents } from "../../globs.js";
 import { supportedCoreRules } from "./rules.js";
 import { internalPlugin } from "../../rules/index.js";
 import { narrowFiles } from "../../utilities/file-scope.js";
+import { withOverrides } from "../../utilities/overrides.js";
 
 /**
  * Builds the core source rules and JSX parser options, including supported Svelte scripts.
@@ -28,10 +29,7 @@ const core = (
       },
       name: "@cravingmaker/eslint-config/javascript/rules",
       plugins: { "@cravingmaker": internalPlugin },
-      rules: {
-        ...supportedCoreRules,
-        ...overrides,
-      },
+      rules: withOverrides(supportedCoreRules, overrides),
     },
     {
       files: [...jsxFiles],

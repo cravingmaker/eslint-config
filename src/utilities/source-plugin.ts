@@ -4,6 +4,7 @@ import type { Context, FeatureOptions, Rules } from "../types.js";
 import { defaultContext } from "../context.js";
 import { narrowFiles } from "./file-scope.js";
 import { sourceFiles, withSvelteComponents } from "../globs.js";
+import { withOverrides } from "./overrides.js";
 
 type SourcePlugin = {
   readonly name: string;
@@ -31,7 +32,7 @@ const sourcePluginConfigs = (
       ),
       ignores: [...ignores],
       name: `@cravingmaker/eslint-config/${name}/rules`,
-      rules: { ...rules, ...overrides },
+      rules: withOverrides(rules, overrides),
     },
   ];
 };

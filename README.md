@@ -108,7 +108,7 @@ Every option from `javascript` down is a feature, and takes one of these values:
 - An object turns it on with these options:
   - `files`: patterns that limit the feature to some of its default files, such as `src/**`. The feature lints a file that matches one of its default patterns and one of these.
   - `ignores`: patterns of files that the feature leaves out. Other features still lint them.
-  - `overrides`: rule settings applied after the feature's own rules, in the feature's files.
+  - `overrides`: rule settings applied after the feature's own rules, in the feature's files. They merge as the rules of a later config object do: a severity alone, such as `"warn"`, keeps the options that the policy gives the rule, and settings with options replace them, without merging the two.
 - `"auto"`, for `react`, `svelte`, and `express` only, turns the feature on when the project declares the framework. It is their default.
 
 ```js

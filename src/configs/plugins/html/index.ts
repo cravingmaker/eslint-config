@@ -7,6 +7,7 @@ import htmlParser from "@html-eslint/parser";
 import { htmlFiles } from "../../../globs.js";
 import { htmlRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 
 /**
  * Builds the flat config for HTML files.
@@ -23,7 +24,7 @@ const html = ({
       languageOptions: { parser: htmlParser },
       name: "@cravingmaker/eslint-config/html/rules",
       plugins: { "@html-eslint": pluginHtml },
-      rules: { ...htmlRules, ...overrides },
+      rules: withOverrides(htmlRules, overrides),
     },
   ];
 };

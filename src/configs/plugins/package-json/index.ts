@@ -8,6 +8,7 @@ import { packageJsonFiles } from "../../../globs.js";
 import { packageJsonRules } from "./rules.js";
 import { internalPlugin } from "../../../rules/index.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 
 /**
  * Registers manifest plugins globally, then applies package metadata rules within package manifests.
@@ -30,7 +31,7 @@ const packageJson = ({
       ignores: [...ignores],
       languageOptions: { parser: jsoncParser },
       name: "@cravingmaker/eslint-config/package-json/rules",
-      rules: { ...packageJsonRules, ...overrides },
+      rules: withOverrides(packageJsonRules, overrides),
     },
   ];
 };

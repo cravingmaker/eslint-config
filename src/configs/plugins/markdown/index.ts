@@ -6,6 +6,7 @@ import pluginMarkdown from "@eslint/markdown";
 import { markdownFiles } from "../../../globs.js";
 import { markdownRules } from "./rules.js";
 import { narrowFiles } from "../../../utilities/file-scope.js";
+import { withOverrides } from "../../../utilities/overrides.js";
 
 /**
  * Builds the flat config for Markdown files, with GitHub Flavored Markdown, YAML front matter, and math.
@@ -34,7 +35,7 @@ const markdown = ({
         math: true,
       },
       name: "@cravingmaker/eslint-config/markdown/rules",
-      rules: { ...markdownRules, ...overrides },
+      rules: withOverrides(markdownRules, overrides),
     },
   ];
 };
