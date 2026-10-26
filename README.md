@@ -13,7 +13,7 @@ Craving Maker's opinionated, TypeScript-first ESLint configuration. One call, `c
 - **Frameworks when you declare them.** The rules for React, Svelte, and Express turn on when the project's `package.json` declares the framework.
 - **Made for Prettier.** Prettier formats, and no rule fights it over layout.
 
-The [coding principles](https://github.com/cravingmaker/eslint-config/blob/main/CODING_PRINCIPLES.md) set the priorities behind the policy.
+Its companion, [@cravingmaker/prettier-config](https://github.com/cravingmaker/prettier-config), formats the layout that this config leaves to Prettier; see [Formatting with Prettier](#formatting-with-prettier). The [coding principles](https://github.com/cravingmaker/eslint-config/blob/main/CODING_PRINCIPLES.md) set the priorities behind the policy.
 
 ## Contents
 
@@ -369,6 +369,8 @@ Prettier formats, and ESLint checks everything else. Run them as separate steps:
 ```bash
 npx prettier --check . && npx eslint .
 ```
+
+Any Prettier config works. [@cravingmaker/prettier-config](https://github.com/cravingmaker/prettier-config) is the companion of this one, and the formatting tests of this package use it.
 
 You do not need eslint-config-prettier. The rules that would fight Prettier over layout are off, each with its reason in the rule map, among them the indentation, wrapping, quote, and semicolon rules of Stylistic, so you can choose Prettier options such as `useTabs`, `printWidth`, `singleQuote`, and `semi`. Others that are off for the same reason:
 
