@@ -981,13 +981,14 @@ The reference that the recipes link to, grouped by topic.
   using real projects for typed files and component parsers. The harness checks
   both second-cycle transitions, so a formatter cannot hide an ESLint rewrite.
   Approved complementary overlaps name a sample, rule IDs, and distinct concerns;
-  a shared location or plugin namespace is not an automatic exception. D1/D2
-  assert uppercase escapes and import-comment convergence, separately and
-  together. D3 checks arrow-variable separation, starred documentation, the
-  original declaration-spacing failure with and without asterisks, and the
-  mixed D1/D2/D3 sample through positive convergence assertions. No temporary
-  loop characterizations remain. Typed passing samples take a parameter to
-  satisfy the independently retained Functional policy.
+  a shared location or plugin namespace is not an automatic exception. The
+  escape and import samples assert uppercase escapes and import-comment
+  convergence, separately and together. The function-layout samples check
+  arrow-variable separation, starred documentation, and function declarations
+  with and without asterisks, and one sample mixes escapes, imports, and
+  functions, all through positive convergence assertions. No temporary loop
+  characterizations remain. In TypeScript, the samples marked `functionLayout`
+  take a parameter to satisfy the independently retained Functional policy.
   The final acceptance matrix also runs every TypeScript source sample without
   type information, supported Svelte rune modules and ordinary `.svelte.mjs` /
   `.svelte.mts` sources, HTML, Markdown, JSON/JSONC/JSON5, and package manifests.
@@ -1042,7 +1043,7 @@ The reference that the recipes link to, grouped by topic.
   a feature never enables an alternative. A consumer can still explicitly enable
   one through its feature overrides or a user config. Tests in `tests/policy/overlaps.test.ts`
   verify enabled, disabled, narrowed, ignored, Svelte, and override cases.
-  `tests/policy/rule-ownership.test.ts` also checks D8's unique cases, overlaps,
+  `tests/policy/rule-ownership.test.ts` also checks each owner's unique cases, overlaps,
   negative controls, typed guards, and manual-fix boundaries through the public
   factory. Buffer constructor conversion must preserve encoding, coercion, and
   shared memory. Keep TypeScript's execution preference scalar off in both
@@ -1239,7 +1240,7 @@ The reference that the recipes link to, grouped by topic.
   TypeScript wrappers. Its selectors must reject functions nested inside data
   objects or calls. Perfectionist retains declaration ordering with module-member
   spacing ignored until its documentation-paragraph fixer is corrected. Do not
-  restore that spacing without the original and mixed convergence regressions.
+  restore that spacing without the function-declaration and mixed convergence regressions.
 - **Descriptions use starred documentation; implementation reasons use line comments.**
   Describe builders and APIs with `/** ... */`, leading asterisks, and prose paragraphs
   kept intact. Let Prettier and `unicorn/no-manually-wrapped-comments` handle
