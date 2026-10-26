@@ -774,7 +774,7 @@ export default createConfig({
         "- `reactRefreshVariant`: an option of 0.1.0, now `react.refresh`.",
         "- `rules`: an option of 0.1.0, now the `overrides` of each feature: `javascript.overrides` for core rules, and the `overrides` of a plugin's feature for the plugin's rules.",
         "- `tsTypeChecked`: an option of 0.1.0, now `typescript.typeChecked`.",
-        'See "Migrating from 0.1.0" in the README.',
+        'See "Migrating from 0.1.0" in the README of 0.2.0: https://github.com/cravingmaker/eslint-config/blob/v0.2.0/README.md#migrating-from-010',
       ].join("\n"),
     );
   }, 120_000);

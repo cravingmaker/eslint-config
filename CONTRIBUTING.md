@@ -662,7 +662,8 @@ pull request, run the full [validation](#validation) as well.
 6. **Check the result** for a path with `--print-config`, as in
    [Inspecting the configuration](#inspecting-the-configuration), and
    update the README where it describes the rule, such as in "Formatting
-   with Prettier", "Rules that replace other rules", or "Known issues".
+   with Prettier", "Code style", "Rules that replace other rules", or
+   "Known issues".
 
 ### Update a plugin
 
@@ -971,8 +972,8 @@ The reference that the recipes link to, grouped by topic.
   JavaScript block of the README as the `eslint.config.js` of a project
   in that consumer, type-checks it, and lints the fixtures with it. The Usage
   configuration itself must also lint without diagnostics in that consumer. A
-  block that must not run, such as the options of 0.1.0, follows an
-  `<!-- eslint-skip -->` comment. The install commands must name ESLint,
+  block that must not run, such as the `overrides` for `npm audit` in "Known
+  issues", follows an `<!-- eslint-skip -->` comment. The install commands must name ESLint,
   the package, and every optional peer but React and Svelte.
 
 - **Combined rules need repeated fixes and formatting.** Build, then run
@@ -1432,8 +1433,10 @@ push to `main` and before the merge:
 3. Merge before anything else lands on `main`. Another push to `main` rewrites
    the body and the branch, and the edits must be made again.
 
-Include consumer-facing migration guidance in the notes and the README when
-rule defaults or configuration behavior change.
+Include consumer-facing migration guidance in the release notes when rule
+defaults or configuration behavior change. The README describes the current
+version only, so it links to the release notes instead of keeping migration
+sections.
 
 Only the maintainer merges the release pull request. Before the merge, run the
 release check on its branch:

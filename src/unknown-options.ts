@@ -78,7 +78,8 @@ const keysByOption: ReadonlyMap<string, false | readonly string[]> = new Map(
     },
   ),
 );
-// The options of 0.1.0 that are gone, with what the migration table of the README names instead.
+// The options of 0.1.0 that are gone, with what the migration table of the 0.2.0 README names
+// instead.
 // The message names them and nothing reads them: the rewrite has no compatibility adapter.
 const replacedOptions = new Map<string, string>([
   [
@@ -176,7 +177,9 @@ const describeUnknownOptions = (options: Options): string | undefined => {
     ...(entries.some(([option]) => {
       return replacedOptions.has(option);
     })
-      ? ['See "Migrating from 0.1.0" in the README.']
+      ? [
+          'See "Migrating from 0.1.0" in the README of 0.2.0: https://github.com/cravingmaker/eslint-config/blob/v0.2.0/README.md#migrating-from-010',
+        ]
       : []),
   ].join("\n");
 };
