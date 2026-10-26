@@ -46,7 +46,8 @@ const pairs = [
   ["perfectionist", "import-x/order", ["perfectionist/sort-imports"]],
   ["perfectionist", "sort-imports", ["perfectionist/sort-imports"]],
   ["perfectionist", "sort-keys", ["perfectionist/sort-objects"]],
-  // D8.5 and D8.10 include approved coverage trade-offs; these assertions verify static settings.
+  // The execution and control-character owners give up some coverage on purpose, which
+  // tests/policy/rule-ownership.test.ts records; these assertions verify static settings.
   [
     "regexp",
     "@typescript-eslint/prefer-regexp-exec",

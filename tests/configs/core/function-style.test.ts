@@ -38,7 +38,7 @@ const lint = async (
   });
 };
 
-describe("D3 arrow function policy", () => {
+describe("arrow function policy", () => {
   it.each([
     "let Factory; Factory = function Factory() {}; new Factory();",
     "function Factory() {} const Alias = Factory; new Alias();",
@@ -257,7 +257,7 @@ describe("D3 arrow function policy", () => {
     ).toEqual(["func-style", "func-style"]);
   });
 
-  it("proves the audit selector misses return values and rejects dynamic receivers", async () => {
+  it("proves that a no-restricted-syntax selector misses return values and rejects dynamic receivers", async () => {
     const eslint = new ESLint({
       overrideConfig: [
         {

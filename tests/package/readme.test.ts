@@ -238,7 +238,7 @@ describe("the README", () => {
     );
   });
 
-  it("retains P10's three-option compiler contract in the README and consumer projects", async () => {
+  it("retains the three-option compiler contract in the README and consumer projects", async () => {
     const [tsconfigExample] = tsconfigExamples;
     expect(tsconfigExamples).toHaveLength(1);
     const expected = readCompilerOptions("README.md", tsconfigExample.text);

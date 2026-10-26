@@ -29,6 +29,13 @@ type SampleResult = {
   readonly name: string;
   readonly trace: Awaited<ReturnType<typeof traceFixCycles>>;
 };
+type Source = {
+  readonly name: string;
+  readonly text: string;
+
+  readonly functionLayout?: boolean;
+  readonly typescriptOnly?: boolean;
+};
 
 const escapeSource = `${String.raw`export const pattern = /\u{e9}/u;`}\n`;
 const stringEscapeSource = `${String.raw`export const characters = ["\xab", "\u00e9", "\u{e9}"];`}\n`;
@@ -60,41 +67,57 @@ const stableSource = [
   "});",
   "",
 ].join("\n");
-const sources = new Map([
-  [
-    "awaits",
-    "export const load = (task) => { return task.then((value) => { return value; }); };\n",
-  ],
-  [
-    "D1-D2-D3-Stages-2-3",
-    `${importSource.replace("export const", "const")}\n${escapeSource.replace("export const", "const")}\n${moduleSource.replace("export { first, second };", "export { directories, first, pattern, second };")}`,
-  ],
-  [
-    "D1-D2-Stage-2",
-    `${importSource.replace("export const", "const")}\n${escapeSource.replace("export const", "const")}\nexport { directories, pattern };\n`,
-  ],
-  ["D1-Stage-2", escapeSource],
-  ["D1-strings-Stage-2", stringEscapeSource],
-  [
-    "D2-following-comment-Stage-2",
-    [
+const sources: readonly Source[] = [
+  {
+    name: "annotation-spacing",
+    text: "export type Mapper = (value: number) => number;\n",
+    typescriptOnly: true,
+  },
+  {
+    name: "awaits",
+    text: "export const load = (task) => { return task.then((value) => { return value; }); };\n",
+  },
+  { name: "commented-imports", text: importSource },
+  { name: "escapes", text: `${String.raw`export const pattern = /\a/;`}\n` },
+  {
+    name: "escapes-and-imports",
+    text: `${importSource.replace("export const", "const")}\n${escapeSource.replace("export const", "const")}\nexport { directories, pattern };\n`,
+  },
+  {
+    functionLayout: true,
+    name: "escapes-imports-and-functions",
+    text: `${importSource.replace("export const", "const")}\n${escapeSource.replace("export const", "const")}\n${moduleSource.replace("export { first, second };", "export { directories, first, pattern, second };")}`,
+  },
+  {
+    name: "explicit-updates",
+    text: "export const counter = { value: 1 };\ncounter.value++;\ncounter.value += 2;\n",
+  },
+  {
+    name: "exports",
+    text: "export const first = 1;\nconst second = 2;\nexport { second };\n",
+  },
+  { name: "fix-and-format", text: "export const options={zeta:1,alpha:2}\n" },
+  {
+    functionLayout: true,
+    name: "function-declarations",
+    text: moduleSource
+      .replace("const first = () =>", "function first()")
+      .replace("const second = () =>", "function second()")
+      .replaceAll("};", "}"),
+  },
+  { functionLayout: true, name: "function-variables", text: moduleSource },
+  {
+    name: "import-then-comment",
+    text: [
       'import os from "node:os";',
       "// Read the temporary directory.",
       "export const directory = os.tmpdir();",
       "",
     ].join("\n"),
-  ],
-  [
-    "D2-following-statement-Stage-2",
-    [
-      'import os from "node:os";',
-      "export const directory = os.tmpdir();",
-      "",
-    ].join("\n"),
-  ],
-  [
-    "D2-multiline-comment-Stage-2",
-    [
+  },
+  {
+    name: "import-then-documentation",
+    text: [
       'import os from "node:os";',
       "",
       "/**",
@@ -103,63 +126,55 @@ const sources = new Map([
       "export const directory = os.tmpdir();",
       "",
     ].join("\n"),
-  ],
-  ["D2-Stage-2", importSource],
-  [
-    "D3-original-Stage-3",
-    moduleSource
-      .replace("const first = () =>", "function first()")
-      .replace("const second = () =>", "function second()")
-      .replaceAll("};", "}"),
-  ],
-  ["D3-Stage-3", moduleSource],
-  [
-    "D3-unstarred-Stage-3",
-    moduleSource
+  },
+  {
+    name: "import-then-statement",
+    text: [
+      'import os from "node:os";',
+      "export const directory = os.tmpdir();",
+      "",
+    ].join("\n"),
+  },
+  { name: "redos", text: "export const pattern = /(?:a+)+$/u;\n" },
+  { name: "regex-escapes", text: escapeSource },
+  { name: "sort", text: "export const values = [10, 2, 1].toSorted();\n" },
+  { name: "stable", text: stableSource },
+  { name: "string-escapes", text: stringEscapeSource },
+  {
+    name: "switch",
+    text: 'export const describe = (value: number): string => { switch (value) { case 1: return "one"; } };\n',
+    typescriptOnly: true,
+  },
+  {
+    name: "unapproved-equality",
+    text: "export const isMissing = (value) => { return value == null; };\n",
+  },
+  { name: "unicode", text: `${String.raw`export const pattern = /\p{L}/;`}\n` },
+  {
+    functionLayout: true,
+    name: "unstarred-function-declarations",
+    text: moduleSource
       .replace("const first = () =>", "function first()")
       .replace("const second = () =>", "function second()")
       .replaceAll("};", "}")
       .replaceAll(" * ", "")
       .replace(" *\n", "\n")
       .replace(" */", "*/"),
-  ],
-  ["D13.2-Stage-7", "export type Mapper = (value: number) => number;\n"],
-  [
-    "D19-Stage-7",
-    "export const counter = { value: 1 };\ncounter.value++;\ncounter.value += 2;\n",
-  ],
-  ["escapes", `${String.raw`export const pattern = /\a/;`}\n`],
-  [
-    "exports",
-    "export const first = 1;\nconst second = 2;\nexport { second };\n",
-  ],
-  ["fix-and-format", "export const options={zeta:1,alpha:2}\n"],
-  ["redos", "export const pattern = /(?:a+)+$/u;\n"],
-  ["sort", "export const values = [10, 2, 1].toSorted();\n"],
-  ["stable", stableSource],
-  [
-    "switch",
-    'export const describe = (value: number): string => { switch (value) { case 1: return "one"; } };\n',
-  ],
-  [
-    "unapproved-equality",
-    "export const isMissing = (value) => { return value == null; };\n",
-  ],
-  ["unicode", `${String.raw`export const pattern = /\p{L}/;`}\n`],
-]);
+  },
+];
 /*
-Every exception is limited to a named sample and individual rule IDs. The D8 decisions retain these checks for distinct coverage, even when both reports refer to intersecting source ranges.
+Every exception is limited to a named sample and individual rule IDs. Each pair keeps both rules because they cover distinct cases, even when both reports refer to intersecting source ranges.
 */
 const approvedOverlaps: readonly ApprovedOverlap[] = [
   {
     concern:
-      "D8.4: core checks strings/templates; RegExp also checks constructor patterns",
+      "core checks strings/templates; RegExp also checks constructor patterns",
     rules: ["no-useless-escape", "regexp/no-useless-escape"],
     sample: "escapes",
   },
   {
     concern:
-      "D8.6: backtracking paths, repeated starting positions, and heuristic risk warnings",
+      "backtracking paths, repeated starting positions, and heuristic risk warnings",
     rules: [
       "regexp/no-super-linear-backtracking",
       "regexp/no-super-linear-move",
@@ -169,13 +184,13 @@ const approvedOverlaps: readonly ApprovedOverlap[] = [
   },
   {
     concern:
-      "D8.8: Promise covers discarded chains; Unicorn additionally covers awaited/top-level chains",
+      "Promise covers discarded chains; Unicorn additionally covers awaited/top-level chains",
     rules: ["promise/prefer-await-to-then", "unicorn/prefer-await"],
     sample: "awaits",
   },
   {
     concern:
-      "D8.9: typed computed/optional calls complement untyped and string-array checks",
+      "typed computed/optional calls complement untyped and string-array checks",
     rules: [
       "@typescript-eslint/require-array-sort-compare",
       "unicorn/require-array-sort-compare",
@@ -184,28 +199,30 @@ const approvedOverlaps: readonly ApprovedOverlap[] = [
   },
   {
     concern:
-      "D8.11: general mode requirements complement typed implicit string patterns",
+      "general mode requirements complement typed implicit string patterns",
     rules: ["require-unicode-regexp", "sonarjs/unicode-aware-regex"],
     sample: "unicode",
   },
   {
     concern:
-      "D8.12: untyped default enforcement complements typed exhaustiveness and stricter omission markers",
+      "untyped default enforcement complements typed exhaustiveness and stricter omission markers",
     rules: ["default-case", "@typescript-eslint/switch-exhaustiveness-check"],
     sample: "switch",
   },
   {
-    concern:
-      "existing owners: export placement and consolidation of separate exports",
+    concern: "export placement and consolidation of separate exports",
     rules: ["import-x/exports-last", "import-x/group-exports"],
     sample: "exports",
   },
 ];
-const sampleText = (name: string, text: string, extension: string): string => {
+const sampleText = (
+  { functionLayout = false, name, text }: Source,
+  extension: string,
+): string => {
   if (extension !== "ts") {
     return text;
   }
-  if (name.includes("D3")) {
+  if (functionLayout) {
     return text
       .replaceAll("= () =>", "= (value: number) =>")
       .replaceAll("function first()", "function first(value: number)")
@@ -220,17 +237,15 @@ const sampleText = (name: string, text: string, extension: string): string => {
 
 const samples: readonly Sample[] = [
   ...["js", "ts"].flatMap((extension) => {
-    return [...sources]
-      .filter(([name]) => {
-        return (
-          !["D13.2-Stage-7", "switch"].includes(name) || extension === "ts"
-        );
+    return sources
+      .filter(({ typescriptOnly = false }) => {
+        return !typescriptOnly || extension === "ts";
       })
-      .map(([name, text]) => {
+      .map((source) => {
         return {
-          fileName: `${name.toLowerCase()}.${extension}`,
-          name: `${name}.${extension}`,
-          text: sampleText(name, text, extension),
+          fileName: `${source.name}.${extension}`,
+          name: `${source.name}.${extension}`,
+          text: sampleText(source, extension),
         };
       });
   }),
@@ -248,7 +263,7 @@ const samples: readonly Sample[] = [
     return [
       {
         fileName: `functions-${language}.svelte`,
-        name: `D3-Stage-3.${language}.svelte`,
+        name: `function-variables.${language}.svelte`,
         text: [
           `<script${language === "ts" ? ' lang="ts"' : ""}>`,
           `const first = (value${language === "ts" ? ": number" : ""}) => { return value; };`,
@@ -265,7 +280,7 @@ const samples: readonly Sample[] = [
       },
       {
         fileName: `escape-${language}.svelte`,
-        name: `D1-Stage-2.${language}.svelte`,
+        name: `regex-escapes.${language}.svelte`,
         text: [
           `<script${language === "ts" ? ' lang="ts"' : ""}>`,
           String.raw`const pattern = /\u{e9}/u;`,
@@ -287,11 +302,11 @@ const samples: readonly Sample[] = [
       },
     ];
   }),
-  ...[...sources].map(([name, text]) => {
+  ...sources.map((source) => {
     return {
-      fileName: `${name.toLowerCase()}.untyped.ts`,
-      name: `${name}.untyped.ts`,
-      text: sampleText(name, text, "ts"),
+      fileName: `${source.name}.untyped.ts`,
+      name: `${source.name}.untyped.ts`,
+      text: sampleText(source, "ts"),
       typeChecked: false,
     };
   }),
@@ -537,8 +552,8 @@ describe("combined ESLint fixes and the package formatter", () => {
     expect(trace[1].formatted.text).toContain('"optional": false');
     expect(trace[1].formatted.messages).toEqual([]);
   });
-  it("D13.2: preserves the annotation-spacing arrow compatibility guard", () => {
-    const trace = getTrace("D13.2-Stage-7.ts");
+  it("preserves the annotation-spacing arrow compatibility guard", () => {
+    const trace = getTrace("annotation-spacing.ts");
     expect(
       selectReports(trace, [
         "@stylistic/type-annotation-spacing",
@@ -551,9 +566,9 @@ describe("combined ESLint fixes and the package formatter", () => {
     expect(convergenceProblems(trace)).toEqual([]);
   });
   it.each(["js", "ts"])(
-    "D19: keeps explicit assignments stable and leaves ++ for manual review in %s",
+    "keeps explicit assignments stable and leaves ++ for manual review in %s",
     (extension) => {
-      const trace = getTrace(`D19-Stage-7.${extension}`);
+      const trace = getTrace(`explicit-updates.${extension}`);
       expect(selectReports(trace, ["no-plusplus"])).toHaveLength(1);
       expect(selectReports(trace, ["operator-assignment"])).toHaveLength(1);
       expect(trace[1].formatted.text).toContain(
@@ -567,9 +582,9 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D3: converges on function padding and documentation in a Svelte %s script",
+    "converges on function padding and documentation in a Svelte %s script",
     (language) => {
-      const trace = getTrace(`D3-Stage-3.${language}.svelte`);
+      const trace = getTrace(`function-variables.${language}.svelte`);
       expect(
         selectReports(trace, ["@cravingmaker/starred-documentation"]),
       ).toHaveLength(1);
@@ -612,9 +627,9 @@ describe("combined ESLint fixes and the package formatter", () => {
     expect(selectReports(getTrace("sort.js"), [rule])).toEqual([]);
   });
   it.each(["js", "ts"])(
-    "D1: converges on uppercase regex escapes in %s",
+    "converges on uppercase regex escapes in %s",
     (extension) => {
-      const trace = getTrace(`D1-Stage-2.${extension}`);
+      const trace = getTrace(`regex-escapes.${extension}`);
       expect(
         trace[0].before.messages.map(({ ruleId }) => {
           return ruleId;
@@ -630,9 +645,9 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D1: converges on uppercase hexadecimal and Unicode string escapes in %s",
+    "converges on uppercase hexadecimal and Unicode string escapes in %s",
     (extension) => {
-      const trace = getTrace(`D1-strings-Stage-2.${extension}`);
+      const trace = getTrace(`string-escapes.${extension}`);
       expect(trace[1].formatted.text).toBe(
         `${String.raw`export const characters = ["\u{AB}", "\u{E9}", "\u{E9}"];`}\n`,
       );
@@ -641,9 +656,9 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D2: sorts imports across interleaved comments and converges in %s",
+    "sorts imports across interleaved comments and converges in %s",
     (extension) => {
-      const trace = getTrace(`D2-Stage-2.${extension}`);
+      const trace = getTrace(`commented-imports.${extension}`);
       const output = [
         "// Second section.",
         'import os from "node:os";',
@@ -659,18 +674,18 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D2: permits a following comment without inserting a blank line in %s",
+    "permits a following comment without inserting a blank line in %s",
     (extension) => {
-      const trace = getTrace(`D2-following-comment-Stage-2.${extension}`);
+      const trace = getTrace(`import-then-comment.${extension}`);
       expect(trace[1].formatted.text).toBe(trace[0].before.text);
       expect(trace[1].formatted.messages).toEqual([]);
       expect(convergenceProblems(trace)).toEqual([]);
     },
   );
   it.each(["js", "ts"])(
-    "D2: retains a blank line before an ordinary statement in %s",
+    "retains a blank line before an ordinary statement in %s",
     (extension) => {
-      const trace = getTrace(`D2-following-statement-Stage-2.${extension}`);
+      const trace = getTrace(`import-then-statement.${extension}`);
       expect(
         selectReports(trace, ["import-x/newline-after-import"]),
       ).toHaveLength(1);
@@ -687,9 +702,9 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D2: preserves multiline documentation after the final import in %s",
+    "preserves multiline documentation after the final import in %s",
     (extension) => {
-      const trace = getTrace(`D2-multiline-comment-Stage-2.${extension}`);
+      const trace = getTrace(`import-then-documentation.${extension}`);
       expect(trace[0].before.messages).toEqual([]);
       expect(trace[1].formatted.text).toBe(trace[0].before.text);
       expect(trace[1].formatted.messages).toEqual([]);
@@ -697,9 +712,9 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D1/D2: converges on combined escapes and commented imports in %s",
+    "converges on combined escapes and commented imports in %s",
     (extension) => {
-      const trace = getTrace(`D1-D2-Stage-2.${extension}`);
+      const trace = getTrace(`escapes-and-imports.${extension}`);
       expect(trace[1].formatted.text).toBe(
         [
           "// Second section.",
@@ -720,9 +735,9 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D3: converges on arrow variables and starred documentation in %s",
+    "converges on arrow variables and starred documentation in %s",
     (extension) => {
-      const trace = getTrace(`D3-Stage-3.${extension}`);
+      const trace = getTrace(`function-variables.${extension}`);
       expect(trace[1].formatted.text).toBe(
         [
           `const first = ${extension === "ts" ? "(value: number)" : "()"} => {`,
@@ -748,12 +763,14 @@ describe("combined ESLint fixes and the package formatter", () => {
   );
   it.each(
     ["js", "ts"].flatMap((extension) => {
-      return ["D3-original-Stage-3", "D3-unstarred-Stage-3"].map((name) => {
-        return { extension, name };
-      });
+      return ["function-declarations", "unstarred-function-declarations"].map(
+        (name) => {
+          return { extension, name };
+        },
+      );
     }),
   )(
-    "D3: converges on the original declaration layout in $name.$extension",
+    "converges on function declarations and leaves them for manual review in $name.$extension",
     ({ extension, name }) => {
       const trace = getTrace(`${name}.${extension}`);
       expect(trace[1].formatted.text).toContain(" * Explain a detail.");
@@ -769,9 +786,9 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D1/D2/D3: converges on mixed escapes, imports, arrows and documentation in %s",
+    "converges on mixed escapes, imports, arrows and documentation in %s",
     (extension) => {
-      const trace = getTrace(`D1-D2-D3-Stages-2-3.${extension}`);
+      const trace = getTrace(`escapes-imports-and-functions.${extension}`);
       expect(trace[1].formatted.text).toContain(String.raw`/\u{E9}/u`);
       expect(trace[1].formatted.text).toContain(" * Explain a detail.");
       expect(trace[1].formatted.messages).toEqual([]);
@@ -779,9 +796,9 @@ describe("combined ESLint fixes and the package formatter", () => {
     },
   );
   it.each(["js", "ts"])(
-    "D1: converges on uppercase escapes in a Svelte %s script",
+    "converges on uppercase escapes in a Svelte %s script",
     (language) => {
-      const trace = getTrace(`D1-Stage-2.${language}.svelte`);
+      const trace = getTrace(`regex-escapes.${language}.svelte`);
       expect(trace[1].formatted.text).toContain(String.raw`/\u{E9}/u`);
       expect(trace[1].formatted.messages).toEqual([]);
       expect(convergenceProblems(trace)).toEqual([]);
@@ -831,7 +848,7 @@ describe("harness controls", () => {
     },
     30_000,
   );
-  it("D8.1: gives strict null comparisons one diagnostic owner", () => {
+  it("gives strict null comparisons one diagnostic owner", () => {
     const messages = selectReports(getTrace("unapproved-equality.js"), [
       "eqeqeq",
       "no-eq-null",
