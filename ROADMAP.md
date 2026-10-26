@@ -1,6 +1,6 @@
 # Roadmap
 
-Work planned after 0.2.0. Nothing here blocks the release; [FIX_BEFORE_RELEASE.md](FIX_BEFORE_RELEASE.md) lists what does. Each item says why it is open and what closes it. The items were reviewed on 24 October 2026 against `main` at `e2cb99a`.
+Work planned after 0.2.0. Each item says why it is open and what closes it. The items were reviewed on 24 October 2026 against `main` at `e2cb99a`.
 
 ## Temporary workarounds
 
