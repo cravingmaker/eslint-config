@@ -1405,7 +1405,37 @@ the same exact version; Dependabot groups their updates. Finish with
 
 ## Releases
 
-Before preparing a release, run:
+[Release Please](https://github.com/googleapis/release-please) prepares each
+release. On every push to `main`, the
+[Release Please workflow](.github/workflows/release-please.yml) opens or
+updates the release pull request, `chore(main): release X.Y.Z`. It reads the
+commits on `main` since the last release. Each is a squashed pull request, with
+the title as its subject and the body as its message, so a `BREAKING CHANGE:`
+footer in the body of a pull request counts too. Before 1.0.0, a breaking
+change or a feature raises the minor version, and a fix the patch version. The
+release pull request sets the version in `package.json`, `package-lock.json`,
+and `.release-please-manifest.json`, and holds the release notes in its body
+and in `CHANGELOG.md` on its branch.
+
+The GitHub Release takes its notes from the body of the release pull request
+when it is merged, and `CHANGELOG.md` comes from its branch. Release Please
+rewrites both on every push to `main`, so edited notes go in after the last
+push to `main` and before the merge:
+
+1. Replace the notes in the body of the pull request: the text between its
+   first and last `---` lines, which must start with the `## [X.Y.Z](…)`
+   heading that Release Please wrote, as its parser requires.
+2. Commit the same text to the `X.Y.Z` section of `CHANGELOG.md` on the
+   branch of the pull request. Prettier leaves `CHANGELOG.md` out, but ESLint
+   lints it with the Markdown rules: check it with `npx eslint CHANGELOG.md`.
+3. Merge before anything else lands on `main`. Another push to `main` rewrites
+   the body and the branch, and the edits must be made again.
+
+Include consumer-facing migration guidance in the notes and the README when
+rule defaults or configuration behavior change.
+
+Only the maintainer merges the release pull request. Before the merge, run the
+release check on its branch:
 
 ```bash
 npm run release:check
@@ -1417,17 +1447,14 @@ when lifecycle scripts are enabled: `.npmrc` disables them, so it guards an
 `npm publish --ignore-scripts=false`, and the publishing workflow runs the
 check as its own step.
 
-Update `package.json` and `package-lock.json` to the intended version.
-Include consumer-facing migration guidance when rule defaults or
-configuration behavior change.
-
-Create a matching `vX.Y.Z` tag from a commit on `main` and publish a GitHub
-Release. The [npm publishing workflow](.github/workflows/publish.yml)
-verifies the tag matches `package.json`, confirms the tagged commit is
-reachable from `main`, and checks that the version has not already been
-published. It then verifies registry signatures, runs the release check,
-and publishes the packed artifact using npm Trusted Publishing, on the
-Node.js version in `.nvmrc`. Prereleases do not trigger publishing.
+After the merge, the Release Please workflow creates the `vX.Y.Z` tag and the
+GitHub Release, which starts the
+[npm publishing workflow](.github/workflows/publish.yml). The workflow
+verifies that the tag matches `package.json`, that the tagged commit is
+reachable from `main`, and that the version has not been published yet. It
+then verifies registry signatures, runs the release check, and publishes the
+packed artifact with npm Trusted Publishing and provenance, on the Node.js
+version in `.nvmrc`. Prereleases do not trigger publishing.
 
 ## Reporting issues
 
