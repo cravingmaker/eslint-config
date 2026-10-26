@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    // The compiler contract that the README asks of consumers (P10). The repository lints itself
+    // The compiler contract that the README asks of consumers. The repository lints itself
     // under the same contract; tests/package/readme.test.ts keeps the two in sync.
     "allowUnreachableCode": false,
     "noImplicitReturns": true,

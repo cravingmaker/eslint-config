@@ -145,31 +145,31 @@ const samples: readonly Sample[] = [
   {
     expected: ["eqeqeq"],
     group: "equality",
-    name: "D8.1 loose null",
+    name: "Equality: loose null",
     text: "value == null;",
   },
   {
     expected: ["eqeqeq"],
     group: "equality",
-    name: "D8.1 loose null inequality",
+    name: "Equality: loose null inequality",
     text: "value != null;",
   },
   {
     expected: ["eqeqeq"],
     group: "equality",
-    name: "D8.1 loose non-null",
+    name: "Equality: loose non-null",
     text: 'value != "ready";',
   },
   {
     expected: [],
     group: "equality",
-    name: "D8.1 strict null",
+    name: "Equality: strict null",
     text: "value !== null;",
   },
   {
     expected: [],
     group: "equality",
-    name: "D8.1 strict non-null",
+    name: "Equality: strict non-null",
     text: 'value === "ready";',
   },
   ...[
@@ -178,102 +178,107 @@ const samples: readonly Sample[] = [
     "eval?.(input);",
     "(0, eval)(input);",
   ].map((text): Sample => {
-    return { expected: ["no-eval"], group: "eval", name: `D8.2 ${text}`, text };
+    return {
+      expected: ["no-eval"],
+      group: "eval",
+      name: `Eval: ${text}`,
+      text,
+    };
   }),
   {
     expected: [],
     group: "eval",
-    name: "D8.2 JSON parsing",
+    name: "Eval: JSON parsing",
     text: "JSON.parse(input);",
   },
   {
     expected: ["no-nested-ternary"],
     group: "ternary",
-    name: "D8.3 reducible result branch",
+    name: "Nested ternary: reducible result branch",
     text: 'enabled ? (ready ? "yes" : "no") : "no";',
   },
   {
     expected: ["no-nested-ternary"],
     group: "ternary",
-    name: "D8.3 distinct result branches",
+    name: "Nested ternary: distinct result branches",
     text: 'enabled ? (ready ? "yes" : "wait") : "no";',
   },
   {
     expected: [],
     group: "ternary",
-    name: "D8.3 condition-position boundary",
+    name: "Nested ternary: condition-position boundary",
     text: '(enabled ? ready : fallback) ? "yes" : "no";',
   },
   {
     expected: [],
     group: "ternary",
-    name: "D8.3 flat replacement",
+    name: "Nested ternary: flat replacement",
     text: 'enabled && ready ? "yes" : "no";',
   },
   {
     expected: ["no-useless-escape"],
     group: "escapes",
-    name: "D8.4 ordinary string",
+    name: "Useless escape: ordinary string",
     text: String.raw`const text = "\a";`,
   },
   {
     expected: ["regexp/no-useless-escape"],
     group: "escapes",
-    name: "D8.4 constructor",
+    name: "Useless escape: constructor",
     text: String.raw`const pattern = new RegExp("[\\[]", "u");`,
   },
   {
     expected: ["no-useless-escape", "regexp/no-useless-escape"],
     group: "escapes",
-    name: "D8.4 shared literal",
+    name: "Useless escape: shared literal",
     text: String.raw`const pattern = /\a/;`,
   },
   {
     expected: ["no-useless-escape"],
     group: "escapes",
-    name: "D8.4 core-only regex literal",
+    name: "Useless escape: core-only regex literal",
     text: String.raw`const pattern = /[a\-]/u;`,
   },
   {
     expected: [],
     group: "escapes",
-    name: "D8.4 plain string",
+    name: "Useless escape: plain string",
     text: 'const text = "plain";',
   },
   {
     expected: ["regexp/no-control-character"],
     group: "control",
-    name: "D8.5 direct control escape",
+    name: "Control character: direct control escape",
     text: String.raw`const pattern = /\x1F/u;`,
   },
   {
     expected: ["regexp/no-control-character"],
     group: "control",
-    name: "D8.5 constant constructor pattern",
+    name: "Control character: constant constructor pattern",
     text: String.raw`const source = "\\x1F"; const pattern = new RegExp(source, "u");`,
   },
   {
     expected: [],
     group: "control",
-    name: "D8.5 intentional constructor tab",
+    name: "Control character: intentional constructor tab",
     text: String.raw`const pattern = new RegExp("\t", "u");`,
   },
   {
     expected: [],
     group: "control",
-    name: "D8.5 intentional constructor newline",
+    name: "Control character: intentional constructor newline",
     text: String.raw`const pattern = new RegExp("\n", "u");`,
   },
   {
     expected: [],
     group: "control",
-    name: "D8.5 explicit regex tab",
+    name: "Control character: explicit regex tab",
     text: String.raw`const pattern = new RegExp("\\t", "u");`,
   },
   {
     expected: [...groups.redos, "regexp/no-super-linear-move"],
     group: "redos",
-    name: "D8.6 shared nested repetition",
+    name: "ReDoS: shared nested repetition",
     text: "const pattern = /(a+)+$/u;",
   },
   {
@@ -283,25 +288,25 @@ const samples: readonly Sample[] = [
       "regexp/no-super-linear-move",
     ],
     group: "redos",
-    name: "D8.6 adjacent quantifiers",
+    name: "ReDoS: adjacent quantifiers",
     text: "const pattern = /a+a+$/u;",
   },
   {
     expected: ["regexp/no-super-linear-move"],
     group: "redos",
-    name: "D8.6 movement only",
+    name: "ReDoS: movement only",
     text: "const pattern = /a+b/u;",
   },
   {
     expected: ["security/detect-unsafe-regex"],
     group: "redos",
-    name: "D8.6 bounded heuristic",
+    name: "ReDoS: bounded heuristic",
     text: "const pattern = /^(a{1,3}){1,3}$/u;",
   },
   {
     expected: [],
     group: "redos",
-    name: "D8.6 linear control",
+    name: "ReDoS: linear control",
     text: "const pattern = /^abc$/u;",
   },
   ...[
@@ -314,32 +319,32 @@ const samples: readonly Sample[] = [
     return {
       expected: ["no-restricted-syntax"],
       group: "buffer",
-      name: `D8.7 ${text}`,
+      name: `Buffer constructor: ${text}`,
       text,
     };
   }),
   {
     expected: [],
     group: "buffer",
-    name: "D8.7 Uint8Array",
+    name: "Buffer constructor: Uint8Array",
     text: "new Uint8Array(10);",
   },
   {
     expected: [],
     group: "buffer",
-    name: "D8.7 alias boundary",
+    name: "Buffer constructor: alias boundary",
     text: 'const { Buffer: NodeBuffer } = await import("node:buffer"); new NodeBuffer(size);',
   },
   {
     expected: [],
     group: "buffer",
-    name: "D8.7 global-property selector boundary",
+    name: "Buffer constructor: global-property selector boundary",
     text: "new globalThis.Buffer(size);",
   },
   {
     expected: groups.await,
     group: "await",
-    name: "D8.8 returned chain",
+    name: "Prefer await: returned chain",
     text: "const load = (task) => { return task.then(consume); };",
     typedText:
       "const load = (task: Promise<string>) => { return task.then(consume); };",
@@ -347,7 +352,7 @@ const samples: readonly Sample[] = [
   {
     expected: ["unicorn/prefer-await"],
     group: "await",
-    name: "D8.8 awaited chain",
+    name: "Prefer await: awaited chain",
     text: "const load = async (task) => { await task.then(consume); };",
     typedText:
       "const load = async (task: Promise<string>) => { await task.then(consume); };",
@@ -355,7 +360,7 @@ const samples: readonly Sample[] = [
   {
     expected: ["promise/prefer-await-to-then"],
     group: "await",
-    name: "D8.8 discarded chain inside a function",
+    name: "Prefer await: discarded chain inside a function",
     text: "const start = (task) => { void task.catch(handleError); };",
     typedText:
       "const start = (task: Promise<string>) => { void task.catch(handleError); };",
@@ -363,19 +368,19 @@ const samples: readonly Sample[] = [
   {
     expected: ["unicorn/prefer-await"],
     group: "await",
-    name: "D8.8 top-level chain",
+    name: "Prefer await: top-level chain",
     text: "Promise.resolve(1).then(consume);",
   },
   {
     expected: [],
     group: "await",
-    name: "D8.8 top-level void boundary",
+    name: "Prefer await: top-level void boundary",
     text: "void Promise.resolve(1).catch(handleError);",
   },
   {
     expected: ["unicorn/prefer-await"],
     group: "await",
-    name: "D8.8 computed method",
+    name: "Prefer await: computed method",
     text: 'const load = (task) => { return task["then"](consume); };',
     typedText:
       'const load = (task: Promise<string>) => { return task["then"](consume); };',
@@ -383,101 +388,101 @@ const samples: readonly Sample[] = [
   {
     expected: ["unicorn/prefer-await"],
     group: "await",
-    name: "D8.8 yielded chain",
+    name: "Prefer await: yielded chain",
     text: "function* load() { yield Promise.resolve(1).then(consume); }",
   },
   {
     expected: ["unicorn/prefer-await"],
     group: "await",
-    name: "D8.8 constructor",
+    name: "Prefer await: constructor",
     text: "class Loader { constructor() { Promise.resolve(1).then(consume); } }",
   },
   {
     expected: groups.await,
     group: "await",
-    name: "D8.8 typed non-promise heuristic",
+    name: "Prefer await: typed non-promise heuristic",
     text: "const store = { catch: () => { return 1; } }; const read = () => { return store.catch(); };",
     typedExpected: ["promise/prefer-await-to-then"],
   },
   {
     expected: [],
     group: "await",
-    name: "D8.8 plain await",
+    name: "Prefer await: plain await",
     text: "const read = async () => { return await Promise.resolve(1); };",
   },
   {
     expected: ["unicorn/require-array-sort-compare"],
     group: "sort",
-    name: "D8.9 numeric array",
+    name: "Sort comparator: numeric array",
     text: "[10, 2, 1].toSorted();",
     typedExpected: groups.sort,
   },
   {
     expected: ["unicorn/require-array-sort-compare"],
     group: "sort",
-    name: "D8.9 string array",
+    name: "Sort comparator: string array",
     text: '["b", "a"].sort();',
   },
   {
     expected: ["unicorn/require-array-sort-compare"],
     group: "sort",
-    name: "D8.9 undefined comparator",
+    name: "Sort comparator: undefined comparator",
     text: "[10, 2, 1].sort(undefined);",
   },
   {
     expected: [],
     group: "sort",
-    name: "D8.9 computed method",
+    name: "Sort comparator: computed method",
     text: '[10, 2, 1]["sort"]();',
     typedExpected: ["@typescript-eslint/require-array-sort-compare"],
   },
   {
     expected: [],
     group: "sort",
-    name: "D8.9 optional call",
+    name: "Sort comparator: optional call",
     text: "[10, 2, 1].sort?.();",
     typedExpected: ["@typescript-eslint/require-array-sort-compare"],
   },
   {
     expected: [],
     group: "sort",
-    name: "D8.9 numeric comparator",
+    name: "Sort comparator: numeric comparator",
     text: "[10, 2, 1].toSorted((left, right) => { return left - right; });",
   },
   {
     expected: [],
     group: "sort",
-    name: "D8.9 Uint8Array",
+    name: "Sort comparator: Uint8Array",
     text: "new Uint8Array([10, 2, 1]).sort();",
   },
   {
     expected: [],
     group: "sort",
-    name: "D8.9 BigInt64Array",
+    name: "Sort comparator: BigInt64Array",
     text: "new BigInt64Array([10n, 2n, 1n]).sort();",
   },
   {
     expected: ["regexp/prefer-regexp-exec"],
     group: "exec",
-    name: "D8.10 ordinary match",
+    name: "RegExp execution: ordinary match",
     text: '"aba".match(/a/u);',
   },
   {
     expected: [],
     group: "exec",
-    name: "D8.10 global match",
+    name: "RegExp execution: global match",
     text: '"aba".match(/a/gu);',
   },
   {
     expected: [],
     group: "exec",
-    name: "D8.10 accepted computed-access loss",
+    name: "RegExp execution: accepted computed-access loss",
     text: '"aba"["match"](/a/u);',
   },
   {
     expected: [],
     group: "exec",
-    name: "D8.10 inherited flags",
+    name: "RegExp execution: inherited global flags",
     text: "const read = (text, source) => { return text.match(new RegExp(source)); };",
     typedExpected: ["regexp/prefer-regexp-exec"],
     typedText:
@@ -486,52 +491,52 @@ const samples: readonly Sample[] = [
   {
     expected: [],
     group: "exec",
-    name: "D8.10 explicit execution",
+    name: "RegExp execution: explicit execution",
     text: '/a/u.exec("aba");',
   },
   {
     expected: ["require-unicode-regexp"],
     group: "unicode",
-    name: "D8.11 general flag requirement",
+    name: "Unicode flag: general flag requirement",
     text: "const pattern = /abc/;",
   },
   {
     expected: ["require-unicode-regexp"],
     group: "unicode",
-    name: "D8.11 explicit Unicode syntax",
+    name: "Unicode flag: explicit Unicode syntax",
     text: String.raw`const pattern = /\p{L}/;`,
     typedExpected: groups.unicode,
   },
   {
     expected: [],
     group: "unicode",
-    name: "D8.11 u flag",
+    name: "Unicode flag: u flag",
     text: String.raw`const pattern = /\p{L}/u;`,
   },
   {
     expected: [],
     group: "unicode",
-    name: "D8.11 v flag",
+    name: "Unicode flag: v flag",
     text: String.raw`const pattern = /\p{L}/v;`,
   },
   {
     expected: [],
     group: "unicode",
-    name: "D8.11 implicit match pattern",
+    name: "Unicode flag: implicit match pattern",
     text: String.raw`"A".match("\\p{L}");`,
     typedExpected: ["sonarjs/unicode-aware-regex"],
   },
   {
     expected: [],
     group: "unicode",
-    name: "D8.11 implicit search pattern",
+    name: "Unicode flag: implicit search pattern",
     text: String.raw`"A".search("\\p{L}");`,
     typedExpected: ["sonarjs/unicode-aware-regex"],
   },
   {
     expected: ["default-case"],
     group: "switch",
-    name: "D8.12 missing broad-type default",
+    name: "Switch default: missing broad-type default",
     text: 'const read = (state) => { switch (state) { case "ready": break; } };',
     typedExpected: groups.switch,
     typedText:
@@ -540,7 +545,7 @@ const samples: readonly Sample[] = [
   {
     expected: [],
     group: "switch",
-    name: "D8.12 empty switch",
+    name: "Switch default: empty switch",
     text: "const read = (state) => { switch (state) {} };",
     typedExpected: ["@typescript-eslint/switch-exhaustiveness-check"],
     typedText: "const read = (state: string) => { switch (state) {} };",
@@ -548,7 +553,7 @@ const samples: readonly Sample[] = [
   {
     expected: [],
     group: "switch",
-    name: "D8.12 exact omission marker",
+    name: "Switch default: exact omission marker",
     text: 'const read = (state) => { switch (state) { case "ready": break;\n// no default\n} };',
     typedText:
       'const read = (state: string) => { switch (state) { case "ready": break;\n// no default\n} };',
@@ -556,7 +561,7 @@ const samples: readonly Sample[] = [
   {
     expected: [],
     group: "switch",
-    name: "D8.12 uppercase omission marker",
+    name: "Switch default: uppercase omission marker",
     text: 'const read = (state) => { switch (state) { case "ready": break;\n// NO DEFAULT\n} };',
     typedExpected: ["@typescript-eslint/switch-exhaustiveness-check"],
     typedText:
@@ -565,7 +570,7 @@ const samples: readonly Sample[] = [
   {
     expected: ["default-case"],
     group: "switch",
-    name: "D8.12 misplaced omission marker",
+    name: "Switch default: misplaced omission marker",
     text: 'const read = (state) => { switch (state) {\n// no default\ncase "ready": break; } };',
     typedExpected: groups.switch,
     typedText:
@@ -574,7 +579,7 @@ const samples: readonly Sample[] = [
   {
     expected: [],
     group: "switch",
-    name: "D8.12 missing union case despite default",
+    name: "Switch default: missing union case despite default",
     text: 'const read = (state) => { switch (state) { case "ready": break; default: break; } };',
     typedExpected: ["@typescript-eslint/switch-exhaustiveness-check"],
     typedText:
@@ -583,7 +588,7 @@ const samples: readonly Sample[] = [
   {
     expected: ["default-case"],
     group: "switch",
-    name: "D8.12 exhaustive union still needs fallback intent",
+    name: "Switch default: exhaustive union still needs fallback intent",
     text: 'const read = (state) => { switch (state) { case "ready": break; case "failed": break; } };',
     typedText:
       'const read = (state: "ready" | "failed") => { switch (state) { case "ready": break; case "failed": break; } };',
@@ -591,7 +596,7 @@ const samples: readonly Sample[] = [
   {
     expected: [],
     group: "switch",
-    name: "D8.12 exhaustive union with default",
+    name: "Switch default: exhaustive union with default",
     text: 'const read = (state) => { switch (state) { case "ready": break; case "failed": break; default: break; } };',
     typedText:
       'const read = (state: "ready" | "failed") => { switch (state) { case "ready": break; case "failed": break; default: break; } };',
@@ -599,7 +604,7 @@ const samples: readonly Sample[] = [
   {
     expected: [],
     group: "switch",
-    name: "D8.12 missing enum member despite default",
+    name: "Switch default: missing enum member despite default",
     text: 'const read = (state) => { switch (state) { case "ready": break; default: break; } };',
     typedExpected: ["@typescript-eslint/switch-exhaustiveness-check"],
     typedText:
@@ -644,7 +649,7 @@ describe.each([
 });
 
 describe("policy-aligned fixes", () => {
-  it("D8.11 leaves Unicode-mode changes for review", async () => {
+  it("leaves Unicode-mode changes for review", async () => {
     const fixer = await createEngine(
       { typescript: { typeChecked: false } },
       true,
@@ -665,7 +670,7 @@ describe("policy-aligned fixes", () => {
     ]);
     expect(JSON.parse(stdout)).toEqual([false, true]);
   });
-  it("D8.7 leaves direct Buffer constructors for manual conversion", async () => {
+  it("leaves direct Buffer constructors for manual conversion", async () => {
     const fixer = await createEngine(
       { typescript: { typeChecked: false } },
       true,
@@ -689,7 +694,7 @@ describe("policy-aligned fixes", () => {
       }),
     ).toBe(true);
   });
-  it("D8.10 preserves all global matches through repeated composed fixes", async () => {
+  it("preserves all global matches through repeated composed fixes", async () => {
     const fixer = await createEngine({}, true);
     const code =
       "export const read = (text: string, source: RegExp) => { return text.match(new RegExp(source)); };\n";
@@ -727,7 +732,7 @@ describe("effective settings and static ownership", () => {
       code: 'import { Buffer } from "node:buffer"; new Buffer(10);',
       owner: "n/no-deprecated-api",
     },
-  ])("D8.7 retains $owner for $code", async ({ code, owner }) => {
+  ])("retains $owner for $code", async ({ code, owner }) => {
     const result = await lint(untyped, code, "sample.js");
     expect(select(result.messages, [owner])).toEqual([
       expect.objectContaining({ ruleId: owner, severity: 2 }),

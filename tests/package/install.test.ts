@@ -334,7 +334,7 @@ describe("packed consumer policy regressions", () => {
     ["with all optional peers", withAllPeers, true],
     ["without optional peers", withoutPeers, false],
   ] as const)(
-    "ships Stage 6 parser, fix, and review boundaries %s",
+    "ships the parser, fix, and review boundaries %s",
     async (_name, consumer, svelteEnabled) => {
       const output = await run(
         consumer,
@@ -429,7 +429,7 @@ describe("packed consumer policy regressions", () => {
     },
   );
 
-  it("ships Stage 5 ownership and preserves global-match results without optional peers", async () => {
+  it("ships rule ownership and preserves global-match results without optional peers", async () => {
     const output = await run(
       withoutPeers,
       String.raw`

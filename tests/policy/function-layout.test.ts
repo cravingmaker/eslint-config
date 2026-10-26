@@ -25,7 +25,7 @@ const eslint = new ESLint({
   overrideConfigFile: true,
 });
 
-describe("D3 function-variable padding", () => {
+describe("function-variable padding", () => {
   it.each([
     { declaration: "const first = () => { return 1; };", padded: true },
     {
@@ -274,7 +274,7 @@ describe("D3 function-variable padding", () => {
   });
 });
 
-describe("D3 starred documentation", () => {
+describe("starred documentation", () => {
   it.each([
     { unicorn: false },
     { unicorn: { files: ["lib/**"] } },
