@@ -42,8 +42,8 @@ const readme = await readFile(
 );
 /*
 The code blocks of the README as ESLint's Markdown processor extracts them, which leaves out a
-block that follows an `<!-- eslint-skip -->` comment, such as the config for 0.1.0 in the
-migration notes. `line` is the line of a block's first line of code.
+block that follows an `<!-- eslint-skip -->` comment, such as the `overrides` for `npm audit` in
+"Known issues". `line` is the line of a block's first line of code.
 */
 const codeBlocks: readonly CodeBlock[] = markdown.processors.markdown
   .preprocess(readme, "README.md")

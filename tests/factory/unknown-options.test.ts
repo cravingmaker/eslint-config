@@ -22,7 +22,8 @@ type FeatureName = Exclude<
 >;
 
 const header = "createConfig() does not know these options:";
-const migration = 'See "Migrating from 0.1.0" in the README.';
+const migration =
+  'See "Migrating from 0.1.0" in the README of 0.2.0: https://github.com/cravingmaker/eslint-config/blob/v0.2.0/README.md#migrating-from-010';
 // The options of `createConfig`, as the message lists them.
 const options =
   "`comments`, `environments`, `express`, `functional`, `globals`, `html`, `ignores`, `imports`, `javascript`, `json`, `markdown`, `node`, `packageJson`, `perfectionist`, `projectRootDirectory`, `promise`, `react`, `regexp`, `security`, `sonarjs`, `stylistic`, `svelte`, `typescript`, `unicorn`, and `unusedImports`";
