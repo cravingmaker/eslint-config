@@ -23,6 +23,7 @@ Node.js 24.15 or later is required at runtime. Check `node --version` before any
 - ESM only. Do not add CommonJS output or CommonJS linting support.
 - Dependencies are pinned to exact versions that are at least seven days old (`save-exact` and `min-release-age` in `.npmrc`). Keep dependency bumps in their own commits.
 - Prettier formats; ESLint does not own layout.
+- Markdown keeps each paragraph and list item on one line; never wrap prose by hand. Write pull request bodies and release notes the same way, because GitHub renders their line breaks.
 - Pull request titles follow Conventional Commits and become the squash commit on `main`.
 - Never bypass the git hooks with `--no-verify`.
 - `tests/policy/__snapshots__/` records the effective lint policy. A changed line there is a changed policy: update with `npx vitest run tests/policy -u` only when the change is intended, and explain the diff. Never edit those files by hand.

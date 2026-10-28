@@ -1,9 +1,6 @@
 # @cravingmaker/eslint-config
 
-[![npm version](https://img.shields.io/npm/v/%40cravingmaker%2Feslint-config)](https://www.npmjs.com/package/@cravingmaker/eslint-config)
-[![CI](https://github.com/cravingmaker/eslint-config/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/cravingmaker/eslint-config/actions/workflows/ci.yml)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/cravingmaker/eslint-config/badge)](https://scorecard.dev/viewer/?uri=github.com/cravingmaker/eslint-config)
-[![License: MIT](https://img.shields.io/npm/l/%40cravingmaker%2Feslint-config)](https://github.com/cravingmaker/eslint-config/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/%40cravingmaker%2Feslint-config)](https://www.npmjs.com/package/@cravingmaker/eslint-config) [![CI](https://github.com/cravingmaker/eslint-config/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/cravingmaker/eslint-config/actions/workflows/ci.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/cravingmaker/eslint-config/badge)](https://scorecard.dev/viewer/?uri=github.com/cravingmaker/eslint-config) [![License: MIT](https://img.shields.io/npm/l/%40cravingmaker%2Feslint-config)](https://github.com/cravingmaker/eslint-config/blob/main/LICENSE)
 
 Craving Maker's opinionated, TypeScript-first ESLint configuration. One call, `createConfig()`, returns a flat config that lints the TypeScript, JavaScript, React, Svelte, Express, HTML, JSON, `package.json`, and Markdown files of an ES module project.
 
