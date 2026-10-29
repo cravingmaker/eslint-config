@@ -425,6 +425,8 @@ Perfectionist orders module declarations, but its checks for blank lines between
 
 `perfectionist/sort-imports` owns the order of imports and the blank lines between them, and comments do not split its groups. `import-x/newline-after-import` asks for at least one blank line after the imports (`count: 1` with `exactCount: false`), so a multiline documentation comment can follow them.
 
+A relative import of a TypeScript file names the extension of the compiled file, such as `./value.js` for `value.ts`, as `module: "nodenext"` requires (`import-x/extensions`). When the tsconfig sets `allowImportingTsExtensions` or `rewriteRelativeImportExtensions`, set `imports: { typescriptExtensions: "source" }`, and the rule asks for the source extension, such as `./value.ts`, instead.
+
 Hexadecimal and Unicode escapes use uppercase letters, in strings (`unicorn/escape-case`) and in regular expressions (`regexp/letter-case`).
 
 ### Binary data

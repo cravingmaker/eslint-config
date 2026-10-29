@@ -31,6 +31,8 @@ const options =
 const featureKeys = "`files`, `ignores`, and `overrides`";
 const jsonKeys =
   "`files`, `ignores`, `overrides`, `overridesJson5`, and `overridesJsonc`";
+const importsKeys =
+  "`files`, `ignores`, `overrides`, and `typescriptExtensions`";
 const reactKeys = "`files`, `ignores`, `overrides`, and `refresh`";
 const typescriptKeys =
   "`files`, `filesTypeAware`, `ignores`, `ignoresTypeAware`, `overrides`, `overridesTypeAware`, `tsconfigRootDir`, and `typeChecked`";
@@ -39,7 +41,7 @@ const keysByFeature = {
   express: featureKeys,
   functional: featureKeys,
   html: featureKeys,
-  imports: featureKeys,
+  imports: importsKeys,
   javascript: featureKeys,
   json: jsonKeys,
   markdown: featureKeys,
@@ -92,7 +94,7 @@ const everyOption = {
   globals: { myGlobal: "readonly" },
   html: scopeTo("html"),
   ignores: ["vendor/**"],
-  imports: sources,
+  imports: { ...sources, typescriptExtensions: "source" },
   javascript: sources,
   json: { ...scopeTo("json"), overridesJson5: {}, overridesJsonc: {} },
   markdown: scopeTo("md"),
