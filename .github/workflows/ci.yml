@@ -142,26 +142,58 @@ jobs:
         with:
           persist-credentials: false
 
+      # Install, build, and pack with the contributor toolchain, whose npm satisfies devEngines.
+      - name: Set up development Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Build and pack package
+        id: pack
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+          echo "tarball=$(npm pack --ignore-scripts --silent)" >> "$GITHUB_OUTPUT"
+
+      # The floor of every peer range in package.json; a range without an explicit floor fails.
+      - name: Read advertised minimum peers
+        id: peers
+        run: |
+          node --input-type=module >> "$GITHUB_OUTPUT" <<'NODE'
+          import { readFileSync } from 'node:fs';
+
+          const { peerDependencies } = JSON.parse(readFileSync('package.json', 'utf8'));
+          const peers = Object.entries(peerDependencies).map(([name, range]) => {
+            const floor = /^>=(\d+\.\d+\.\d+)(?:\s|$)/u.exec(range)?.[1];
+            if (floor === undefined) {
+              throw new Error(`Declare an explicit floor for the peer ${name}: ${range}`);
+            }
+            return `${name}@${floor}`;
+          });
+          console.log(`list=${peers.join(' ')}`);
+          NODE
+
+      # The consumer project has no devEngines, so the npm of Node.js 24.15.0 installs it. The
+      # cache stays off: setting it up runs npm in this repository, which fails the devEngines check.
       - name: Set up minimum Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24.15.0
-          cache: npm
-
-      - name: Build package
-        run: |
-          npm ci --ignore-scripts
-          npm run build
+          package-manager-cache: false
 
       # Installing the advertised lower bounds outside a lockfile is the point of this job.
       - name: Install advertised minimum peers
+        env:
+          PEERS: ${{ steps.peers.outputs.list }}
+          TARBALL: ${{ steps.pack.outputs.tarball }}
         run: | # zizmor: ignore[adhoc-packages]
-          TARBALL="$(npm pack --ignore-scripts --silent)"
+          read -ra peers <<< "${PEERS}"
           mkdir -p .tmp/minimum-peer-consumer
           cd .tmp/minimum-peer-consumer
           npm init --yes >/dev/null
           npm pkg set type=module >/dev/null
-          npm install --ignore-scripts --save-exact "$GITHUB_WORKSPACE/$TARBALL" eslint@10.4.0 @html-eslint/eslint-plugin-react@0.60.0 @html-eslint/eslint-plugin-svelte@0.60.0 eslint-plugin-express-security@1.2.0 eslint-plugin-react-hooks@7.1.0 eslint-plugin-react-refresh@0.5.0 react@19.0.0 svelte@5.0.0 svelte-eslint-parser@1.6.0
+          npm install --ignore-scripts --save-exact "$GITHUB_WORKSPACE/$TARBALL" "${peers[@]}"
           npm ls --all
 
       - name: Verify minimum peer integrations
