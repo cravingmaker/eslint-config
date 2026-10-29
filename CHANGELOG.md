@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.0](https://github.com/cravingmaker/eslint-config/compare/v0.2.0...v0.3.0) (2026-10-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* lint Vitest tests in projects that declare vitest ([#169](https://github.com/cravingmaker/eslint-config/issues/169))
+
+### Features
+
+* add an option for TypeScript files imported by their source extension ([#168](https://github.com/cravingmaker/eslint-config/issues/168)) ([79555eb](https://github.com/cravingmaker/eslint-config/commit/79555eb9406d503fa649492584de9e6fece81229))
+* lint Vitest tests in projects that declare vitest ([#169](https://github.com/cravingmaker/eslint-config/issues/169)) ([e5b705f](https://github.com/cravingmaker/eslint-config/commit/e5b705fc4cbbb826834392e47b1390a2f3e4177c))
+* report unused disable directives and inline configs as errors ([#167](https://github.com/cravingmaker/eslint-config/issues/167)) ([3e700d5](https://github.com/cravingmaker/eslint-config/commit/3e700d5c201aded69653dab7270838368a198c89))
+
+
+### Bug Fixes
+
+* sort only declared lists of literals in perfectionist/sort-arrays ([#166](https://github.com/cravingmaker/eslint-config/issues/166)) ([aed4564](https://github.com/cravingmaker/eslint-config/commit/aed456407b9f291cb5245faed7a842df4d76b547))
+
 ## [0.2.0](https://github.com/cravingmaker/eslint-config/compare/v0.1.0...v0.2.0) (2026-10-26)
 
 This release rebuilds the config around one option per feature, lints TypeScript with type information by default, and revises most of the rule policy. A project that passes with 0.1.0 can fail with 0.2.0: read [Migrating from 0.1.0](https://github.com/cravingmaker/eslint-config/blob/v0.2.0/README.md#migrating-from-010) before upgrading, and keep the version pinned. The requirements are unchanged: Node.js 24.15.0 or later, ESLint 10.4.0 or later and below 11, and TypeScript below 6.1.
