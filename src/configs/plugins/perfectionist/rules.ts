@@ -71,7 +71,9 @@ const perfectionistRules: Rules = {
 
       ...commonCollectionRuleOptions,
       useConfigurationIf: {
-        matchesAstSelector: "TSAsExpression > ArrayExpression", // Only fires on `[...] as const` — safe to sort.
+        // Only a const-asserted list of literals that a variable declares, such as `const names = ["b", "a"] as const`. A tuple is positional, so sorting `return [key, value] as const` would swap its meaning.
+        matchesAstSelector:
+          "VariableDeclarator > TSAsExpression > ArrayExpression:not(:has(> :not(Literal)))",
       },
     },
   ], // Automatically fixable by the --fix command.
