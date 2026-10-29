@@ -16,7 +16,7 @@ A TypeScript-first, shareable ESLint flat config, published to npm as an ESM-onl
 
 ## Environment
 
-Node.js 24.15 or later is required at runtime. Check `node --version` before anything else and use the contributor version in `.nvmrc`. In a Claude Code cloud session, if `/opt/node24/bin/node` matches that version, put `/opt/node24/bin` first on `PATH` for every command; otherwise install the pinned version from `nodejs.org` into `/opt/node24` first. See the setup script in `CONTRIBUTING.md`, then run `npm ci` and `npm run prepare`.
+Node.js 24.15 or later is required at runtime. Check `node --version` before anything else and use the contributor version in `.nvmrc`. In a Claude Code cloud session, if `/opt/node/bin/node` matches that version, put `/opt/node/bin` first on `PATH` for every command; otherwise install the pinned version from `nodejs.org` into `/opt/node` first. See the setup script in `CONTRIBUTING.md`, then run `npm ci` and `npm run prepare`.
 
 ## Conventions
 

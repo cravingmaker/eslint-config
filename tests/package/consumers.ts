@@ -9,6 +9,7 @@ import {
 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
@@ -25,6 +26,10 @@ type Manifest = {
 // eslint-disable-next-line @typescript-eslint/strict-void-return -- promisify takes the callback form of execFile, which also returns its child process.
 const execute = promisify(execFile);
 const projectDirectory = fileURLToPath(new URL("../..", import.meta.url));
+// The Node.js that runs the consumer programs. CI sets it to the Node.js of its matrix and runs npm on the contributor Node.js.
+// eslint-disable-next-line n/no-process-env -- CI selects the runtime of the consumer programs.
+const selectedNode = process.env.ESLINT_CONFIG_CONSUMER_NODE;
+const consumerNode = selectedNode ?? process.execPath;
 const fixturesDirectory = fileURLToPath(
   new URL("../fixtures", import.meta.url),
 );
@@ -38,8 +43,8 @@ const testedVersions = new Map(Object.entries(manifest.devDependencies));
 
 /*
 A project in `parentDirectory` that installs the packed package, ESLint, and `peers` from the
-registry, as a consumer does, with this repository's install policy: no install scripts, and no
-version less than seven days old. The fixtures are copied into `fixtures/`.
+registry, as a consumer does, with this repository's install policy: no install scripts, no
+version less than seven days old, and no git or remote-tarball dependencies. The fixtures are copied into `fixtures/`.
 */
 const createConsumer = async (
   parentDirectory: string,
@@ -58,7 +63,7 @@ const createConsumer = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only .npmrc inside the consumer directory just created above.
   await writeFile(
     path.join(directory, ".npmrc"),
-    "audit=false\nfund=false\nignore-scripts=true\nmin-release-age=7\n",
+    "audit=false\nfund=false\nignore-scripts=true\nmin-release-age=7\nallow-git=none\nallow-remote=none\n",
   );
   // eslint-disable-next-line functional/no-expression-statements -- The install resolves or rejects; what it prints is not needed.
   await execute(
@@ -157,6 +162,7 @@ const runCommand = async (
 };
 
 export {
+  consumerNode,
   createConsumer,
   createTarball,
   createTemporaryDirectory,
