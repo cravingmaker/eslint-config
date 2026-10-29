@@ -9,6 +9,7 @@ import {
 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
@@ -25,6 +26,10 @@ type Manifest = {
 // eslint-disable-next-line @typescript-eslint/strict-void-return -- promisify takes the callback form of execFile, which also returns its child process.
 const execute = promisify(execFile);
 const projectDirectory = fileURLToPath(new URL("../..", import.meta.url));
+// The Node.js that runs the consumer programs. CI sets it to the Node.js of its matrix and runs npm on the contributor Node.js.
+// eslint-disable-next-line n/no-process-env -- CI selects the runtime of the consumer programs.
+const consumerNode =
+  process.env.ESLINT_CONFIG_CONSUMER_NODE ?? process.execPath;
 const fixturesDirectory = fileURLToPath(
   new URL("../fixtures", import.meta.url),
 );
@@ -157,6 +162,7 @@ const runCommand = async (
 };
 
 export {
+  consumerNode,
   createConsumer,
   createTarball,
   createTemporaryDirectory,

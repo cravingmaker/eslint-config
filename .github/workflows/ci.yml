@@ -63,11 +63,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Node.js
+      # Install and build with the contributor toolchain, whose npm satisfies devEngines.
+      - name: Set up development Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: ${{ matrix.node-version }}
-          check-latest: true
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
@@ -76,8 +76,34 @@ jobs:
       - name: Build package
         run: npm run build
 
+      # Resolve the newest release of the line instead of an older cached runner copy. The cache
+      # stays off: setting it up runs npm, and the npm of Node.js 24.15.0 fails the devEngines check.
+      - name: Set up runtime Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          check-latest: true
+          package-manager-cache: false
+
+      - name: Capture runtime executable
+        id: runtime-node
+        run: echo "executable=$(node --print process.execPath)" >> "$GITHUB_OUTPUT"
+
+      # `node --run` skips npm's devEngines check, which the npm of Node.js 24.15.0 fails.
       - name: Test
-        run: npm test
+        run: node --run test:unit:built
+
+      # npm packs and installs with the contributor toolchain again; the consumer programs run on
+      # the runtime Node.js.
+      - name: Restore development Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Test packed consumers
+        env:
+          ESLINT_CONFIG_CONSUMER_NODE: ${{ steps.runtime-node.outputs.executable }}
+        run: npm run test:package:built
 
   minimum-peers:
     name: Minimum peer versions
