@@ -10,6 +10,7 @@ import { describe, expect, it } from "vitest";
 
 import { imports } from "../../../../src/configs/plugins/imports/index.js";
 import { createContext, defaultContext } from "../../../../src/context.js";
+import { createConfig } from "../../../../src/factory.js";
 import { expectLintError } from "../../../support/lint.js";
 import { getResolvedConfig } from "../../../support/resolved-config.js";
 
@@ -135,4 +136,55 @@ describe("import-x rules", () => {
       },
     );
   });
+});
+
+describe("the TypeScript extensions of the imports feature", () => {
+  it.each([
+    { expected: ["import-x/extensions"], typescriptExtensions: "output" },
+    { expected: [], typescriptExtensions: "source" },
+  ] as const)(
+    "with $typescriptExtensions, reports a relative import of value.ts: $expected",
+    async ({ expected, typescriptExtensions }) => {
+      const directory = await mkdtemp(
+        path.join(os.tmpdir(), "eslint-config-extensions-"),
+      );
+      try {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only the manifest of the temporary project created above.
+        await writeFile(
+          path.join(directory, "package.json"),
+          '{"name":"extensions","type":"module"}\n',
+        );
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only the imported module of the temporary project created above.
+        await writeFile(
+          path.join(directory, "value.ts"),
+          "export const value = 1;\n",
+        );
+        const eslint = new ESLint({
+          cwd: directory,
+          overrideConfig: await createConfig({
+            imports: { typescriptExtensions },
+            projectRootDirectory: directory,
+            typescript: { tsconfigRootDir: directory, typeChecked: false },
+          }),
+          overrideConfigFile: true,
+        });
+        const [result] = await eslint.lintText(
+          'import { value } from "./value.ts";\n\nexport { value };\n',
+          { filePath: path.join(directory, "index.ts") },
+        );
+
+        expect(
+          result.messages
+            .map(({ ruleId }) => {
+              return ruleId;
+            })
+            .filter((ruleId) => {
+              return ruleId === "import-x/extensions";
+            }),
+        ).toEqual(expected);
+      } finally {
+        await rm(directory, { force: true, recursive: true });
+      }
+    },
+  );
 });

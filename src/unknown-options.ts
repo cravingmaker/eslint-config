@@ -36,7 +36,12 @@ const optionKeys = {
   globals: false,
   html: featureKeys,
   ignores: false,
-  imports: featureKeys,
+  imports: {
+    files: true,
+    ignores: true,
+    overrides: true,
+    typescriptExtensions: true,
+  },
   javascript: featureKeys,
   json: {
     files: true,
