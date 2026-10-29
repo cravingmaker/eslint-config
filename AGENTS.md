@@ -34,4 +34,4 @@ Node.js 24.15 or later is required at runtime. Check `node --version` before any
 
 ## Releases
 
-Do not merge Release Please pull requests, create tags, or publish GitHub Releases. Merging a release pull request publishes to npm. The maintainer does this.
+Do not merge Release Please pull requests, create tags, publish GitHub Releases, or approve staged npm versions. Merging a release pull request stages the release on npm. The maintainer does this.
