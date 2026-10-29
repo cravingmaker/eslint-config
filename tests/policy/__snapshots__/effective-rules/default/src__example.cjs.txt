@@ -9,7 +9,8 @@ languageOptions:
   parserOptions: {"sourceType":"commonjs"}
   sourceType: "commonjs"
 linterOptions:
-  reportUnusedDisableDirectives: 1
+  reportUnusedDisableDirectives: 2
+  reportUnusedInlineConfigs: 2
 settings: null
 rules: 0 (error 0, off 0, warn 0)
 

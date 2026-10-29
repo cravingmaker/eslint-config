@@ -421,6 +421,8 @@ A blank line follows a function-valued variable declaration, before the next sta
 
 Perfectionist orders module declarations, but its checks for blank lines between them are off, because its fixer miscounts the paragraphs of documentation comments.
 
+A disable directive or an inline config that changes no result is an error, through the `linterOptions` of `createConfig()`: `reportUnusedDisableDirectives` and `reportUnusedInlineConfigs`. Remove the comment, or set other `linterOptions` in a user config.
+
 ### Imports and escapes
 
 `perfectionist/sort-imports` owns the order of imports and the blank lines between them, and comments do not split its groups. `import-x/newline-after-import` asks for at least one blank line after the imports (`count: 1` with `exactCount: false`), so a multiline documentation comment can follow them.

@@ -93,6 +93,7 @@ describe("createConfig", () => {
       }),
     ).toEqual([
       "ignores",
+      "linter-options",
       "javascript",
       "comments",
       "node",
@@ -156,6 +157,7 @@ describe("createConfig", () => {
     ]);
     const everyName = [
       "ignores",
+      "linter-options",
       "javascript/rules",
       "javascript/jsx",
       "comments/setup",
@@ -240,6 +242,39 @@ describe("createConfig", () => {
         .map((name) => {
           return `${prefix}${name}`;
         }),
+    );
+  });
+
+  it("reports unused disable directives and inline configs as errors", async () => {
+    const projectRootDirectory = await createProject("linter-options", []);
+    const eslint = new ESLint({
+      cwd: projectRootDirectory,
+      overrideConfig: await createConfig({
+        ...baseOptions,
+        projectRootDirectory,
+        typescript: false,
+      }),
+      overrideConfigFile: true,
+    });
+    const [result] = await eslint.lintText(
+      [
+        "// eslint-disable-next-line no-console -- The next line logs nothing.",
+        "export const value = 1;",
+        '/* eslint func-style: "off" -- The policy already turns it off. */',
+        "",
+      ].join("\n"),
+      { filePath: path.join(projectRootDirectory, "src/example.js") },
+    );
+
+    const reports = result.messages.map(({ message, severity }) => {
+      return `${String(severity)} ${message}`;
+    });
+
+    expect(reports).toContainEqual(
+      expect.stringMatching(/^2 Unused eslint-disable directive/u),
+    );
+    expect(reports).toContainEqual(
+      expect.stringMatching(/^2 Unused inline config/u),
     );
   });
 

@@ -9,7 +9,8 @@ languageOptions:
   parserOptions: {}
   sourceType: "module"
 linterOptions:
-  reportUnusedDisableDirectives: 1
+  reportUnusedDisableDirectives: 2
+  reportUnusedInlineConfigs: 2
 settings: null
 rules: 101 (error 80, off 21, warn 0)
 

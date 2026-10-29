@@ -10,7 +10,8 @@ languageOptions:
   parserOptions: {"parser":"[Parser typescript-eslint/parser]","projectService":true,"tsconfigRootDir":"<root>"}
   sourceType: "module"
 linterOptions:
-  reportUnusedDisableDirectives: 1
+  reportUnusedDisableDirectives: 2
+  reportUnusedInlineConfigs: 2
 settings:
   import-x/parsers: {"espree":[".js",".mjs",".cjs"]}
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]

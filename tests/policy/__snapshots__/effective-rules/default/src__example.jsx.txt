@@ -10,7 +10,8 @@ languageOptions:
   parserOptions: {"ecmaFeatures":{"jsx":true},"sourceType":"module"}
   sourceType: "module"
 linterOptions:
-  reportUnusedDisableDirectives: 1
+  reportUnusedDisableDirectives: 2
+  reportUnusedInlineConfigs: 2
 settings: null
 rules: 1246 (error 854, off 338, warn 54)
 
