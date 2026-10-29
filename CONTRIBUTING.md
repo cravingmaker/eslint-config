@@ -16,7 +16,7 @@ This guide starts with setup, a map of the code, and recipes for the common main
 
 ## Setup
 
-Development and the published configuration require Node.js 24.15.0 or newer.
+Development and the published configuration require Node.js 24.15.0 or newer, and development requires npm 11.15.0 or newer; `devEngines` makes npm stop on older versions. [.npmrc](.npmrc) installs only versions at least seven days old, saves exact versions, and refuses git and remote-tarball dependencies, as npm 12 does by default.
 
 Use the contributor Node.js version pinned in [.nvmrc](.nvmrc). If you use nvm, run:
 
