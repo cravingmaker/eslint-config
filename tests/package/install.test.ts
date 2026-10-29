@@ -1,10 +1,10 @@
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import process from "node:process";
 
 import { afterAll, describe, expect, it } from "vitest";
 
 import {
+  consumerNode,
   createConsumer,
   createTarball,
   createTemporaryDirectory,
@@ -143,7 +143,7 @@ const lint = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- Write only eslint.config.js in a consumer created by this suite.
   await writeFile(path.join(directory, "eslint.config.js"), config);
   const output = await getOutput(
-    process.execPath,
+    consumerNode,
     [
       path.join(directory, "node_modules", "eslint", "bin", "eslint.js"),
       "--format",
@@ -169,7 +169,7 @@ const lint = async (
 // Runs `script` as an ES module in the consumer in `directory` and returns what it prints.
 const run = async (directory: string, script: string): Promise<string> => {
   const { stdout } = await execute(
-    process.execPath,
+    consumerNode,
     ["--input-type=module", "--eval", script],
     { cwd: directory },
   );
@@ -757,7 +757,7 @@ export default createConfig({
 `,
     );
     const { exitCode, stderr, stdout } = await runCommand(
-      process.execPath,
+      consumerNode,
       [
         path.join(withoutPeers, "node_modules", "eslint", "bin", "eslint.js"),
         "fixtures/format-date.js",
@@ -867,7 +867,7 @@ export { config, invalidAuto, invalidRuleOptions, invalidSonarjsOptions, invalid
 
     expect(
       await getOutput(
-        process.execPath,
+        consumerNode,
         [
           path.join(withoutPeers, "node_modules", "typescript", "bin", "tsc"),
           "--project",

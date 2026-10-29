@@ -1,2 +1,5 @@
 # Normalize text files and use LF on checkout.
 * text=auto eol=lf
+
+# Exclude test inputs from GitHub language statistics.
+tests/fixtures/** -linguist-detectable
