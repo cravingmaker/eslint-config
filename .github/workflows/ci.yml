@@ -105,6 +105,31 @@ jobs:
           ESLINT_CONFIG_CONSUMER_NODE: ${{ steps.runtime-node.outputs.executable }}
         run: npm run test:package:built
 
+  macos:
+    name: macOS packed consumers
+    runs-on: macos-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up development Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # The temporary directory of macOS is a symbolic link, which Linux runners do not show.
+      - name: Test packed consumers
+        run: npm run test:package
+
   minimum-peers:
     name: Minimum peer versions
     runs-on: ubuntu-latest
@@ -221,6 +246,7 @@ jobs:
     needs:
       - static
       - test
+      - macos
       - minimum-peers
       - audit
       - dependency-review
