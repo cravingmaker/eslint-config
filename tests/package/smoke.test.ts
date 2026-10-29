@@ -221,7 +221,7 @@ const createFrameworkScript = (
 						const config = await createConfig(options);
 						results[name] = config
 							.map((entry) => entry.name)
-							.filter((blockName) => ['express', 'react', 'svelte'].includes(blockName.split('/')[2]));
+							.filter((blockName) => ['express', 'react', 'svelte', 'vitest'].includes(blockName.split('/')[2]));
 					} catch (error) {
 						results[name] = error.message;
 					}
@@ -669,6 +669,7 @@ describe("published package", () => {
           express: { express: true },
           react: { react: true },
           svelte: { svelte: true },
+          vitest: { vitest: true },
         }),
       ),
     );
@@ -680,6 +681,8 @@ describe("published package", () => {
         'The "react" feature needs "@html-eslint/eslint-plugin-react", which is not installed. Install it, or set `react: false` to turn the feature off.',
       svelte:
         'The "svelte" feature needs "@html-eslint/eslint-plugin-svelte", which is not installed. Install it, or set `svelte: false` to turn the feature off.',
+      vitest:
+        'The "vitest" feature needs "@vitest/eslint-plugin", which is not installed. Install it, or set `vitest: false` to turn the feature off.',
     });
   });
 
@@ -739,6 +742,7 @@ describe("published package", () => {
         react: "1.0.0",
         svelte: "1.0.0",
         vite: "1.0.0",
+        vitest: "1.0.0",
       },
       name: "detection-consumer",
     });
@@ -759,6 +763,7 @@ describe("published package", () => {
       none: await createCase("none", {}),
       react: await createCase("react", { react: "1.0.0" }),
       svelte: await createCase("svelte", { svelte: "1.0.0" }),
+      vitest: await createCase("vitest", { vitest: "1.0.0" }),
     };
 
     const results: unknown = JSON.parse(
@@ -778,6 +783,8 @@ describe("published package", () => {
       ],
       svelte:
         'The "svelte" feature needs "svelte-eslint-parser", which is not installed. Install it, or set `svelte: false` to turn the feature off.',
+      vitest:
+        'The "vitest" feature needs "@vitest/eslint-plugin", which is not installed. Install it, or set `vitest: false` to turn the feature off.',
     });
   });
 });

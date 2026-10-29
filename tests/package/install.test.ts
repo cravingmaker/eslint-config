@@ -195,7 +195,7 @@ const runFrameworkCases = async (
           const config = await createConfig(options);
           results[name] = config
             .map((entry) => entry.name)
-            .filter((blockName) => ["express", "react", "svelte"].includes(blockName.split("/")[2]));
+            .filter((blockName) => ["express", "react", "svelte", "vitest"].includes(blockName.split("/")[2]));
         } catch (error) {
           results[name] = error.message;
         }
@@ -229,6 +229,7 @@ const [withoutPeers, withPartialPeers, withAllPeers] = await Promise.all([
   createConsumer(temporaryDirectory, "all-peers", tarball, [
     "@html-eslint/eslint-plugin-react",
     "@html-eslint/eslint-plugin-svelte",
+    "@vitest/eslint-plugin",
     "eslint-plugin-express-security",
     "eslint-plugin-react-hooks",
     "eslint-plugin-react-refresh",
@@ -728,6 +729,7 @@ describe("packed consumer policy regressions", () => {
         react: { react: true },
         svelte: { svelte: true },
         undeclared: {},
+        vitest: { vitest: true },
       }),
     ).toEqual({
       declared:
@@ -740,6 +742,8 @@ describe("packed consumer policy regressions", () => {
       svelte:
         'The "svelte" feature needs "@html-eslint/eslint-plugin-svelte", which is not installed. Install it, or set `svelte: false` to turn the feature off.',
       undeclared: [],
+      vitest:
+        'The "vitest" feature needs "@vitest/eslint-plugin", which is not installed. Install it, or set `vitest: false` to turn the feature off.',
     });
   });
 
@@ -982,6 +986,7 @@ export default createConfig({
     tsconfigRootDir: fixtures,
     typeChecked: true,
   },
+  vitest: true,
 });
 `,
       ["fixtures", "scripts"],

@@ -2,12 +2,12 @@
 
 [![npm version](https://img.shields.io/npm/v/%40cravingmaker%2Feslint-config)](https://www.npmjs.com/package/@cravingmaker/eslint-config) [![CI](https://github.com/cravingmaker/eslint-config/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/cravingmaker/eslint-config/actions/workflows/ci.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/cravingmaker/eslint-config/badge)](https://scorecard.dev/viewer/?uri=github.com/cravingmaker/eslint-config) [![License: MIT](https://img.shields.io/npm/l/%40cravingmaker%2Feslint-config)](https://github.com/cravingmaker/eslint-config/blob/main/LICENSE)
 
-Craving Maker's opinionated, TypeScript-first ESLint configuration. One call, `createConfig()`, returns a flat config that lints the TypeScript, JavaScript, React, Svelte, Express, HTML, JSON, `package.json`, and Markdown files of an ES module project.
+Craving Maker's opinionated, TypeScript-first ESLint configuration. One call, `createConfig()`, returns a flat config that lints the TypeScript, JavaScript, React, Svelte, Express, HTML, JSON, `package.json`, and Markdown files of an ES module project, and its Vitest tests.
 
 - **TypeScript first.** TypeScript files get typescript-eslint's strict and stylistic rules with type information, read through the project's `tsconfig.json`.
 - **One explicit policy.** ESLint's core rules and more than twenty plugins, with an explicit setting for every rule that is not deprecated, instead of plugin presets. Where two rules repeat a check, one of them is off. A rule that a plugin update adds stays off until the policy covers it.
 - **Features that you control.** Each plugin is a feature that you can turn off, limit to some files, or adjust with overrides. The options are typed, down to the options of each rule.
-- **Frameworks when you declare them.** The rules for React, Svelte, and Express turn on when the project's `package.json` declares the framework.
+- **Frameworks when you declare them.** The rules for React, Svelte, Express, and Vitest turn on when the project's `package.json` declares the framework.
 - **Made for Prettier.** Prettier formats, and no rule fights it over layout.
 
 Its companion, [@cravingmaker/prettier-config](https://github.com/cravingmaker/prettier-config), formats the layout that this config leaves to Prettier; see [Formatting with Prettier](#formatting-with-prettier). The [coding principles](https://github.com/cravingmaker/eslint-config/blob/main/CODING_PRINCIPLES.md) set the priorities behind the policy.
@@ -69,7 +69,7 @@ npx eslint .
 
 `createConfig()` returns a promise of a flat config array, which ESLint accepts as the default export. With `// @ts-check`, an editor checks the options against the types of this package, including the options of each rule.
 
-Every feature is on by default, apart from React, Svelte, and Express, which turn on when the `package.json` of the project declares them; see [Automatic detection](#automatic-detection). TypeScript files are linted with type information, so a tsconfig must include each of them; see [Typed linting](#typed-linting).
+Every feature is on by default, apart from React, Svelte, Express, and Vitest, which turn on when the `package.json` of the project declares them; see [Automatic detection](#automatic-detection). TypeScript files are linted with type information, so a tsconfig must include each of them; see [Typed linting](#typed-linting).
 
 Only the built-in globals of ECMAScript are defined. In JavaScript files, `no-undef` therefore reports names such as `console`, `window`, and `process` until `environments` names the runtime. TypeScript files are not affected, because the compiler checks names there.
 
@@ -95,7 +95,7 @@ export default createConfig({
 | `typescript`                                                                                                                                      | `true`          | typescript-eslint, with type information by default and the options in [TypeScript](#typescript).                                                                                           |
 | `comments`, `node`, `security`, `sonarjs`, `imports`, `unusedImports`, `promise`, `regexp`, `unicorn`, `functional`, `perfectionist`, `stylistic` | `true`          | Code-quality and style plugins for JavaScript and TypeScript.                                                                                                                               |
 | `html`, `json`, `packageJson`, `markdown`                                                                                                         | `true`          | File formats. `json` also takes `overridesJsonc` and `overridesJson5`.                                                                                                                      |
-| `react`, `svelte`, `express`                                                                                                                      | `"auto"`        | Frameworks, described in [Frameworks](#frameworks).                                                                                                                                         |
+| `react`, `svelte`, `express`, `vitest`                                                                                                            | `"auto"`        | Frameworks, described in [Frameworks](#frameworks).                                                                                                                                         |
 
 The default ignores apply at any depth, inside workspaces too, whatever the features and the frameworks. Your `ignores` come after them, so a directory negation such as `"!**/.next/"` lints that directory again, while negating a single file inside a directory that stays ignored has no effect.
 
@@ -109,7 +109,7 @@ Every option from `javascript` down is a feature, and takes one of these values:
   - `files`: patterns that limit the feature to some of its default files, such as `src/**`. The feature lints a file that matches one of its default patterns and one of these.
   - `ignores`: patterns of files that the feature leaves out. Other features still lint them.
   - `overrides`: rule settings applied after the feature's own rules, in the feature's files. They merge as the rules of a later config object do: a severity alone, such as `"warn"`, keeps the options that the policy gives the rule, and settings with options replace them, without merging the two.
-- `"auto"`, for `react`, `svelte`, and `express` only, turns the feature on when the project declares the framework. It is their default.
+- `"auto"`, for `react`, `svelte`, `express`, and `vitest` only, turns the feature on when the project declares the framework. It is their default.
 
 ```js
 import { createConfig } from "@cravingmaker/eslint-config";
@@ -156,6 +156,7 @@ A source is a JavaScript or TypeScript file: `**/*.{js,mjs,jsx,mjsx,ts,mts,tsx,m
 | `react`         | [@html-eslint/eslint-plugin-react](https://www.npmjs.com/package/@html-eslint/eslint-plugin-react), [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks), [eslint-plugin-react-refresh](https://www.npmjs.com/package/eslint-plugin-react-refresh) | The hooks rules in sources, the others in `**/*.{jsx,mjsx,tsx,mtsx}`   |
 | `svelte`        | [@html-eslint/eslint-plugin-svelte](https://www.npmjs.com/package/@html-eslint/eslint-plugin-svelte), with [svelte-eslint-parser](https://www.npmjs.com/package/svelte-eslint-parser)                                                                                              | `**/*.svelte`, and rune modules: `**/*.svelte.{js,ts}`                 |
 | `express`       | [eslint-plugin-express-security](https://www.npmjs.com/package/eslint-plugin-express-security)                                                                                                                                                                                     | `**/*.{js,mjs,ts,mts}`                                                 |
+| `vitest`        | [@vitest/eslint-plugin](https://www.npmjs.com/package/@vitest/eslint-plugin)                                                                                                                                                                                                       | Sources named `*.test.*` or `*.spec.*`                                 |
 | `html`          | [@html-eslint/eslint-plugin](https://www.npmjs.com/package/@html-eslint/eslint-plugin)                                                                                                                                                                                             | `**/*.html`                                                            |
 | `json`          | [@eslint/json](https://www.npmjs.com/package/@eslint/json)                                                                                                                                                                                                                         | JSON, JSONC, and JSON5 files, below                                    |
 | `packageJson`   | [eslint-plugin-package-json](https://www.npmjs.com/package/eslint-plugin-package-json), [eslint-enforce-package-type](https://www.npmjs.com/package/eslint-enforce-package-type)                                                                                                   | `**/package.json`                                                      |
@@ -202,7 +203,7 @@ The `json` feature lints three languages:
 
 ### Automatic detection
 
-`react`, `svelte`, and `express` default to `"auto"`. The feature turns on when the `package.json` in `projectRootDirectory` declares the package `react`, `svelte`, or `express` in `dependencies`, `devDependencies`, or `peerDependencies`. Installed packages count for nothing, and neither do the plugins, declared or installed. A `package.json` that is missing or not valid JSON declares nothing.
+`react`, `svelte`, `express`, and `vitest` default to `"auto"`. The feature turns on when the `package.json` in `projectRootDirectory` declares the package `react`, `svelte`, `express`, or `vitest` in `dependencies`, `devDependencies`, or `peerDependencies`. Installed packages count for nothing, and neither do the plugins, declared or installed. A `package.json` that is missing or not valid JSON declares nothing.
 
 `true`, `false`, or an object always wins over detection. A monorepo root that declares no framework therefore turns a framework on with `true` or an object; see [Monorepos](#monorepos).
 
@@ -217,6 +218,8 @@ npm install --save-dev --save-exact @html-eslint/eslint-plugin-react eslint-plug
 npm install --save-dev --save-exact @html-eslint/eslint-plugin-svelte svelte-eslint-parser
 # Express
 npm install --save-dev --save-exact eslint-plugin-express-security
+# Vitest
+npm install --save-dev --save-exact @vitest/eslint-plugin
 ```
 
 | Feature   | Needs                                                                                                                           |
@@ -224,6 +227,7 @@ npm install --save-dev --save-exact eslint-plugin-express-security
 | `react`   | `@html-eslint/eslint-plugin-react` and `eslint-plugin-react-hooks`, and `eslint-plugin-react-refresh` while React Refresh is on |
 | `svelte`  | `@html-eslint/eslint-plugin-svelte` and `svelte-eslint-parser`, which loads `svelte` from the project                           |
 | `express` | `eslint-plugin-express-security`                                                                                                |
+| `vitest`  | `@vitest/eslint-plugin`                                                                                                         |
 
 The supported versions are the ranges in the `peerDependencies` of this package, which include React 19 and Svelte 5. The policy uses the rules and options of the installed version. When a feature is on, whether set or detected, and a package that it needs is missing, `createConfig()` rejects with a message that names the first missing package, and ESLint exits with code 2 before it lints anything:
 
@@ -293,6 +297,18 @@ Prettier formats `.svelte` files only with [prettier-plugin-svelte](https://www.
 ### Express
 
 The `express` feature turns on nine rules of eslint-plugin-express-security, such as `require-helmet` and `no-permissive-cors`, in `**/*.{js,mjs,ts,mts}`. The plugin's other rules are not turned on.
+
+### Vitest
+
+The `vitest` feature turns on five rules of @vitest/eslint-plugin in test files, the sources named `*.test.*` or `*.spec.*`. They catch at lint time what Vitest reports only when the tests run, or not at all:
+
+- `no-focused-tests`: `.only`, and the `only` option of a test or suite. It reports without a fix, so `eslint --fix` leaves `.only` for you to remove.
+- `no-disabled-tests`: skipped tests and suites, `context.skip()`, and tests without a body. `it.todo()` stays allowed.
+- `valid-expect`: an `expect()` without a matcher, a matcher that is not called, and an async assertion, such as `.resolves`, that is neither awaited nor returned. A message as the second argument is allowed.
+- `valid-expect-in-promise`: an assertion in a promise chain that the test neither awaits nor returns.
+- `require-awaited-expect-poll`: an `expect.poll()` that is not awaited.
+
+The plugin's other rules are not turned on. Three of them repeat checks of SonarJS test rules, and each pair stays on; see [Rules that replace other rules](#rules-that-replace-other-rules).
 
 ## TypeScript
 
@@ -475,6 +491,9 @@ These pairs both stay on, because each rule covers cases that the other misses:
 | `unicorn/require-array-sort-compare` and `@typescript-eslint/require-array-sort-compare`                    | Unicorn covers string arrays, an explicit `undefined` comparator, and untyped files; TypeScript covers typed computed and optional calls, with `ignoreStringArrays: true`. Typed arrays may sort without a comparator.                                                        |
 | `require-unicode-regexp` and `sonarjs/unicode-aware-regex`                                                  | Core requires the `u` or `v` flag on literals and constructors; SonarJS, with type information, covers string patterns passed to methods such as `match`.                                                                                                                     |
 | `default-case` and `@typescript-eslint/switch-exhaustiveness-check`                                         | Core requires a `default` branch or a `// no default` comment; TypeScript, with type information, reports empty switches and missing union and enum cases, accepts only the exact lowercase `// no default`, and does not let a `default` branch excuse a missing union case. |
+| `sonarjs/no-exclusive-tests` and `vitest/no-focused-tests`                                                  | SonarJS covers the tests of every source, found by the names of the test APIs; Vitest also covers the `only` option of a test, in the files of the Vitest feature.                                                                                                            |
+| `sonarjs/no-skipped-tests` and `vitest/no-disabled-tests`                                                   | SonarJS warns about a test that is skipped without a comment that gives the reason, in every source; Vitest reports every skipped test, `context.skip()`, and tests without a body, in the files of the Vitest feature.                                                       |
+| `sonarjs/async-test-assertions` and `vitest/valid-expect`                                                   | SonarJS covers the async assertions of every source; Vitest also reports an `expect()` without a matcher or with a matcher that is not called, in the files of the Vitest feature.                                                                                            |
 
 Fix these reports by hand with care: adding a Unicode flag can change what a pattern matches, turning a `.then()` chain into `await` changes when detached work runs and is not possible in a constructor, and a `.match()` call with a global pattern must keep returning every match.
 

@@ -51,9 +51,10 @@ const detectReactRefreshVariant = (
 };
 
 /**
- * Detects what the `"auto"` defaults of `react`, `svelte`, and `express` turn on from the package
- * names that the project declares: a framework is detected when the project declares its package,
- * whatever plugins are installed, and React Refresh follows the bundler that the project declares.
+ * Detects what the `"auto"` defaults of `react`, `svelte`, `express`, and `vitest` turn on from the
+ * package names that the project declares: a framework is detected when the project declares its
+ * package, whatever plugins are installed, and React Refresh follows the bundler that the project
+ * declares.
  */
 const detectFeatures = (dependencies: ReadonlySet<string>): Detection => {
   return {
@@ -61,6 +62,7 @@ const detectFeatures = (dependencies: ReadonlySet<string>): Detection => {
     react: dependencies.has("react"),
     reactRefresh: detectReactRefreshVariant(dependencies),
     svelte: dependencies.has("svelte"),
+    vitest: dependencies.has("vitest"),
   };
 };
 

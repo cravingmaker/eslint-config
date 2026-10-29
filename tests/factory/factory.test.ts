@@ -17,7 +17,13 @@ const baseOptions = {
   projectRootDirectory: process.cwd(),
   typescript: { tsconfigRootDir: process.cwd() },
 } as const;
-const frameworks: ReadonlySet<string> = new Set(["express", "react", "svelte"]);
+// The features whose default, `"auto"`, follows the project's manifest.
+const autoFeatures: ReadonlySet<string> = new Set([
+  "express",
+  "react",
+  "svelte",
+  "vitest",
+]);
 
 const temporaryDirectory = await mkdtemp(
   path.join(os.tmpdir(), "eslint-config-factory-"),
@@ -68,13 +74,13 @@ const getFeatureOrder = async (
   });
 };
 
-// The framework features among the blocks, in order.
-const getFrameworks = async (
+// The auto features among the blocks, in order.
+const getAutoFeatures = async (
   options: Parameters<typeof createConfig>[0] = {},
 ): Promise<readonly string[]> => {
   const order = await getFeatureOrder(options);
   return order.filter((feature) => {
-    return frameworks.has(feature);
+    return autoFeatures.has(feature);
   });
 };
 
@@ -90,6 +96,7 @@ describe("createConfig", () => {
         express: true,
         react: true,
         svelte: true,
+        vitest: true,
       }),
     ).toEqual([
       "ignores",
@@ -110,6 +117,7 @@ describe("createConfig", () => {
       "react",
       "svelte",
       "express",
+      "vitest",
       "html",
       "json",
       "package-json",
@@ -257,27 +265,31 @@ describe("createConfig", () => {
     expect(order).toContain("functional");
   });
 
-  it("turns frameworks on when the project declares them, unless they are off", async () => {
+  it("turns the auto features on when the project declares them, unless they are off", async () => {
     const [declared, undeclared] = await Promise.all([
-      createProject("declared", ["express", "react", "svelte"]),
+      createProject("declared", ["express", "react", "svelte", "vitest"]),
       // Every optional peer is installed in this repository.
       createProject("undeclared", []),
     ]);
 
     expect(
-      await getFrameworks({ ...baseOptions, projectRootDirectory: declared }),
-    ).toEqual(["react", "svelte", "express"]);
+      await getAutoFeatures({ ...baseOptions, projectRootDirectory: declared }),
+    ).toEqual(["react", "svelte", "express", "vitest"]);
     expect(
-      await getFrameworks({
+      await getAutoFeatures({
         ...baseOptions,
         express: false,
         projectRootDirectory: declared,
         react: false,
         svelte: false,
+        vitest: false,
       }),
     ).toEqual([]);
     expect(
-      await getFrameworks({ ...baseOptions, projectRootDirectory: undeclared }),
+      await getAutoFeatures({
+        ...baseOptions,
+        projectRootDirectory: undeclared,
+      }),
     ).toEqual([]);
   });
 
@@ -319,26 +331,33 @@ describe("createConfig", () => {
 
   it("lets an explicit value beat detection either way", async () => {
     const [declared, undeclared] = await Promise.all([
-      createProject("explicit-declared", ["express", "react", "svelte"]),
+      createProject("explicit-declared", [
+        "express",
+        "react",
+        "svelte",
+        "vitest",
+      ]),
       createProject("explicit-undeclared", []),
     ]);
 
     expect(
-      await getFrameworks({
+      await getAutoFeatures({
         ...baseOptions,
         express: true,
         projectRootDirectory: undeclared,
         react: {},
         svelte: true,
+        vitest: {},
       }),
-    ).toEqual(["react", "svelte", "express"]);
+    ).toEqual(["react", "svelte", "express", "vitest"]);
     expect(
-      await getFrameworks({
+      await getAutoFeatures({
         ...baseOptions,
         express: false,
         projectRootDirectory: declared,
         react: false,
         svelte: false,
+        vitest: false,
       }),
     ).toEqual([]);
   });
@@ -350,6 +369,7 @@ describe("createConfig", () => {
       react: { refresh: "vite" },
       svelte: true,
       typescript: { ...baseOptions.typescript, typeChecked: true },
+      vitest: true,
     } as const;
     const reversed = Object.fromEntries(Object.entries(options).toReversed());
     const filePaths = [
@@ -359,6 +379,7 @@ describe("createConfig", () => {
       "package.json",
       "src/Component.svelte",
       "src/example.js",
+      "src/example.test.ts",
       "src/example.ts",
       "src/example.tsx",
     ];

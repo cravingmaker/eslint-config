@@ -26,7 +26,7 @@ const migration =
   'See "Migrating from 0.1.0" in the README of 0.2.0: https://github.com/cravingmaker/eslint-config/blob/v0.2.0/README.md#migrating-from-010';
 // The options of `createConfig`, as the message lists them.
 const options =
-  "`comments`, `environments`, `express`, `functional`, `globals`, `html`, `ignores`, `imports`, `javascript`, `json`, `markdown`, `node`, `packageJson`, `perfectionist`, `projectRootDirectory`, `promise`, `react`, `regexp`, `security`, `sonarjs`, `stylistic`, `svelte`, `typescript`, `unicorn`, and `unusedImports`";
+  "`comments`, `environments`, `express`, `functional`, `globals`, `html`, `ignores`, `imports`, `javascript`, `json`, `markdown`, `node`, `packageJson`, `perfectionist`, `projectRootDirectory`, `promise`, `react`, `regexp`, `security`, `sonarjs`, `stylistic`, `svelte`, `typescript`, `unicorn`, `unusedImports`, and `vitest`";
 // The keys that every feature takes, and those of the features that take more.
 const featureKeys = "`files`, `ignores`, and `overrides`";
 const jsonKeys =
@@ -56,6 +56,7 @@ const keysByFeature = {
   typescript: typescriptKeys,
   unicorn: featureKeys,
   unusedImports: featureKeys,
+  vitest: featureKeys,
 } as const satisfies Record<FeatureName, string>;
 // Each option of 0.1.0 that is gone, with a value that 0.1.0 took and what the message names instead.
 const replacedOptions = [
@@ -117,6 +118,7 @@ const everyOption = {
   },
   unicorn: sources,
   unusedImports: sources,
+  vitest: scopeTo("test.ts"),
 } as const satisfies EveryOption;
 
 /*

@@ -235,16 +235,17 @@ describe("detectReactRefreshVariant", () => {
 describe("detectFeatures", () => {
   it("detects the frameworks that the project declares and the React Refresh variant", () => {
     expect(
-      detectFeatures(new Set(["express", "react", "svelte", "vite"])),
+      detectFeatures(new Set(["express", "react", "svelte", "vite", "vitest"])),
     ).toEqual({
       express: true,
       react: true,
       reactRefresh: "vite",
       svelte: true,
+      vitest: true,
     });
   });
 
-  it.each(["express", "react", "svelte"])(
+  it.each(["express", "react", "svelte", "vitest"])(
     "detects %s on its own",
     (framework) => {
       expect(detectFeatures(new Set([framework]))).toEqual({
@@ -252,6 +253,7 @@ describe("detectFeatures", () => {
         react: framework === "react",
         reactRefresh: false,
         svelte: framework === "svelte",
+        vitest: framework === "vitest",
       });
     },
   );
@@ -262,6 +264,7 @@ describe("detectFeatures", () => {
       react: false,
       reactRefresh: false,
       svelte: false,
+      vitest: false,
     };
 
     // Every optional peer is installed in this repository.
@@ -275,6 +278,7 @@ describe("detectFeatures", () => {
           "@html-eslint/eslint-plugin-react",
           "@html-eslint/eslint-plugin-svelte",
           "svelte-eslint-parser",
+          "@vitest/eslint-plugin",
         ]),
       ),
     ).toEqual(undetected);

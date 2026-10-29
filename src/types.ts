@@ -75,7 +75,7 @@ type JsonOptions = FeatureOptions & {
   readonly overridesJsonc?: Rules;
 };
 /**
- * Options for `createConfig`. A feature defaults to `true`, except `react`, `svelte`, and `express`, which default to `"auto"`: on when the manifest at the project root declares the `react`, `svelte`, or `express` package.
+ * Options for `createConfig`. A feature defaults to `true`, except `react`, `svelte`, `express`, and `vitest`, which default to `"auto"`: on when the manifest at the project root declares the `react`, `svelte`, `express`, or `vitest` package.
  */
 type Options = {
   readonly comments?: Feature;
@@ -124,6 +124,10 @@ type Options = {
   readonly typescript?: Feature<TypeScriptOptions>;
   readonly unicorn?: Feature;
   readonly unusedImports?: Feature;
+  /**
+   * Vitest test files, `*.test.*` and `*.spec.*`, with @vitest/eslint-plugin. `"auto"`, the default, turns it on when the project declares `vitest`.
+   */
+  readonly vitest?: Feature | "auto";
 };
 /**
  * Options of the `react` feature. By default, the hooks rules apply to every JavaScript and TypeScript file, where custom hooks also live, and the other React rules to JSX and TSX files. `files` limits both to the files that match one of its patterns. Overrides of hooks rules apply wherever the hooks rules do, and other overrides where the other React rules do. While React Refresh is off, overrides of its rule apply nowhere.

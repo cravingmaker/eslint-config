@@ -33,6 +33,7 @@ const baseOptions = {
   react: { refresh: "generic" },
   svelte: true,
   typescript: { tsconfigRootDir: rootDirectory },
+  vitest: true,
 } as const satisfies ConfigOptions;
 
 /*

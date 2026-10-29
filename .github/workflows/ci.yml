@@ -110,7 +110,7 @@ jobs:
           cd .tmp/minimum-peer-consumer
           npm init --yes >/dev/null
           npm pkg set type=module >/dev/null
-          npm install --ignore-scripts --save-exact "$GITHUB_WORKSPACE/$TARBALL" eslint@10.4.0 @html-eslint/eslint-plugin-react@0.60.0 @html-eslint/eslint-plugin-svelte@0.60.0 eslint-plugin-express-security@1.2.0 eslint-plugin-react-hooks@7.1.0 eslint-plugin-react-refresh@0.5.0 react@19.0.0 svelte@5.0.0 svelte-eslint-parser@1.6.0
+          npm install --ignore-scripts --save-exact "$GITHUB_WORKSPACE/$TARBALL" eslint@10.4.0 @html-eslint/eslint-plugin-react@0.60.0 @html-eslint/eslint-plugin-svelte@0.60.0 @vitest/eslint-plugin@1.6.27 eslint-plugin-express-security@1.2.0 eslint-plugin-react-hooks@7.1.0 eslint-plugin-react-refresh@0.5.0 react@19.0.0 svelte@5.0.0 svelte-eslint-parser@1.6.0
           npm ls --all
 
       - name: Verify minimum peer integrations
@@ -120,7 +120,7 @@ jobs:
           import { ESLint } from 'eslint';
           import { createConfig } from '@cravingmaker/eslint-config';
 
-          const config = await createConfig({ express: true, react: { refresh: 'vite' }, svelte: true });
+          const config = await createConfig({ express: true, react: { refresh: 'vite' }, svelte: true, vitest: true });
           const pluginNames = new Set(config.flatMap((entry) => Object.keys(entry.plugins ?? {})));
 
           for (const plugin of [
@@ -129,6 +129,7 @@ jobs:
             'express-security',
             'react-hooks',
             'react-refresh',
+            'vitest',
           ]) {
             if (!pluginNames.has(plugin)) {
               throw new Error(`Minimum peer integration was not loaded: ${plugin}`);
@@ -140,6 +141,7 @@ jobs:
             ['component.jsx', 'export default function Component() { return <div />; }'],
             ['component.svelte', '<script lang="ts">const value: number = 1;</script><p>{value}</p>'],
             ['server.js', 'export const app = {};'],
+            ['server.test.js', "import { expect, it } from 'vitest';\n\nit('starts', () => {\n  expect(1).toBe(1);\n});\n"],
           ];
 
           for (const [filePath, code] of fixtures) {

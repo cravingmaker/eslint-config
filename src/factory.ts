@@ -27,6 +27,7 @@ import { svelte } from "./configs/plugins/svelte/index.js";
 import { typescript } from "./configs/plugins/typescript/index.js";
 import { unicorn } from "./configs/plugins/unicorn/index.js";
 import { unusedImports } from "./configs/plugins/unused-imports/index.js";
+import { vitest } from "./configs/plugins/vitest/index.js";
 import { prepareConfig } from "./context.js";
 
 // A disabled feature contributes no blocks; rule ownership stays in the owning maps.
@@ -42,7 +43,7 @@ const buildFeature = <
 };
 
 /**
- * Builds the ESLint flat config. It is TypeScript first: TypeScript files get typescript-eslint's strict rules, with type information unless `typescript.typeChecked` is `false`. Frameworks are detected from the project manifest, and all other features are on unless explicitly disabled. Rule ownership is declared in each feature's map. File-role exceptions follow the features, then user configs apply in the order supplied.
+ * Builds the ESLint flat config. It is TypeScript first: TypeScript files get typescript-eslint's strict rules, with type information unless `typescript.typeChecked` is `false`. Frameworks and Vitest are detected from the project manifest, and all other features are on unless explicitly disabled. Rule ownership is declared in each feature's map. File-role exceptions follow the features, then user configs apply in the order supplied.
  */
 const createConfig = async (
   options: Options = {},
@@ -50,13 +51,19 @@ const createConfig = async (
   ...userConfigs: Linter.Config[]
 ): Promise<Linter.Config[]> => {
   const { context, resolved } = await prepareConfig(options);
-  const [typescriptConfigs, reactConfigs, svelteConfigs, expressConfigs] =
-    await Promise.all([
-      buildFeature(resolved.typescript, typescript, context),
-      buildFeature(resolved.react, react, context),
-      buildFeature(resolved.svelte, svelte, context),
-      buildFeature(resolved.express, express, context),
-    ]);
+  const [
+    typescriptConfigs,
+    reactConfigs,
+    svelteConfigs,
+    expressConfigs,
+    vitestConfigs,
+  ] = await Promise.all([
+    buildFeature(resolved.typescript, typescript, context),
+    buildFeature(resolved.react, react, context),
+    buildFeature(resolved.svelte, svelte, context),
+    buildFeature(resolved.express, express, context),
+    buildFeature(resolved.vitest, vitest, context),
+  ]);
 
   return defineConfig([
     ...ignores(resolved.ignores),
@@ -77,6 +84,7 @@ const createConfig = async (
     ...reactConfigs,
     ...svelteConfigs,
     ...expressConfigs,
+    ...vitestConfigs,
     ...buildFeature(resolved.html, html, context),
     ...buildFeature(resolved.json, json, context),
     ...buildFeature(resolved.packageJson, packageJson, context),

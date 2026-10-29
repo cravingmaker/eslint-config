@@ -52,6 +52,7 @@ describe("generated rule types", () => {
       react: { refresh: "generic" },
       svelte: true,
       typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
+      vitest: true,
     });
     const configuredRuleIds = new Set(
       config.flatMap((entry) => {

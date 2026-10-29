@@ -63,6 +63,7 @@ describe("rule coverage", () => {
       react: { refresh: "generic" },
       svelte: true,
       typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
+      vitest: true,
     });
     const plugins = new Map(
       config.flatMap((entry) => {
@@ -95,7 +96,7 @@ describe("rule coverage", () => {
         return left.localeCompare(right);
       });
 
-    expect(plugins.size).toBe(24);
+    expect(plugins.size).toBe(25);
     expect(unclassified).toEqual([]);
   });
 });

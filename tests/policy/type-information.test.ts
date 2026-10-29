@@ -352,6 +352,7 @@ const createEslint = async (options: ConfigOptions): Promise<ESLint> => {
       projectRootDirectory: projectDirectory,
       react: { refresh: "vite" },
       svelte: true,
+      vitest: true,
       ...options,
     }),
     overrideConfigFile: true,
