@@ -7,7 +7,8 @@ languageOptions:
   frontmatter: "yaml"
   math: true
 linterOptions:
-  reportUnusedDisableDirectives: 1
+  reportUnusedDisableDirectives: 2
+  reportUnusedInlineConfigs: 2
 settings: null
 rules: 21 (error 14, off 7, warn 0)
 

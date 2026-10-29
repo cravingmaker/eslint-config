@@ -10,7 +10,8 @@ languageOptions:
   parserOptions: {"sourceType":"module"}
   sourceType: "module"
 linterOptions:
-  reportUnusedDisableDirectives: 1
+  reportUnusedDisableDirectives: 2
+  reportUnusedInlineConfigs: 2
 settings: null
 rules: 1260 (error 851, off 356, warn 53)
 

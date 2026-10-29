@@ -5,7 +5,8 @@ processor: none
 plugins: @ @cravingmaker @eslint-community/eslint-comments @stylistic functional import-x json markdown n package-json perfectionist promise regexp security sonarjs unicorn unused-imports
 languageOptions:
 linterOptions:
-  reportUnusedDisableDirectives: 1
+  reportUnusedDisableDirectives: 2
+  reportUnusedInlineConfigs: 2
 settings: null
 rules: 6 (error 6, off 0, warn 0)
 

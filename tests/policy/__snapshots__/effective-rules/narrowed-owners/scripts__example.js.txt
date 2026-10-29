@@ -10,7 +10,8 @@ languageOptions:
   parserOptions: {"sourceType":"module"}
   sourceType: "module"
 linterOptions:
-  reportUnusedDisableDirectives: 1
+  reportUnusedDisableDirectives: 2
+  reportUnusedInlineConfigs: 2
 settings: null
 rules: 732 (error 373, off 307, warn 52)
 
