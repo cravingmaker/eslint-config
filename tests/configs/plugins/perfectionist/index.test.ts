@@ -19,6 +19,23 @@ describe("perfectionist rules", () => {
     );
   });
 
+  it.each([
+    [
+      "a returned tuple",
+      "const entry = (key: string, value: string) => {\n  return [value, key] as const;\n};\nconsole.log(entry);\n",
+    ],
+    [
+      "a declared tuple of names",
+      "const second = 'b';\nconst first = 'a';\nconst pair = [second, first] as const;\nconsole.log(pair);\n",
+    ],
+    ["a list in a call", "console.log(['beta', 'alpha'] as const);\n"],
+  ])(
+    "perfectionist/sort-arrays: leaves %s unsorted, because a tuple is positional",
+    async (_description, code) => {
+      await expectNoLintError(code, "perfectionist/sort-arrays", tsOptions);
+    },
+  );
+
   it("perfectionist/sort-imports: fixes imports into the groups of the policy, with node: imports on their own and paths sorted without their leading dots", async () => {
     const code = [
       'import { shared } from "../shared.js";',

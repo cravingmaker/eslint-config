@@ -6,6 +6,7 @@ import { defineConfig } from "eslint/config";
 import { core } from "./configs/core/index.js";
 import { exceptions } from "./configs/exceptions/index.js";
 import { ignores } from "./configs/ignores/index.js";
+import { linterOptions } from "./configs/linter-options/index.js";
 import { comments } from "./configs/plugins/comments/index.js";
 import { enforcePackageType } from "./configs/plugins/enforce-package-type/index.js";
 import { express } from "./configs/plugins/express/index.js";
@@ -67,6 +68,7 @@ const createConfig = async (
 
   return defineConfig([
     ...ignores(resolved.ignores),
+    ...linterOptions,
     ...core(resolved.javascript, context),
     ...buildFeature(resolved.comments, comments, context),
     ...buildFeature(resolved.node, node, context),

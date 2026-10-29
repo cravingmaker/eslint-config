@@ -62,6 +62,15 @@ type FeatureOptions = {
  */
 type GlobalEnvironment = keyof typeof globalVariables;
 /**
+ * Options of the `imports` feature.
+ */
+type ImportsOptions = FeatureOptions & {
+  /**
+   * The extension that a relative import of a TypeScript file names. `"output"`, the default, is the extension of the compiled file, such as `./value.js` for `value.ts`, as `module: "nodenext"` requires. `"source"` is the file's own extension, such as `./value.ts`, which `allowImportingTsExtensions` or `rewriteRelativeImportExtensions` in the tsconfig allows.
+   */
+  readonly typescriptExtensions?: "output" | "source";
+};
+/**
  * Options of the `json` feature.
  */
 type JsonOptions = FeatureOptions & {
@@ -94,7 +103,7 @@ type Options = {
    * Extra global ignore patterns.
    */
   readonly ignores?: readonly string[];
-  readonly imports?: Feature;
+  readonly imports?: Feature<ImportsOptions>;
   /**
    * ESLint's core rules. Always on.
    */
@@ -193,6 +202,7 @@ export type {
   Feature,
   FeatureOptions,
   GlobalEnvironment,
+  ImportsOptions,
   JsonOptions,
   Options,
   ReactOptions,

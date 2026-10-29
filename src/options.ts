@@ -3,6 +3,7 @@ import type {
   Feature,
   FeatureOptions,
   GlobalEnvironment,
+  ImportsOptions,
   JsonOptions,
   Options,
   ReactOptions,
@@ -46,7 +47,7 @@ type ResolvedOptions = {
   readonly globals: Readonly<Linter.Globals>;
   readonly html: FeatureOptions | undefined;
   readonly ignores: readonly string[];
-  readonly imports: FeatureOptions | undefined;
+  readonly imports: ImportsOptions | undefined;
   readonly javascript: FeatureOptions;
   /**
    * The JavaScript rune modules that the Svelte feature parses, which typescript-eslint's parser reads without type information.

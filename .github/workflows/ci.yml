@@ -63,11 +63,11 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Set up Node.js
+      # Install and build with the contributor toolchain, whose npm satisfies devEngines.
+      - name: Set up development Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: ${{ matrix.node-version }}
-          check-latest: true
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
@@ -76,8 +76,59 @@ jobs:
       - name: Build package
         run: npm run build
 
+      # Resolve the newest release of the line instead of an older cached runner copy. The cache
+      # stays off: setting it up runs npm, and the npm of Node.js 24.15.0 fails the devEngines check.
+      - name: Set up runtime Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          check-latest: true
+          package-manager-cache: false
+
+      - name: Capture runtime executable
+        id: runtime-node
+        run: echo "executable=$(node --print process.execPath)" >> "$GITHUB_OUTPUT"
+
+      # `node --run` skips npm's devEngines check, which the npm of Node.js 24.15.0 fails.
       - name: Test
-        run: npm test
+        run: node --run test:unit:built
+
+      # npm packs and installs with the contributor toolchain again; the consumer programs run on
+      # the runtime Node.js.
+      - name: Restore development Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Test packed consumers
+        env:
+          ESLINT_CONFIG_CONSUMER_NODE: ${{ steps.runtime-node.outputs.executable }}
+        run: npm run test:package:built
+
+  macos:
+    name: macOS packed consumers
+    runs-on: macos-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up development Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # The temporary directory of macOS is a symbolic link, which Linux runners do not show.
+      - name: Test packed consumers
+        run: npm run test:package
 
   minimum-peers:
     name: Minimum peer versions
@@ -91,30 +142,64 @@ jobs:
         with:
           persist-credentials: false
 
+      # Install, build, and pack with the contributor toolchain, whose npm satisfies devEngines.
+      - name: Set up development Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Build and pack package
+        id: pack
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+          echo "tarball=$(npm pack --ignore-scripts --silent)" >> "$GITHUB_OUTPUT"
+
+      # The floor of every peer range in package.json; a range without an explicit floor fails.
+      - name: Read advertised minimum peers
+        id: peers
+        run: |
+          node --input-type=module >> "$GITHUB_OUTPUT" <<'NODE'
+          import { readFileSync } from 'node:fs';
+
+          const { peerDependencies } = JSON.parse(readFileSync('package.json', 'utf8'));
+          const peers = Object.entries(peerDependencies).map(([name, range]) => {
+            const floor = /^>=(\d+\.\d+\.\d+)(?:\s|$)/u.exec(range)?.[1];
+            if (floor === undefined) {
+              throw new Error(`Declare an explicit floor for the peer ${name}: ${range}`);
+            }
+            return `${name}@${floor}`;
+          });
+          console.log(`list=${peers.join(' ')}`);
+          NODE
+
+      # The consumer project has no devEngines, so the npm of Node.js 24.15.0 installs it. The
+      # cache stays off: setting it up runs npm in this repository, which fails the devEngines check.
       - name: Set up minimum Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24.15.0
-          cache: npm
+          package-manager-cache: false
 
-      - name: Build package
-        run: |
-          npm ci --ignore-scripts
-          npm run build
-
-      # Installing the advertised lower bounds outside a lockfile is the point of this job.
+      # Installing the advertised lower bounds outside a lockfile is the point of this job. The
+      # consumer lives outside the checkout, so npm reads neither the package.json nor the .npmrc of
+      # this repository, and Node.js cannot fall back to its node_modules.
       - name: Install advertised minimum peers
+        env:
+          PEERS: ${{ steps.peers.outputs.list }}
+          TARBALL: ${{ steps.pack.outputs.tarball }}
         run: | # zizmor: ignore[adhoc-packages]
-          TARBALL="$(npm pack --ignore-scripts --silent)"
-          mkdir -p .tmp/minimum-peer-consumer
-          cd .tmp/minimum-peer-consumer
+          read -ra peers <<< "${PEERS}"
+          mkdir -p "${RUNNER_TEMP}/minimum-peer-consumer"
+          cd "${RUNNER_TEMP}/minimum-peer-consumer"
           npm init --yes >/dev/null
           npm pkg set type=module >/dev/null
-          npm install --ignore-scripts --save-exact "$GITHUB_WORKSPACE/$TARBALL" eslint@10.4.0 @html-eslint/eslint-plugin-react@0.60.0 @html-eslint/eslint-plugin-svelte@0.60.0 @vitest/eslint-plugin@1.6.27 eslint-plugin-express-security@1.2.0 eslint-plugin-react-hooks@7.1.0 eslint-plugin-react-refresh@0.5.0 react@19.0.0 svelte@5.0.0 svelte-eslint-parser@1.6.0
+          npm install --ignore-scripts --save-exact "$GITHUB_WORKSPACE/$TARBALL" "${peers[@]}"
           npm ls --all
 
       - name: Verify minimum peer integrations
-        working-directory: .tmp/minimum-peer-consumer
+        working-directory: ${{ runner.temp }}/minimum-peer-consumer
         run: |
           node --input-type=module <<'NODE'
           import { ESLint } from 'eslint';
@@ -197,6 +282,7 @@ jobs:
     needs:
       - static
       - test
+      - macos
       - minimum-peers
       - audit
       - dependency-review

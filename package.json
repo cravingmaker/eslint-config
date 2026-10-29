@@ -61,7 +61,7 @@
     "prepare": "husky",
     "prepublishOnly": "npm run release:check",
     "release:check": "npm audit --audit-level=low && npm run validate && npm pack --dry-run --ignore-scripts",
-    "test": "vitest run",
+    "test": "npm run test:unit",
     "test:package": "npm run build && npm run test:package:built",
     "test:package:built": "vitest run tests/package",
     "test:package:ui": "npm run build && vitest --ui --watch tests/package",
@@ -73,7 +73,7 @@
     "typecheck:built": "tsc --noEmit",
     "typecheck:package": "npm run build && npm run typecheck:package:built",
     "typecheck:package:built": "attw --pack . --profile esm-only",
-    "validate": "npm run validate:static && npm test",
+    "validate": "npm run validate:static && npm run test:unit:built && npm run test:package:built",
     "validate:static": "npm run format:check && npm run build && npm run typecheck:built && npm run lint:unused && npm run lint:built && npm run lint:workflows && npm run lint:package:built && npm run typecheck:package:built"
   },
   "lint-staged": {
@@ -191,6 +191,11 @@
     "node": ">=24.15.0"
   },
   "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.15.0",
+      "onFail": "error"
+    },
     "runtime": {
       "name": "node",
       "version": ">=24.15.0",

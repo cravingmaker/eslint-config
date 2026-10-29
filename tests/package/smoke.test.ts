@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { afterAll, describe, expect, it } from "vitest";
 
-import { createTemporaryDirectory } from "./consumers.js";
+import { consumerNode, createTemporaryDirectory } from "./consumers.js";
 
 type ConsumerOptions = {
   readonly dependencies: readonly string[];
@@ -195,14 +195,10 @@ const createBrokenPackage = async (
 
 const runConsumer = (consumerDirectory: string, script: string) => {
   // eslint-disable-next-line n/no-sync -- Smoke assertions consume the completed child process output synchronously.
-  return execFileSync(
-    process.execPath,
-    ["--input-type=module", "--eval", script],
-    {
-      cwd: consumerDirectory,
-      encoding: "utf8",
-    },
-  );
+  return execFileSync(consumerNode, ["--input-type=module", "--eval", script], {
+    cwd: consumerDirectory,
+    encoding: "utf8",
+  });
 };
 
 /*

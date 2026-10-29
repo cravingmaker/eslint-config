@@ -16,7 +16,7 @@ This guide starts with setup, a map of the code, and recipes for the common main
 
 ## Setup
 
-Development and the published configuration require Node.js 24.15.0 or newer.
+Development and the published configuration require Node.js 24.15.0 or newer, and development requires npm 11.15.0 or newer; `devEngines` makes npm stop on older versions. [.npmrc](.npmrc) installs only versions at least seven days old, saves exact versions, and refuses git and remote-tarball dependencies, as npm 12 does by default.
 
 Use the contributor Node.js version pinned in [.nvmrc](.nvmrc). If you use nvm, run:
 
@@ -44,21 +44,27 @@ To install the contributor Node.js version in a Claude Code cloud environment, p
 #!/bin/bash
 set -euo pipefail
 
-# Keep in sync with .nvmrc.
-NODE_VERSION=24.22.1
+# Keep in sync with .nvmrc, with both checksums from the SHASUMS256.txt of the release.
+NODE_VERSION=26.13.0
+NODE_SHA256_ARM64=439e9c438acdf6a6ffe47418da709153d66c4bed812e30a473faacb107dd2791
+NODE_SHA256_X64=5848553868b402d3fabb5b09270649977780a390f832155721025a08b5104455
 
 case "$(uname -m)" in
-  x86_64) NODE_ARCH=x64 ;;
-  aarch64) NODE_ARCH=arm64 ;;
+  x86_64) NODE_ARCH=x64 NODE_SHA256="${NODE_SHA256_X64}" ;;
+  aarch64) NODE_ARCH=arm64 NODE_SHA256="${NODE_SHA256_ARM64}" ;;
   *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
 esac
 
-mkdir -p /opt/node24
-curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.gz" \
-  | tar -xz --strip-components=1 -C /opt/node24
+archive="$(mktemp)"
+trap 'rm -f "${archive}"' EXIT
+curl --fail --silent --show-error --location --proto '=https' --output "${archive}" \
+  "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.gz"
+echo "${NODE_SHA256}  ${archive}" | sha256sum --check --strict
+mkdir -p /opt/node
+tar -xzf "${archive}" --strip-components=1 -C /opt/node
 ```
 
-The script does not change the default `node`, which stays first on `PATH`, so [AGENTS.md](AGENTS.md) tells Claude to put `/opt/node24/bin` first on `PATH` in every command. Without the script, Claude installs Node.js 24 itself at the start of each session.
+The script installs the archive only when its SHA-256 matches the pinned one. It does not change the default `node`, which stays first on `PATH`, so [AGENTS.md](AGENTS.md) tells Claude to put `/opt/node/bin` first on `PATH` in every command. Without the script, Claude installs Node.js 26 itself at the start of each session.
 
 After dependency installation, run `npm run prepare` in the checkout to enable the hooks; installation scripts are disabled here as in local setup.
 
@@ -494,9 +500,9 @@ Focused tests fail locally as well as in CI (`allowOnly: false`), so a pre-push 
 
 For faster feedback, run `npm run test:unit` for unit tests or `npm run test:package` for package consumer tests. Both commands build the package first; their `:built` variants reuse an existing build.
 
-The pre-commit hook runs `npm run lint:staged`, which builds the package and runs lint-staged. It applies ESLint fixes and then Prettier to the staged files of the formats that ESLint lints, and Prettier alone to every other staged file that Prettier can format. A remaining ESLint warning fails the commit, as it fails validation. The pre-push hook runs the full test suite through `npm test`. Full validation runs through `npm run validate` and in CI.
+The pre-commit hook runs `npm run lint:staged`, which builds the package and runs lint-staged. It applies ESLint fixes and then Prettier to the staged files of the formats that ESLint lints, and Prettier alone to every other staged file that Prettier can format. A remaining ESLint warning fails the commit, as it fails validation. The pre-push hook runs `npm test`, which builds the package and runs the unit tests. The packed-consumer tests install from the npm registry, so they run in `npm run validate` and in CI, not in the hook.
 
-CI runs the static phase once on the development Node.js version in `.nvmrc`, after verifying registry signatures. The tests run on Node.js 24.15.0, the minimum, and on the newest Node.js 26 release. "Minimum peer versions" installs the packed package with every advertised minimum peer. "Dependency audit" runs `npm audit --audit-level=low` on the lockfile in its own job, so an advisory published after the last dependency change does not hide the other results. Pull requests also run Dependency Review. All jobs run in parallel. The `CI result` job fails unless every one of them succeeds, and it is the status that the repository rules require.
+CI runs the static phase once on the development Node.js version in `.nvmrc`, after verifying registry signatures. The unit and packed-consumer tests run on Node.js 24.15.0, the minimum, and on the newest Node.js 26 release. Each matrix job installs and builds on the contributor Node.js in `.nvmrc`, whose npm satisfies `devEngines`, runs `node --run test:unit:built` on its version, and then runs the packed consumers, whose programs run on its version through `ESLINT_CONFIG_CONSUMER_NODE`. "macOS packed consumers" runs the packed-consumer tests on macOS, whose temporary directory is a symbolic link. "Minimum peer versions" installs the packed package with the floor of every peer range in `package.json` on Node.js 24.15.0, and fails on a range without an explicit floor, such as `^1.2.0`. "Dependency audit" runs `npm audit --audit-level=low` on the lockfile in its own job, so an advisory published after the last dependency change does not hide the other results. Pull requests also run Dependency Review. All jobs run in parallel. The `CI result` job fails unless every one of them succeeds, and it is the status that the repository rules require.
 
 ### Workflow checks
 
@@ -560,7 +566,12 @@ npm run release:check
 
 This runs a dependency security audit, full validation, and a dry run of the package tarball. `prepublishOnly` runs the same check, but npm runs it only when lifecycle scripts are enabled: `.npmrc` disables them, so it guards an `npm publish --ignore-scripts=false`, and the publishing workflow runs the check as its own step.
 
-After the merge, the Release Please workflow creates the `vX.Y.Z` tag and the GitHub Release, which starts the [npm publishing workflow](.github/workflows/publish.yml). The workflow verifies that the tag matches `package.json`, that the tagged commit is reachable from `main`, and that the version has not been published yet. It then verifies registry signatures, runs the release check, and publishes the packed artifact with npm Trusted Publishing and provenance, on the Node.js version in `.nvmrc`. Prereleases do not trigger publishing.
+After the merge, the Release Please workflow creates the `vX.Y.Z` tag and the GitHub Release, which starts the [npm publishing workflow](.github/workflows/publish.yml) in two jobs:
+
+1. **Verify release** has no permission to publish. It checks that the tag matches `package.json`, that the tagged commit is reachable from `main`, and that the version has not been published yet. It then installs without a cache, verifies registry signatures, runs the release check, packs the tarball once, and records its SHA-256, on the Node.js version in `.nvmrc`.
+2. **Publish** runs in the `npm` environment, which only `v*` tags can use, and runs no code of the repository or its dependencies. It verifies the SHA-256 of the tarball and stages it with npm trusted publishing, which adds provenance.
+
+The maintainer then approves the staged version on npmjs.com with two-factor authentication; until then, nobody can install it. Prereleases do not trigger publishing.
 
 ## Reporting issues
 

@@ -23,14 +23,6 @@ export default createConfig(
     },
   },
   {
-    // Fail on disable directives and inline configs that no longer change a result.
-    linterOptions: {
-      reportUnusedDisableDirectives: "error",
-      reportUnusedInlineConfigs: "error",
-    },
-    name: "repository/linter-options",
-  },
-  {
     // Rule maps explicitly leave optional, inferred settings unset.
     files: ["src/configs/**/*.ts"],
     name: "repository/rule-option-data",

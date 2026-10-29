@@ -1,6 +1,5 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import process from "node:process";
 import { fileURLToPath } from "node:url";
 
 import markdown from "@eslint/markdown";
@@ -8,6 +7,7 @@ import ts from "typescript";
 import { afterAll, describe, expect, it } from "vitest";
 
 import {
+  consumerNode,
   createConsumer,
   createTarball,
   createTemporaryDirectory,
@@ -196,7 +196,7 @@ describe("the README", () => {
     expect(example.text).toContain("export default createConfig();");
     const directory = await createExampleProject(example);
     const { exitCode, stderr, stdout } = await runCommand(
-      process.execPath,
+      consumerNode,
       [
         path.join(consumer, "node_modules", "eslint", "bin", "eslint.js"),
         "--format",
@@ -298,7 +298,7 @@ describe("the README", () => {
       // `skipLibCheck`.
       expectInTest(
         await getOutput(
-          process.execPath,
+          consumerNode,
           [
             path.join(consumer, "node_modules", "typescript", "bin", "tsc"),
             "--allowJs",
@@ -324,7 +324,7 @@ describe("the README", () => {
       ).toBe("");
 
       const { exitCode, stderr, stdout } = await runCommand(
-        process.execPath,
+        consumerNode,
         [
           path.join(consumer, "node_modules", "eslint", "bin", "eslint.js"),
           "--format",

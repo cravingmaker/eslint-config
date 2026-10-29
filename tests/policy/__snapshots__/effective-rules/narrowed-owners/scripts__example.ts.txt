@@ -10,7 +10,8 @@ languageOptions:
   parserOptions: {"projectService":true,"tsconfigRootDir":"<root>"}
   sourceType: "module"
 linterOptions:
-  reportUnusedDisableDirectives: 1
+  reportUnusedDisableDirectives: 2
+  reportUnusedInlineConfigs: 2
 settings: null
 rules: 859 (error 474, off 328, warn 57)
 

@@ -9,6 +9,11 @@ type PackageManifest = {
   readonly dependencies: StringRecord;
   readonly devDependencies: StringRecord;
   readonly devEngines: {
+    readonly packageManager: {
+      readonly name: string;
+      readonly onFail: string;
+      readonly version: string;
+    };
     readonly runtime: {
       readonly name: string;
       readonly onFail: string;
@@ -135,6 +140,12 @@ describe("package contract", () => {
 
     expect(packageManifest.engines).toEqual({ node: ">=24.15.0" });
     expect(packageManifest.devEngines).toEqual({
+      // The npm floor, 11.15.0, supports the registry-only settings of `.npmrc` and staged publishing.
+      packageManager: {
+        name: "npm",
+        onFail: "error",
+        version: ">=11.15.0",
+      },
       runtime: {
         name: "node",
         onFail: "error",
