@@ -44,21 +44,27 @@ To install the contributor Node.js version in a Claude Code cloud environment, p
 #!/bin/bash
 set -euo pipefail
 
-# Keep in sync with .nvmrc.
-NODE_VERSION=24.22.1
+# Keep in sync with .nvmrc, with both checksums from the SHASUMS256.txt of the release.
+NODE_VERSION=26.13.0
+NODE_SHA256_ARM64=439e9c438acdf6a6ffe47418da709153d66c4bed812e30a473faacb107dd2791
+NODE_SHA256_X64=5848553868b402d3fabb5b09270649977780a390f832155721025a08b5104455
 
 case "$(uname -m)" in
-  x86_64) NODE_ARCH=x64 ;;
-  aarch64) NODE_ARCH=arm64 ;;
+  x86_64) NODE_ARCH=x64 NODE_SHA256="${NODE_SHA256_X64}" ;;
+  aarch64) NODE_ARCH=arm64 NODE_SHA256="${NODE_SHA256_ARM64}" ;;
   *) echo "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
 esac
 
-mkdir -p /opt/node24
-curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.gz" \
-  | tar -xz --strip-components=1 -C /opt/node24
+archive="$(mktemp)"
+trap 'rm -f "${archive}"' EXIT
+curl --fail --silent --show-error --location --proto '=https' --output "${archive}" \
+  "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.gz"
+echo "${NODE_SHA256}  ${archive}" | sha256sum --check --strict
+mkdir -p /opt/node
+tar -xzf "${archive}" --strip-components=1 -C /opt/node
 ```
 
-The script does not change the default `node`, which stays first on `PATH`, so [AGENTS.md](AGENTS.md) tells Claude to put `/opt/node24/bin` first on `PATH` in every command. Without the script, Claude installs Node.js 24 itself at the start of each session.
+The script installs the archive only when its SHA-256 matches the pinned one. It does not change the default `node`, which stays first on `PATH`, so [AGENTS.md](AGENTS.md) tells Claude to put `/opt/node/bin` first on `PATH` in every command. Without the script, Claude installs Node.js 26 itself at the start of each session.
 
 After dependency installation, run `npm run prepare` in the checkout to enable the hooks; installation scripts are disabled here as in local setup.
 
