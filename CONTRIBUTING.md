@@ -558,7 +558,12 @@ npm run release:check
 
 This runs a dependency security audit, full validation, and a dry run of the package tarball. `prepublishOnly` runs the same check, but npm runs it only when lifecycle scripts are enabled: `.npmrc` disables them, so it guards an `npm publish --ignore-scripts=false`, and the publishing workflow runs the check as its own step.
 
-After the merge, the Release Please workflow creates the `vX.Y.Z` tag and the GitHub Release, which starts the [npm publishing workflow](.github/workflows/publish.yml). The workflow verifies that the tag matches `package.json`, that the tagged commit is reachable from `main`, and that the version has not been published yet. It then verifies registry signatures, runs the release check, and publishes the packed artifact with npm Trusted Publishing and provenance, on the Node.js version in `.nvmrc`. Prereleases do not trigger publishing.
+After the merge, the Release Please workflow creates the `vX.Y.Z` tag and the GitHub Release, which starts the [npm publishing workflow](.github/workflows/publish.yml) in two jobs:
+
+1. **Verify release** has no permission to publish. It checks that the tag matches `package.json`, that the tagged commit is reachable from `main`, and that the version has not been published yet. It then installs without a cache, verifies registry signatures, runs the release check, packs the tarball once, and records its SHA-256, on the Node.js version in `.nvmrc`.
+2. **Publish** runs in the `npm` environment, which only `v*` tags can use, and runs no code of the repository or its dependencies. It verifies the SHA-256 of the tarball and stages it with npm trusted publishing, which adds provenance.
+
+The maintainer then approves the staged version on npmjs.com with two-factor authentication; until then, nobody can install it. Prereleases do not trigger publishing.
 
 ## Reporting issues
 
