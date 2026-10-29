@@ -182,22 +182,24 @@ jobs:
           node-version: 24.15.0
           package-manager-cache: false
 
-      # Installing the advertised lower bounds outside a lockfile is the point of this job.
+      # Installing the advertised lower bounds outside a lockfile is the point of this job. The
+      # consumer lives outside the checkout, so npm reads neither the package.json nor the .npmrc of
+      # this repository, and Node.js cannot fall back to its node_modules.
       - name: Install advertised minimum peers
         env:
           PEERS: ${{ steps.peers.outputs.list }}
           TARBALL: ${{ steps.pack.outputs.tarball }}
         run: | # zizmor: ignore[adhoc-packages]
           read -ra peers <<< "${PEERS}"
-          mkdir -p .tmp/minimum-peer-consumer
-          cd .tmp/minimum-peer-consumer
+          mkdir -p "${RUNNER_TEMP}/minimum-peer-consumer"
+          cd "${RUNNER_TEMP}/minimum-peer-consumer"
           npm init --yes >/dev/null
           npm pkg set type=module >/dev/null
           npm install --ignore-scripts --save-exact "$GITHUB_WORKSPACE/$TARBALL" "${peers[@]}"
           npm ls --all
 
       - name: Verify minimum peer integrations
-        working-directory: .tmp/minimum-peer-consumer
+        working-directory: ${{ runner.temp }}/minimum-peer-consumer
         run: |
           node --input-type=module <<'NODE'
           import { ESLint } from 'eslint';
