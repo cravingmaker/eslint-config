@@ -30,6 +30,10 @@ The README lists these under "Known issues" and "Limits". Each one needs a polic
 - **Global declaration files.** `import-x/unambiguous` reports a declaration file without imports or exports, such as the `vite-env.d.ts` that Vite generates, and `@typescript-eslint/triple-slash-reference` its `/// <reference types="vite/client" />`.
 - **JSX file extensions.** A `.js` file with JSX fails to parse, even with `react: true`, although a JavaScript Next.js project names its pages so. `.mtsx` is in the TypeScript and React globs, but typescript-eslint parses JSX in `.tsx` files only. Decide whether `.js` files get JSX while React is on, and whether `.mtsx` stays in the globs.
 
+## Policy coverage
+
+- **The other Vitest rules.** The `vitest` feature turns on five of the 81 rules of @vitest/eslint-plugin 1.6.27, those that the repositories of Craving Maker already used. Review the other 76 against the SonarJS test rules, which already cover some of their checks, such as duplicate titles and tests without assertions, and turn on those that add a check. Each one needs its reason in the rule map and a line in the README.
+
 ## Options and overrides
 
 - **Option values are not checked.** `createConfig()` rejects unknown keys, but a value of the wrong type passes in silence: `javascript: false` keeps the core rules on, `typescript: "strict"` and `typescript: { typeChecked: "yes" }` give the config of `typescript: true`, and `createConfig("strict")` that of a call without options. An unknown name in `environments`, such as `"nodejs"`, rejects with `TypeError: Cannot convert undefined or null to object`. With `// @ts-check`, the compiler reports each of them.

@@ -232,6 +232,7 @@ describe("explicit rule options", () => {
       react: { refresh: "generic" },
       svelte: true,
       typescript: { tsconfigRootDir: rootDirectory, typeChecked: true },
+      vitest: true,
     });
     const plugins = new Map(
       config.flatMap((entry) => {
@@ -355,6 +356,7 @@ describe.each([false, true])(
           react: { refresh: "generic" },
           svelte: true,
           typescript: { tsconfigRootDir: rootDirectory, typeChecked },
+          vitest: true,
         });
         const offRuleIds = await getOffRuleIds(
           new ESLint({ overrideConfig: config, overrideConfigFile: true }),

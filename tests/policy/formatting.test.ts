@@ -141,6 +141,7 @@ const createEslint = async (isTypeChecked: boolean): Promise<ESLint> => {
         tsconfigRootDir: fixturesDirectory,
         typeChecked: isTypeChecked,
       },
+      vitest: true,
     }),
     overrideConfigFile: true,
   });

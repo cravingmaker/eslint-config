@@ -65,6 +65,7 @@ const eslint = new ESLint({
     react: false,
     svelte: false,
     typescript: { typeChecked: false },
+    vitest: false,
   }),
   overrideConfigFile: true,
 });

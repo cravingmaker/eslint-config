@@ -17,6 +17,7 @@ const allFeatures = {
   react: true,
   svelte: true,
   typescript: { tsconfigRootDir: process.cwd(), typeChecked: true },
+  vitest: true,
 } as const satisfies Options;
 // Files of a feature that name the CommonJS extensions next to those of ES modules.
 const withCommonJs = { files: ["**/*.{js,cjs,ts,cts}"] } as const;

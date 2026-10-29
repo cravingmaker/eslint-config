@@ -34,6 +34,7 @@ const lintRuleIds = async (
         tsconfigRootDir: process.cwd(),
         typeChecked,
       },
+      vitest: true,
     }),
     // True = disable automatic config-file discovery; we supply config entirely via overrideConfig.
     overrideConfigFile: true,

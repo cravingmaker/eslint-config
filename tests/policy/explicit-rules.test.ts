@@ -65,6 +65,9 @@ vi.mock("@html-eslint/eslint-plugin-react", async (importOriginal) => {
 vi.mock("@html-eslint/eslint-plugin-svelte", async (importOriginal) => {
   return withFutureRule(await importOriginal<PluginModule>());
 });
+vi.mock("@vitest/eslint-plugin", async (importOriginal) => {
+  return withFutureRule(await importOriginal<PluginModule>());
+});
 
 const { createConfig } = await import("../../dist/index.mjs");
 
@@ -100,6 +103,7 @@ describe("explicit rule policy", () => {
     "@stylistic",
     "@html-eslint/react",
     "@html-eslint/svelte",
+    "vitest",
   ])(
     "does not configure a new %s rule added by an upstream update",
     async (prefix) => {
@@ -107,6 +111,7 @@ describe("explicit rule policy", () => {
         express: false,
         react: { refresh: false },
         svelte: true,
+        vitest: true,
       });
       const plugins = new Map(
         config.flatMap((entry) => {

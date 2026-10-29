@@ -205,7 +205,7 @@ jobs:
           import { ESLint } from 'eslint';
           import { createConfig } from '@cravingmaker/eslint-config';
 
-          const config = await createConfig({ express: true, react: { refresh: 'vite' }, svelte: true });
+          const config = await createConfig({ express: true, react: { refresh: 'vite' }, svelte: true, vitest: true });
           const pluginNames = new Set(config.flatMap((entry) => Object.keys(entry.plugins ?? {})));
 
           for (const plugin of [
@@ -214,6 +214,7 @@ jobs:
             'express-security',
             'react-hooks',
             'react-refresh',
+            'vitest',
           ]) {
             if (!pluginNames.has(plugin)) {
               throw new Error(`Minimum peer integration was not loaded: ${plugin}`);
@@ -225,6 +226,7 @@ jobs:
             ['component.jsx', 'export default function Component() { return <div />; }'],
             ['component.svelte', '<script lang="ts">const value: number = 1;</script><p>{value}</p>'],
             ['server.js', 'export const app = {};'],
+            ['server.test.js', "import { expect, it } from 'vitest';\n\nit('starts', () => {\n  expect(1).toBe(1);\n});\n"],
           ];
 
           for (const [filePath, code] of fixtures) {

@@ -32,6 +32,7 @@ type Detection = {
   readonly react: boolean;
   readonly reactRefresh: ReactRefreshVariant | false;
   readonly svelte: boolean;
+  readonly vitest: boolean;
 };
 /**
  * The options of `createConfig` with every default applied. A feature that is off is `undefined`.
@@ -73,6 +74,7 @@ type ResolvedOptions = {
   readonly typescript: ResolvedTypeScriptOptions | undefined;
   readonly unicorn: FeatureOptions | undefined;
   readonly unusedImports: FeatureOptions | undefined;
+  readonly vitest: FeatureOptions | undefined;
 };
 type ResolvedReactOptions = Omit<ReactOptions, "refresh"> & {
   readonly refresh: ReactRefreshVariant | false;
@@ -89,6 +91,7 @@ const undetected: Detection = {
   react: false,
   reactRefresh: false,
   svelte: false,
+  vitest: false,
 };
 const resolveFeature = <Settings extends FeatureOptions>(
   value: Feature<Settings> = true,
@@ -212,7 +215,8 @@ const resolveTypeScript = (
 
 /**
  * Applies the defaults to the options of `createConfig`. Every feature is on unless it is
- * `false`, except `react`, `svelte`, and `express`, whose `"auto"` default follows `detection`.
+ * `false`, except `react`, `svelte`, `express`, and `vitest`, whose `"auto"` default follows
+ * `detection`.
  * The project root becomes an absolute path: a relative one is resolved from the working directory, which is also its default. Preparation passes the root it used to read the manifest.
  */
 const resolveOptions = (
@@ -258,6 +262,7 @@ const resolveOptions = (
     typescript,
     unicorn: resolveFeature(options.unicorn),
     unusedImports: resolveFeature(options.unusedImports),
+    vitest: resolveDetectedFeature(detection.vitest, options.vitest),
   };
 };
 

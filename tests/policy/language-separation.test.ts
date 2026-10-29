@@ -115,6 +115,7 @@ describe.each([false, true])(
         tsconfigRootDir: rootDirectory,
         typeChecked: isTypeChecked,
       },
+      vitest: true,
     });
 
     it.each(otherLanguages)(

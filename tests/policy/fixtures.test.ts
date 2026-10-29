@@ -83,6 +83,7 @@ const lintFixtures = async (
         tsconfigRootDir: fixturesDirectory,
         typeChecked: isTypeChecked,
       },
+      vitest: true,
     }),
     overrideConfigFile: true,
   });

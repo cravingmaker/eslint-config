@@ -44,6 +44,10 @@ const json5Files = ["**/*.json5"] as const;
 // Test files, named with the infix that test runners look for. Like `configFiles`, this matches
 // any file type; `configs/exceptions/index.ts` narrows both to `sourceFiles`.
 const testFiles = ["**/*.{test,spec}.*"] as const;
+// Test files among the sources, which the Vitest feature lints.
+const vitestFiles = [
+  "**/*.{test,spec}.{js,mjs,jsx,mjsx,ts,mts,tsx,mtsx}",
+] as const;
 // Config files of tools such as ESLint, Vite, and Vitest.
 const configFiles = ["**/*.config.*"] as const;
 
@@ -82,5 +86,6 @@ export {
   svelteFiles,
   testFiles,
   typescriptFiles,
+  vitestFiles,
   withSvelteComponents,
 };

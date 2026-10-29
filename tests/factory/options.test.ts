@@ -30,6 +30,7 @@ const allDetected = {
   react: true,
   reactRefresh: "vite",
   svelte: true,
+  vitest: true,
 } as const;
 // Relative paths, each with the segments that lead to it from the working directory.
 const relativeDirectories: ReadonlyArray<
@@ -75,28 +76,33 @@ describe("resolveOptions", () => {
     expect(undetected.express).toBeUndefined();
     expect(undetected.react).toBeUndefined();
     expect(undetected.svelte).toBeUndefined();
+    expect(undetected.vitest).toBeUndefined();
     expect(detected.express).toEqual({});
     expect(detected.react).toEqual({ refresh: "vite" });
     expect(detected.svelte).toEqual({});
+    expect(detected.vitest).toEqual({});
   });
 
   it("lets an explicit value beat detection", () => {
     const disabled = resolveOptions(
-      { express: false, react: false, svelte: false },
+      { express: false, react: false, svelte: false, vitest: false },
       allDetected,
     );
     const enabled = resolveOptions({
       express: true,
       react: { files: ["app/**/*.tsx"] },
       svelte: true,
+      vitest: true,
     });
 
     expect(disabled.express).toBeUndefined();
     expect(disabled.react).toBeUndefined();
     expect(disabled.svelte).toBeUndefined();
+    expect(disabled.vitest).toBeUndefined();
     expect(enabled.express).toEqual({});
     expect(enabled.react).toEqual({ files: ["app/**/*.tsx"], refresh: false });
     expect(enabled.svelte).toEqual({});
+    expect(enabled.vitest).toEqual({});
   });
 
   it("detects the React Refresh variant unless it is set", () => {

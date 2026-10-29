@@ -61,6 +61,7 @@ type PackageLock = {
 const expectedOptionalPeerDependencies = [
   "@html-eslint/eslint-plugin-react",
   "@html-eslint/eslint-plugin-svelte",
+  "@vitest/eslint-plugin",
   "eslint-plugin-express-security",
   "eslint-plugin-react-hooks",
   "eslint-plugin-react-refresh",
@@ -72,6 +73,7 @@ const expectedOptionalPeerDependencies = [
 const expectedPeerDependencies = {
   "@html-eslint/eslint-plugin-react": ">=0.60.0 <1",
   "@html-eslint/eslint-plugin-svelte": ">=0.60.0 <1",
+  "@vitest/eslint-plugin": ">=1.6.27 <2",
   eslint: ">=10.4.0 <11",
   "eslint-plugin-express-security": ">=1.2.0 <4",
   "eslint-plugin-react-hooks": ">=7.1.0 <8",

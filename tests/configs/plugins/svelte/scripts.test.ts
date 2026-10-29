@@ -24,6 +24,7 @@ const baseOptions = {
   react: false,
   svelte: true,
   typescript: { tsconfigRootDir: rootDirectory },
+  vitest: false,
 } as const satisfies Options;
 // The rules that Svelte components break by design, which are off in them.
 const componentExceptions = [

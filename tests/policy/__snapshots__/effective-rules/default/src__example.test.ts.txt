@@ -2,7 +2,7 @@ path: src/example.test.ts
 ignored: false
 language: @/js
 processor: none
-plugins: @ @cravingmaker @eslint-community/eslint-comments @stylistic @typescript-eslint express-security functional import-x markdown n package-json perfectionist promise react-hooks regexp security sonarjs unicorn unused-imports
+plugins: @ @cravingmaker @eslint-community/eslint-comments @stylistic @typescript-eslint express-security functional import-x markdown n package-json perfectionist promise react-hooks regexp security sonarjs unicorn unused-imports vitest
 languageOptions:
   ecmaVersion: 2026
   globals: "AggregateError:false Array:false ArrayBuffer:false AsyncDisposableStack:false Atomics:false BigInt:false BigInt64Array:false BigUint64Array:false Boolean:false DataView:false Date:false DisposableStack:false Error:false EvalError:false FinalizationRegistry:false Float16Array:false Float32Array:false Float64Array:false Function:false Infinity:false Int16Array:false Int32Array:false Int8Array:false Intl:false Iterator:false JSON:false Map:false Math:false NaN:false Number:false Object:false Promise:false Proxy:false RangeError:false ReferenceError:false Reflect:false RegExp:false Set:false SharedArrayBuffer:false String:false SuppressedError:false Symbol:false SyntaxError:false TypeError:false URIError:false Uint16Array:false Uint32Array:false Uint8Array:false Uint8ClampedArray:false WeakMap:false WeakRef:false WeakSet:false decodeURI:false decodeURIComponent:false encodeURI:false encodeURIComponent:false escape:false eval:false globalThis:false isFinite:false isNaN:false parseFloat:false parseInt:false undefined:false unescape:false"
@@ -14,7 +14,7 @@ linterOptions:
   reportUnusedInlineConfigs: 2
 settings:
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 1387 (error 952, off 377, warn 58)
+rules: 1468 (error 957, off 453, warn 58)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/starred-documentation: error
@@ -1402,4 +1402,85 @@ unused-imports/no-unused-vars: error [{"args":"after-used","argsIgnorePattern":"
 use-isnan: error [{"enforceForIndexOf":false,"enforceForSwitchCase":true}]
 valid-typeof: error [{"requireStringLiterals":false}]
 vars-on-top: off
+vitest/consistent-each-for: off [{}]
+vitest/consistent-test-filename: off [{"allTestPattern":".*\\.(test|spec)\\.[tj]sx?$","pattern":".*\\.test\\.[tj]sx?$"}]
+vitest/consistent-test-it: off [{}]
+vitest/consistent-vitest-vi: off [{"fn":"vi"}]
+vitest/expect-expect: off [{"additionalTestBlockFunctions":[],"assertFunctionNames":["expect","assert"]}]
+vitest/hoisted-apis-on-top: off
+vitest/max-expects: off [{"max":5}]
+vitest/max-nested-describe: off [{"max":5}]
+vitest/no-alias-methods: off
+vitest/no-commented-out-tests: off
+vitest/no-conditional-expect: off [{"expectAssertions":false}]
+vitest/no-conditional-in-test: off
+vitest/no-conditional-tests: off
+vitest/no-disabled-tests: error
+vitest/no-duplicate-hooks: off
+vitest/no-focused-tests: error [{"fixable":false}]
+vitest/no-hooks: off [{"allow":[]}]
+vitest/no-identical-title: off
+vitest/no-import-node-test: off
+vitest/no-importing-vitest-globals: off
+vitest/no-interpolation-in-snapshots: off
+vitest/no-large-snapshots: off [{}]
+vitest/no-mocks-import: off
+vitest/no-restricted-matchers: off [{}]
+vitest/no-restricted-vi-methods: off [{}]
+vitest/no-standalone-expect: off [{"additionalTestBlockFunctions":[]}]
+vitest/no-test-prefixes: off
+vitest/no-test-return-statement: off
+vitest/no-unneeded-async-expect-function: off
+vitest/padding-around-after-all-blocks: off
+vitest/padding-around-after-each-blocks: off
+vitest/padding-around-all: off
+vitest/padding-around-before-all-blocks: off
+vitest/padding-around-before-each-blocks: off
+vitest/padding-around-describe-blocks: off
+vitest/padding-around-expect-groups: off
+vitest/padding-around-test-blocks: off
+vitest/prefer-called-exactly-once-with: off
+vitest/prefer-called-once: off
+vitest/prefer-called-times: off
+vitest/prefer-called-with: off
+vitest/prefer-comparison-matcher: off
+vitest/prefer-describe-function-title: off
+vitest/prefer-each: off
+vitest/prefer-equality-matcher: off
+vitest/prefer-expect-assertions: off [{"disallowHasAssertions":false,"onlyFunctionsWithAsyncKeyword":false,"onlyFunctionsWithExpectInCallback":false,"onlyFunctionsWithExpectInLoop":false}]
+vitest/prefer-expect-resolves: off
+vitest/prefer-expect-type-of: off
+vitest/prefer-hooks-in-order: off
+vitest/prefer-hooks-on-top: off
+vitest/prefer-import-in-mock: off [{"fixable":true}]
+vitest/prefer-importing-vitest-globals: off
+vitest/prefer-lowercase-title: off [{"allowedPrefixes":[],"ignore":[],"ignoreTopLevelDescribe":false,"lowercaseFirstCharacterOnly":true}]
+vitest/prefer-mock-promise-shorthand: off
+vitest/prefer-mock-return-shorthand: off
+vitest/prefer-snapshot-hint: off ["multi"]
+vitest/prefer-spy-on: off
+vitest/prefer-strict-boolean-matchers: off
+vitest/prefer-strict-equal: off
+vitest/prefer-to-be: off
+vitest/prefer-to-be-falsy: off
+vitest/prefer-to-be-object: off
+vitest/prefer-to-be-truthy: off
+vitest/prefer-to-contain: off
+vitest/prefer-to-have-been-called-times: off
+vitest/prefer-to-have-length: off
+vitest/prefer-todo: off
+vitest/prefer-vi-mocked: off
+vitest/require-awaited-expect-poll: error
+vitest/require-hook: off [{"allowedFunctionCalls":[]}]
+vitest/require-local-test-context-for-concurrent-snapshots: off
+vitest/require-mock-type-parameters: off [{"checkImportFunctions":false}]
+vitest/require-test-timeout: off
+vitest/require-to-throw-message: off
+vitest/require-top-level-describe: off [{"maxNumberOfTopLevelDescribes":"[Number Infinity]"}]
+vitest/unbound-method: off [{"ignoreStatic":false}]
+vitest/valid-describe-callback: off
+vitest/valid-expect: error [{"alwaysAwait":false,"asyncMatchers":["toReject","toResolve"],"maxArgs":2,"minArgs":1}]
+vitest/valid-expect-in-promise: error
+vitest/valid-title: off [{"allowArguments":false,"disallowedWords":[],"ignoreTypeOfDescribeName":false}]
+vitest/warn-todo: off
 yoda: error ["never",{"exceptRange":false,"onlyEquality":false}]

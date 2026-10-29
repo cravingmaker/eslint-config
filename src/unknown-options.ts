@@ -74,6 +74,7 @@ const optionKeys = {
   },
   unicorn: featureKeys,
   unusedImports: featureKeys,
+  vitest: featureKeys,
 } as const satisfies OptionKeys;
 // The keys of each option as a list, or `false` for an option whose keys are not checked.
 const keysByOption: ReadonlyMap<string, false | readonly string[]> = new Map(
