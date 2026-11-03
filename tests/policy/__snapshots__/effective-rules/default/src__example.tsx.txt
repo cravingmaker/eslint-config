@@ -14,7 +14,7 @@ linterOptions:
   reportUnusedInlineConfigs: 2
 settings:
   import-x/resolver-next: [{"interfaceVersion":3,"name":"eslint-import-resolver-typescript","resolve":"[Function]"},{"clearCache":"[Function]","interfaceVersion":3,"name":"eslint-plugin-import-x:node","resolve":"[Function]"}]
-rules: 1373 (error 955, off 359, warn 59)
+rules: 1376 (error 957, off 359, warn 60)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/starred-documentation: error
@@ -28,6 +28,7 @@ rules: 1373 (error 955, off 359, warn 59)
 @eslint-community/eslint-comments/no-use: error [{"additionalDirectives":[],"allow":["eslint-disable","eslint-enable","eslint-disable-next-line"]}]
 @eslint-community/eslint-comments/require-description: error [{"additionalDirectives":[],"ignore":[]}]
 @html-eslint/react/classname-spacing: error [{"callees":["classnames","clsx","cn","cva","tw","twMerge"]}]
+@html-eslint/react/id-naming-convention: error ["kebab-case",{}]
 @html-eslint/react/no-duplicate-classname: error [{"callees":["classnames","clsx","cn","cva","tw","twMerge"]}]
 @html-eslint/react/no-ineffective-attrs: error
 @html-eslint/react/no-invalid-attr-value: error [{"allow":[]}]
@@ -35,7 +36,9 @@ rules: 1373 (error 955, off 359, warn 59)
 @html-eslint/react/no-obsolete-tags: error
 @html-eslint/react/no-restricted-attr-values: error
 @html-eslint/react/no-restricted-attrs: error
+@html-eslint/react/no-restricted-tags: warn [{"message":"Use semantic alternatives or CSS instead.","tagPatterns":["^(b|i|s|u)$"]}]
 @html-eslint/react/require-attrs: error
+@html-eslint/react/require-li-container: error
 @html-eslint/react/use-baseline: error [{"available":"widely"}]
 @stylistic/array-bracket-newline: off
 @stylistic/array-bracket-spacing: error ["never",{"arraysInArrays":false,"objectsInArrays":false,"singleValue":false}]

@@ -241,7 +241,7 @@ The packages that a peer loads itself are not checked. Without `svelte`, for exa
 
 The `react` feature has three parts:
 
-- **HTML in JSX.** Every rule of @html-eslint/eslint-plugin-react, in JSX and TSX files. The class name rules also check the arguments of `classnames`, `clsx`, `cn`, `cva`, `tw`, and `twMerge`.
+- **HTML in JSX.** Every rule of @html-eslint/eslint-plugin-react, in JSX and TSX files. The class name rules also check the arguments of `classnames`, `clsx`, `cn`, `cva`, `tw`, and `twMerge`. With plugin 0.67.0 or newer, IDs use kebab-case, `<b>`, `<i>`, `<s>`, and `<u>` produce warnings to use semantic alternatives or CSS, and `<li>` requires a `<ul>`, `<ol>`, or `<menu>` container, as in HTML files.
 - **Hooks.** The Rules of Hooks, `exhaustive-deps`, and the React Compiler rules of eslint-plugin-react-hooks, in every source, because custom hooks live in `.js` and `.ts` files too. The compiler rules analyze functions named like a component, with a capital letter, or like a hook, with `use` and a capital letter or digit.
 - **React Refresh.** `react-refresh/only-export-components`, as a warning, in JSX and TSX files.
 
