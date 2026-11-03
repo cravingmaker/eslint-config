@@ -232,6 +232,53 @@ describe("published package", () => {
     await fs.rm(temporaryDirectory, { force: true, recursive: true });
   });
 
+  it("applies the new HTML rules in a React consumer", async () => {
+    const consumerDirectory = await createConsumer({
+      dependencies: [
+        "eslint",
+        ...runtimeDependencies,
+        ...optionalPeerDependencies,
+      ],
+      name: "react-html-policy-consumer",
+    });
+    const results: unknown = JSON.parse(
+      runConsumer(
+        consumerDirectory,
+        `
+          import { ESLint } from 'eslint';
+          import { createConfig } from '@cravingmaker/eslint-config';
+
+          const eslint = new ESLint({
+            overrideConfig: await createConfig({
+              react: { refresh: false },
+              typescript: { typeChecked: false },
+            }),
+            overrideConfigFile: true,
+          });
+          const results = await eslint.lintText(
+            'export const Example = () => <div id="mainPanel"><b><li>Item</li></b></div>;',
+            { filePath: 'component.jsx' },
+          );
+          const messages = results.flatMap((result) => result.messages);
+          if (messages.some((message) => message.fatal)) throw new Error('JSX did not parse');
+          const ruleIds = new Set([
+            '@html-eslint/react/id-naming-convention',
+            '@html-eslint/react/no-restricted-tags',
+            '@html-eslint/react/require-li-container',
+          ]);
+          process.stdout.write(JSON.stringify(messages
+            .filter((message) => ruleIds.has(message.ruleId))
+            .map(({ ruleId, severity }) => ({ ruleId, severity }))));
+        `,
+      ),
+    );
+    expect(results).toEqual([
+      { ruleId: "@html-eslint/react/id-naming-convention", severity: 2 },
+      { ruleId: "@html-eslint/react/no-restricted-tags", severity: 1 },
+      { ruleId: "@html-eslint/react/require-li-container", severity: 2 },
+    ]);
+  });
+
   it("works without optional peers and defaults TypeScript type checking to off", async () => {
     const consumerDirectory = await createConsumer({
       dependencies: ["eslint", ...runtimeDependencies],

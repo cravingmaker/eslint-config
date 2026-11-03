@@ -250,6 +250,7 @@ const keptHtmlStyleRules = new Map([
     "@html-eslint/react/classname-spacing",
     "Prettier leaves the content of JSX strings alone",
   ],
+  ["@html-eslint/react/id-naming-convention", "it checks names, not layout"],
   ["@html-eslint/sort-attrs", "Prettier keeps the order of attributes"],
   [
     "@html-eslint/svelte/class-spacing",

@@ -13,7 +13,7 @@ linterOptions:
   reportUnusedDisableDirectives: 2
   reportUnusedInlineConfigs: 2
 settings: null
-rules: 1246 (error 854, off 338, warn 54)
+rules: 1249 (error 856, off 338, warn 55)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/starred-documentation: error
@@ -27,6 +27,7 @@ rules: 1246 (error 854, off 338, warn 54)
 @eslint-community/eslint-comments/no-use: error [{"additionalDirectives":[],"allow":["eslint-disable","eslint-enable","eslint-disable-next-line"]}]
 @eslint-community/eslint-comments/require-description: error [{"additionalDirectives":[],"ignore":[]}]
 @html-eslint/react/classname-spacing: error [{"callees":["classnames","clsx","cn","cva","tw","twMerge"]}]
+@html-eslint/react/id-naming-convention: error ["kebab-case",{}]
 @html-eslint/react/no-duplicate-classname: error [{"callees":["classnames","clsx","cn","cva","tw","twMerge"]}]
 @html-eslint/react/no-ineffective-attrs: error
 @html-eslint/react/no-invalid-attr-value: error [{"allow":[]}]
@@ -34,7 +35,9 @@ rules: 1246 (error 854, off 338, warn 54)
 @html-eslint/react/no-obsolete-tags: error
 @html-eslint/react/no-restricted-attr-values: error
 @html-eslint/react/no-restricted-attrs: error
+@html-eslint/react/no-restricted-tags: warn [{"message":"Use semantic alternatives or CSS instead.","tagPatterns":["^(b|i|s|u)$"]}]
 @html-eslint/react/require-attrs: error
+@html-eslint/react/require-li-container: error
 @html-eslint/react/use-baseline: error [{"available":"widely"}]
 @stylistic/array-bracket-newline: off
 @stylistic/array-bracket-spacing: error ["never",{"arraysInArrays":false,"objectsInArrays":false,"singleValue":false}]
