@@ -590,6 +590,54 @@ describe("published package", () => {
     expect(output).toBe("ok");
   });
 
+  it("applies the new HTML rules in a Svelte consumer", async () => {
+    const consumerDirectory = await createConsumer({
+      dependencies: [
+        "eslint",
+        ...runtimeDependencies,
+        ...optionalPeerDependencies,
+      ],
+      name: "svelte-html-policy-consumer",
+    });
+    const results: unknown = JSON.parse(
+      runConsumer(
+        consumerDirectory,
+        `
+          import { ESLint } from 'eslint';
+          import { createConfig } from '@cravingmaker/eslint-config';
+
+          const eslint = new ESLint({
+            overrideConfig: await createConfig({
+              react: false,
+              svelte: true,
+              typescript: { typeChecked: false },
+            }),
+            overrideConfigFile: true,
+          });
+          const results = await eslint.lintText(
+            '<div id="mainPanel"><b><li>Item</li></b></div>',
+            { filePath: 'component.svelte' },
+          );
+          const messages = results.flatMap((result) => result.messages);
+          if (messages.some((message) => message.fatal)) throw new Error('Svelte did not parse');
+          const ruleIds = new Set([
+            '@html-eslint/svelte/id-naming-convention',
+            '@html-eslint/svelte/no-restricted-tags',
+            '@html-eslint/svelte/require-li-container',
+          ]);
+          process.stdout.write(JSON.stringify(messages
+            .filter((message) => ruleIds.has(message.ruleId))
+            .map(({ ruleId, severity }) => ({ ruleId, severity }))));
+        `,
+      ),
+    );
+    expect(results).toEqual([
+      { ruleId: "@html-eslint/svelte/id-naming-convention", severity: 2 },
+      { ruleId: "@html-eslint/svelte/no-restricted-tags", severity: 1 },
+      { ruleId: "@html-eslint/svelte/require-li-container", severity: 2 },
+    ]);
+  });
+
   it("exposes environments, custom globals, markdown overrides, and config names", async () => {
     const consumerDirectory = await createConsumer({
       dependencies: ["eslint", ...runtimeDependencies],

@@ -276,7 +276,7 @@ The feature has no rules for JSX itself, such as those of eslint-plugin-react, a
 
 The `svelte` feature lints components (`.svelte`) and rune modules (`.svelte.js` and `.svelte.ts`):
 
-- **Markup.** Every rule of @html-eslint/eslint-plugin-svelte.
+- **Markup.** Every rule of @html-eslint/eslint-plugin-svelte. With plugin 0.67.0 or newer, IDs use kebab-case, `<b>`, `<i>`, `<s>`, and `<u>` produce warnings to use semantic alternatives or CSS, and `<li>` requires a `<ul>`, `<ol>`, or `<menu>` container, as in HTML files.
 - **Scripts.** svelte-eslint-parser hands every script of a component to typescript-eslint's parser, with `lang="ts"` or without. The scripts therefore get the rules of TypeScript sources, apart from the React and Express rules, and without type information. Core rules that the TypeScript compiler checks, such as `no-undef`, are off in components as in TypeScript files. A project with no TypeScript files whose components are written in JavaScript can keep `no-undef` with `typescript: false`.
 - **Rune modules** are sources by their extension, so they get the rules of JavaScript or TypeScript sources in full, apart from `n/no-sync` in `.svelte.js` modules. svelte-eslint-parser hands rune modules to typescript-eslint's parser, where that rule needs type information, which JavaScript files never get.
 

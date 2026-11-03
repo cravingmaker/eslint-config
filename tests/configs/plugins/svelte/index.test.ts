@@ -174,7 +174,7 @@ describe("svelte feature", () => {
       return ruleId.startsWith("@html-eslint/svelte/");
     });
     expect(svelteRules).toHaveLength(
-      parser === "svelte-eslint-parser" ? 10 : 0,
+      parser === "svelte-eslint-parser" ? 13 : 0,
     );
   });
 
