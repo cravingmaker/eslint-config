@@ -1,11 +1,13 @@
 import type { Rules } from "../../../types.js";
 
 import { bestPracticeRules } from "./rules/best-practice.js";
+import { styleRules } from "./rules/style.js";
 import { stylisticIssuesRules } from "./rules/stylistic-issues.js";
 
 const svelteRules: Rules = {
-  ...stylisticIssuesRules, // 1/10 rules, 1 automatically fixable, 0 editor suggestions fixable.
-  ...bestPracticeRules, // 9/10 rules, 2 automatically fixable, 0 editor suggestions fixable.
+  ...stylisticIssuesRules, // 1/13 rules, 1 automatically fixable, 0 editor suggestions fixable.
+  ...bestPracticeRules, // 11/13 rules, 2 automatically fixable, 0 editor suggestions fixable.
+  ...styleRules, // 1/13 rules, 0 automatically fixable, 0 editor suggestions fixable.
 } as const;
 
 export { svelteRules };

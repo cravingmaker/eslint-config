@@ -14,7 +14,7 @@ linterOptions:
   reportUnusedInlineConfigs: 2
 settings:
   import-x/parsers: {"espree":[".js",".mjs",".cjs"]}
-rules: 1270 (error 862, off 355, warn 53)
+rules: 1273 (error 864, off 355, warn 54)
 
 @cravingmaker/prefer-arrow-functions: error
 @cravingmaker/starred-documentation: error
@@ -28,6 +28,7 @@ rules: 1270 (error 862, off 355, warn 53)
 @eslint-community/eslint-comments/no-use: error [{"additionalDirectives":[],"allow":["eslint-disable","eslint-enable","eslint-disable-next-line"]}]
 @eslint-community/eslint-comments/require-description: error [{"additionalDirectives":[],"ignore":[]}]
 @html-eslint/svelte/class-spacing: error
+@html-eslint/svelte/id-naming-convention: error ["kebab-case",{}]
 @html-eslint/svelte/no-duplicate-class: error
 @html-eslint/svelte/no-ineffective-attrs: error
 @html-eslint/svelte/no-invalid-attr-value: error [{"allow":[]}]
@@ -35,7 +36,9 @@ rules: 1270 (error 862, off 355, warn 53)
 @html-eslint/svelte/no-obsolete-tags: error
 @html-eslint/svelte/no-restricted-attr-values: error
 @html-eslint/svelte/no-restricted-attrs: error
+@html-eslint/svelte/no-restricted-tags: warn [{"message":"Use semantic alternatives or CSS instead.","tagPatterns":["^(b|i|s|u)$"]}]
 @html-eslint/svelte/require-attrs: error
+@html-eslint/svelte/require-li-container: error
 @html-eslint/svelte/use-baseline: error [{"available":"widely"}]
 @stylistic/array-bracket-newline: off
 @stylistic/array-bracket-spacing: error ["never",{"arraysInArrays":false,"objectsInArrays":false,"singleValue":false}]

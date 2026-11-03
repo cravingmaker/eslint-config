@@ -255,6 +255,7 @@ const keptHtmlStyleRules = new Map([
     "@html-eslint/svelte/class-spacing",
     "prettier-plugin-svelte keeps leading spaces in class names and does not undo the fix",
   ],
+  ["@html-eslint/svelte/id-naming-convention", "it checks names, not layout"],
 ]);
 // A file that each @html-eslint plugin lints.
 const htmlPluginFiles = new Map([
